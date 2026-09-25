@@ -162,6 +162,7 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 .calmenu>summary{list-style:none}
 .calmenu>summary::-webkit-details-marker{display:none}
 .calpanel{position:absolute;right:0;top:calc(100% + 8px);width:min(360px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 18px 40px -18px var(--shadow)}
+.calpanel:focus{outline:none}
 .calpanel h2{margin:0;font:800 1.3rem/1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.03em}
 .calpanel p{margin:0;color:var(--muted);font-size:14px}
 .cal-actions{display:flex;flex-wrap:wrap;gap:8px}
@@ -458,7 +459,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
     <div class="tools">
       <details class="calmenu" id="setmenu">
         <summary class="btn"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-t="settings">Settings</span></summary>
-        <div class="calpanel setpanel">
+        <div class="calpanel setpanel" tabindex="-1">
           <div class="panel-head"><h2 data-t="settings">Settings</h2>
             <button type="button" class="close-x" id="setdone"><span data-t="done">Close</span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
           <h3 class="set-group" data-t="grpRegion">Region</h3>
@@ -487,7 +488,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
       <button type="button" class="btn" id="tablesbtn" aria-haspopup="dialog"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16"/></svg><span data-t="tablesBtn">Tables</span></button>
       <details class="calmenu" id="calmenu">
         <summary class="btn primary"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="15" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4M12 13v4M10 15h4"/></svg><span data-t="calBtn">Calendar</span></summary>
-        <div class="calpanel">
+        <div class="calpanel" tabindex="-1">
           <h2 data-t="calTitle">Add to your calendar</h2>
           <p data-t="calText">Subscribe once. Your calendar keeps every time up to date and reminds you 30 minutes before each confirmed kick-off.</p>
           <div class="cal-actions">
@@ -870,9 +871,23 @@ document.getElementById("copy").onclick=async()=>{
 };
 const calmenu=document.getElementById("calmenu"), setmenu=document.getElementById("setmenu"), MENUS=[setmenu,calmenu];
 function closeMenu(m,focus){ m.open=false; if(focus) m.querySelector("summary").focus(); }
-MENUS.forEach(m=>m.addEventListener("toggle",()=>{ if(m.open) MENUS.forEach(o=>{ if(o!==m) o.open=false; }); }));
-document.addEventListener("keydown",e=>{ if(e.key==="Escape") MENUS.forEach(m=>{ if(m.open) closeMenu(m,true); }); });
-document.addEventListener("click",e=>{ MENUS.forEach(m=>{ if(m.open&&(e.target===m||!m.contains(e.target))) m.open=false; }); });
+// on phones the menus open as a sheet over a dimmed page: focus moves into the sheet and Tab stays inside it
+const SHEET=matchMedia("(max-width:640px)");
+const tabbable=m=>[...m.querySelectorAll('.calpanel a[href],.calpanel button,.calpanel select,.calpanel input,.calpanel summary')].filter(el=>(el.checkVisibility?el.checkVisibility():el.getClientRects().length>0)&&!(el.type==="radio"&&!el.checked));   // a radio group is one Tab stop
+MENUS.forEach(m=>m.addEventListener("toggle",()=>{ if(!m.open) return;
+  MENUS.forEach(o=>{ if(o!==m) o.open=false; });
+  if(SHEET.matches) m.querySelector(".calpanel").focus(); }));
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape") MENUS.forEach(m=>{ if(m.open) closeMenu(m,true); });
+  const m=MENUS.find(x=>x.open);
+  if(e.key!=="Tab"||!m||!SHEET.matches) return;
+  const t=tabbable(m); if(!t.length) return;
+  const first=t[0], last=t[t.length-1], at=document.activeElement, inside=m.querySelector(".calpanel").contains(at);
+  if(e.shiftKey&&(!inside||at===first||at===m.querySelector(".calpanel"))){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey&&(!inside||at===last)){ e.preventDefault(); first.focus(); }
+});
+// a tap on the dimmed page (the menu's own ::before layer) closes the menu and returns focus to its button
+document.addEventListener("click",e=>{ MENUS.forEach(m=>{ if(!m.open) return; if(e.target===m) closeMenu(m,true); else if(!m.contains(e.target)) m.open=false; }); });
 document.getElementById("setdone").onclick=()=>closeMenu(setmenu,true);
 function showRepo(){
   if(!location.hostname.endsWith("github.io")) return;
