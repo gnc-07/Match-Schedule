@@ -18,7 +18,7 @@ This is a *static site*: GitHub Pages only hands out files, it never runs code o
 
 ## Setting it up (web browser only, about 15 minutes)
 
-1. **Use your repository `gnc-07/Match-Schedules`.** It must be **Public** for free GitHub Pages: check under **Settings**, **General**, at the bottom (**Danger Zone**, Change visibility).
+1. **Use your repository `gnc-07/Match-Schedule`.** It must be **Public** for free GitHub Pages: check under **Settings**, **General**, at the bottom (**Danger Zone**, Change visibility).
 
 2. **Upload the files.** On the new repository's page, click **uploading an existing file**. Drag in `index.html`, `build_schedule.py`, `research.py`, `friendlies.json`, `overrides.json`, `README.md` and the whole `fonts` folder (drag the folder itself; GitHub keeps it as a folder), then click **Commit changes**.
 
@@ -34,9 +34,9 @@ This is a *static site*: GitHub Pages only hands out files, it never runs code o
 
 8. **Run it the first time.** Open the **Actions** tab. If GitHub asks whether to enable workflows, confirm. Click **Build and deploy site** on the left, then **Run workflow**, then the green **Run workflow** button. After a minute or two both jobs (build, deploy) show a green tick.
 
-9. **Open your site** at `https://gnc-07.github.io/Match-Schedules/`. The deploy job also shows this link.
+9. **Open your site** at `https://gnc-07.github.io/Match-Schedule/`. The deploy job also shows this link.
 
-10. **Subscribe in Proton Calendar** with `https://gnc-07.github.io/Match-Schedules/soccer.ics` (Settings, Calendars, Other calendars, Add calendar from URL). If you subscribed to an earlier feed, remove that calendar so matches do not appear twice.
+10. **Subscribe in Proton Calendar** with `https://gnc-07.github.io/Match-Schedule/soccer.ics` (Settings, Calendars, Other calendars, Add calendar from URL). If you subscribed to an earlier feed, remove that calendar so matches do not appear twice.
 
 If you already made a repository from the earlier calendar-only instructions, you can reuse it: delete `.github/workflows/update-calendar.yml` there (otherwise two workflows compete to commit), then do steps 2 to 9.
 
@@ -71,12 +71,12 @@ A time is shown as **verified** only when an official source gives it or at leas
 If you would rather edit on your own computer, these commands do the same as the web steps. Each part is explained.
 
 ```bash
-git clone https://github.com/gnc-07/Match-Schedules.git
+git clone https://github.com/gnc-07/Match-Schedule.git
 ```
-`git` is the version-control program. `clone` downloads a copy of the repository, including its full history, into a new folder named `Match-Schedules` in your current directory.
+`git` is the version-control program. `clone` downloads a copy of the repository, including its full history, into a new folder named `Match-Schedule` in your current directory.
 
 ```bash
-cd Match-Schedules
+cd Match-Schedule
 ```
 `cd` (change directory) moves your terminal into that folder, so the next commands act on it.
 
@@ -112,7 +112,7 @@ Uploads your commits to GitHub. Because you changed `friendlies.json`, the push 
 
 ## Languages, time zones and accessibility
 
-- The site is in English and Brazilian Portuguese. It follows the visitor's browser language, remembers a choice made in the language menu, and can be linked directly with `?lang=pt` or `?lang=en` (for example `https://gnc-07.github.io/Match-Schedules/?lang=pt`).
-- Times can be shown in Edmonton, São Paulo (Brasília), Toronto, London, Madrid, Berlin, UTC, or the visitor's own zone. Portuguese defaults to São Paulo and English to Edmonton until the visitor picks a zone.
-- To add a language, copy the `en` block in the `I18N` table near the top of the script in `index.html`, translate the values, and add an option to the language menu.
-- Last measured with Lighthouse 12 (mobile and desktop, both languages): performance 92 to 100, accessibility 100, best practices 100, SEO 100. An axe-core scan (WCAG 2.2 AA plus best practices) found no violations in light and dark themes, both languages, at phone and desktop widths.
+- The site is in English and Brazilian Portuguese. It follows the visitor's browser language, remembers a choice made in the Settings menu, and can be linked directly with `?lang=pt` or `?lang=en` (for example `https://gnc-07.github.io/Match-Schedule/?lang=pt`).
+- In the Settings menu, times can be shown in Edmonton, São Paulo (Brasília), Toronto, London, Madrid, Berlin, UTC, or the visitor's own zone. Portuguese defaults to São Paulo and English to Edmonton until the visitor picks a zone.
+- To add a language, copy the `en` block in the `I18N` table near the top of the script in `index.html`, translate the values, and add an option to the language list in the Settings menu.
+- Last measured with Lighthouse 12 (mobile and desktop, both languages): performance 93 to 100, accessibility 100, best practices 100, SEO 100. An axe-core scan (WCAG 2.2 AA plus best practices) found no violations in light and dark themes, both languages, at phone and desktop widths, with the Settings and Calendar menus open.

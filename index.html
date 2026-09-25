@@ -108,7 +108,10 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 .choice input:checked+span{background:var(--ink);color:var(--bg)}
 .choice input:focus-visible+span{outline:3px solid var(--accent);outline-offset:2px}
 .hint{margin:6px 0 0;font-size:13.5px;color:var(--muted)}
-.done{min-height:48px;font-size:16px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.close-x{display:inline-flex;align-items:center;gap:5px;min-height:36px;padding:0 8px 0 10px;margin-right:-6px;border:0;border-radius:8px;background:transparent;color:var(--ink-2);font-size:14px;font-weight:600;cursor:pointer}
+.close-x:hover{background:var(--panel-2);color:var(--ink)}
+.close-x svg{width:16px;height:16px}
 .calmenu>summary{list-style:none}
 .calmenu>summary::-webkit-details-marker{display:none}
 .calpanel{position:absolute;right:0;top:calc(100% + 8px);width:min(360px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 18px 40px -18px rgba(10,15,28,.45)}
@@ -281,7 +284,8 @@ footer p{margin:10px 0 0}
       <details class="calmenu" id="setmenu">
         <summary class="btn"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-t="settings">Settings</span></summary>
         <div class="calpanel setpanel">
-          <h2 data-t="settings">Settings</h2>
+          <div class="panel-head"><h2 data-t="settings">Settings</h2>
+            <button type="button" class="close-x" id="setdone"><span data-t="done">Close</span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
           <div class="field"><label for="langsel" data-t="langLabel">Language</label>
             <select id="langsel"><option value="en" lang="en">English</option><option value="pt" lang="pt-BR">Português (Brasil)</option></select></div>
           <div class="field"><label for="tzsel" data-t="tzLabel">Show times in</label>
@@ -294,7 +298,7 @@ footer p{margin:10px 0 0}
             </div>
             <p class="hint" data-t="thHint">Automatic follows your device.</p>
           </fieldset>
-          <button type="button" class="btn primary done" id="setdone" data-t="done">Done</button>
+          <p class="hint" data-t="autoSave">Changes apply straight away and are remembered on this device.</p>
         </div>
       </details>
       <details class="calmenu" id="calmenu">
@@ -400,7 +404,7 @@ footer p{margin:10px 0 0}
    ========================================================================= */
 const I18N={
  en:{locale:"en-CA",
-  skip:"Skip to fixtures",settings:"Settings",themeLabel:"Theme",thAuto:"Automatic",thLight:"Light",thDark:"Dark",thHint:"Automatic follows your device.",done:"Done",langLabel:"Language",tzLabel:"Show times in",calBtn:"Calendar",calTitle:"Add to your calendar",
+  skip:"Skip to fixtures",settings:"Settings",themeLabel:"Theme",thAuto:"Automatic",thLight:"Light",thDark:"Dark",thHint:"Automatic follows your device.",done:"Close",autoSave:"Changes apply straight away and are remembered on this device.",langLabel:"Language",tzLabel:"Show times in",calBtn:"Calendar",calTitle:"Add to your calendar",
   calText:"Subscribe once. Your calendar keeps every time up to date and reminds you 30 minutes before each confirmed kick-off.",
   subscribe:"Subscribe",copy:"Copy link",download:"Download .ics",copied:"Link copied. Paste it into your calendar app.",
   selected:"Link selected. Press Ctrl+C (or Cmd+C) to copy.",calLangNote:"",howTo:"How to subscribe in your app",
@@ -435,7 +439,7 @@ const I18N={
   notes:{},tzNames:{"America/Edmonton":"Edmonton","America/Sao_Paulo":"São Paulo (Brasília)","America/Toronto":"Toronto","Europe/London":"London","Europe/Madrid":"Madrid","Europe/Berlin":"Berlin","UTC":"UTC"},
   myTz:z=>"My time zone ("+z+")"},
  pt:{locale:"pt-BR",
-  skip:"Pular para os jogos",settings:"Ajustes",themeLabel:"Tema",thAuto:"Automático",thLight:"Claro",thDark:"Escuro",thHint:"Automático segue o seu aparelho.",done:"Pronto",langLabel:"Idioma",tzLabel:"Mostrar horários em",calBtn:"Agenda",calTitle:"Adicione à sua agenda",
+  skip:"Pular para os jogos",settings:"Ajustes",themeLabel:"Tema",thAuto:"Automático",thLight:"Claro",thDark:"Escuro",thHint:"Automático segue o seu aparelho.",done:"Fechar",autoSave:"As mudanças valem na hora e ficam salvas neste aparelho.",langLabel:"Idioma",tzLabel:"Mostrar horários em",calBtn:"Agenda",calTitle:"Adicione à sua agenda",
   calText:"Assine uma vez. Sua agenda mantém todos os horários atualizados e avisa 30 minutos antes de cada jogo com horário confirmado.",
   subscribe:"Assinar",copy:"Copiar link",download:"Baixar .ics",copied:"Link copiado. Cole no seu aplicativo de agenda.",
   selected:"Link selecionado. Pressione Ctrl+C (ou Cmd+C) para copiar.",calLangNote:"Os eventos da agenda aparecem em inglês.",
