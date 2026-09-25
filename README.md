@@ -114,6 +114,7 @@ Uploads your commits to GitHub. Because you changed `friendlies.json`, the push 
 ## Languages, time zones and accessibility
 
 - The site is in English and Brazilian Portuguese. It follows the visitor's browser language, remembers a choice made in the Settings menu, and can be linked directly with `?lang=pt` or `?lang=en` (for example `https://gnc-07.github.io/Match-Schedule/?lang=pt`).
+- The Settings menu also has **Contrast** (Normal or High, for stronger colours and borders) and **Text size** (Normal, Large or Extra large). Both apply straight away and are remembered on the device.
 - In the Settings menu, times can be shown in Edmonton, São Paulo (Brasília), Toronto, London, Madrid, Berlin, UTC, or the visitor's own zone. Portuguese defaults to São Paulo and English to Edmonton until the visitor picks a zone.
 - To add a language, copy the `en` block in the `I18N` table near the top of the script in `index.html`, translate the values, and add an option to the language list in the Settings menu.
 - Last measured with Lighthouse 12 (mobile and desktop, both languages): performance 93 to 100, accessibility 100, best practices 100, SEO 100. An axe-core scan (WCAG 2.2 AA plus best practices) found no violations in light and dark themes, both languages, at phone and desktop widths, with the Settings and Calendar menus open.

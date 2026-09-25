@@ -1,6 +1,6 @@
 // Runs axe-core (WCAG 2.2 AA plus best practices) over every combination the
 // project rules require: light and dark theme, English and Portuguese,
-// 390px and 1280px wide, with the menus closed, Settings open and Calendar open.
+// 390px and 1280px wide, with the menus closed, Settings open, Calendar open, and in high contrast.
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
 import puppeteer from "puppeteer-core";
@@ -13,7 +13,7 @@ const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-prac
 const themes = ["light", "dark"];
 const langs = ["en", "pt"];
 const widths = [390, 1280];
-const states = ["closed", "setmenu", "calmenu"];
+const states = ["closed", "setmenu", "calmenu", "high"];
 
 const server = await startServer();
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true,
@@ -25,9 +25,10 @@ try {
     const page = await browser.newPage();
     await page.setViewport({ width, height: 900 });
     // Save the theme the same way the Settings menu does, before the page loads.
-    await page.evaluateOnNewDocument(t => { try { localStorage.setItem("mp.theme", JSON.stringify(t)); } catch {} }, theme);
+    await page.evaluateOnNewDocument((t, high) => { try { localStorage.setItem("mp.theme", JSON.stringify(t));
+      if (high) localStorage.setItem("mp.contrast", JSON.stringify("high")); } catch {} }, theme, state === "high");
     await page.goto(`${BASE}?lang=${lang}`, { waitUntil: "networkidle0" });
-    if (state !== "closed") await page.evaluate(id => { document.getElementById(id).open = true; }, state);
+    if (state === "setmenu" || state === "calmenu") await page.evaluate(id => { document.getElementById(id).open = true; }, state);
     await page.evaluate(AXE);
     const result = await page.evaluate(tags => axe.run(document, { runOnly: { type: "tag", values: tags } }), TAGS);
     const label = `${theme.padEnd(5)} ${lang} ${String(width).padStart(4)}px ${state.padEnd(7)}`;
