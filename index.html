@@ -1636,7 +1636,7 @@ function paintWkSched(){
     const pill=st==="on"?'<span class="pill live"><span class="dot-live" aria-hidden="true"></span>'+esc(T.pOn)+'</span>':
       st==="done"?'<span class="pill ft">'+esc(T.pDone)+'</span>':st==="next"?'<span class="pill next">'+esc(T.f1NextPill)+'</span>':'';
     const d=r.when?new Intl.DateTimeFormat(T.locale,{weekday:"short",timeZone:TZ}).format(r.when):"";
-    const t=r.when?'<time datetime="'+r.utc+'">'+fmtT.format(r.when)+'</time>':esc(T.tbcSmall);
+    const t=r.when?'<time datetime="'+esc(r.utc)+'">'+fmtT.format(r.when)+'</time>':esc(T.tbcSmall);
     return '<li'+(r.sess==="R"?' class="race"':'')+'><span class="when"><span class="d">'+esc(d)+'</span> '+t+'</span>'+
       '<span class="what"><b>'+esc(S[r.sess])+'</b>'+(lead?'<small>'+esc(lead)+'</small>':'')+'</span>'+pill+'</li>';
   }).join("")+'</ol>';
@@ -1675,7 +1675,7 @@ function paintWkRes(){
   }
   // a race or sprint: podium, then everyone
   const p=rows.slice(0,3);
-  const pod=p.length===3?'<ol class="pod" aria-label="'+esc(T.f1Podium)+'">'+[p[1],p[0],p[2]].map(r=>'<li class="p'+r.position+'"><span class="n">'+esc(r.position)+'</span><span class="fn">'+esc(r.Driver.givenName)+'</span><span class="ln">'+esc(r.Driver.familyName)+'</span><small>'+esc(r.Constructor.name)+'</small><span class="tt">'+esc(r.Time?r.Time.time:"")+'</span></li>').join("")+'</ol>':'';
+  const pod=p.length===3?'<ol class="pod" aria-label="'+esc(T.f1Podium)+'">'+[p[1],p[0],p[2]].map(r=>'<li class="p'+esc(r.position)+'"><span class="n">'+esc(r.position)+'</span><span class="fn">'+esc(r.Driver.givenName)+'</span><span class="ln">'+esc(r.Driver.familyName)+'</span><small>'+esc(r.Constructor.name)+'</small><span class="tt">'+esc(r.Time?r.Time.time:"")+'</span></li>').join("")+'</ol>':'';
   t+='<th scope="col" class="chg-c"><span class="sr">'+esc(T.f1Grid)+'</span></th>'+th(T.f1Time)+th(T.f1Pts,T.f1PtsFull,"pts-c")+'</tr></thead><tbody>';
   for(const r of rows){
     const num=/^\d+$/.test(r.positionText), pos=+r.position, grid=+r.grid, ch=num&&grid>0?grid-pos:0;
@@ -1724,7 +1724,7 @@ function weekendClick(e){
     const id=b.dataset.drv, inRes=!!b.closest("#wk-res");
     f1favs.has(id)?f1favs.delete(id):f1favs.add(id); store.set("f1favs",[...f1favs]);
     paintWkRes(); paintWkChamp();
-    refocus((inRes?"#wk-res":"#wk-champ")+' .star[data-drv="'+id+'"]');   // keep keyboard focus on the same star
+    refocus((inRes?"#wk-res":"#wk-champ")+' .star[data-drv="'+CSS.escape(id)+'"]');   // keep keyboard focus on the same star
   }
 }
 async function shareWeekend(){
