@@ -14,7 +14,7 @@ on:
         default: false
   push:
     branches: [main]
-    paths: ["friendlies.json", "overrides.json", "build_schedule.py", "research.py", "index.html", ".github/workflows/**"]
+    paths: ["friendlies.json", "overrides.json", "build_schedule.py", "research.py", "index.html", "fonts/**", ".github/workflows/**"]
 
 permissions:
   contents: write                # lets the job commit the rebuilt data
@@ -76,7 +76,7 @@ jobs:
       - name: Collect the files that make up the website
         run: |
           mkdir -p _site
-          cp index.html fixtures.json soccer.ics _site/
+          cp -r index.html fixtures.json soccer.ics fonts _site/
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
@@ -92,4 +92,3 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
-
