@@ -676,6 +676,7 @@ const I18N={
   f1Sess:{FP1:"Practice 1",FP2:"Practice 2",FP3:"Practice 3",SQ:"Sprint qualifying",S:"Sprint",Q:"Qualifying",R:"Race"},
   f1Pole:"Pole",f1Winner:"Winner",f1Podium:"Podium",pOn:"on now",pDone:"finished",gp:{},
   howF1html:'Formula 1 session times come from <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> and are marked verified when <a href="https://openf1.org/" rel="noopener">OpenF1</a> gives the same time. F1 is not in the calendar.',
+  f1Stale:"F1 times could not be refreshed at this update; the ones shown are from an earlier update.",
   grpRegion:"Region",grpLook:"Appearance",ctHighLabel:"High contrast",sizeLabel:"Text size",szNormal:"Normal",szLarge:"Large",szXl:"Extra large"},
  pt:{locale:"pt-BR",
   skip:"Pular para os jogos",settings:"Ajustes",themeLabel:"Tema",thAuto:"Aparelho",thLight:"Claro",thDark:"Escuro",done:"Fechar",langLabel:"Idioma",tzLabel:"Mostrar horários em",calBtn:"Agenda",calTitle:"Adicione à sua agenda",
@@ -746,6 +747,7 @@ const I18N={
     "Mexico City Grand Prix":"GP da Cidade do México","São Paulo Grand Prix":"GP de São Paulo","Las Vegas Grand Prix":"GP de Las Vegas",
     "Qatar Grand Prix":"GP do Catar","Abu Dhabi Grand Prix":"GP de Abu Dhabi","Emilia Romagna Grand Prix":"GP da Emília-Romanha"},
   howF1html:'Os horários das sessões de Fórmula 1 vêm do <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> e são marcados como verificados quando o <a href="https://openf1.org/" rel="noopener">OpenF1</a> informa o mesmo horário. A F1 não entra na agenda.',
+  f1Stale:"Os horários da F1 não puderam ser atualizados desta vez; os mostrados são de uma atualização anterior.",
   grpRegion:"Região",grpLook:"Aparência",ctHighLabel:"Contraste alto",sizeLabel:"Tamanho do texto",szNormal:"Normal",szLarge:"Grande",szXl:"Muito grande"}
 };
 
@@ -1068,7 +1070,7 @@ function render(){
         if(r.when && +fmtH.format(r.when)<7) tags.push('<span class="pill early">'+ICON.moon+esc(T.pEarly)+'</span>');
       }
       const timeCell=started?'<span class="score" role="img" aria-label="'+esc(T.score(L.hs,L.as))+'">'+esc(L.hs)+'–'+esc(L.as)+'</span><small>'+esc(L.state==="in"?T.liveSmall:T.finalSmall)+'</small>'
-        :(r.when?'<time datetime="'+r.utc+'">'+fmtT.format(r.when)+'</time><small>'+zoneOf(r.when)+'</small>':'<span aria-hidden="true">– –</span><small>'+esc(T.tbcSmall)+'</small>');
+        :(r.when?'<time datetime="'+esc(r.utc)+'">'+fmtT.format(r.when)+'</time><small>'+zoneOf(r.when)+'</small>':'<span aria-hidden="true">– –</span><small>'+esc(T.tbcSmall)+'</small>');
       const meta=['<span class="comp"><i aria-hidden="true"></i>'+esc(compName(r.comp))+'</span>'];
       if(r.round) meta.push('<span>'+esc(T.round(r.round))+'</span>');
       if(r.venue) meta.push('<span>'+esc(r.venue)+'</span>');
@@ -1119,7 +1121,7 @@ function f1Tags(r){
   return t.join("");
 }
 function f1Row(r){
-  const time='<div class="m-time">'+(r.when?'<time datetime="'+r.utc+'">'+fmtT.format(r.when)+'</time><small>'+zoneOf(r.when)+'</small>':'<span aria-hidden="true">– –</span><small>'+esc(T.tbcSmall)+'</small>')+'</div>';
+  const time='<div class="m-time">'+(r.when?'<time datetime="'+esc(r.utc)+'">'+fmtT.format(r.when)+'</time><small>'+zoneOf(r.when)+'</small>':'<span aria-hidden="true">– –</span><small>'+esc(T.tbcSmall)+'</small>')+'</div>';
   const tags='<div class="m-tags">'+f1Tags(r)+'</div>', gp=gpName(r.gp), S=T.f1Sess;
   if(r.sess!=="R"){
     const res=r.top?'<p class="sess-res">'+esc((r.sess==="Q"?T.f1Pole:T.f1Winner)+": "+r.top[0])+'</p>':'';
@@ -1134,9 +1136,10 @@ function f1Row(r){
 }
 function assignDays(){ DATA.forEach(r=>{r.day=r.when?dayKey.format(r.when):r.date;}); }
 function renderStamp(){
+  const stale=META.f1stale?'<span class="src">'+esc(T.f1Stale)+'</span>':'';   // Jolpica-F1 was unreachable at the last rebuild
   const src=[...new Set(Object.entries(META.sources||{}).filter(([k])=>k!=="INTL").map(([,v])=>v))].join(", ");
   const d=new Date(META.generated);
-  document.getElementById("stamp").innerHTML='<span>'+esc(T.updated)+' <b>'+fmtStamp.format(d)+' '+zoneOf(d)+'</b></span>'+(src?'<span class="src"><span class="src-l">'+esc(T.leagueData)+': </span>'+esc(src)+'</span>':'');
+  document.getElementById("stamp").innerHTML='<span>'+esc(T.updated)+' <b>'+fmtStamp.format(d)+' '+zoneOf(d)+'</b></span>'+(src?'<span class="src"><span class="src-l">'+esc(T.leagueData)+': </span>'+esc(src)+'</span>':'')+stale;
 }
 
 /* ---------- live scores (ESPN public scoreboard, fetched by the visitor's browser) ---------- */
@@ -1322,7 +1325,7 @@ function mdHead(m){
   if(st){ mid='<span class="md-sc" role="img" aria-label="'+esc(T.score(st.hs,st.as))+'">'+esc(st.hs)+'–'+esc(st.as)+'</span>';
     tag=st.state==="in"?'<span class="pill live"><span class="dot-live" aria-hidden="true"></span>'+esc(T.pLive)+' '+esc(st.clock)+'</span>'
                        :'<span class="pill ft">'+esc(st.detail==="FT"||!st.detail?T.ft:st.detail)+'</span>'; }
-  else mid=r.when?'<span class="md-kick"><time datetime="'+r.utc+'">'+fmtT.format(r.when)+'</time> <small>'+zoneOf(r.when)+'</small></span>'
+  else mid=r.when?'<span class="md-kick"><time datetime="'+esc(r.utc)+'">'+fmtT.format(r.when)+'</time> <small>'+zoneOf(r.when)+'</small></span>'
                  :'<span class="pill tbc">'+esc(T.pTbc)+'</span>';
   const dd=new Date(r.day+"T12:00:00Z"), long=fmtDayLong.format(dd);
   const when=long.charAt(0).toUpperCase()+long.slice(1)+(r.when&&st?" · "+T.mdKick+" "+fmtT.format(r.when)+" "+zoneOf(r.when):"");

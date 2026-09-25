@@ -90,7 +90,7 @@ export async function mockNetwork(page) {
   page.on("request", req => {
     const u = req.url();
     if (new URL(u).pathname.endsWith("/fixtures.json"))
-      return req.respond({ status: 200, contentType: "application/json", body: JSON.stringify({ ...data, matches: [...data.matches, ...F1].sort((a, b) => (a.utc || a.date + "T99") < (b.utc || b.date + "T99") ? -1 : 1) }) });   // in time order, as build_schedule.py writes it
+      return req.respond({ status: 200, contentType: "application/json", body: JSON.stringify({ ...data, f1stale: true, matches: [...data.matches, ...F1].sort((a, b) => (a.utc || a.date + "T99") < (b.utc || b.date + "T99") ? -1 : 1) }) });   // in time order, as build_schedule.py writes it
     const json = body => req.respond({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(body) });
     if (u.includes("espn.com")) {
       if (u.includes("/standings")) return json(standings);

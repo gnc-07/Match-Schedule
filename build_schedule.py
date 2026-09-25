@@ -209,6 +209,7 @@ OPENF1_NAMES = {"FP1": {"practice 1"}, "FP2": {"practice 2"}, "FP3": {"practice 
                 "SQ": {"sprint qualifying", "sprint shootout"}, "S": {"sprint"}, "Q": {"qualifying"}, "R": {"race"}}
 
 def _f1_time(d, t):
+    """A Jolpica date and time ("15:00:00Z") as a UTC datetime, or None when there is no time yet."""
     return datetime.fromisoformat(f"{d}T{t.rstrip('Z')}").replace(tzinfo=timezone.utc) if t else None
 
 def _f1_top(season, rnd, what, key, n):
@@ -218,6 +219,7 @@ def _f1_top(season, rnd, what, key, n):
     return [x["Driver"]["familyName"] for x in rows[:n]] or None
 
 def from_f1(start, now=None):
+    """Every F1 session from yesterday on, as records like the football ones (no teams; kind "f1")."""
     now = now or datetime.now(timezone.utc)
     recent = start - timedelta(days=KEEP_DAYS)
     races = get_json(f"{JOLPICA}/{start.year}/races/?limit=100")["MRData"]["RaceTable"]["Races"]
@@ -273,6 +275,19 @@ def from_f1(start, now=None):
                 print(f"F1 results for round {rnd} could not be read ({e})")
     return out
 
+F1_CODES = {code for _, code in F1_SESSIONS}
+
+def _valid_f1(r):
+    """True for a well-formed F1 record: reused records are checked, not trusted, before they are published again."""
+    try:
+        date.fromisoformat(r["date"])
+        if r.get("utc") is not None:
+            r["utc"] = datetime.fromisoformat(r["utc"]).astimezone(timezone.utc).isoformat()   # normalised, as from_f1 writes it
+        return (r.get("code") == "F1" and r.get("kind") == "f1" and r.get("sess") in F1_CODES
+                and isinstance(r.get("gp"), str) and str(r.get("wk", "")).startswith("f1|") and r.get("uid", "").startswith(r["wk"]))
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return False
+
 def previous_f1(start, path="fixtures.json"):
     """The F1 sessions from the last published fixtures.json: used when Jolpica-F1 cannot be reached."""
     try:
@@ -280,11 +295,13 @@ def previous_f1(start, path="fixtures.json"):
     except Exception:
         return []
     recent = (start - timedelta(days=KEEP_DAYS)).isoformat()
-    return [r for r in old if r.get("code") == "F1" and r["date"] >= recent]
+    return [r for r in old if isinstance(r, dict) and _valid_f1(r) and r["date"] >= recent]
 
 SOURCES = {}   # which source each league came from, recorded in fixtures.json
+F1_STALE = False   # True when Jolpica-F1 failed and the F1 sessions are the previous build's (the site says so)
 
 def load_all(start):
+    global F1_STALE
     token = os.environ.get("FOOTBALL_DATA_TOKEN")
     out = []
     for code, (name, fd_code, filename, style, tz) in LEAGUES.items():
@@ -305,6 +322,7 @@ def load_all(start):
         SOURCES["F1"] = "Jolpica-F1" + (" and OpenF1" if any(r.get("check") for r in f1) else "")
     except Exception as e:                   # F1 must never stop the football schedule from publishing
         print(f"Jolpica-F1 failed ({e}); keeping the F1 sessions already published")
+        F1_STALE = True
         f1 = previous_f1(start)
         SOURCES["F1"] = "Jolpica-F1"
     out += f1
@@ -410,6 +428,8 @@ if __name__ == "__main__":
     site = hashlib.sha256(open("index.html", "rb").read()).hexdigest()[:12]
     meta = {"generated": datetime.now(timezone.utc).isoformat(timespec="minutes"), "site": site,
             "sources": SOURCES, "matches": recs}
+    if F1_STALE:
+        meta["f1stale"] = True
     write_fixtures(meta)
     open(a.out, "w", newline="", encoding="utf-8").write(ics([r for r in recs if r["code"] != "F1"]))   # the calendar stays football-only
     print(f"{len(recs)} matches -> {a.out}")
