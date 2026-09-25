@@ -96,6 +96,19 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 
 /* calendar menu */
 .calmenu{position:relative}
+.setpanel{gap:16px}
+.field{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;border:0;min-width:0}
+.field>label,.field>legend{font-size:15px;font-weight:600;color:var(--ink);padding:0;margin-bottom:6px}
+.field>label{margin-bottom:0}
+.field select{min-height:48px;font-size:16px;font-weight:600;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);color:var(--ink);padding:0 12px;cursor:pointer;width:100%}
+.choice{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px}
+.choice label{position:relative;display:block}
+.choice input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.choice span{min-height:44px;display:grid;place-items:center;border-radius:8px;font-weight:600;font-size:15px;color:var(--ink-2);text-align:center;padding:0 4px}
+.choice input:checked+span{background:var(--ink);color:var(--bg)}
+.choice input:focus-visible+span{outline:3px solid var(--accent);outline-offset:2px}
+.hint{margin:6px 0 0;font-size:13.5px;color:var(--muted)}
+.done{min-height:48px;font-size:16px}
 .calmenu>summary{list-style:none}
 .calmenu>summary::-webkit-details-marker{display:none}
 .calpanel{position:absolute;right:0;top:calc(100% + 8px);width:min(360px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 18px 40px -18px rgba(10,15,28,.45)}
@@ -143,10 +156,20 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 .search:focus-within{outline:3px solid var(--accent);outline-offset:2px}
 label.tog{display:inline-flex;gap:8px;align-items:center;color:var(--ink-2);font-size:14px;cursor:pointer;min-height:44px}
 label.tog input{accent-color:var(--accent);width:20px;height:20px;margin:0}
-details.more-f>summary{cursor:pointer;color:var(--ink-2);font-weight:600;font-size:14px;min-height:44px;display:flex;align-items:center}
-.date-f{display:inline-flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+.daterange{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.date-f{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink-2)}
+.date-err{flex-basis:100%;order:3;margin:0;font-size:13.5px;font-weight:600;color:var(--live-ink)}
+.date-err:empty{display:none}
+input[type=date][aria-invalid="true"]{border-color:var(--live-ink)}
+.search input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.clear-q{border:0;background:transparent;color:var(--muted);width:36px;height:36px;margin-right:-6px;border-radius:8px;display:grid;place-items:center;cursor:pointer;flex:none}
+.clear-q:hover{background:var(--panel-2);color:var(--ink)}
+.clear-q svg{width:16px;height:16px}
+.reset{margin-left:auto;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font-size:14px;font-weight:600;cursor:pointer}
+.reset:hover{border-color:var(--muted)}
+.reset svg{width:16px;height:16px}
 input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:0 10px;color:var(--ink)}
-.summary{margin:0;display:flex;flex-wrap:wrap;gap:4px 16px;color:var(--muted);font-size:13.5px}
+.summary{margin:0;min-height:1.6em;display:flex;flex-wrap:wrap;gap:4px 16px;color:var(--muted);font-size:13.5px}
 .summary b{color:var(--ink);font-variant-numeric:tabular-nums}
 
 /* ---------- fixture list ---------- */
@@ -164,9 +187,9 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
 .match:first-child{border-top:0}
 .match::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:0 3px 3px 0;background:var(--c)}
 .match.is-live{background:var(--live-soft)}
-.m-time{font:600 15px/1.1 "Azeret Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap;padding-top:4px}
+.m-time{font:700 16px/1.1 "Instrument Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap;padding-top:4px}
 .m-time small{display:block;margin-top:5px;font:600 11.5px/1 "Instrument Sans",sans-serif;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
-.score{font:600 1.35rem/1 "Azeret Mono",monospace;color:var(--ink)}
+.score{font:700 1.4rem/1 "Instrument Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink)}
 .is-live .score{color:var(--live-ink)}
 .m-main{min-width:0;display:flex;flex-direction:column;gap:6px}
 .m-teams{margin:0;font-size:16px;font-weight:600;display:flex;flex-direction:column;gap:0}
@@ -223,11 +246,25 @@ footer p{margin:10px 0 0}
   .cal-block .mon{order:2;width:auto;background:transparent;color:var(--muted);padding:0;font-size:13px}
   .cal-block .wd{order:3;padding:0;font-size:13px}
   .cal-block .rel{order:4;width:auto;border-radius:999px;padding:5px 9px}
-  .match{grid-template-columns:70px minmax(0,1fr);padding:13px 12px 13px 16px;gap:6px 12px}
+  .match{grid-template-columns:82px minmax(0,1fr);padding:13px 12px 13px 16px;gap:6px 12px}
+  .m-time{font-size:15px}
+  .topbar{flex-direction:column;align-items:stretch;gap:12px}
+  .tools{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .tools>.calmenu>summary.btn{width:100%;min-height:52px;font-size:16px}
+  .filters{position:static}
+  .day-h{position:static}
+  #leagues,.seg{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px;scroll-padding-inline:16px}
+  #leagues::-webkit-scrollbar,.seg::-webkit-scrollbar{display:none}
+  .chip,.seg button{flex:none}
+  .seg{margin-inline:0;padding-inline:3px;max-width:100%}
+  .search{flex-basis:100%}
+  .reset{margin-left:0}
   .m-tags{grid-column:2;justify-content:flex-start}
   .lv-row{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;padding:12px}
   .lv-row .clk{grid-column:1/-1;justify-self:center}
   .ctl select{max-width:38vw}
+  .calmenu{position:static}
+  .calpanel{left:0;right:0;width:auto}
 }
 </style>
 </head>
@@ -241,13 +278,25 @@ footer p{margin:10px 0 0}
       <h1>Matchday Planner</h1>
     </div>
     <div class="tools">
-      <label class="ctl"><span class="sr" data-t="langLabel">Language</span>
-        <svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg>
-        <select id="langsel"><option value="en" lang="en">English</option><option value="pt" lang="pt-BR">Português (Brasil)</option></select></label>
-      <label class="ctl"><span class="sr" data-t="tzLabel">Show times in</span>
-        <svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        <select id="tzsel"></select></label>
-      <button type="button" class="btn" id="theme"></button>
+      <details class="calmenu" id="setmenu">
+        <summary class="btn"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-t="settings">Settings</span></summary>
+        <div class="calpanel setpanel">
+          <h2 data-t="settings">Settings</h2>
+          <div class="field"><label for="langsel" data-t="langLabel">Language</label>
+            <select id="langsel"><option value="en" lang="en">English</option><option value="pt" lang="pt-BR">Português (Brasil)</option></select></div>
+          <div class="field"><label for="tzsel" data-t="tzLabel">Show times in</label>
+            <select id="tzsel"></select></div>
+          <fieldset class="field"><legend data-t="themeLabel">Theme</legend>
+            <div class="choice">
+              <label><input type="radio" name="theme" value="auto"><span data-t="thAuto">Automatic</span></label>
+              <label><input type="radio" name="theme" value="light"><span data-t="thLight">Light</span></label>
+              <label><input type="radio" name="theme" value="dark"><span data-t="thDark">Dark</span></label>
+            </div>
+            <p class="hint" data-t="thHint">Automatic follows your device.</p>
+          </fieldset>
+          <button type="button" class="btn primary done" id="setdone" data-t="done">Done</button>
+        </div>
+      </details>
       <details class="calmenu" id="calmenu">
         <summary class="btn primary"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="15" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4M12 13v4M10 15h4"/></svg><span data-t="calBtn">Calendar</span></summary>
         <div class="calpanel">
@@ -291,23 +340,26 @@ footer p{margin:10px 0 0}
         <button type="button" data-r="today" data-t="today">Today</button>
         <button type="button" data-r="weekend" data-t="weekend">This weekend</button>
         <button type="button" data-r="week" data-t="week">Next 7 days</button>
+        <button type="button" data-r="custom" data-t="custom" aria-controls="daterange">Custom</button>
       </div>
-      <label class="search"><span class="sr" data-t="searchLabel">Filter by team</span>
+      <div class="daterange" id="daterange" hidden>
+        <label class="date-f"><span data-t="fromDate">From</span><input type="date" id="from"></label>
+        <label class="date-f"><span data-t="toDate">to</span><input type="date" id="to" aria-describedby="date-err"></label>
+      </div>
+      <div class="search">
         <svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input type="search" id="q" autocomplete="off"></label>
+        <label class="sr" for="q" data-t="searchLabel">Filter by team</label>
+        <input type="search" id="q" autocomplete="off">
+        <button type="button" class="clear-q" id="clearq" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <p class="date-err" id="date-err" role="alert"></p>
     </div>
     <div class="row">
-      <label class="tog"><input type="checkbox" id="favonly"><span data-t="favOnly">Starred teams only</span></label>
+      <label class="tog"><input type="checkbox" id="favonly"><span id="favlabel">Starred teams only</span></label>
       <label class="tog"><input type="checkbox" id="showtbc" checked><span data-t="showTbc">Include matches without a confirmed time</span></label>
-      <details class="more-f">
-        <summary data-t="customDates">Custom dates</summary>
-        <div class="row">
-          <label class="date-f"><span data-t="fromDate">From</span><input type="date" id="from"></label>
-          <label class="date-f"><span data-t="toDate">To</span><input type="date" id="to"></label>
-        </div>
-      </details>
+      <button type="button" class="reset" id="reset" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span data-t="clearFilters">Clear filters</span></button>
     </div>
-    <p class="summary" id="summary" aria-live="polite"></p>
+    <p class="sr" id="summary" role="status"></p>
   </section>
 
   <main id="list" tabindex="-1"><p class="status" data-t="loading">Loading fixtures…</p></main>
@@ -348,7 +400,7 @@ footer p{margin:10px 0 0}
    ========================================================================= */
 const I18N={
  en:{locale:"en-CA",
-  skip:"Skip to fixtures",langLabel:"Language",tzLabel:"Show times in",calBtn:"Calendar",calTitle:"Add to your calendar",
+  skip:"Skip to fixtures",settings:"Settings",themeLabel:"Theme",thAuto:"Automatic",thLight:"Light",thDark:"Dark",thHint:"Automatic follows your device.",done:"Done",langLabel:"Language",tzLabel:"Show times in",calBtn:"Calendar",calTitle:"Add to your calendar",
   calText:"Subscribe once. Your calendar keeps every time up to date and reminds you 30 minutes before each confirmed kick-off.",
   subscribe:"Subscribe",copy:"Copy link",download:"Download .ics",copied:"Link copied. Paste it into your calendar app.",
   selected:"Link selected. Press Ctrl+C (or Cmd+C) to copy.",calLangNote:"",howTo:"How to subscribe in your app",
@@ -359,8 +411,8 @@ const I18N={
   liveNow:"Live now",liveNote:"Updates every 30 seconds · ESPN",nLive:n=>n+" live now",
   filters:"Filters",leagues:"Leagues",dateRange:"Date range",all:"All",today:"Today",weekend:"This weekend",week:"Next 7 days",
   searchLabel:"Filter by team",searchPh:"Find teams: Arsenal, Flamengo, Canada",favOnly:"Starred teams only",
-  showTbc:"Include matches without a confirmed time",customDates:"Custom dates",fromDate:"From",toDate:"To",
-  matches:"matches",loading:"Loading fixtures…",loadError:"The fixture list could not be loaded. Reload the page to try again.",
+  showTbc:"Include matches without a confirmed time",custom:"Custom",fromDate:"From",toDate:"to",clearFilters:"Clear filters",clearSearch:"Clear search",dateErr:"The end date is before the start date. Pick a later end date.",favCount:n=>"Starred teams only"+(n?" ("+n+")":""),
+  matches:"matches",shown:n=>n+(n===1?" match shown":" matches shown"),loading:"Loading fixtures…",loadError:"The fixture list could not be loaded. Reload the page to try again.",
   updated:"Updated",leagueData:"League data",tomorrow:"Tomorrow",todayRel:"Today",
   pVerified:"verified",pConflicting:"conflicting reports",pUnconfirmed:"1 unconfirmed report",pProvisional:"provisional",pTbc:"time TBC",
   pEarly:"early",pLive:"LIVE",ft:"FT",liveSmall:"live",finalSmall:"final",tbcSmall:"time TBC",
@@ -379,11 +431,11 @@ const I18N={
   how3:"Live scores come from ESPN's public scoreboard, refreshed every 30 seconds while a match is on. They appear on this site only, not in the calendar.",
   how4:"Stars and settings are saved in your browser only. Finished matches drop off two hours after kick-off.",
   repo:"Source code and data:",theme:{auto:"Auto",light:"Light",dark:"Dark"},themeAria:l=>"Colour theme: "+l+". Select to change.",
-  comp:{"International friendly":"International friendly"},friendlies:"Friendlies",round:r=>r,
+  teams:{},comp:{"International friendly":"International friendly"},friendlies:"Friendlies",round:r=>r,
   notes:{},tzNames:{"America/Edmonton":"Edmonton","America/Sao_Paulo":"São Paulo (Brasília)","America/Toronto":"Toronto","Europe/London":"London","Europe/Madrid":"Madrid","Europe/Berlin":"Berlin","UTC":"UTC"},
   myTz:z=>"My time zone ("+z+")"},
  pt:{locale:"pt-BR",
-  skip:"Pular para os jogos",langLabel:"Idioma",tzLabel:"Mostrar horários em",calBtn:"Agenda",calTitle:"Adicione à sua agenda",
+  skip:"Pular para os jogos",settings:"Ajustes",themeLabel:"Tema",thAuto:"Automático",thLight:"Claro",thDark:"Escuro",thHint:"Automático segue o seu aparelho.",done:"Pronto",langLabel:"Idioma",tzLabel:"Mostrar horários em",calBtn:"Agenda",calTitle:"Adicione à sua agenda",
   calText:"Assine uma vez. Sua agenda mantém todos os horários atualizados e avisa 30 minutos antes de cada jogo com horário confirmado.",
   subscribe:"Assinar",copy:"Copiar link",download:"Baixar .ics",copied:"Link copiado. Cole no seu aplicativo de agenda.",
   selected:"Link selecionado. Pressione Ctrl+C (ou Cmd+C) para copiar.",calLangNote:"Os eventos da agenda aparecem em inglês.",
@@ -395,8 +447,8 @@ const I18N={
   liveNow:"Ao vivo",liveNote:"Atualiza a cada 30 segundos · ESPN",nLive:n=>n+" ao vivo agora",
   filters:"Filtros",leagues:"Ligas",dateRange:"Período",all:"Todos",today:"Hoje",weekend:"Este fim de semana",week:"Próximos 7 dias",
   searchLabel:"Filtrar por time",searchPh:"Buscar times: Flamengo, Palmeiras, Brasil",favOnly:"Só times favoritos",
-  showTbc:"Incluir jogos sem horário confirmado",customDates:"Datas personalizadas",fromDate:"De",toDate:"Até",
-  matches:"jogos",loading:"Carregando jogos…",loadError:"Não foi possível carregar a lista de jogos. Recarregue a página para tentar novamente.",
+  showTbc:"Incluir jogos sem horário confirmado",custom:"Personalizado",fromDate:"De",toDate:"até",clearFilters:"Limpar filtros",clearSearch:"Limpar busca",dateErr:"A data final é anterior à data inicial. Escolha uma data final posterior.",favCount:n=>"Só times favoritos"+(n?" ("+n+")":""),
+  matches:"jogos",shown:n=>n+(n===1?" jogo exibido":" jogos exibidos"),loading:"Carregando jogos…",loadError:"Não foi possível carregar a lista de jogos. Recarregue a página para tentar novamente.",
   updated:"Atualizado em",leagueData:"Dados das ligas",tomorrow:"Amanhã",todayRel:"Hoje",
   pVerified:"verificado",pConflicting:"relatos conflitantes",pUnconfirmed:"1 relato não confirmado",pProvisional:"provisório",pTbc:"horário a definir",
   pEarly:"cedo",pLive:"AO VIVO",ft:"Encerrado",liveSmall:"ao vivo",finalSmall:"final",tbcSmall:"a definir",
@@ -415,6 +467,7 @@ const I18N={
   how3:"Os placares ao vivo vêm do placar público da ESPN e são atualizados a cada 30 segundos durante o jogo. Aparecem só neste site, não na agenda.",
   how4:"Favoritos e preferências ficam salvos só no seu navegador. Jogos encerrados saem da lista duas horas após o início.",
   repo:"Código-fonte e dados:",theme:{auto:"Automático",light:"Claro",dark:"Escuro"},themeAria:l=>"Tema de cores: "+l+". Selecione para mudar.",
+  teams:{"Brazil":"Brasil","Canada":"Canadá","Bolivia":"Bolívia","India":"Índia","Australia":"Austrália","United States":"Estados Unidos","Mexico":"México","Spain":"Espanha","Benin":"Benin","Burkina Faso":"Burkina Faso","Chile":"Chile","Peru":"Peru","Argentina":"Argentina","England":"Inglaterra","France":"França","Germany":"Alemanha","Italy":"Itália","Netherlands":"Países Baixos","Belgium":"Bélgica","Switzerland":"Suíça","Japan":"Japão","South Korea":"Coreia do Sul","Uruguay":"Uruguai","Colombia":"Colômbia","Ecuador":"Equador","Paraguay":"Paraguai","Venezuela":"Venezuela","Morocco":"Marrocos","Senegal":"Senegal","Nigeria":"Nigéria","Ghana":"Gana","Egypt":"Egito","Croatia":"Croácia","Poland":"Polônia","Denmark":"Dinamarca","Sweden":"Suécia","Norway":"Noruega","Scotland":"Escócia","Wales":"País de Gales","Ireland":"Irlanda","Austria":"Áustria","Czechia":"Tchéquia","Turkey":"Turquia","Greece":"Grécia","Ukraine":"Ucrânia","Serbia":"Sérvia","Hungary":"Hungria","Romania":"Romênia","Finland":"Finlândia","Iceland":"Islândia","Cyprus":"Chipre","Estonia":"Estônia","Andorra":"Andorra"},
   comp:{"International friendly":"Amistoso internacional"},friendlies:"Amistosos",round:r=>r.replace(/^Matchday (\d+)$/,"Rodada $1"),
   notes:{"Messi's farewell match":"Jogo de despedida de Messi","Postponed; new date not set.":"Adiado; nova data não definida."},
   tzNames:{"America/Edmonton":"Edmonton","America/Sao_Paulo":"São Paulo (Brasília)","America/Toronto":"Toronto","Europe/London":"Londres","Europe/Madrid":"Madri","Europe/Berlin":"Berlim","UTC":"UTC"},
@@ -473,16 +526,14 @@ const zoneOf=d=>fmtZ.formatToParts(d).find(p=>p.type==="timeZoneName").value;
 const clean=s=>String(s).replace(/\.$/,"");   // "Mon." -> "Mon"
 
 /* ---------- theme switch: auto (follow the device), light, dark ---------- */
-const themeBtn=document.getElementById("theme");
 let theme=store.get("theme","auto");
+const themeRadios=[...document.querySelectorAll('input[name="theme"]')];
 function applyTheme(){
   if(theme==="auto") document.documentElement.removeAttribute("data-theme");
   else document.documentElement.setAttribute("data-theme",theme);
-  const label=T.theme[theme];
-  themeBtn.innerHTML=ICON[theme]+'<span>'+label+'</span>';
-  themeBtn.setAttribute("aria-label",T.themeAria(label));
+  themeRadios.forEach(r=>r.checked=r.value===theme);
 }
-themeBtn.onclick=()=>{theme={auto:"light",light:"dark",dark:"auto"}[theme];store.set("theme",theme);applyTheme();};
+themeRadios.forEach(r=>r.addEventListener("change",()=>{theme=r.value;store.set("theme",theme);applyTheme();}));
 
 /* ---------- fixtures: shared state ---------- */
 const LEAGUES=[
@@ -491,6 +542,8 @@ const LEAGUES=[
   {code:"INTL",name:"Friendlies",abbr:"INT",c:"--intl"}];
 const addDays=(key,n)=>{const d=new Date(key+"T12:00:00Z");d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);};
 const colorOf=code=>"var("+LEAGUES.find(l=>l.code===code).c+")";
+const ORDER={en:["EPL","LIGA","BUN","BRA","INTL"],pt:["BRA","INTL","EPL","LIGA","BUN"]};
+const ordered=()=>ORDER[LANG].map(c=>LEAGUES.find(l=>l.code===c));
 const on=new Set(store.get("leagues",LEAGUES.map(l=>l.code)));
 const favs=new Set(store.get("favs",[]));
 const openSrc=new Set();            // which source lists are open, so a refresh keeps them open
@@ -508,8 +561,9 @@ function applyLang(){
   document.getElementById("q").placeholder=T.searchPh;
   document.getElementById("leagues").setAttribute("aria-label",T.leagues);
   document.getElementById("range").setAttribute("aria-label",T.dateRange);
-  LEAGUES.forEach(l=>{const b=document.getElementById("chip-"+l.code); if(b) b.lastChild.textContent=l.code==="INTL"?T.friendlies:l.name;});
+  ordered().forEach(l=>{const b=document.getElementById("chip-"+l.code); if(b){ b.lastChild.textContent=l.code==="INTL"?T.friendlies:l.name; b.parentNode.appendChild(b); }});
   fillZones(); makeFormatters(); applyTheme(); showRepo();
+  if(typeof checkDates==="function"){ checkDates(); syncControls(); }
 }
 langsel.onchange=()=>{
   LANG=langsel.value; T=I18N[LANG]; store.set("lang",LANG);
@@ -527,9 +581,12 @@ document.getElementById("copy").onclick=async()=>{
   try{await navigator.clipboard.writeText(icsURL);toast.textContent=T.copied;}
   catch{const r=document.createRange();r.selectNodeContents(document.getElementById("calurl"));getSelection().removeAllRanges();getSelection().addRange(r);toast.textContent=T.selected;}
 };
-const calmenu=document.getElementById("calmenu");
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&calmenu.open){calmenu.open=false;calmenu.querySelector("summary").focus();} });
-document.addEventListener("click",e=>{ if(calmenu.open&&!calmenu.contains(e.target)) calmenu.open=false; });
+const calmenu=document.getElementById("calmenu"), setmenu=document.getElementById("setmenu"), MENUS=[setmenu,calmenu];
+function closeMenu(m,focus){ m.open=false; if(focus) m.querySelector("summary").focus(); }
+MENUS.forEach(m=>m.addEventListener("toggle",()=>{ if(m.open) MENUS.forEach(o=>{ if(o!==m) o.open=false; }); }));
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") MENUS.forEach(m=>{ if(m.open) closeMenu(m,true); }); });
+document.addEventListener("click",e=>{ MENUS.forEach(m=>{ if(m.open&&!m.contains(e.target)) m.open=false; }); });
+document.getElementById("setdone").onclick=()=>closeMenu(setmenu,true);
 function showRepo(){
   if(!location.hostname.endsWith("github.io")) return;
   const user=location.hostname.split(".")[0], repo=location.pathname.split("/").filter(Boolean)[0];
@@ -549,13 +606,37 @@ LEAGUES.forEach(l=>{
   b.onclick=()=>{on.has(l.code)?on.delete(l.code):on.add(l.code);b.setAttribute("aria-pressed",on.has(l.code));store.set("leagues",[...on]);limit=40;render();};
   lg.appendChild(b);
 });
-document.querySelectorAll("#range button").forEach(b=>{
-  b.setAttribute("aria-pressed",b.dataset.r===range);
-  b.onclick=()=>{range=b.dataset.r;store.set("range",range);from.value="";to.value="";
-    document.querySelectorAll("#range button").forEach(x=>x.setAttribute("aria-pressed",x===b));limit=40;render();};
-});
+const daterange=document.getElementById("daterange"), dateErr=document.getElementById("date-err"),
+      clearq=document.getElementById("clearq"), resetBtn=document.getElementById("reset");
+from.value=store.get("from",""); to.value=store.get("to","");
+function setRange(r,focus){
+  range=r; store.set("range",r);
+  document.querySelectorAll("#range button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.r===r));
+  daterange.hidden=r!=="custom";
+  if(r==="custom"){ if(!from.value) from.value=dayKey.format(new Date()); if(focus) from.focus(); }
+  checkDates(); limit=40; render();
+}
+function checkDates(){ // "to" can't be before "from": say so, and ignore the end date until it's fixed
+  to.min=from.value||""; from.max=to.value||"";
+  const bad=!!(from.value&&to.value&&to.value<from.value);
+  to.setAttribute("aria-invalid",bad); dateErr.textContent=bad?T.dateErr:"";
+  store.set("from",from.value); store.set("to",to.value);
+  return bad;
+}
+document.querySelectorAll("#range button").forEach(b=>{ b.onclick=()=>setRange(b.dataset.r,true); });
+[from,to].forEach(el=>el.addEventListener("input",()=>{checkDates();limit=40;render();}));
 [q,tbc,favonly].forEach(el=>el.addEventListener("input",()=>{store.set("q",q.value);store.set("tbc",tbc.checked);store.set("favonly",favonly.checked);limit=40;render();}));
-[from,to].forEach(el=>el.addEventListener("input",()=>{if(from.value||to.value){range="custom";document.querySelectorAll("#range button").forEach(x=>x.setAttribute("aria-pressed","false"));}limit=40;render();}));
+clearq.onclick=()=>{q.value="";store.set("q","");q.focus();limit=40;render();};
+resetBtn.onclick=()=>{
+  LEAGUES.forEach(l=>{on.add(l.code);document.getElementById("chip-"+l.code).setAttribute("aria-pressed","true");}); store.set("leagues",[...on]);
+  q.value="";store.set("q",""); favonly.checked=false;store.set("favonly",false); tbc.checked=true;store.set("tbc",true);
+  from.value="";to.value=""; setRange("all",false); document.querySelector('#range button[data-r="all"]').focus();
+};
+function syncControls(){ // small bits of UI that depend on the current filters
+  clearq.hidden=!q.value; clearq.setAttribute("aria-label",T.clearSearch);
+  document.getElementById("favlabel").textContent=T.favCount(favs.size);
+  resetBtn.hidden=on.size===LEAGUES.length&&range==="all"&&!q.value&&!favonly.checked&&tbc.checked;
+}
 
 // day headers stick just below the filter bar, whatever its height
 const filtersEl=document.getElementById("filters");
@@ -571,7 +652,7 @@ function bounds(){
     const fri=dow===0?addDays(today,-2):dow===6?addDays(today,-1):addDays(today,5-dow);
     return [dow===0||dow===6||dow===5?today:fri, addDays(fri,2)];
   }
-  if(range==="custom") return [from.value||"0000",to.value||"9999"];
+  if(range==="custom") return [from.value||"0000",(to.value&&to.value>=(from.value||""))?to.value:"9999"];
   return ["0000","9999"];
 }
 function live(){ // drop finished matches: two hours after kick-off, or dated days that have passed
@@ -583,16 +664,17 @@ function filtered(){
   const terms=q.value.split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
   const [a,b]=bounds();
   return live().filter(r=>on.has(r.code)
-    &&(!terms.length||terms.some(t=>r.home.toLowerCase().includes(t)||r.away.toLowerCase().includes(t)))
+    &&(!terms.length||terms.some(t=>[r.home,r.away,I18N.pt.teams[r.home]||"",I18N.pt.teams[r.away]||""].some(n=>n.toLowerCase().includes(t))))
     &&(!favonly.checked||favs.has(r.home)||favs.has(r.away))
     &&r.day>=a&&r.day<=b&&(tbc.checked||r.utc));
 }
 
 /* ---------- rendering ---------- */
 const compName=c=>T.comp[c]||c;
+const teamName=n=>T.teams[n]||n;
 function teamHTML(name){
   const f=favs.has(name);
-  return '<span class="team'+(f?" fav":"")+'"><span class="nm">'+esc(name)+'</span><button type="button" class="star" data-team="'+esc(name)+'" aria-pressed="'+f+'" aria-label="'+esc((f?T.unstar:T.star)+" "+name)+'">'+(f?ICON.star:ICON.starO)+'</button></span>';
+  return '<span class="team'+(f?" fav":"")+'"><span class="nm">'+esc(teamName(name))+'</span><button type="button" class="star" data-team="'+esc(name)+'" aria-pressed="'+f+'" aria-label="'+esc((f?T.unstar:T.star)+" "+teamName(name))+'">'+(f?ICON.star:ICON.starO)+'</button></span>';
 }
 function srcHTML(r){
   const c=r.check; if(!c||!c.sources||!c.sources.length) return "";
@@ -610,11 +692,12 @@ function srcHTML(r){
 function render(){
   if(!META) return;
   document.querySelectorAll("details.srcs").forEach(d=>d.open?openSrc.add(d.dataset.k):openSrc.delete(d.dataset.k));
+  syncControls();
   const rows=filtered(),list=document.getElementById("list");
   renderLive();
   const counts={}; rows.forEach(r=>counts[r.code]=(counts[r.code]||0)+1);
-  document.getElementById("summary").innerHTML='<span><b>'+rows.length+'</b> '+esc(T.matches)+'</span>'+
-    LEAGUES.filter(l=>counts[l.code]).map(l=>'<span>'+esc(l.code==="INTL"?T.friendlies:l.name)+' <b>'+counts[l.code]+'</b></span>').join("");
+  // not shown on screen; screen readers hear how many matches the filters leave
+  document.getElementById("summary").textContent=T.shown(rows.length);
   const groups=new Map(); let shown=0;
   for(const r of rows){ if(shown>=limit&&!groups.has(r.day)) break; if(!groups.has(r.day)) groups.set(r.day,[]); groups.get(r.day).push(r); shown++; }
   const today=dayKey.format(new Date()), tomorrow=addDays(today,1);
@@ -738,7 +821,7 @@ async function pollLive(){
 function renderLive(){
   const box=document.getElementById("livebox"), list=document.getElementById("livelist");
   const rows=[];
-  for(const r of DATA){ const L=liveOf(r); if(L&&L.state==="in"&&on.has(r.code)) rows.push({home:r.home,away:r.away,hs:L.hs,as:L.as,clock:L.clock,comp:compName(r.comp)}); }
+  for(const r of DATA){ const L=liveOf(r); if(L&&L.state==="in"&&on.has(r.code)) rows.push({home:teamName(r.home),away:teamName(r.away),hs:L.hs,as:L.as,clock:L.clock,comp:compName(r.comp)}); }
   const codeOf={"eng.1":"EPL","esp.1":"LIGA","ger.1":"BUN","bra.1":"BRA"};
   for(const e of LIVE_EXTRA){ const code=codeOf[e.slug]; if(on.has(code)) rows.push({home:e.hn,away:e.an,hs:e.hs,as:e.as,clock:e.detail==="HT"?"HT":e.clock,comp:LEAGUES.find(l=>l.code===code).name}); }
   const lc=document.getElementById("livecount");
@@ -752,7 +835,7 @@ function renderLive(){
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden) pollLive(); });
 
 /* ---------- start ---------- */
-applyLang();
+applyLang(); setRange(range,false);
 fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok) throw new Error(r.status);return r.json();}).then(j=>{
   META=j; DATA=j.matches; DATA.forEach(r=>{r.when=r.utc?new Date(r.utc):null;}); assignDays();
   renderStamp(); render(); setInterval(render,60000);
