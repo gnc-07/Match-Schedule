@@ -38,7 +38,7 @@ const order = [1, 0, 2, 4, 3, 5, 7, 6, 9, 8, 10, 12, 11, 13, 15, 14, 17, 16, 19,
 const f1Race = jolRace("Results", order.map((k, i) => {
   const x = DRIVERS[k], out = i >= 20, lapped = i >= 16 && !out;
   return { position: String(i + 1), positionText: out ? "R" : String(i + 1), points: String(POINTS[i] || 0), Driver: x.d, Constructor: x.c,
-    grid: String(k + 1), laps: out ? String(30 + i) : lapped ? "61" : "62", status: out ? "Retired" : lapped ? "+1 Lap" : "Finished",
+    grid: String(k + 1), laps: out ? String(30 + i) : lapped ? "61" : "62", status: out ? "Retired" : lapped ? (i % 2 ? "Lapped" : "+1 Lap") : "Finished",   // both forms Jolpica uses
     ...(out || lapped ? {} : { Time: { time: i === 0 ? "1:40:12.345" : `+${(i * 2.31).toFixed(3)}` } }),
     ...(i === 3 ? { FastestLap: { rank: "1" } } : {}) };
 }));

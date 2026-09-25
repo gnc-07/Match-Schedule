@@ -767,7 +767,7 @@ const I18N={
   f1Loading:"Loading results…",f1Error:"Results could not be loaded just now. Close and reopen this window to try again.",
   f1Champ:"Championship",f1Drivers:"Drivers",f1Teams:"Teams",f1After:r=>"After round "+r,f1ShowAll:n=>"Show all "+n+" drivers",f1ShowTop:"Show the top 10",
   f1Circuit:"Circuit",f1Pos:"Pos",f1PosFull:"Position",f1Driver:"Driver",f1Team:"Team",f1Time:"Time",f1Pts:"Pts",f1PtsFull:"Points",f1PtsIn:n=>n+" pts",f1Grid:"Places gained or lost",
-  f1FastLap:"Fastest lap",f1Out:"Out",f1Lap:n=>"lap "+n,f1Lapped:n=>"+"+n+(n===1?" lap":" laps"),f1Dsq:"Disqualified",f1OutQ:n=>"Out in Q"+n,
+  f1FastLap:"Fastest lap",f1Out:"Out",f1Lap:n=>"lap "+n,f1Lapped:n=>"+"+n+(n===1?" lap":" laps"),f1Dsq:"Disqualified",f1LappedAny:"Lapped",f1OutQ:n=>"Out in Q"+n,
   f1Up:n=>"Gained "+n+(n===1?" place":" places"),f1Down:n=>"Lost "+n+(n===1?" place":" places"),
   f1Key:"▲ ▼ places gained or lost from the starting grid. Starred drivers are highlighted.",
   f1GridNote:"The race usually starts in qualifying order, but penalties can change it.",f1Dates:(a,b)=>a+" to "+b,
@@ -848,7 +848,7 @@ const I18N={
   f1Loading:"Carregando os resultados…",f1Error:"Não foi possível carregar os resultados agora. Feche e abra esta janela de novo para tentar outra vez.",
   f1Champ:"Campeonato",f1Drivers:"Pilotos",f1Teams:"Equipes",f1After:r=>"Após a etapa "+r,f1ShowAll:n=>"Mostrar os "+n+" pilotos",f1ShowTop:"Mostrar só os 10 primeiros",
   f1Circuit:"Circuito",f1Pos:"Pos",f1PosFull:"Posição",f1Driver:"Piloto",f1Team:"Equipe",f1Time:"Tempo",f1Pts:"Pts",f1PtsFull:"Pontos",f1PtsIn:n=>n+" pts",f1Grid:"Posições ganhas ou perdidas",
-  f1FastLap:"Volta mais rápida",f1Out:"Abandonou",f1Lap:n=>"volta "+n,f1Lapped:n=>"+"+n+(n===1?" volta":" voltas"),f1Dsq:"Desclassificado",f1OutQ:n=>"Eliminados no Q"+n,
+  f1FastLap:"Volta mais rápida",f1Out:"Abandonou",f1Lap:n=>"volta "+n,f1Lapped:n=>"+"+n+(n===1?" volta":" voltas"),f1Dsq:"Desclassificado",f1LappedAny:"Retardatário",f1OutQ:n=>"Eliminados no Q"+n,
   f1Up:n=>"Ganhou "+n+(n===1?" posição":" posições"),f1Down:n=>"Perdeu "+n+(n===1?" posição":" posições"),
   f1Key:"▲ ▼ posições ganhas ou perdidas em relação ao grid de largada. Pilotos favoritos aparecem em destaque.",
   f1GridNote:"A largada costuma seguir a ordem da classificação, mas punições podem mudá-la.",f1Dates:(a,b)=>a+" a "+b,
@@ -1573,9 +1573,11 @@ async function loadWeekend(){
   try{
     for(const [s,path,key] of [["S","sprint","SprintResults"],["Q","qualifying","QualifyingResults"],["R","results","Results"]]){
       if(!started(s)) continue;
+      if(WK!==w) return;             // the panel was closed or switched: stop asking
       const race=(await jol(season+"/"+round+"/"+path+"/?limit=100")).MRData.RaceTable.Races[0];
       if(race&&(race[key]||[]).length) w.res[s]=race[key];
     }
+    if(WK!==w) return;
     w.standD=(await jol(season+"/driverstandings/?limit=100")).MRData.StandingsTable.StandingsLists[0]||null;
     w.standC=(await jol(season+"/constructorstandings/?limit=100")).MRData.StandingsTable.StandingsLists[0]||null;
     w.state="ok";
@@ -1609,7 +1611,7 @@ function paintWeekend(){
     v.innerHTML='<h3>'+esc(T.f1Circuit)+'</h3><p>'+esc(c.name)+'</p>'+(c.locality?'<p class="md-note">'+esc([c.locality,c.country].filter(Boolean).join(", "))+'</p>':'')+
       '<div class="map" id="wk-map" data-name="'+esc(c.name)+'" data-full="'+esc(c.name)+'"></div>';
     v.hidden=false;
-    if(c.lat!=null) paintMap(v.querySelector("#wk-map"),{lat:c.lat,lon:c.lon},14);
+    paintMap(v.querySelector("#wk-map"),c.lat!=null?{lat:c.lat,lon:c.lon}:null,14);   // no coordinates: found by name, or a "find it" link
   }
   w.root.querySelector("#wk-src").textContent=T.f1Src;
 }
@@ -1680,8 +1682,8 @@ function paintWkRes(){
   for(const r of rows){
     const num=/^\d+$/.test(r.positionText), pos=+r.position, grid=+r.grid, ch=num&&grid>0?grid-pos:0;
     const chg=ch?'<span class="chg '+(ch>0?"up":"dn")+'" role="img" aria-label="'+esc(ch>0?T.f1Up(ch):T.f1Down(-ch))+'">'+(ch>0?"▲":"▼")+Math.abs(ch)+'</span>':'<span class="chg" aria-hidden="true">–</span>';
-    const lapped=/^\+(\d+) Laps?$/.exec(r.status||"");
-    const time=r.Time?esc(r.Time.time):lapped?esc(T.f1Lapped(+lapped[1])):r.positionText==="D"?'<span class="dnf">'+esc(T.f1Dsq)+'</span>':
+    const lapped=/^\+(\d+) Laps?$/.exec(r.status||"");   // older results say "+1 Lap"; current ones just "Lapped"
+    const time=r.Time?esc(r.Time.time):lapped?esc(T.f1Lapped(+lapped[1])):r.status==="Lapped"?esc(T.f1LappedAny):r.positionText==="D"?'<span class="dnf">'+esc(T.f1Dsq)+'</span>':
       '<span class="dnf">'+esc(T.f1Out)+'</span><small>'+esc(T.f1Lap(r.laps))+'</small>';
     const fl=r.FastestLap&&r.FastestLap.rank==="1"?'<span class="fl">'+ICON.clock+esc(T.f1FastLap)+'</span>':'';
     t+='<tr'+mine(r)+'><td class="pos-c">'+(num?esc(r.positionText):'–')+'</td>'+drvCell(r.Driver,r.Constructor,(ch?'<span class="chg-in">'+chg+'</span>':'')+fl)+'<td class="chg-c">'+chg+'</td><td class="tt">'+time+(+r.points?'<small class="pts-in">'+esc(T.f1PtsIn(r.points))+'</small>':'')+'</td><td class="pts pts-c">'+(+r.points?esc(r.points):"")+'</td></tr>';
