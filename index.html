@@ -763,6 +763,19 @@ const ICON={
 const store={get(k,d){try{const v=localStorage.getItem("mp."+k);return v===null?d:JSON.parse(v);}catch{return d;}},
              set(k,v){try{localStorage.setItem("mp."+k,JSON.stringify(v));}catch{}}};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+// Pictures for the league buttons: flags for the four leagues, a globe for friendlies and the F1 mark (from
+// Simple Icons, https://simpleicons.org). A league missing here keeps its letter badge (abbr).
+const band=(v,x,y,w,h)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" style="fill:var(--flag-'+v+')"/>';
+const CREST={
+  EPL:["flag",band("white",0,0,24,24)+band("eng",9.5,0,5,24)+band("eng",0,9.5,24,5)],
+  LIGA:["flag",band("esp-red",0,0,24,24)+band("esp-gold",0,6,24,12)],
+  BUN:["flag",band("black",0,0,24,8)+band("ger-red",0,8,24,8)+band("ger-gold",0,16,24,8)],
+  BRA:["flag",band("bra-green",0,0,24,24)+'<path d="M12 3.5 22.5 12 12 20.5 1.5 12z" style="fill:var(--flag-bra-yellow)"/><circle cx="12" cy="12" r="5" style="fill:var(--flag-bra-blue)"/><path d="M7.2 11.1c3-.9 6.6-.5 9.6 1.3" style="fill:none;stroke:var(--flag-white)"/>'],
+  INTL:["mark",'<g style="fill:none;stroke:currentColor;stroke-width:1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-4.5 5-4.5 13 0 18M12 3c4.5 5 4.5 13 0 18"/></g>'],
+  F1:["mark",'<path d="M9.6 11.24h7.91L19.75 9H9.39c-2.85 0-3.62.34-5.17 1.81C2.71 12.3 0 15 0 15h3.38c.77-.75 2.2-2.13 2.85-2.75.92-.87 1.37-1.01 3.37-1.01zM20.39 9l-6 6H18l6-6h-3.61zm-3.25 2.61H9.88c-2.22 0-2.6.12-3.55 1.07C5.44 13.57 4 15 4 15h3.15l.75-.75c.49-.49.75-.55 1.78-.55h5.37l2.09-2.09z"/>']};
+const crestHTML=l=>{const c=CREST[l.code];
+  return c?'<span class="crest pic '+c[0]+'" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">'+c[1]+'</svg></span>'
+    :'<span class="crest" aria-hidden="true">'+l.abbr+'</span>';};
 
 /* ---------- language: ?lang=pt in the address, then the saved choice, then the browser's language ---------- */
 const urlLang=new URLSearchParams(location.search).get("lang");
@@ -908,19 +921,6 @@ function showRepo(){
 const q=document.getElementById("q"),from=document.getElementById("from"),to=document.getElementById("to"),
       tbc=document.getElementById("showtbc"),favonly=document.getElementById("favonly");
 q.value=store.get("q",""); tbc.checked=store.get("tbc",true); favonly.checked=store.get("favonly",false);
-// Pictures for the league buttons: flags for the four leagues, a globe for friendlies and the F1 mark (from
-// Simple Icons, https://simpleicons.org). A league missing here keeps its letter badge (abbr).
-const band=(v,x,y,w,h)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" style="fill:var(--flag-'+v+')"/>';
-const CREST={
-  EPL:["flag",band("white",0,0,24,24)+band("eng",9.5,0,5,24)+band("eng",0,9.5,24,5)],
-  LIGA:["flag",band("esp-red",0,0,24,24)+band("esp-gold",0,6,24,12)],
-  BUN:["flag",band("black",0,0,24,8)+band("ger-red",0,8,24,8)+band("ger-gold",0,16,24,8)],
-  BRA:["flag",band("bra-green",0,0,24,24)+'<path d="M12 3.5 22.5 12 12 20.5 1.5 12z" style="fill:var(--flag-bra-yellow)"/><circle cx="12" cy="12" r="5" style="fill:var(--flag-bra-blue)"/><path d="M7.2 11.1c3-.9 6.6-.5 9.6 1.3" style="fill:none;stroke:var(--flag-white)"/>'],
-  INTL:["mark",'<g style="fill:none;stroke:currentColor;stroke-width:1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-4.5 5-4.5 13 0 18M12 3c4.5 5 4.5 13 0 18"/></g>'],
-  F1:["mark",'<path d="M9.6 11.24h7.91L19.75 9H9.39c-2.85 0-3.62.34-5.17 1.81C2.71 12.3 0 15 0 15h3.38c.77-.75 2.2-2.13 2.85-2.75.92-.87 1.37-1.01 3.37-1.01zM20.39 9l-6 6H18l6-6h-3.61zm-3.25 2.61H9.88c-2.22 0-2.6.12-3.55 1.07C5.44 13.57 4 15 4 15h3.15l.75-.75c.49-.49.75-.55 1.78-.55h5.37l2.09-2.09z"/>']};
-const crestHTML=l=>{const c=CREST[l.code];
-  return c?'<span class="crest pic '+c[0]+'" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">'+c[1]+'</svg></span>'
-    :'<span class="crest" aria-hidden="true">'+l.abbr+'</span>';};
 const lg=document.getElementById("leagues");
 LEAGUES.forEach(l=>{
   const b=document.createElement("button"); b.type="button"; b.className="chip"; b.id="chip-"+l.code;
