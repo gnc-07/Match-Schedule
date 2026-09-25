@@ -53,6 +53,9 @@ git push
 ```
 Order matters: `git pull --rebase` refuses to run while there are uncommitted changes, so always commit first. Pushing to `main` starts the workflow, which republishes the site in about two minutes. Tell the owner to check the Actions tab. Visitors need no hard refresh: GitHub Pages lets browsers reuse `index.html` for up to 10 minutes (`cache-control: max-age=600`), `fixtures.json` is always fetched fresh, and a page left open re-checks `fixtures.json` when the visitor returns and every 15 minutes, reloading itself (only on return) when the `site` fingerprint of `index.html` changes. The owner can see a change at once with Ctrl+Shift+R, or wait 10 minutes and reload normally.
 
+### Branch names
+When work goes through a branch and pull request, name the branch after what it changes: a few lowercase words joined by hyphens, such as `match-details-panel`, `fix-live-scores` or `readme-setup-steps`. Never use generated names like `claude/inspiring-rubin-k5ruq0`. When one piece of work is split into several pull requests that must be merged in order, start each name with its place in the order: `1-faster-loading`, `2-contrast-settings`.
+
 ## How to talk to the owner
 - Always give instructions step by step, stating exactly what to click or change.
 - Explain every terminal command in full: what each part, flag and subcommand does.
