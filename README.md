@@ -49,6 +49,7 @@ If you already made a repository from the earlier calendar-only instructions, yo
 - **Bad data never replaces good data:** if a build finds fewer than 20 upcoming league matches, it stops and the last good version of the site stays up. GitHub emails you when a run fails.
 - **The schedule stays switched on:** GitHub pauses scheduled workflows after 60 days without repository activity, so the workflow makes an empty commit after 45 quiet days.
 - **Live scores** need no maintenance; they are fetched by each visitor's browser.
+- **Finished matches** stay on the list for a day after kick-off, with the final score.
 
 To have the research run immediately instead of waiting for the daily run: Actions, **Build and deploy site**, **Run workflow**, tick **Also research missing kick-off times**.
 

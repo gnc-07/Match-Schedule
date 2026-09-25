@@ -39,6 +39,7 @@ LEAGUES = {
     "BRA":  ("Brasileirão",    "BSA", "br.1.json", "calendar", "America/Sao_Paulo"),
 }
 MIN_MATCHES = 20   # fewer upcoming league matches than this means something broke: do not publish
+KEEP_DAYS = 1      # matches from this many days back stay listed, so the site can show their final score
 
 def season_folders(style, today):
     """Openfootball folder names to try, newest first, so new seasons are picked up automatically."""
@@ -62,19 +63,27 @@ def record(comp, code, home, away, day, utc=None, rnd="", venue=None, note=None,
 def from_football_data(code, name, fd_code, tz, start, token):
     data = get_json(f"{FD_API}/competitions/{fd_code}/matches", {"X-Auth-Token": token})
     out = []
+    recent = start - timedelta(days=KEEP_DAYS)
     for m in data["matches"]:
-        if m["status"] not in ("SCHEDULED", "TIMED", "POSTPONED"):
-            continue                      # skip finished, live, cancelled
+        played = m["status"] in ("IN_PLAY", "PAUSED", "FINISHED")
+        if m["status"] not in ("SCHEDULED", "TIMED", "POSTPONED") and not played:
+            continue                      # skip cancelled, suspended
         kick = datetime.fromisoformat(m["utcDate"].replace("Z", "+00:00"))
         day = kick.astimezone(ZoneInfo(tz)).date()
-        if day < start:
+        if day < (recent if played else start):
             continue
-        confirmed = m["status"] == "TIMED"
+        confirmed = m["status"] == "TIMED" or played
         note = "Postponed; new date not set." if m["status"] == "POSTPONED" else None
-        out.append(record(name, code, m["homeTeam"]["name"], m["awayTeam"]["name"], day.isoformat(),
-                          kick.isoformat() if confirmed else None,
-                          f"Matchday {m['matchday']}" if m.get("matchday") else "",
-                          m.get("venue"), note, uid=f"fd-{m['id']}"))
+        r = record(name, code, m["homeTeam"]["name"], m["awayTeam"]["name"], day.isoformat(),
+                   kick.isoformat() if confirmed else None,
+                   f"Matchday {m['matchday']}" if m.get("matchday") else "",
+                   m.get("venue"), note, uid=f"fd-{m['id']}")
+        ft = (m.get("score") or {}).get("fullTime") or {}
+        if m["status"] == "FINISHED" and ft.get("home") is not None:
+            r["result"] = {"home": ft["home"], "away": ft["away"]}
+        elif played:
+            r["started"] = True           # on now: the site gets the live score from ESPN
+        out.append(r)
     return out
 
 # ---------- source 2: openfootball ----------
@@ -87,16 +96,21 @@ def from_openfootball(code, name, filename, style, tz, start):
             if e.code != 404: raise                     # only "file not there yet" means try the older season
     if data is None:
         print(f"{code}: no openfootball file found"); return []
-    out = []
+    out, recent = [], start - timedelta(days=KEEP_DAYS)
     for m in data["matches"]:
-        if date.fromisoformat(m["date"]) < start or "score" in m:
+        played = "score" in m
+        if date.fromisoformat(m["date"]) < (recent if played else start):
             continue
         utc = None
         if m.get("time"):
             local = datetime.fromisoformat(f"{m['date']}T{m['time']}").replace(tzinfo=ZoneInfo(tz))
             utc = local.astimezone(timezone.utc).isoformat()
-        out.append(record(name, code, m["team1"], m["team2"], m["date"], utc, m.get("round", ""), m.get("ground")))
-    mark_provisional(out)
+        r = record(name, code, m["team1"], m["team2"], m["date"], utc, m.get("round", ""), m.get("ground"))
+        ft = (m.get("score") or {}).get("ft")
+        if played and ft:
+            r["result"] = {"home": ft[0], "away": ft[1]}
+        out.append(r)
+    mark_provisional([r for r in out if "result" not in r])
     return out
 
 def mark_provisional(recs):
@@ -196,7 +210,7 @@ def load_all(start):
         out += from_openfootball(code, name, filename, style, tz, start)
         SOURCES[code] = "openfootball"
     apply_overrides(out)
-    out = [r for r in out if date.fromisoformat(r["date"]) >= start]
+    out = [r for r in out if date.fromisoformat(r["date"]) >= start or "result" in r or r.get("started")]
     out += from_friendlies(start)
     SOURCES["INTL"] = "friendlies.json (hand-maintained, cross-checked)"
     out.sort(key=lambda r: (r["utc"] or r["date"] + "T99"))
@@ -291,7 +305,7 @@ if __name__ == "__main__":
     ap.add_argument("--out", default="soccer.ics")
     a = ap.parse_args()
     recs = load_all(date.fromisoformat(a.start))
-    league_count = sum(1 for r in recs if r["code"] != "INTL")
+    league_count = sum(1 for r in recs if r["code"] != "INTL" and "result" not in r and not r.get("started"))
     if league_count < MIN_MATCHES:
         # exiting with an error stops the workflow before it publishes, so the last good site stays up
         sys.exit(f"Only {league_count} upcoming league matches found; refusing to publish. Check the data sources.")

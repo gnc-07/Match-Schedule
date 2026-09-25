@@ -442,7 +442,7 @@ footer p{margin:10px 0 0}
         <li data-t="how2">When that feed lags, corrections are added from official league and club sites and cross-checked against the press. Friendlies are entered the same way, with every source kept.</li>
         <li data-t="how3">Live scores come from ESPN's public scoreboard, refreshed every 30 seconds while a match is on. They appear on this site only, not in the calendar.</li>
         <li data-t="how5">Where CazéTV streams a match free on YouTube, a Watch on CazéTV button appears once the stream is scheduled. Before that, matches on its schedule (taken from the fan-made agendacazetv.com) link to its YouTube channel. Most of its streams only play in Brazil.</li>
-        <li data-t="how4">Stars and settings are saved in your browser only. Finished matches drop off two hours after kick-off.</li>
+        <li data-t="how4">Stars and settings are saved in your browser only. Finished matches stay on the list, with the final score, for a day after kick-off.</li>
       </ul>
       <p id="repo" hidden></p>
     </section>
@@ -488,7 +488,7 @@ const I18N={
   how5:"Where CazéTV streams a match free on YouTube, a Watch on CazéTV button appears once the stream is scheduled. Before that, matches on its schedule (taken from the fan-made agendacazetv.com) link to its YouTube channel. Most of its streams only play in Brazil.",
   watch:"Watch on CazéTV",watchNote:"Free on YouTube. Usually only plays in Brazil.",watchAria:(h,a)=>"Watch on CazéTV: "+h+" v "+a+", on YouTube",
   watchPlanned:"CazéTV on YouTube",watchPlannedNote:"On CazéTV's schedule. The stream link appears once the stream is created. Usually only plays in Brazil.",watchPlannedAria:(h,a)=>h+" v "+a+" is on CazéTV's schedule. Open CazéTV's YouTube channel",
-  how4:"Stars and settings are saved in your browser only. Finished matches drop off two hours after kick-off.",
+  how4:"Stars and settings are saved in your browser only. Finished matches stay on the list, with the final score, for a day after kick-off.",
   repo:"Source code and data:",theme:{auto:"Auto",light:"Light",dark:"Dark"},themeAria:l=>"Colour theme: "+l+". Select to change.",
   teams:{},comp:{"International friendly":"International friendly"},friendlies:"Friendlies",round:r=>r,
   notes:{},tzNames:{"America/Edmonton":"Edmonton","America/Sao_Paulo":"São Paulo (Brasília)","America/Toronto":"Toronto","Europe/London":"London","Europe/Madrid":"Madrid","Europe/Berlin":"Berlin","UTC":"UTC"},
@@ -528,7 +528,7 @@ const I18N={
   how5:"Quando a CazéTV transmite um jogo de graça no YouTube, aparece o botão Assistir na CazéTV assim que a transmissão é agendada. Antes disso, os jogos da programação (tirada do site de fã agendacazetv.com) levam ao canal dela no YouTube. A maioria das transmissões só funciona no Brasil.",
   watch:"Assistir na CazéTV",watchNote:"Grátis no YouTube. Em geral só funciona no Brasil.",watchAria:(h,a)=>"Assistir na CazéTV: "+h+" x "+a+", no YouTube",
   watchPlanned:"CazéTV no YouTube",watchPlannedNote:"Na programação da CazéTV. O link da transmissão aparece quando ela for criada. Em geral só funciona no Brasil.",watchPlannedAria:(h,a)=>h+" x "+a+" está na programação da CazéTV. Abrir o canal da CazéTV no YouTube",
-  how4:"Favoritos e preferências ficam salvos só no seu navegador. Jogos encerrados saem da lista duas horas após o início.",
+  how4:"Favoritos e preferências ficam salvos só no seu navegador. Jogos encerrados continuam na lista, com o placar final, por um dia após o início.",
   repo:"Código-fonte e dados:",theme:{auto:"Automático",light:"Claro",dark:"Escuro"},themeAria:l=>"Tema de cores: "+l+". Selecione para mudar.",
   teams:{"Brazil":"Brasil","Canada":"Canadá","Bolivia":"Bolívia","India":"Índia","Australia":"Austrália","United States":"Estados Unidos","Mexico":"México","Spain":"Espanha","Benin":"Benin","Burkina Faso":"Burkina Faso","Chile":"Chile","Peru":"Peru","Argentina":"Argentina","England":"Inglaterra","France":"França","Germany":"Alemanha","Italy":"Itália","Netherlands":"Países Baixos","Belgium":"Bélgica","Switzerland":"Suíça","Japan":"Japão","South Korea":"Coreia do Sul","Uruguay":"Uruguai","Colombia":"Colômbia","Ecuador":"Equador","Paraguay":"Paraguai","Venezuela":"Venezuela","Morocco":"Marrocos","Senegal":"Senegal","Nigeria":"Nigéria","Ghana":"Gana","Egypt":"Egito","Croatia":"Croácia","Poland":"Polônia","Denmark":"Dinamarca","Sweden":"Suécia","Norway":"Noruega","Scotland":"Escócia","Wales":"País de Gales","Ireland":"Irlanda","Austria":"Áustria","Czechia":"Tchéquia","Turkey":"Turquia","Greece":"Grécia","Ukraine":"Ucrânia","Serbia":"Sérvia","Hungary":"Hungria","Romania":"Romênia","Finland":"Finlândia","Iceland":"Islândia","Cyprus":"Chipre","Estonia":"Estônia","Andorra":"Andorra"},
   comp:{"International friendly":"Amistoso internacional"},friendlies:"Amistosos",round:r=>r.replace(/^Matchday (\d+)$/,"Rodada $1"),
@@ -742,10 +742,11 @@ function bounds(){
   if(range==="custom") return [from.value||"0000",(to.value&&to.value>=(from.value||""))?to.value:"9999"];
   return ["0000","9999"];
 }
-function live(){ // drop finished matches: two hours after kick-off, or dated days that have passed
+function live(){ // finished matches stay a day when the final score is known, else two hours; dated days that have passed go
   const now=Date.now(), today=dayKey.format(new Date());
   return DATA.filter(r=>{const L=liveOf(r); if(L&&L.state==="in") return true;
-    return r.when? r.when.getTime()+2*3600e3>now : r.day>=today;});
+    if(!r.when) return r.day>=today;
+    return r.when.getTime()+(L&&L.state==="post"?24:2)*3600e3>now;});
 }
 function filtered(){
   const terms=q.value.split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
@@ -855,10 +856,14 @@ function renderStamp(){
 
 /* ---------- live scores (ESPN public scoreboard, fetched by the visitor's browser) ---------- */
 const ESPN={EPL:"eng.1",LIGA:"esp.1",BUN:"ger.1",BRA:"bra.1",INTL:"fifa.friendly"};
-const LIVE=new Map();          // our match key -> {state, clock, detail, hs, as}
+const ESPN_API="https://site.api.espn.com/apis/site/v2/sports/soccer/";
+const LIVE=new Map();          // our match key -> {id, state, clock, detail, hs, as}
+const FINAL=new Map();         // finished matches: kept so the final score stays on the card for a day
+const TRIED=new Set();         // matches more than 3 hours old that were already looked up once
 let LIVE_EXTRA=[];             // live league events we could not match to a listed fixture
 const keyOf=r=>r.code+"|"+r.home+"|"+r.away+"|"+r.date;
-const liveOf=r=>LIVE.get(keyOf(r));
+// ESPN first; else the final score from the league feed (build_schedule.py adds "result" for recent matches)
+const liveOf=r=>LIVE.get(keyOf(r))||FINAL.get(keyOf(r))||(r.result?{state:"post",detail:"FT",clock:"",hs:String(r.result.home),as:String(r.result.away)}:undefined);
 const STOP=new Set(["fc","cf","afc","sc","ac","cd","rc","ud","sd","ca","ec","se","cr","fbpa","club","clube","de","del","la","le","the","and","futbol","football","sport","sporting","esporte","regatas","balompie","calcio","sad","national","team"]);
 const ALIAS={mineiro:"atleticomg",paranaense:"athleticopr",munchen:"munich",koln:"cologne",wolverhampton:"wolves"};
 function tokens(name){
@@ -874,10 +879,32 @@ function sameMatch(r,ev){
   if(r.when) return Math.abs(r.when-ev.date)<=3*3600e3;
   return Math.abs(new Date(r.date+"T12:00:00Z")-ev.date)<=36*3600e3;
 }
-function candidates(){ // matches that could be on right now
+function candidates(){ // matches that could be on right now, or finished today without a known score
   const now=Date.now(), today=dayKey.format(new Date());
-  return DATA.filter(r=>ESPN[r.code]&&(r.when? (now>=r.when-15*60e3 && now<=r.when.getTime()+3*3600e3) : r.day===today)
-                    ||(liveOf(r)||{}).state==="in");
+  return DATA.filter(r=>{
+    const k=keyOf(r); if(!ESPN[r.code]||FINAL.has(k)||r.result) return false;
+    if((LIVE.get(k)||{}).state==="in") return true;
+    if(!r.when) return r.day===today;
+    const t=r.when.getTime();
+    return (now>=t-15*60e3&&now<=t+3*3600e3) || (now<=t+24*3600e3&&now>t&&!TRIED.has(k));   // older ones: look up once
+  });
+}
+// one league's matches on one day (US Eastern date, as ESPN groups them)
+async function board(slug,day){
+  const res=await fetch(ESPN_API+slug+"/scoreboard?dates="+day,{cache:"no-store"});
+  if(!res.ok) throw new Error(res.status);
+  const js=await res.json(), out=[];
+  for(const e of js.events||[]){
+    const c=(e.competitions||[])[0]; if(!c) continue;
+    const h=c.competitors.find(x=>x.homeAway==="home"), a=c.competitors.find(x=>x.homeAway==="away"); if(!h||!a) continue;
+    const st=(c.status||e.status||{}), ty=st.type||{};
+    const nm=x=>(x.team&&(x.team.displayName||x.team.name))||"";
+    out.push({slug, id:e.id, date:new Date(e.date), state:ty.state, clock:st.displayClock||ty.shortDetail||"", detail:ty.shortDetail||"",
+      hn:nm(h), an:nm(a), hs:h.score??"0", as:a.score??"0",
+      ht:new Set([...tokens(nm(h)),...tokens((h.team&&h.team.shortDisplayName)||"")]),
+      at:new Set([...tokens(nm(a)),...tokens((a.team&&a.team.shortDisplayName)||"")])});
+  }
+  return out;
 }
 const etDay=d=>new Intl.DateTimeFormat("en-CA",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit"}).format(d).replace(/-/g,"");
 async function pollLive(){
@@ -889,26 +916,16 @@ async function pollLive(){
   const events=[];
   await Promise.all([...jobs].map(async j=>{
     const [slug,day]=j.split("|");
-    try{
-      const res=await fetch("https://site.api.espn.com/apis/site/v2/sports/soccer/"+slug+"/scoreboard?dates="+day,{cache:"no-store"});
-      if(!res.ok) return;
-      const js=await res.json();
-      for(const e of js.events||[]){
-        const c=(e.competitions||[])[0]; if(!c) continue;
-        const h=c.competitors.find(x=>x.homeAway==="home"), a=c.competitors.find(x=>x.homeAway==="away"); if(!h||!a) continue;
-        const st=(c.status||e.status||{}), ty=st.type||{};
-        const nm=x=>(x.team&&(x.team.displayName||x.team.name))||"";
-        events.push({slug, id:e.id, date:new Date(e.date), state:ty.state, clock:st.displayClock||ty.shortDetail||"", detail:ty.shortDetail||"",
-          hn:nm(h), an:nm(a), hs:h.score??"0", as:a.score??"0",
-          ht:new Set([...tokens(nm(h)),...tokens((h.team&&h.team.shortDisplayName)||"")]),
-          at:new Set([...tokens(nm(a)),...tokens((a.team&&a.team.shortDisplayName)||"")])});
-      }
-    }catch(err){}
+    try{ events.push(...await board(slug,day)); }catch(err){}
   }));
   LIVE.clear(); const used=new Set();
   for(const r of cands){
+    const k=keyOf(r); if(r.when&&Date.now()>r.when.getTime()+3*3600e3) TRIED.add(k);
     const ev=events.find(e=>e.slug===ESPN[r.code]&&!used.has(e.id)&&sameMatch(r,e));
-    if(ev){ used.add(ev.id); LIVE.set(keyOf(r),{state:ev.state,clock:ev.state==="in"?(ev.detail==="HT"?"HT":ev.clock):ev.clock,detail:ev.detail,hs:ev.hs,as:ev.as}); }
+    if(!ev) continue;
+    used.add(ev.id);
+    const L={id:ev.id,state:ev.state,clock:ev.state==="in"?(ev.detail==="HT"?"HT":ev.clock):ev.clock,detail:ev.detail,hs:ev.hs,as:ev.as};
+    if(ev.state==="post") FINAL.set(k,L); else LIVE.set(k,L);
   }
   LIVE_EXTRA=events.filter(e=>e.state==="in"&&!used.has(e.id)&&e.slug!=="fifa.friendly")
     .filter((e,i,a)=>a.findIndex(x=>x.id===e.id)===i);
