@@ -498,6 +498,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
 .lt tr.mine>*{background:var(--mine)}
 .lt tr.mine .tm-c svg{width:14px;height:14px;color:var(--star);vertical-align:-1px;margin-left:4px}
 .lt-key{margin:12px 0 0;font-size:13.5px;color:var(--muted)}
+.lt-seg{margin-bottom:12px}
 
 /* ---------- small screens ---------- */
 @media (max-width:640px){
@@ -759,6 +760,8 @@ const I18N={
   ltSource:"Source: ESPN.",ltLoading:"Loading the table…",ltError:"The table could not be loaded. Try again later.",
   ltCols:{pos:"Position",team:"Team",p:"Played",w:"Won",d:"Drawn",l:"Lost",gd:"Goal difference",pts:"Points"},ltAbbr:{p:"P",w:"W",d:"D",l:"L",gd:"GD",pts:"Pts"},
   ltKey:"P played · W won · D drawn · L lost · GD goal difference · Pts points.",starred:"starred",
+  f1LtD:"Drivers' championship",f1LtC:"Teams' championship",f1Wins:"Wins",f1WinsAbbr:"W",f1LtNone:"The championship table appears after the first race of the season.",
+  f1LtKey:(y,r)=>y+" season, after round "+r+". W wins · Pts points. Starred drivers are highlighted.",f1LtSource:"Source: Jolpica-F1.",
   f1:"Formula 1",f1Prac:"Include F1 practice sessions",f1Round:r=>"Round "+r,f1SprintWk:"Sprint weekend",f1Weekend:"This weekend:",
   f1Sess:{FP1:"Practice 1",FP2:"Practice 2",FP3:"Practice 3",SQ:"Sprint qualifying",S:"Sprint",Q:"Qualifying",R:"Race"},
   f1Pole:"Pole",f1Winner:"Winner",f1Podium:"Podium",pOn:"on now",pDone:"finished",gp:{},
@@ -833,6 +836,8 @@ const I18N={
   ltSource:"Fonte: ESPN.",ltLoading:"Carregando a classificação…",ltError:"Não foi possível carregar a classificação. Tente mais tarde.",
   ltCols:{pos:"Posição",team:"Time",p:"Jogos",w:"Vitórias",d:"Empates",l:"Derrotas",gd:"Saldo de gols",pts:"Pontos"},ltAbbr:{p:"J",w:"V",d:"E",l:"D",gd:"SG",pts:"Pts"},
   ltKey:"J jogos · V vitórias · E empates · D derrotas · SG saldo de gols · Pts pontos.",starred:"favorito",
+  f1LtD:"Campeonato de pilotos",f1LtC:"Campeonato de equipes",f1Wins:"Vitórias",f1WinsAbbr:"V",f1LtNone:"A classificação do campeonato aparece depois da primeira corrida da temporada.",
+  f1LtKey:(y,r)=>"Temporada "+y+", após a etapa "+r+". V vitórias · Pts pontos. Pilotos favoritos aparecem em destaque.",f1LtSource:"Fonte: Jolpica-F1.",
   f1:"Fórmula 1",f1Prac:"Incluir treinos livres da F1",f1Round:r=>"Etapa "+r,f1SprintWk:"Fim de semana com sprint",f1Weekend:"Neste fim de semana:",
   f1Sess:{FP1:"Treino livre 1",FP2:"Treino livre 2",FP3:"Treino livre 3",SQ:"Classificação sprint",S:"Corrida sprint",Q:"Classificação",R:"Corrida"},
   f1Pole:"Pole",f1Winner:"Vencedor",f1Podium:"Pódio",pOn:"agora",pDone:"encerrada",
@@ -1862,11 +1867,12 @@ addEventListener("popstate",()=>{
   d.addEventListener("click",e=>{ if(e.target===d) d.close(); });     // a click on the dimmed background closes it
 });
 /* ---------- league tables (ESPN standings, fetched when the window opens) ---------- */
-const TABLES=new Map();        // league code -> {at, rows}
-let ltCode=null;
+const TABLES=new Map();        // league code -> {at, rows}; for "F1": {at, d, c} (drivers' and teams' standings)
+const LT_CODES=[...TABLE_CODES,"F1"];   // the Tables window also has the Formula 1 championship
+let ltCode=null, ltF1="d";     // ltF1: the F1 table shown, "d" drivers or "c" teams
 function paintChips(){
   const box=document.getElementById("ltchips");
-  box.innerHTML=ordered().filter(l=>TABLE_CODES.includes(l.code)).map(l=>
+  box.innerHTML=ordered().filter(l=>LT_CODES.includes(l.code)).map(l=>
     '<button type="button" class="chip" data-code="'+l.code+'" aria-pressed="'+(l.code===ltCode)+'" style="--c:var('+l.c+')">'+crestHTML(l)+'<span>'+esc(l.name)+'</span></button>').join("");
 }
 document.getElementById("ltchips").addEventListener("click",e=>{
@@ -1875,9 +1881,9 @@ document.getElementById("ltchips").addEventListener("click",e=>{
 });
 // from the header's Tables button, or a match's league-table button (the table opens over the match; Close goes back to it)
 function openTables(code){
-  ltCode=code||ltCode||(ordered().find(l=>TABLE_CODES.includes(l.code)&&on.has(l.code))||{code:"EPL"}).code;
+  ltCode=code||ltCode||(ordered().find(l=>LT_CODES.includes(l.code)&&on.has(l.code))||{code:"EPL"}).code;
   paintChips(); ltdlg.showModal(); ltdlg.querySelector("[data-close]").focus(); loadTable();
-  TABLE_CODES.forEach(c=>fetchTable(c).catch(()=>{}));   // download the other leagues now, so switching is instant
+  LT_CODES.forEach(c=>fetchTable(c).catch(()=>{}));   // download the other leagues now, so switching is instant
 }
 document.getElementById("tablesbtn").onclick=()=>openTables();
 const TABLE_REQ=new Map();     // league code -> download in progress, so one league is never fetched twice at once
@@ -1885,15 +1891,22 @@ function fetchTable(code){
   const have=TABLES.get(code);
   if(have&&Date.now()-have.at<=5*60e3) return Promise.resolve();
   if(TABLE_REQ.has(code)) return TABLE_REQ.get(code);
-  const req=fetch("https://site.api.espn.com/apis/v2/sports/soccer/"+ESPN[code]+"/standings",{cache:"no-store"}).then(async res=>{
-    if(!res.ok) throw new Error(res.status);
-    const js=await res.json(), g=(js.children||[])[0]||js;
-    const rows=(((g.standings||{}).entries)||[]).map(e=>{const s={}; (e.stats||[]).forEach(x=>s[x.name||x.type]=x.value);
-      return {team:(e.team&&(e.team.displayName||e.team.name))||"",rank:s.rank,p:s.gamesPlayed,w:s.wins,d:s.ties,l:s.losses,gd:s.pointDifferential,pts:s.points};});
-    rows.sort((a,b)=>(a.rank??99)-(b.rank??99)||(b.pts-a.pts)||(b.gd-a.gd));
-    TABLES.set(code,{at:Date.now(),rows});
-  }).finally(()=>TABLE_REQ.delete(code));
+  const req=(code==="F1"?f1Table():espnTable(code)).then(t=>{ t.at=Date.now(); TABLES.set(code,t); }).finally(()=>TABLE_REQ.delete(code));
   TABLE_REQ.set(code,req); return req;
+}
+async function espnTable(code){
+  const res=await fetch("https://site.api.espn.com/apis/v2/sports/soccer/"+ESPN[code]+"/standings",{cache:"no-store"});
+  if(!res.ok) throw new Error(res.status);
+  const js=await res.json(), g=(js.children||[])[0]||js;
+  const rows=(((g.standings||{}).entries)||[]).map(e=>{const s={}; (e.stats||[]).forEach(x=>s[x.name||x.type]=x.value);
+    return {team:(e.team&&(e.team.displayName||e.team.name))||"",rank:s.rank,p:s.gamesPlayed,w:s.wins,d:s.ties,l:s.losses,gd:s.pointDifferential,pts:s.points};});
+  rows.sort((a,b)=>(a.rank??99)-(b.rank??99)||(b.pts-a.pts)||(b.gd-a.gd));
+  return {rows};
+}
+async function f1Table(){   // Jolpica-F1, one request after the other (see jol above)
+  const d=(await jol("current/driverstandings/?limit=100")).MRData.StandingsTable.StandingsLists[0]||null;
+  const c=(await jol("current/constructorstandings/?limit=100")).MRData.StandingsTable.StandingsLists[0]||null;
+  return {d,c};
 }
 async function loadTable(){
   const code=ltCode, body=document.getElementById("ltbody");
@@ -1907,6 +1920,7 @@ async function loadTable(){
   if(ltCode===code){ body.removeAttribute("aria-busy"); paintTable(); }
 }
 function paintTable(){
+  if(ltCode==="F1") return paintF1Table();
   const t=TABLES.get(ltCode); if(!t) return;
   const lg=LEAGUES.find(l=>l.code===ltCode), mine=[...favs].map(tokens);
   const C=T.ltCols, A=T.ltAbbr;
@@ -1922,6 +1936,30 @@ function paintTable(){
     th("p")+th("w","wdl")+th("d","wdl")+th("l","wdl")+th("gd")+th("pts")+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
     '<p class="lt-key">'+esc(T.ltKey)+' '+esc(T.ltSource)+'</p>';
 }
+function paintF1Table(){
+  const t=TABLES.get("F1"); if(!t) return;
+  const drivers=ltF1==="d", L=drivers?t.d:t.c, body=document.getElementById("ltbody");
+  const seg='<div class="seg lt-seg" role="group" aria-label="'+esc(T.f1Champ)+'">'+
+    '<button type="button" data-lt="d" aria-pressed="'+drivers+'">'+esc(T.f1Drivers)+'</button><button type="button" data-lt="c" aria-pressed="'+!drivers+'">'+esc(T.f1Teams)+'</button></div>';
+  if(!L){ body.innerHTML=seg+'<p class="md-note">'+esc(T.f1LtNone)+'</p>'; return; }
+  const th=(txt,full,cls)=>'<th scope="col"'+(cls?' class="'+cls+'"':'')+'>'+(full?'<span aria-hidden="true">'+esc(txt)+'</span><span class="sr">'+esc(full)+'</span>':esc(txt))+'</th>';
+  const name=(id,long,short,sub,fav)=>'<th scope="row" class="tm-c"><span class="drv"><span class="tbar" style="--tc:var('+(TEAM_C[id]||"--line")+')" aria-hidden="true"></span><span><b>'+
+    (short?'<span class="nl">'+esc(long)+'</span><span class="ns">'+esc(short)+'</span>':esc(long))+'</b>'+
+    (fav?ICON.star+'<span class="sr"> ('+esc(T.starred)+')</span>':'')+(sub?'<small>'+esc(sub)+'</small>':'')+'</span></span></th>';
+  const rows=drivers?L.DriverStandings.map(x=>{
+      const d=x.Driver, team=(x.Constructors||[])[0]||{}, fav=f1favs.has(d.driverId);
+      return '<tr'+(fav?' class="mine"':'')+'><td class="pos-c">'+esc(x.positionText||x.position)+'</td>'+
+        name(team.constructorId,f1Name(d),d.givenName.charAt(0)+". "+d.familyName,team.name,fav)+'<td>'+esc(x.wins??"")+'</td><td class="pts">'+esc(x.points)+'</td></tr>';
+    }):L.ConstructorStandings.map(x=>'<tr><td class="pos-c">'+esc(x.positionText||x.position)+'</td>'+name(x.Constructor.constructorId,x.Constructor.name)+
+      '<td>'+esc(x.wins??"")+'</td><td class="pts">'+esc(x.points)+'</td></tr>');
+  body.innerHTML=seg+'<div class="lt-wrap"><table class="lt f1t"><caption>'+esc(drivers?T.f1LtD:T.f1LtC)+'</caption><thead><tr>'+
+    th("#",T.f1PosFull,"pos-c")+th(drivers?T.f1Driver:T.f1Team,"","tm-c")+th(T.f1WinsAbbr,T.f1Wins)+th(T.f1Pts,T.f1PtsFull)+'</tr></thead><tbody>'+rows.join("")+'</tbody></table></div>'+
+    '<p class="lt-key">'+esc(T.f1LtKey(L.season,L.round))+' '+esc(T.f1LtSource)+'</p>';
+}
+document.getElementById("ltbody").addEventListener("click",e=>{
+  const b=e.target.closest("[data-lt]"); if(!b) return;
+  ltF1=b.dataset.lt; paintF1Table(); document.querySelector('#ltbody [data-lt="'+ltF1+'"]').focus();
+});
 
 /* ---------- keep a page left open up to date ---------- */
 // Phones keep tabs in memory and show them again without reloading, so the page checks for new data itself:

@@ -43,9 +43,9 @@ const f1Race = jolRace("Results", order.map((k, i) => {
     ...(i === 3 ? { FastestLap: { rank: "1" } } : {}) };
 }));
 const f1Drivers = { MRData: { StandingsTable: { StandingsLists: [{ season: "2026", round: "18", DriverStandings: DRIVERS.map((x, i) =>
-  ({ position: String(i + 1), positionText: String(i + 1), points: String(400 - i * 17), Driver: x.d, Constructors: [x.c] })) }] } } };
+  ({ position: String(i + 1), positionText: String(i + 1), points: String(400 - i * 17), wins: String(Math.max(0, 6 - i)), Driver: x.d, Constructors: [x.c] })) }] } } };
 const f1Teams = { MRData: { StandingsTable: { StandingsLists: [{ season: "2026", round: "18", ConstructorStandings: TEAMS.map(([id, name], i) =>
-  ({ position: String(i + 1), positionText: String(i + 1), points: String(700 - i * 60), Constructor: { constructorId: id, name } })) }] } } };
+  ({ position: String(i + 1), positionText: String(i + 1), points: String(700 - i * 60), wins: String(Math.max(0, 8 - 2 * i)), Constructor: { constructorId: id, name } })) }] } } };
 const EPL_TEAMS = [...new Set(data.matches.filter(m => m.code === "EPL").flatMap(m => [m.home, m.away]))].slice(0, 20);
 const short = n => n.replace(/\b(FC|AFC)\b/g, "").trim();
 
