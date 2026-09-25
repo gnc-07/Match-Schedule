@@ -14,12 +14,9 @@ on:
         default: false
   push:
     branches: [main]
-    paths: ["friendlies.json", "overrides.json", "build_schedule.py", "cazetv.py", "research.py", "index.html", "fonts/**", ".github/workflows/**"]
+    paths: ["friendlies.json", "overrides.json", "build_schedule.py", "cazetv.py", "research.py", "common.py", "index.html", "fonts/**", "tests/test_scripts.py", ".github/workflows/**"]
 
-permissions:
-  contents: write                # lets the job commit the rebuilt data
-  pages: write                   # lets the job publish to GitHub Pages
-  id-token: write                # proves to Pages that this workflow is allowed to deploy
+permissions: {}                  # nothing by default; each job below asks only for what it needs
 
 concurrency:                     # never run two builds at once; a new one waits for the last
   group: pages
@@ -28,6 +25,10 @@ concurrency:                     # never run two builds at once; a new one waits
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20            # a stuck download must not keep the machine busy for hours
+    permissions:
+      contents: write              # lets the job commit the rebuilt data
+      pages: write                 # lets configure-pages read the site's Pages settings
     env:
       HAS_RESEARCH_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
     steps:
@@ -36,10 +37,17 @@ jobs:
           # the newest commit on the branch, not the one that started this run: a run that waited
           # behind another one would otherwise rebuild on old data and clash with its saved changes
           ref: ${{ github.ref_name }}
+          # do not leave the push key in the checkout while outside code (the anthropic package, the feeds)
+          # runs; the "Save changes" step below hands it to git only for its own commit and push
+          persist-credentials: false
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Check the build scripts
+        # quick checks with made-up data (no network); a failure stops the run before anything is published
+        run: python -m unittest discover -s tests
 
       - name: Research missing kick-off times
         # only on the daily 12:05 run, or a manual run with the box ticked, and only if the key exists
@@ -49,7 +57,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           RESEARCH_MAX_CALLS: ${{ vars.RESEARCH_MAX_CALLS || '4' }}
         run: |
-          pip install --quiet anthropic
+          pip install --quiet anthropic==1.8.0    # a fixed version: a new release is only used once someone updates this line
           python research.py
 
       - name: Build fixtures.json and soccer.ics
@@ -58,7 +66,10 @@ jobs:
         run: python build_schedule.py
 
       - name: Save changes to the repository
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -N soccer.ics fixtures.json streams.json    # lets git diff see the files even on the very first run
@@ -90,6 +101,10 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write                 # lets the job publish to GitHub Pages
+      id-token: write              # proves to Pages that this workflow is allowed to deploy
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
