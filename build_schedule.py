@@ -287,7 +287,9 @@ if __name__ == "__main__":
         sys.exit(f"Only {league_count} upcoming league matches found; refusing to publish. Check the data sources.")
     cazetv.add_streams(recs)
     recs = apply_filters(recs, a.leagues and a.leagues.split(","), a.teams and a.teams.split(","))
-    meta = {"generated": datetime.now(timezone.utc).isoformat(timespec="minutes"),
+    # "site" fingerprints index.html, so a page left open can tell the site itself was updated and reload
+    site = hashlib.sha256(open("index.html", "rb").read()).hexdigest()[:12]
+    meta = {"generated": datetime.now(timezone.utc).isoformat(timespec="minutes"), "site": site,
             "sources": SOURCES, "matches": recs}
     json.dump(meta, open("fixtures.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     open(a.out, "w", newline="", encoding="utf-8").write(ics(recs))

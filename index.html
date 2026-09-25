@@ -857,11 +857,34 @@ function renderLive(){
 }
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden) pollLive(); });
 
+/* ---------- keep a page left open up to date ---------- */
+// Phones keep tabs in memory and show them again without reloading, so the page checks for new data itself:
+// when the visitor comes back to it, and every 15 minutes while it is open. If the site itself changed
+// (the "site" fingerprint in fixtures.json), it reloads when the visitor comes back, never while they read.
+let lastCheck=0;
+function getData(){
+  lastCheck=Date.now();
+  return fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok) throw new Error(r.status);return r.json();});
+}
+function useData(j){
+  META=j; DATA=j.matches; DATA.forEach(r=>{r.when=r.utc?new Date(r.utc):null;}); assignDays();
+  renderStamp(); render();
+}
+function refresh(back){
+  if(!META||Date.now()-lastCheck<(back?60000:15*60000)) return;
+  getData().then(j=>{
+    if(back&&j.site&&META.site&&j.site!==META.site){ location.reload(); return; }
+    if(j.generated!==META.generated) useData(Object.assign(j,{site:META.site}));   // keep the old fingerprint until the reload
+  }).catch(()=>{});   // offline or a failed check: keep showing what we have
+}
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) refresh(true); });
+addEventListener("pageshow",e=>{ if(e.persisted) refresh(true); });   // page restored from the back/forward cache
+setInterval(()=>refresh(false),60000);
+
 /* ---------- start ---------- */
 applyLang(); setRange(range,false);
-fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok) throw new Error(r.status);return r.json();}).then(j=>{
-  META=j; DATA=j.matches; DATA.forEach(r=>{r.when=r.utc?new Date(r.utc):null;}); assignDays();
-  renderStamp(); render(); setInterval(render,60000);
+getData().then(j=>{
+  useData(j); setInterval(render,60000);
   pollLive(); setInterval(pollLive,30000);
 }).catch(()=>{
   document.getElementById("stamp").textContent="";
