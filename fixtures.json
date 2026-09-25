@@ -1,10 +1,10 @@
 {
- "generated": "2026-09-25T04:44+00:00",
+ "generated": "2026-09-25T15:06+00:00",
  "sources": {
   "EPL": "football-data.org",
   "LIGA": "football-data.org",
   "BUN": "football-data.org",
-  "BRA": "football-data.org",
+  "BRA": "openfootball",
   "INTL": "friendlies.json (hand-maintained, cross-checked)"
  },
  "matches": [
@@ -156,7 +156,7 @@
    "utc": "2026-10-02T23:00:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-554948"
+   "uid": null
   },
   {
    "comp": "International friendly",
@@ -234,7 +234,7 @@
    "utc": "2026-10-03T21:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-554940"
+   "uid": null
   },
   {
    "comp": "International friendly",
@@ -342,7 +342,7 @@
    "utc": "2026-10-07T22:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555022"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -354,7 +354,7 @@
    "utc": "2026-10-07T22:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555025"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -366,7 +366,7 @@
    "utc": "2026-10-07T22:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555027"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -378,7 +378,7 @@
    "utc": "2026-10-07T23:00:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555029"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -390,7 +390,7 @@
    "utc": "2026-10-07T23:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555021"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -402,7 +402,7 @@
    "utc": "2026-10-08T00:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555023"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -414,7 +414,7 @@
    "utc": "2026-10-08T22:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555028"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -426,7 +426,7 @@
    "utc": "2026-10-08T23:00:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555020"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -438,7 +438,7 @@
    "utc": "2026-10-09T00:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555024"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -450,7 +450,7 @@
    "utc": "2026-10-09T00:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555026"
+   "uid": null
   },
   {
    "comp": "Bundesliga",
@@ -678,7 +678,7 @@
    "utc": "2026-10-10T20:00:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555039"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -690,7 +690,7 @@
    "utc": "2026-10-11T00:00:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555038"
+   "uid": null
   },
   {
    "comp": "La Liga",
@@ -810,7 +810,7 @@
    "utc": "2026-10-11T19:00:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555030"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -822,7 +822,7 @@
    "utc": "2026-10-11T20:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555035"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -834,7 +834,7 @@
    "utc": "2026-10-11T20:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555036"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -846,7 +846,7 @@
    "utc": "2026-10-11T20:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555037"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -858,7 +858,19 @@
    "utc": "2026-10-11T22:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555031"
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 30",
+   "home": "Coritiba FBC",
+   "away": "Botafogo FR",
+   "date": "2026-10-11",
+   "utc": "2026-10-11T22:30:00+00:00",
+   "venue": null,
+   "note": null,
+   "uid": null
   },
   {
    "comp": "Premier League",
@@ -888,25 +900,13 @@
    "comp": "Brasileirão",
    "code": "BRA",
    "round": "Matchday 30",
-   "home": "Coritiba FBC",
-   "away": "Botafogo FR",
-   "date": "2026-10-12",
-   "utc": "2026-10-12T19:00:00+00:00",
-   "venue": null,
-   "note": null,
-   "uid": "fd-555034"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 30",
    "home": "Chapecoense AF",
    "away": "CA Paranaense",
    "date": "2026-10-12",
    "utc": "2026-10-12T22:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555033"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -918,7 +918,7 @@
    "utc": "2026-10-13T00:00:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555032"
+   "uid": null
   },
   {
    "comp": "Bundesliga",
@@ -943,126 +943,6 @@
    "venue": null,
    "note": null,
    "uid": "fd-564716"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 31",
-   "home": "CA Paranaense",
-   "away": "SE Palmeiras",
-   "date": "2026-10-16",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555040"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 31",
-   "home": "CA Mineiro",
-   "away": "Coritiba FBC",
-   "date": "2026-10-16",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555041"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 31",
-   "home": "EC Bahia",
-   "away": "CR Flamengo",
-   "date": "2026-10-16",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555042"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 31",
-   "home": "Botafogo FR",
-   "away": "Chapecoense AF",
-   "date": "2026-10-16",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555043"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 31",
-   "home": "SC Corinthians Paulista",
-   "away": "EC Vitória",
-   "date": "2026-10-16",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555044"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 31",
-   "home": "Fluminense FC",
-   "away": "Santos FC",
-   "date": "2026-10-16",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555045"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 31",
-   "home": "Grêmio FBPA",
-   "away": "Cruzeiro EC",
-   "date": "2026-10-16",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555046"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 31",
-   "home": "Mirassol FC",
-   "away": "SC Internacional",
-   "date": "2026-10-16",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555047"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 31",
-   "home": "Clube do Remo",
-   "away": "RB Bragantino",
-   "date": "2026-10-16",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555048"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 31",
-   "home": "São Paulo FC",
-   "away": "CR Vasco da Gama",
-   "date": "2026-10-16",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555049"
   },
   {
    "comp": "Premier League",
@@ -1243,6 +1123,126 @@
    "venue": null,
    "note": null,
    "uid": "fd-564711"
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 31",
+   "home": "CA Paranaense",
+   "away": "SE Palmeiras",
+   "date": "2026-10-17",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 31",
+   "home": "CA Mineiro",
+   "away": "Coritiba FBC",
+   "date": "2026-10-17",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 31",
+   "home": "EC Bahia",
+   "away": "CR Flamengo",
+   "date": "2026-10-17",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 31",
+   "home": "Botafogo FR",
+   "away": "Chapecoense AF",
+   "date": "2026-10-17",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 31",
+   "home": "SC Corinthians Paulista",
+   "away": "EC Vitória",
+   "date": "2026-10-17",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 31",
+   "home": "Fluminense FC",
+   "away": "Santos FC",
+   "date": "2026-10-17",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 31",
+   "home": "Grêmio FBPA",
+   "away": "Cruzeiro EC",
+   "date": "2026-10-17",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 31",
+   "home": "Mirassol FC",
+   "away": "SC Internacional",
+   "date": "2026-10-17",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 31",
+   "home": "Clube do Remo",
+   "away": "RB Bragantino",
+   "date": "2026-10-17",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 31",
+   "home": "São Paulo FC",
+   "away": "CR Vasco da Gama",
+   "date": "2026-10-17",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
   },
   {
    "comp": "La Liga",
@@ -1468,126 +1468,6 @@
     }
    },
    "provisional": false
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 32",
-   "home": "Chapecoense AF",
-   "away": "Fluminense FC",
-   "date": "2026-10-23",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555050"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 32",
-   "home": "Coritiba FBC",
-   "away": "Grêmio FBPA",
-   "date": "2026-10-23",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555051"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 32",
-   "home": "Cruzeiro EC",
-   "away": "Clube do Remo",
-   "date": "2026-10-23",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555052"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 32",
-   "home": "CR Flamengo",
-   "away": "CA Mineiro",
-   "date": "2026-10-23",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555053"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 32",
-   "home": "SC Internacional",
-   "away": "Botafogo FR",
-   "date": "2026-10-23",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555054"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 32",
-   "home": "Mirassol FC",
-   "away": "São Paulo FC",
-   "date": "2026-10-23",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555055"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 32",
-   "home": "SE Palmeiras",
-   "away": "RB Bragantino",
-   "date": "2026-10-23",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555056"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 32",
-   "home": "Santos FC",
-   "away": "EC Bahia",
-   "date": "2026-10-23",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555057"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 32",
-   "home": "CR Vasco da Gama",
-   "away": "SC Corinthians Paulista",
-   "date": "2026-10-23",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555058"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 32",
-   "home": "EC Vitória",
-   "away": "CA Paranaense",
-   "date": "2026-10-23",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555059"
   },
   {
    "comp": "Premier League",
@@ -1885,6 +1765,126 @@
     }
    },
    "provisional": false
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 32",
+   "home": "Chapecoense AF",
+   "away": "Fluminense FC",
+   "date": "2026-10-24",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 32",
+   "home": "Coritiba FBC",
+   "away": "Grêmio FBPA",
+   "date": "2026-10-24",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 32",
+   "home": "Cruzeiro EC",
+   "away": "Clube do Remo",
+   "date": "2026-10-24",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 32",
+   "home": "CR Flamengo",
+   "away": "CA Mineiro",
+   "date": "2026-10-24",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 32",
+   "home": "SC Internacional",
+   "away": "Botafogo FR",
+   "date": "2026-10-24",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 32",
+   "home": "Mirassol FC",
+   "away": "São Paulo FC",
+   "date": "2026-10-24",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 32",
+   "home": "SE Palmeiras",
+   "away": "RB Bragantino",
+   "date": "2026-10-24",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 32",
+   "home": "Santos FC",
+   "away": "EC Bahia",
+   "date": "2026-10-24",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 32",
+   "home": "CR Vasco da Gama",
+   "away": "SC Corinthians Paulista",
+   "date": "2026-10-24",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 32",
+   "home": "EC Vitória",
+   "away": "CA Paranaense",
+   "date": "2026-10-24",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
   },
   {
    "comp": "La Liga",
@@ -2201,11 +2201,11 @@
    "round": "Matchday 33",
    "home": "CA Mineiro",
    "away": "Cruzeiro EC",
-   "date": "2026-10-27",
+   "date": "2026-10-28",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555060"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2213,11 +2213,11 @@
    "round": "Matchday 33",
    "home": "EC Bahia",
    "away": "São Paulo FC",
-   "date": "2026-10-27",
+   "date": "2026-10-28",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555061"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2225,11 +2225,11 @@
    "round": "Matchday 33",
    "home": "RB Bragantino",
    "away": "Chapecoense AF",
-   "date": "2026-10-27",
+   "date": "2026-10-28",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555062"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2237,11 +2237,11 @@
    "round": "Matchday 33",
    "home": "SC Corinthians Paulista",
    "away": "Mirassol FC",
-   "date": "2026-10-27",
+   "date": "2026-10-28",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555063"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2249,11 +2249,11 @@
    "round": "Matchday 33",
    "home": "Coritiba FBC",
    "away": "EC Vitória",
-   "date": "2026-10-27",
+   "date": "2026-10-28",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555064"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2261,11 +2261,11 @@
    "round": "Matchday 33",
    "home": "Fluminense FC",
    "away": "SC Internacional",
-   "date": "2026-10-27",
+   "date": "2026-10-28",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555065"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2273,11 +2273,11 @@
    "round": "Matchday 33",
    "home": "Grêmio FBPA",
    "away": "CA Paranaense",
-   "date": "2026-10-27",
+   "date": "2026-10-28",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555066"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2285,11 +2285,11 @@
    "round": "Matchday 33",
    "home": "Clube do Remo",
    "away": "Botafogo FR",
-   "date": "2026-10-27",
+   "date": "2026-10-28",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555067"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2297,11 +2297,11 @@
    "round": "Matchday 33",
    "home": "Santos FC",
    "away": "SE Palmeiras",
-   "date": "2026-10-27",
+   "date": "2026-10-28",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555068"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2309,11 +2309,11 @@
    "round": "Matchday 33",
    "home": "CR Vasco da Gama",
    "away": "CR Flamengo",
-   "date": "2026-10-27",
+   "date": "2026-10-28",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555069"
+   "uid": null
   },
   {
    "comp": "Bundesliga",
@@ -2669,11 +2669,11 @@
    "round": "Matchday 34",
    "home": "CA Paranaense",
    "away": "CR Vasco da Gama",
-   "date": "2026-11-03",
+   "date": "2026-11-04",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555070"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2681,11 +2681,11 @@
    "round": "Matchday 34",
    "home": "Botafogo FR",
    "away": "CA Mineiro",
-   "date": "2026-11-03",
+   "date": "2026-11-04",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555071"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2693,11 +2693,11 @@
    "round": "Matchday 34",
    "home": "RB Bragantino",
    "away": "Santos FC",
-   "date": "2026-11-03",
+   "date": "2026-11-04",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555072"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2705,11 +2705,11 @@
    "round": "Matchday 34",
    "home": "Chapecoense AF",
    "away": "Mirassol FC",
-   "date": "2026-11-03",
+   "date": "2026-11-04",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555073"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2717,11 +2717,11 @@
    "round": "Matchday 34",
    "home": "Cruzeiro EC",
    "away": "EC Bahia",
-   "date": "2026-11-03",
+   "date": "2026-11-04",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555074"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2729,11 +2729,11 @@
    "round": "Matchday 34",
    "home": "CR Flamengo",
    "away": "Grêmio FBPA",
-   "date": "2026-11-03",
+   "date": "2026-11-04",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555075"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2741,11 +2741,11 @@
    "round": "Matchday 34",
    "home": "SC Internacional",
    "away": "Coritiba FBC",
-   "date": "2026-11-03",
+   "date": "2026-11-04",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555076"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2753,11 +2753,11 @@
    "round": "Matchday 34",
    "home": "SE Palmeiras",
    "away": "Clube do Remo",
-   "date": "2026-11-03",
+   "date": "2026-11-04",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555077"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2765,11 +2765,11 @@
    "round": "Matchday 34",
    "home": "São Paulo FC",
    "away": "SC Corinthians Paulista",
-   "date": "2026-11-03",
+   "date": "2026-11-04",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555078"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -2777,11 +2777,11 @@
    "round": "Matchday 34",
    "home": "EC Vitória",
    "away": "Fluminense FC",
-   "date": "2026-11-03",
+   "date": "2026-11-04",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555079"
+   "uid": null
   },
   {
    "comp": "Bundesliga",
@@ -3137,11 +3137,11 @@
    "round": "Matchday 35",
    "home": "SC Corinthians Paulista",
    "away": "Botafogo FR",
-   "date": "2026-11-17",
+   "date": "2026-11-18",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555080"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -3149,11 +3149,11 @@
    "round": "Matchday 35",
    "home": "Coritiba FBC",
    "away": "Santos FC",
-   "date": "2026-11-17",
+   "date": "2026-11-18",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555081"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -3161,11 +3161,11 @@
    "round": "Matchday 35",
    "home": "Cruzeiro EC",
    "away": "SE Palmeiras",
-   "date": "2026-11-17",
+   "date": "2026-11-18",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555082"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -3173,11 +3173,11 @@
    "round": "Matchday 35",
    "home": "CR Flamengo",
    "away": "CA Paranaense",
-   "date": "2026-11-17",
+   "date": "2026-11-18",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555083"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -3185,11 +3185,11 @@
    "round": "Matchday 35",
    "home": "Grêmio FBPA",
    "away": "EC Bahia",
-   "date": "2026-11-17",
+   "date": "2026-11-18",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555084"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -3197,11 +3197,11 @@
    "round": "Matchday 35",
    "home": "Mirassol FC",
    "away": "CA Mineiro",
-   "date": "2026-11-17",
+   "date": "2026-11-18",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555085"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -3209,11 +3209,11 @@
    "round": "Matchday 35",
    "home": "Clube do Remo",
    "away": "Chapecoense AF",
-   "date": "2026-11-17",
+   "date": "2026-11-18",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555086"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -3221,11 +3221,11 @@
    "round": "Matchday 35",
    "home": "São Paulo FC",
    "away": "Fluminense FC",
-   "date": "2026-11-17",
+   "date": "2026-11-18",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555087"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -3233,11 +3233,11 @@
    "round": "Matchday 35",
    "home": "CR Vasco da Gama",
    "away": "SC Internacional",
-   "date": "2026-11-17",
+   "date": "2026-11-18",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555088"
+   "uid": null
   },
   {
    "comp": "Brasileirão",
@@ -3245,11 +3245,11 @@
    "round": "Matchday 35",
    "home": "EC Vitória",
    "away": "RB Bragantino",
-   "date": "2026-11-17",
+   "date": "2026-11-18",
    "utc": null,
    "venue": null,
    "note": null,
-   "uid": "fd-555089"
+   "uid": null
   },
   {
    "comp": "Bundesliga",
@@ -3262,126 +3262,6 @@
    "venue": null,
    "note": null,
    "uid": "fd-565859"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 36",
-   "home": "CA Paranaense",
-   "away": "Clube do Remo",
-   "date": "2026-11-20",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555090"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 36",
-   "home": "CA Mineiro",
-   "away": "SC Corinthians Paulista",
-   "date": "2026-11-20",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555091"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 36",
-   "home": "EC Bahia",
-   "away": "Coritiba FBC",
-   "date": "2026-11-20",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555092"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 36",
-   "home": "Botafogo FR",
-   "away": "São Paulo FC",
-   "date": "2026-11-20",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555093"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 36",
-   "home": "RB Bragantino",
-   "away": "CR Vasco da Gama",
-   "date": "2026-11-20",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555094"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 36",
-   "home": "Chapecoense AF",
-   "away": "Cruzeiro EC",
-   "date": "2026-11-20",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555095"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 36",
-   "home": "Fluminense FC",
-   "away": "Mirassol FC",
-   "date": "2026-11-20",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555096"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 36",
-   "home": "SC Internacional",
-   "away": "EC Vitória",
-   "date": "2026-11-20",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555097"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 36",
-   "home": "SE Palmeiras",
-   "away": "CR Flamengo",
-   "date": "2026-11-20",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555098"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 36",
-   "home": "Santos FC",
-   "away": "Grêmio FBPA",
-   "date": "2026-11-20",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555099"
   },
   {
    "comp": "Premier League",
@@ -3538,6 +3418,126 @@
    "venue": null,
    "note": null,
    "uid": "fd-565861"
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 36",
+   "home": "CA Paranaense",
+   "away": "Clube do Remo",
+   "date": "2026-11-21",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 36",
+   "home": "CA Mineiro",
+   "away": "SC Corinthians Paulista",
+   "date": "2026-11-21",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 36",
+   "home": "EC Bahia",
+   "away": "Coritiba FBC",
+   "date": "2026-11-21",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 36",
+   "home": "Botafogo FR",
+   "away": "São Paulo FC",
+   "date": "2026-11-21",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 36",
+   "home": "RB Bragantino",
+   "away": "CR Vasco da Gama",
+   "date": "2026-11-21",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 36",
+   "home": "Chapecoense AF",
+   "away": "Cruzeiro EC",
+   "date": "2026-11-21",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 36",
+   "home": "Fluminense FC",
+   "away": "Mirassol FC",
+   "date": "2026-11-21",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 36",
+   "home": "SC Internacional",
+   "away": "EC Vitória",
+   "date": "2026-11-21",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 36",
+   "home": "SE Palmeiras",
+   "away": "CR Flamengo",
+   "date": "2026-11-21",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 36",
+   "home": "Santos FC",
+   "away": "Grêmio FBPA",
+   "date": "2026-11-21",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
   },
   {
    "comp": "Premier League",
@@ -3744,126 +3744,6 @@
    "uid": "fd-560658"
   },
   {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 37",
-   "home": "CA Mineiro",
-   "away": "CR Vasco da Gama",
-   "date": "2026-11-27",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555100"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 37",
-   "home": "Botafogo FR",
-   "away": "EC Bahia",
-   "date": "2026-11-27",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555101"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 37",
-   "home": "Chapecoense AF",
-   "away": "SE Palmeiras",
-   "date": "2026-11-27",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555102"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 37",
-   "home": "SC Corinthians Paulista",
-   "away": "Grêmio FBPA",
-   "date": "2026-11-27",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555103"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 37",
-   "home": "Coritiba FBC",
-   "away": "CR Flamengo",
-   "date": "2026-11-27",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555104"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 37",
-   "home": "Fluminense FC",
-   "away": "Cruzeiro EC",
-   "date": "2026-11-27",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555105"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 37",
-   "home": "SC Internacional",
-   "away": "RB Bragantino",
-   "date": "2026-11-27",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555106"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 37",
-   "home": "Mirassol FC",
-   "away": "CA Paranaense",
-   "date": "2026-11-27",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555107"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 37",
-   "home": "São Paulo FC",
-   "away": "Clube do Remo",
-   "date": "2026-11-27",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555108"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 37",
-   "home": "EC Vitória",
-   "away": "Santos FC",
-   "date": "2026-11-27",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555109"
-  },
-  {
    "comp": "Bundesliga",
    "code": "BUN",
    "round": "Matchday 11",
@@ -3958,6 +3838,126 @@
    "venue": null,
    "note": null,
    "uid": "fd-565870"
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 37",
+   "home": "CA Mineiro",
+   "away": "CR Vasco da Gama",
+   "date": "2026-11-28",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 37",
+   "home": "Botafogo FR",
+   "away": "EC Bahia",
+   "date": "2026-11-28",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 37",
+   "home": "Chapecoense AF",
+   "away": "SE Palmeiras",
+   "date": "2026-11-28",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 37",
+   "home": "SC Corinthians Paulista",
+   "away": "Grêmio FBPA",
+   "date": "2026-11-28",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 37",
+   "home": "Coritiba FBC",
+   "away": "CR Flamengo",
+   "date": "2026-11-28",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 37",
+   "home": "Fluminense FC",
+   "away": "Cruzeiro EC",
+   "date": "2026-11-28",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 37",
+   "home": "SC Internacional",
+   "away": "RB Bragantino",
+   "date": "2026-11-28",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 37",
+   "home": "Mirassol FC",
+   "away": "CA Paranaense",
+   "date": "2026-11-28",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 37",
+   "home": "São Paulo FC",
+   "away": "Clube do Remo",
+   "date": "2026-11-28",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 37",
+   "home": "EC Vitória",
+   "away": "Santos FC",
+   "date": "2026-11-28",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
   },
   {
    "comp": "Premier League",
@@ -4188,126 +4188,6 @@
    "uid": "fd-564767"
   },
   {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 38",
-   "home": "CA Paranaense",
-   "away": "São Paulo FC",
-   "date": "2026-12-01",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555110"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 38",
-   "home": "EC Bahia",
-   "away": "CA Mineiro",
-   "date": "2026-12-01",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555111"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 38",
-   "home": "RB Bragantino",
-   "away": "Fluminense FC",
-   "date": "2026-12-01",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555112"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 38",
-   "home": "Cruzeiro EC",
-   "away": "SC Internacional",
-   "date": "2026-12-01",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555113"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 38",
-   "home": "CR Flamengo",
-   "away": "Chapecoense AF",
-   "date": "2026-12-01",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555114"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 38",
-   "home": "Grêmio FBPA",
-   "away": "Mirassol FC",
-   "date": "2026-12-01",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555115"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 38",
-   "home": "SE Palmeiras",
-   "away": "Coritiba FBC",
-   "date": "2026-12-01",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555116"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 38",
-   "home": "Clube do Remo",
-   "away": "SC Corinthians Paulista",
-   "date": "2026-12-01",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555117"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 38",
-   "home": "Santos FC",
-   "away": "Botafogo FR",
-   "date": "2026-12-01",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555118"
-  },
-  {
-   "comp": "Brasileirão",
-   "code": "BRA",
-   "round": "Matchday 38",
-   "home": "CR Vasco da Gama",
-   "away": "EC Vitória",
-   "date": "2026-12-01",
-   "utc": null,
-   "venue": null,
-   "note": null,
-   "uid": "fd-555119"
-  },
-  {
    "comp": "Premier League",
    "code": "EPL",
    "round": "Matchday 13",
@@ -4426,6 +4306,126 @@
    "venue": null,
    "note": null,
    "uid": "fd-560671"
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 38",
+   "home": "CA Paranaense",
+   "away": "São Paulo FC",
+   "date": "2026-12-02",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 38",
+   "home": "EC Bahia",
+   "away": "CA Mineiro",
+   "date": "2026-12-02",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 38",
+   "home": "RB Bragantino",
+   "away": "Fluminense FC",
+   "date": "2026-12-02",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 38",
+   "home": "Cruzeiro EC",
+   "away": "SC Internacional",
+   "date": "2026-12-02",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 38",
+   "home": "CR Flamengo",
+   "away": "Chapecoense AF",
+   "date": "2026-12-02",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 38",
+   "home": "Grêmio FBPA",
+   "away": "Mirassol FC",
+   "date": "2026-12-02",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 38",
+   "home": "SE Palmeiras",
+   "away": "Coritiba FBC",
+   "date": "2026-12-02",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 38",
+   "home": "Clube do Remo",
+   "away": "SC Corinthians Paulista",
+   "date": "2026-12-02",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 38",
+   "home": "Santos FC",
+   "away": "Botafogo FR",
+   "date": "2026-12-02",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
+  },
+  {
+   "comp": "Brasileirão",
+   "code": "BRA",
+   "round": "Matchday 38",
+   "home": "CR Vasco da Gama",
+   "away": "EC Vitória",
+   "date": "2026-12-02",
+   "utc": null,
+   "venue": null,
+   "note": null,
+   "uid": null
   },
   {
    "comp": "Premier League",
