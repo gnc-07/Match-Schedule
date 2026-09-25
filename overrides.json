@@ -1,0 +1,42 @@
+[
+ {"code":"LIGA","home":"Alavés","away":"Málaga","reports":[
+   {"source":"LaLiga","official":true,"url":"https://www.laliga.com/noticias/horarios-de-la-decima-jornada-de-laliga-ea-sports-2026-27","date":"2026-10-23","time":"21:00","tz":"Europe/Madrid"},
+   {"source":"Libertad Digital","url":"https://www.libertaddigital.com/deportes/liga/2026-09-21/laliga-fija-el-clasico-entre-barcelona-y-real-madrid-para-el-25-de-octubre-7463622/","date":"2026-10-23","time":"21:00","tz":"Europe/Madrid"},
+   {"source":"Fichajes.com","url":"https://www.fichajes.com/espana/primera-division/calendario/2845475080053520280-jornada-10","date":"2026-10-23","time":"21:00","tz":"Europe/Madrid"}]},
+ {"code":"LIGA","home":"Rayo","away":"Elche","reports":[
+   {"source":"Libertad Digital","url":"https://www.libertaddigital.com/deportes/liga/2026-09-21/laliga-fija-el-clasico-entre-barcelona-y-real-madrid-para-el-25-de-octubre-7463622/","date":"2026-10-24","time":"14:00","tz":"Europe/Madrid"},
+   {"source":"Fichajes.com","url":"https://www.fichajes.com/espana/primera-division/calendario/2845475080053520280-jornada-10","date":"2026-10-24","time":"14:00","tz":"Europe/Madrid"},
+   {"source":"El Desmarque","url":"https://www.eldesmarque.com/futbol/liga-1a-division/20260921/fechas-horarios-jornada-10-laliga-ea-sports_18_020227876.html","date":"2026-10-24","time":"14:00","tz":"Europe/Madrid"}]},
+ {"code":"LIGA","home":"Racing","away":"Espanyol","reports":[
+   {"source":"Libertad Digital","url":"https://www.libertaddigital.com/deportes/liga/2026-09-21/laliga-fija-el-clasico-entre-barcelona-y-real-madrid-para-el-25-de-octubre-7463622/","date":"2026-10-24","time":"16:15","tz":"Europe/Madrid"},
+   {"source":"Fichajes.com","url":"https://www.fichajes.com/espana/primera-division/calendario/2845475080053520280-jornada-10","date":"2026-10-24","time":"16:15","tz":"Europe/Madrid"},
+   {"source":"El Desmarque","url":"https://www.eldesmarque.com/futbol/liga-1a-division/20260921/fechas-horarios-jornada-10-laliga-ea-sports_18_020227876.html","date":"2026-10-24","time":"16:15","tz":"Europe/Madrid"}]},
+ {"code":"LIGA","home":"Valencia","away":"Villarreal","reports":[
+   {"source":"Fichajes.com","url":"https://www.fichajes.com/espana/primera-division/calendario/2845475080053520280-jornada-10","date":"2026-10-24","time":"18:30","tz":"Europe/Madrid"},
+   {"source":"El Desmarque","url":"https://www.eldesmarque.com/futbol/liga-1a-division/20260921/fechas-horarios-jornada-10-laliga-ea-sports_18_020227876.html","date":"2026-10-24","time":"18:30","tz":"Europe/Madrid"},
+   {"source":"Libertad Digital","url":"https://www.libertaddigital.com/deportes/liga/2026-09-21/laliga-fija-el-clasico-entre-barcelona-y-real-madrid-para-el-25-de-octubre-7463622/","date":"2026-10-24","time":"18:30","tz":"Europe/Madrid","comment":"Lists the teams the other way round (Villarreal at home); fixture list and two other sources have Valencia at home"}]},
+ {"code":"LIGA","home":"Atlético","away":"Coruña","reports":[
+   {"source":"Libertad Digital","url":"https://www.libertaddigital.com/deportes/liga/2026-09-21/laliga-fija-el-clasico-entre-barcelona-y-real-madrid-para-el-25-de-octubre-7463622/","date":"2026-10-24","time":"21:00","tz":"Europe/Madrid"},
+   {"source":"Fichajes.com","url":"https://www.fichajes.com/espana/primera-division/calendario/2845475080053520280-jornada-10","date":"2026-10-24","time":"21:00","tz":"Europe/Madrid"},
+   {"source":"El Desmarque","url":"https://www.eldesmarque.com/futbol/liga-1a-division/20260921/fechas-horarios-jornada-10-laliga-ea-sports_18_020227876.html","date":"2026-10-24","time":"21:00","tz":"Europe/Madrid"}]},
+ {"code":"LIGA","home":"Athletic","away":"Getafe","reports":[
+   {"source":"Libertad Digital","url":"https://www.libertaddigital.com/deportes/liga/2026-09-21/laliga-fija-el-clasico-entre-barcelona-y-real-madrid-para-el-25-de-octubre-7463622/","date":"2026-10-25","time":"14:00","tz":"Europe/Madrid"},
+   {"source":"Fichajes.com","url":"https://www.fichajes.com/espana/primera-division/calendario/2845475080053520280-jornada-10","date":"2026-10-25","time":"14:00","tz":"Europe/Madrid"},
+   {"source":"El Desmarque","url":"https://www.eldesmarque.com/futbol/liga-1a-division/20260921/fechas-horarios-jornada-10-laliga-ea-sports_18_020227876.html","date":"2026-10-25","time":"12:00","tz":"Europe/Madrid"}]},
+ {"code":"LIGA","home":"Celta","away":"Betis","reports":[
+   {"source":"Libertad Digital","url":"https://www.libertaddigital.com/deportes/liga/2026-09-21/laliga-fija-el-clasico-entre-barcelona-y-real-madrid-para-el-25-de-octubre-7463622/","date":"2026-10-25","time":"16:15","tz":"Europe/Madrid"},
+   {"source":"Fichajes.com","url":"https://www.fichajes.com/espana/primera-division/calendario/2845475080053520280-jornada-10","date":"2026-10-25","time":"16:15","tz":"Europe/Madrid"},
+   {"source":"El Desmarque","url":"https://www.eldesmarque.com/futbol/liga-1a-division/20260921/fechas-horarios-jornada-10-laliga-ea-sports_18_020227876.html","date":"2026-10-25","time":"16:30","tz":"Europe/Madrid"}]},
+ {"code":"LIGA","home":"Real Sociedad","away":"Levante","reports":[
+   {"source":"Libertad Digital","url":"https://www.libertaddigital.com/deportes/liga/2026-09-21/laliga-fija-el-clasico-entre-barcelona-y-real-madrid-para-el-25-de-octubre-7463622/","date":"2026-10-25","time":"18:30","tz":"Europe/Madrid"},
+   {"source":"Fichajes.com","url":"https://www.fichajes.com/espana/primera-division/calendario/2845475080053520280-jornada-10","date":"2026-10-25","time":"18:30","tz":"Europe/Madrid"},
+   {"source":"El Desmarque","url":"https://www.eldesmarque.com/futbol/liga-1a-division/20260921/fechas-horarios-jornada-10-laliga-ea-sports_18_020227876.html","date":"2026-10-25","time":"18:45","tz":"Europe/Madrid"}]},
+ {"code":"LIGA","home":"Barcelona","away":"Real Madrid","reports":[
+   {"source":"Real Madrid CF","official":true,"url":"https://www.realmadrid.com/en-US/news/football/first-team/latest-news/el-barcelona-real-madrid-se-jugara-el-domingo-25-de-octubre-a-las-21-00-h-01-09-2026","date":"2026-10-25","time":"21:00","tz":"Europe/Madrid"},
+   {"source":"Libertad Digital","url":"https://www.libertaddigital.com/deportes/liga/2026-09-21/laliga-fija-el-clasico-entre-barcelona-y-real-madrid-para-el-25-de-octubre-7463622/","date":"2026-10-25","time":"21:00","tz":"Europe/Madrid"},
+   {"source":"Fichajes.com","url":"https://www.fichajes.com/espana/primera-division/calendario/2845475080053520280-jornada-10","date":"2026-10-25","time":"21:00","tz":"Europe/Madrid"}]},
+ {"code":"LIGA","home":"Sevilla","away":"Osasuna","reports":[
+   {"source":"LaLiga","official":true,"url":"https://www.laliga.com/noticias/horarios-de-la-decima-jornada-de-laliga-ea-sports-2026-27","date":"2026-10-26","time":"21:00","tz":"Europe/Madrid"},
+   {"source":"Libertad Digital","url":"https://www.libertaddigital.com/deportes/liga/2026-09-21/laliga-fija-el-clasico-entre-barcelona-y-real-madrid-para-el-25-de-octubre-7463622/","date":"2026-10-26","time":"21:00","tz":"Europe/Madrid"},
+   {"source":"Fichajes.com","url":"https://www.fichajes.com/espana/primera-division/calendario/2845475080053520280-jornada-10","date":"2026-10-26","time":"21:00","tz":"Europe/Madrid"}]}
+]

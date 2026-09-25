@@ -1,0 +1,31 @@
+[
+ {"team1":"Australia","team2":"Brazil","venue":"Queensland Country Bank Stadium, Townsville","reports":[
+   {"source":"Brasil 247","url":"https://www.brasil247.com/tendencias/2026/09/23/australia-x-brasil-que-horas-sera-o-amistoso-de-sexta-e-onde-assistir-ao-primeiro-jogo-da-selecao-apos-a-copa/","date":"2026-09-25","time":"07:00","tz":"America/Sao_Paulo"},
+   {"source":"O Tempo","url":"https://www.otempo.com.br/sports/selecao-brasileira/2026/9/23/super-data-fifa-brasil-e-india-vao-se-enfrentar-pela-primeira-vez-na-historia","date":"2026-09-25","time":"07:00","tz":"America/Sao_Paulo"}]},
+ {"team1":"Canada","team2":"Chile","venue":"BMO Field, Toronto","reports":[
+   {"source":"Canada Soccer","official":true,"url":"https://news.canadasoccer.com/canmnt-squad-named-for-september-october-international-window-following-historic-fifa-world-cup-26","date":"2026-09-26","time":"19:00","tz":"America/Toronto"}]},
+ {"team1":"Australia","team2":"Brazil","venue":"Suncorp Stadium, Brisbane","reports":[
+   {"source":"Brasil 247","url":"https://www.brasil247.com/tendencias/2026/09/23/australia-x-brasil-que-horas-sera-o-amistoso-de-sexta-e-onde-assistir-ao-primeiro-jogo-da-selecao-apos-a-copa/","date":"2026-09-29","time":"07:00","tz":"America/Sao_Paulo"},
+   {"source":"O Tempo","url":"https://www.otempo.com.br/sports/selecao-brasileira/2026/9/23/super-data-fifa-brasil-e-india-vao-se-enfrentar-pela-primeira-vez-na-historia","date":"2026-09-29","time":"07:00","tz":"America/Sao_Paulo"}]},
+ {"team1":"Argentina","team2":"Bolivia","venue":"Estadio Mario Alberto Kempes, Córdoba","reports":[
+   {"source":"AFA","official":true,"url":"https://www.afa.com.ar/es/posts/amistosos-internacionales-en-argentina","date":"2026-09-30","comment":"Date and venue only; no kick-off time published"},
+   {"source":"El Destape","url":"https://www.eldestapeweb.com/deportes/cuando-juega-argentina-vs-bolivia-amistoso-fecha-fifa-todo-hay-saber-202692491552","date":"2026-09-30","time":"20:00","tz":"America/Argentina/Buenos_Aires"},
+   {"source":"Bolivia.com","url":"https://www.bolivia.com/futbol/la-seleccion/anuncian-el-horario-para-el-amistoso-entre-argentina-y-bolivia-602123","date":"2026-09-30","time":"20:00","tz":"America/La_Paz","comment":"20:00 Bolivia time, which is 21:00 in Argentina"},
+   {"source":"FotMob","url":"https://www.fotmob.com/teams/6706/fixtures/argentina","comment":"Shows 'Tue, Sep 29, 11:00 PM' with no time zone; the date disagrees with the AFA, so not counted"}]},
+ {"team1":"India","team2":"Brazil","venue":"Vivekananda Yuba Bharati Krirangan (Salt Lake Stadium), Kolkata","reports":[
+   {"source":"District (official ticketing, organised by the AIFF)","official":true,"url":"https://www.district.in/events/fifa-international-friendly-india-vs-brazil-buy-tickets","date":"2026-10-03","time":"19:30","tz":"Asia/Kolkata"},
+   {"source":"O Tempo","url":"https://www.otempo.com.br/sports/selecao-brasileira/2026/9/23/super-data-fifa-brasil-e-india-vao-se-enfrentar-pela-primeira-vez-na-historia","date":"2026-10-03","time":"11:00","tz":"America/Sao_Paulo"},
+   {"source":"FootballDream","url":"https://www.footballdream.in/blog/india-vs-brazil-2026-kolkata-friendly-time-tickets-tv","date":"2026-10-03","time":"19:30","tz":"Asia/Kolkata"}]},
+ {"team1":"Canada","team2":"Peru","venue":"Stade Saputo, Montréal","reports":[
+   {"source":"Canada Soccer","official":true,"url":"https://news.canadasoccer.com/canmnt-squad-named-for-september-october-international-window-following-historic-fifa-world-cup-26","date":"2026-10-03","time":"14:00","tz":"America/Toronto"}]},
+ {"team1":"Argentina","team2":"Burkina Faso","venue":"Estadio Monumental, Buenos Aires","reports":[
+   {"source":"AFA","official":true,"url":"https://www.afa.com.ar/es/posts/amistosos-internacionales-en-argentina","date":"2026-10-03","comment":"Date and venue only; no kick-off time published"},
+   {"source":"El Destape","url":"https://www.eldestapeweb.com/deportes/cuando-juega-argentina-vs-burkina-faso-amistoso-fecha-fifa-fecha-hora-confirmada-2026924175648","date":"2026-10-03","comment":"Headline says time confirmed, but no time appears in the article"},
+   {"source":"FotMob","url":"https://www.fotmob.com/teams/6706/fixtures/argentina","comment":"Shows 8:00 PM with no time zone; not counted until a source gives the zone"}]},
+ {"team1":"United States","team2":"Canada","venue":"Allianz Field, St. Paul, Minnesota","reports":[
+   {"source":"Canada Soccer","official":true,"url":"https://news.canadasoccer.com/canmnt-squad-named-for-september-october-international-window-following-historic-fifa-world-cup-26","date":"2026-10-06","time":"20:00","tz":"America/Toronto"}]},
+ {"team1":"Argentina","team2":"Benin","venue":"Estadio Monumental, Buenos Aires","note":"Messi's farewell match","reports":[
+   {"source":"AFA","official":true,"url":"https://www.afa.com.ar/es/posts/amistosos-internacionales-en-argentina","date":"2026-10-06","comment":"Date and venue only; no kick-off time published"},
+   {"source":"El Destape","url":"https://www.eldestapeweb.com/deportes/cuando-juega-argentina-vs-benin-amistoso-fecha-fifa-fecha-hora-confirmada-2026924175727","date":"2026-10-06","comment":"No time in the article"},
+   {"source":"FotMob","url":"https://www.fotmob.com/teams/6706/fixtures/argentina","comment":"Shows 8:00 PM with no time zone; not counted until a source gives the zone"}]}
+]
