@@ -1113,7 +1113,15 @@ function candidates(){ // matches that could be on right now, or finished today 
   });
 }
 // one league's matches on one day (US Eastern date, as ESPN groups them)
-async function board(slug,day){
+const BOARDS=new Map();        // "slug|day" -> {at, req}: a scoreboard fetched in the last 25 seconds is reused
+function board(slug,day){
+  const k=slug+"|"+day, have=BOARDS.get(k);
+  if(have&&Date.now()-have.at<25e3) return have.req;
+  const req=boardFetch(slug,day); BOARDS.set(k,{at:Date.now(),req});
+  req.catch(()=>BOARDS.delete(k));
+  return req;
+}
+async function boardFetch(slug,day){
   const res=await fetch(ESPN_API+slug+"/scoreboard?dates="+day,{cache:"no-store"});
   if(!res.ok) throw new Error(res.status);
   const js=await res.json(), out=[];
@@ -1178,6 +1186,19 @@ const shareURL=r=>{const u=new URL(location.pathname,location.href); u.searchPar
 const EVID=new Map();          // our match key -> ESPN event (or null when ESPN does not list it)
 let MD=null;                   // the match being shown: {r, root, S, status, timer, venueKey, seen}
 
+const SUMS=new Map();          // ESPN event id -> {at, req}: a match summary fetched in the last 20 seconds is reused
+function summary(ev){
+  const have=SUMS.get(ev.id);
+  if(have&&Date.now()-have.at<20e3) return have.req;
+  const req=fetch(ESPN_API+ev.slug+"/summary?event="+ev.id,{cache:"no-store"}).then(res=>{if(!res.ok) throw new Error(res.status); return res.json();}).then(parseSummary);
+  SUMS.set(ev.id,{at:Date.now(),req}); req.catch(()=>SUMS.delete(ev.id));
+  return req;
+}
+// Start loading a match's details as soon as the visitor points at, touches or tabs to its button, so they are ready on click.
+function warmMatch(uid){
+  const r=DATA.find(x=>x.uid===uid); if(!r||!ESPN[r.code]) return;
+  findEvent(r).then(ev=>{ if(ev) return summary(ev); }).catch(()=>{});
+}
 async function findEvent(r){
   const slug=ESPN[r.code]; if(!slug) return null;
   const k=keyOf(r), L=LIVE.get(k)||FINAL.get(k);
@@ -1340,8 +1361,8 @@ function openMatch(uid,root){
   if(!r){ root.innerHTML='<div class="md"><p class="md-card md-note">'+esc(T.mdGone)+'</p></div>'; return; }
   MD={r,root,S:null,status:"loading",timer:0,venueKey:null,seen:null};
   root.innerHTML='<article class="md"><section class="md-card md-top"><div id="md-head"></div><div id="md-act"></div></section>'+
-    '<section class="md-card" id="md-ev" hidden></section><section class="md-card" id="md-lu" hidden></section>'+
-    '<section class="md-card venue" id="md-venue" hidden></section><p class="md-state" id="md-state"></p><p class="md-src" id="md-src"></p></article>';
+    '<p class="md-state" id="md-state"></p><section class="md-card" id="md-ev" hidden></section><section class="md-card" id="md-lu" hidden></section>'+
+    '<section class="md-card venue" id="md-venue" hidden></section><p class="md-src" id="md-src"></p></article>';
   paintActions();
   paintMatch(); loadMatch();
 }
@@ -1374,9 +1395,7 @@ async function loadMatch(){
     const ev=await findEvent(m.r);
     if(!ev){ m.status="none"; }
     else{
-      const res=await fetch(ESPN_API+ev.slug+"/summary?event="+ev.id,{cache:"no-store"});
-      if(!res.ok) throw new Error(res.status);
-      m.S=parseSummary(await res.json()); m.status="ok";
+      m.S=await summary(ev); m.status="ok";
     }
   }catch(err){ m.status=m.S?"ok":"error"; }
   if(MD!==m) return;
@@ -1435,6 +1454,9 @@ function showPanel(uid){
   if(!mddlg.open) mddlg.showModal();
   mddlg.querySelector("[data-close]").focus();
 }
+["pointerover","focusin","touchstart"].forEach(t=>listEl.addEventListener(t,e=>{
+  const a=e.target.closest(".md-open"); if(a) warmMatch(a.dataset.uid);
+},{passive:true}));
 listEl.addEventListener("click",e=>{
   const a=e.target.closest(".md-open"); if(!a||e.ctrlKey||e.metaKey||e.shiftKey) return;
   e.preventDefault(); trigger=a.dataset.uid;
