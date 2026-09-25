@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>/* start downloading the fixtures straight away, while the rest of the page is still being read */
+window.FX=fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});FX.catch(()=>{});</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Matchday Planner</title>
 <meta name="description" content="Upcoming Premier League, La Liga, Bundesliga, Brasileirão and national-team friendly fixtures, with cross-checked kick-off times, live scores and a calendar you can subscribe to. In English and Brazilian Portuguese.">
@@ -146,7 +148,7 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
   background:var(--bg);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .chip{min-height:44px;font-size:14px;font-weight:600;line-height:1;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);border-radius:999px;padding:0 14px 0 7px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
-.chip .crest{font:600 11px/1 "Azeret Mono",monospace;color:var(--crest-ink);background:var(--c);border-radius:999px;min-width:30px;height:26px;display:grid;place-items:center;padding-inline:6px}
+.chip .crest{font:700 11px/1 "Instrument Sans",sans-serif;letter-spacing:.04em;color:var(--crest-ink);background:var(--c);border-radius:999px;min-width:30px;height:26px;display:grid;place-items:center;padding-inline:6px}
 .chip[aria-pressed="true"]{border-color:var(--c);color:var(--ink)}
 .chip[aria-pressed="false"]{color:var(--muted)}
 .chip[aria-pressed="false"] .crest{background:var(--tbc-bg);color:var(--tbc-ink)}
@@ -357,7 +359,7 @@ footer p{margin:10px 0 0}
       <div class="search">
         <svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <label class="sr" for="q" data-t="searchLabel">Filter by team</label>
-        <input type="search" id="q" autocomplete="off">
+        <input type="search" id="q" autocomplete="off" placeholder="Find teams: Arsenal, Flamengo, Canada">
         <button type="button" class="clear-q" id="clearq" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
       </div>
       <p class="date-err" id="date-err" role="alert"></p>
@@ -641,7 +643,9 @@ function checkDates(){ // "to" can't be before "from": say so, and ignore the en
 }
 document.querySelectorAll("#range button").forEach(b=>{ b.onclick=()=>setRange(b.dataset.r,true); });
 [from,to].forEach(el=>el.addEventListener("input",()=>{checkDates();limit=40;render();}));
-[q,tbc,favonly].forEach(el=>el.addEventListener("input",()=>{store.set("q",q.value);store.set("tbc",tbc.checked);store.set("favonly",favonly.checked);limit=40;render();}));
+let typing=0;   // while someone types, redraw once they pause (every key press would redraw the whole list)
+[q,tbc,favonly].forEach(el=>el.addEventListener("input",()=>{store.set("q",q.value);store.set("tbc",tbc.checked);store.set("favonly",favonly.checked);limit=40;
+  clearTimeout(typing); if(el===q) typing=setTimeout(render,150); else render();}));
 clearq.onclick=()=>{q.value="";store.set("q","");q.focus();limit=40;render();};
 resetBtn.onclick=()=>{
   LEAGUES.forEach(l=>{on.add(l.code);document.getElementById("chip-"+l.code).setAttribute("aria-pressed","true");}); store.set("leagues",[...on]);
@@ -705,6 +709,7 @@ function srcHTML(r){
   }).join("")+'</ul></div></details>';
   return h;
 }
+let lastList="";
 function render(){
   if(!META) return;
   document.querySelectorAll("details.srcs").forEach(d=>d.open?openSrc.add(d.dataset.k):openSrc.delete(d.dataset.k));
@@ -757,7 +762,8 @@ function render(){
   }
   if(!rows.length) html='<p class="empty">'+esc(T.empty)+' '+esc(favonly.checked&&!favs.size?T.emptyFav:T.emptyWide)+'</p>';
   if(rows.length>shown) html+='<button type="button" class="more" id="more">'+esc(T.more(rows.length-shown))+'</button>';
-  list.innerHTML=html;
+  if(html===lastList) return;          // the minute-by-minute refresh usually changes nothing: leave the page alone
+  lastList=html; list.innerHTML=html;
   const m=document.getElementById("more"); if(m) m.onclick=()=>{limit+=80;render();};
 }
 const listEl=document.getElementById("list");
@@ -864,6 +870,7 @@ document.addEventListener("visibilitychange",()=>{ if(!document.hidden) pollLive
 let lastCheck=0;
 function getData(){
   lastCheck=Date.now();
+  if(window.FX){ const first=window.FX; window.FX=null; return first; }   // the download started in <head>
   return fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok) throw new Error(r.status);return r.json();});
 }
 function useData(j){

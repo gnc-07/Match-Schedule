@@ -41,7 +41,7 @@ npm test                  # axe (24 combinations) then Lighthouse; exits non-zer
 npm run test:axe          # axe-core WCAG 2.2 AA: light/dark, en/pt, 390/1280px, menus closed/Settings/Calendar
 npm run test:lighthouse   # mobile and desktop, en and pt; every category must be 90+; HTML reports in lighthouse-reports/
 ```
-Run `npm test` after `python3 build_schedule.py` and before every commit that touches `index.html`. The tests start their own server on port 8123 and use the system Chromium (override with `CHROME_PATH`). They do not check the 44px control height; check that by hand. `node_modules/` and `lighthouse-reports/` are git-ignored; `tests/` and `package.json` are never published (the workflow copies only the site files).
+Run `npm test` after `python3 build_schedule.py` and before every commit that touches `index.html`. The tests start their own server on port 8123 and use the system Chromium (override with `CHROME_PATH`; when run as root, as in a cloud container, they add Chromium's `--no-sandbox`). They do not check the 44px control height; check that by hand. `node_modules/` and `lighthouse-reports/` are git-ignored; `tests/` and `package.json` are never published (the workflow copies only the site files).
 
 ## How to publish
 ```bash
@@ -63,4 +63,5 @@ Order matters: `git pull --rebase` refuses to run while there are uncommitted ch
 - Header: brand on the left; **Settings** (language, time zone, theme as three choices, small "Close ×") and **Calendar** buttons on the right. On phones they sit side by side under the brand.
 - Filters: league chips (order depends on language; Portuguese puts Brasileirão and friendlies first), date range (All, Today, This weekend, Next 7 days, Custom with inline From/To dates), team search with a clear button, Starred teams only, Include matches without a confirmed time, Clear filters (appears only when filters differ from the defaults). Match counts are announced to screen readers only.
 - List: each day as a small calendar block; match cards with time, teams (star to follow), league, venue, collapsible sources, status pills, and a "Watch on CazéTV" button (with a "usually only plays in Brazil" note) when a CazéTV YouTube stream is scheduled. Live scores from ESPN's public scoreboard, polled every 30 seconds while a listed match could be on.
-- Fonts: Big Shoulders Display (headings), Instrument Sans (text and times), Azeret Mono (scores and code).
+- Fonts: Big Shoulders Display (headings), Instrument Sans (text, times and league crests), Azeret Mono (scores and code; not needed at first load).
+- Speed: `fixtures.json` is requested from `<head>`, is written compactly (one match per line), and the list is only redrawn when it changed.
