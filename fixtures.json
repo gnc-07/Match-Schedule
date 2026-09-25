@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-25T17:14+00:00",
+ "generated": "2026-09-25T17:54+00:00",
  "sources": {
   "EPL": "football-data.org",
   "LIGA": "football-data.org",
@@ -354,7 +354,12 @@
    "utc": "2026-10-07T22:30:00+00:00",
    "venue": null,
    "note": null,
-   "uid": "fd-555025"
+   "uid": "fd-555025",
+   "watch": {
+    "url": "https://www.youtube.com/watch?v=7uq9nMdsVFU",
+    "title": "INTERNACIONAL x CORINTHIANS",
+    "kind": "stream"
+   }
   },
   {
    "comp": "Brasileirão",
