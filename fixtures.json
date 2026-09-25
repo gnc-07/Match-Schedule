@@ -1,5 +1,5 @@
-{"generated":"2026-09-25T19:51+00:00",
-"site":"5d9996e96bf3",
+{"generated":"2026-09-25T20:41+00:00",
+"site":"4329ff401849",
 "sources":{"EPL":"football-data.org","LIGA":"football-data.org","BUN":"football-data.org","BRA":"football-data.org","INTL":"friendlies.json (hand-maintained, cross-checked)"},
 "matches":[
 {"comp":"International friendly","code":"INTL","round":"","home":"Australia","away":"Brazil","date":"2026-09-25","utc":"2026-09-25T10:00:00+00:00","venue":"Queensland Country Bank Stadium, Townsville","uid":"intl|Australia|Brazil|2026-09-25","check":{"sources":[{"source":"Brasil 247","url":"https://www.brasil247.com/tendencias/2026/09/23/australia-x-brasil-que-horas-sera-o-amistoso-de-sexta-e-onde-assistir-ao-primeiro-jogo-da-selecao-apos-a-copa/","time":"07:00","tz":"America/Sao_Paulo","date":"2026-09-25"},{"source":"O Tempo","url":"https://www.otempo.com.br/sports/selecao-brasileira/2026/9/23/super-data-fifa-brasil-e-india-vao-se-enfrentar-pela-primeira-vez-na-historia","time":"07:00","tz":"America/Sao_Paulo","date":"2026-09-25"}],"status":"confirmed","basis":"2 independent sources agree"}},
