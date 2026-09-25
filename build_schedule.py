@@ -232,9 +232,26 @@ def from_f1(start, now=None):
             other += get_json(f"{OPENF1}/sessions?year={season}")
         except Exception as e:               # the cross-check is optional: without it times simply stay unverified
             print(f"OpenF1 could not be read for {season} ({e}); those F1 times are not cross-checked this run")
+    # OpenF1 groups sessions by race weekend ("meeting"). Each Grand Prix is paired with the meeting whose race starts
+    # closest to it (weekends are at least a week apart), so sessions are then matched by name alone, however far apart
+    # the two sources' times are: a big disagreement still reaches resolve() and shows as conflicting.
+    meetings = {}
+    for o in other:
+        if o.get("meeting_key") is not None and o.get("date_start"):
+            meetings.setdefault(o["meeting_key"], []).append(o)
+    def meeting_of(race):
+        when = _f1_time(race["date"], race.get("time")) or datetime.fromisoformat(race["date"] + "T12:00:00+00:00")
+        best = None
+        for key, ss in meetings.items():
+            rs = [datetime.fromisoformat(o["date_start"]) for o in ss if (o.get("session_name") or "").lower() == "race"]
+            gap = min((abs(t - when) for t in rs), default=None)
+            if gap is not None and gap < timedelta(days=4) and (best is None or gap < best[0]):
+                best = (gap, ss)
+        return best[1] if best else []
     out = []
     for race in races:
         season, rnd, c = race["season"], race["round"], race["Circuit"]
+        weekend = meeting_of(race)
         loc = c.get("Location", {})
         for key, code in F1_SESSIONS:
             s = race if key is None else race.get(key)
@@ -252,8 +269,7 @@ def from_f1(start, now=None):
                 r["circuit"] = {"name": c["circuitName"], "locality": loc.get("locality"), "country": loc.get("country"),
                                 "lat": float(loc["lat"]), "lon": float(loc["long"])} if loc.get("lat") else {"name": c["circuitName"]}
             if utc:
-                match = [o for o in other if (o.get("session_name") or "").lower() in OPENF1_NAMES[code]
-                         and o.get("date_start") and abs(datetime.fromisoformat(o["date_start"]) - utc) < timedelta(hours=12)]
+                match = [o for o in weekend if (o.get("session_name") or "").lower() in OPENF1_NAMES[code]]
                 if match:
                     o = datetime.fromisoformat(match[0]["date_start"]).astimezone(timezone.utc)
                     r["check"] = resolve([
@@ -284,7 +300,7 @@ def _valid_f1(r):
         if r.get("utc") is not None:
             r["utc"] = datetime.fromisoformat(r["utc"]).astimezone(timezone.utc).isoformat()   # normalised, as from_f1 writes it
         return (r.get("code") == "F1" and r.get("kind") == "f1" and r.get("sess") in F1_CODES
-                and isinstance(r.get("gp"), str) and str(r.get("wk", "")).startswith("f1|") and r.get("uid", "").startswith(r["wk"]))
+                and isinstance(r.get("gp"), str) and str(r.get("wk", "")).startswith("f1|") and r.get("uid") == f"{r['wk']}|{r['sess']}")
     except (KeyError, TypeError, ValueError, AttributeError):
         return False
 
