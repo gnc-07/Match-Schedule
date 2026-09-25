@@ -37,11 +37,11 @@ Check: English and Portuguese (`?lang=pt`), light and dark theme (Settings menu)
 
 Automated checks (needs Node.js; run `npm install` once to download the tools):
 ```bash
-npm test                  # axe (32 combinations) then Lighthouse; exits non-zero if anything fails
-npm run test:axe          # axe-core WCAG 2.2 AA: light/dark, en/pt, 390/1280px; menus closed, Settings, Calendar, high contrast
+npm test                  # axe (56 combinations) then Lighthouse; exits non-zero if anything fails
+npm run test:axe          # axe-core WCAG 2.2 AA: light/dark, en/pt, 390/1280px; menus closed, Settings, Calendar, Tables, match details, high contrast
 npm run test:lighthouse   # mobile and desktop, en and pt; every category must be 90+; HTML reports in lighthouse-reports/
 ```
-Run `npm test` after `python3 build_schedule.py` and before every commit that touches `index.html`. The tests start their own server on port 8123 and use the system Chromium (override with `CHROME_PATH`; when run as root, as in a cloud container, they add Chromium's `--no-sandbox`). They do not check the 44px control height; check that by hand. `node_modules/` and `lighthouse-reports/` are git-ignored; `tests/` and `package.json` are never published (the workflow copies only the site files).
+Run `npm test` after `python3 build_schedule.py` and before every commit that touches `index.html`. The axe run also covers the League tables window, the match details panel and high contrast, using the sample data in `tests/mock-data.mjs` in place of ESPN, Wikidata and OpenStreetMap. `node tests/screenshots.mjs` saves preview pictures with that sample data in `screenshots/` (git-ignored), for showing the owner design options before anything is published. The tests start their own server on port 8123 and use the system Chromium (override with `CHROME_PATH`; when run as root, as in a cloud container, they add Chromium's `--no-sandbox`). They do not check the 44px control height; check that by hand. `node_modules/` and `lighthouse-reports/` are git-ignored; `tests/` and `package.json` are never published (the workflow copies only the site files).
 
 ## How to publish
 ```bash
@@ -60,9 +60,12 @@ Order matters: `git pull --rebase` refuses to run while there are uncommitted ch
 - Be honest about limits and anything not tested.
 
 ## Current design (September 2026)
-- Header: brand on the left; **Settings** (language, time zone, theme as three choices, contrast Normal or High, text size Normal, Large or Extra large, small "Close ×") and **Calendar** buttons on the right. On phones they sit side by side under the brand.
+- Header: brand on the left; **Settings** (language, time zone, theme as three choices, contrast Normal or High, text size Normal, Large or Extra large, small "Close ×"), **Tables** and **Calendar** buttons on the right. On phones the three sit side by side under the brand (Calendar moves to its own row at Large and Extra large text).
 - Filters: league chips (order depends on language; Portuguese puts Brasileirão and friendlies first), date range (All, Today, This weekend, Next 7 days, Custom with inline From/To dates), team search with a clear button, Starred teams only, Include matches without a confirmed time, Clear filters (appears only when filters differ from the defaults). Match counts are announced to screen readers only.
 - List: each day as a small calendar block; match cards with time, teams (star to follow), league, venue, collapsible sources, status pills, and a "Watch on CazéTV" button (with a "usually only plays in Brazil" note) when a CazéTV YouTube stream is scheduled. Live scores from ESPN's public scoreboard, polled every 30 seconds while a listed match could be on.
+- Match details: a "Match details" button on each card opens a panel over the list (address `?match=<uid>`, so Back closes it and the link can be shared): score, timeline of goals, cards and substitutions (icon plus text label), line-ups with formation and coach, Add to my calendar (one .ics), Share, the league's table, and the stadium with a small OpenStreetMap map (plain tile images located through Wikidata; no map script). Data from ESPN's public match summary, refreshed every 30 seconds during a match.
+- **Tables** opens the league tables (ESPN standings, starred teams highlighted).
+- Match panel and tables: spacing scale 4, 8, 12, 16px; cards 16px padding and 14px corners; controls 10px corners.
 - Finished matches stay a day with the final score (ESPN, else the league feed's result from `build_schedule.py`).
 - Colours: every colour is a token, including the live box and shadows. The scheme is "Navy and gold"; high contrast (Settings) is the only alternative.
 - Fonts: Big Shoulders Display (headings), Instrument Sans (text, times and league crests), Azeret Mono (scores and code; not needed at first load).
