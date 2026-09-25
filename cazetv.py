@@ -18,9 +18,10 @@ A stream or listing is linked to a match only when both team names match the
 fixture and the dates fit. Anything uncertain is left unlinked. A real YouTube
 stream always wins over a schedule listing.
 """
-import json, os, re, unicodedata, urllib.request
+import json, re, unicodedata
 from datetime import datetime, timedelta, timezone
 from xml.etree import ElementTree as ET
+from common import fetch, load_json, save_json
 
 CHANNEL_ID = "UCZiYbVptd3PVPf4f6eR6UaQ"     # youtube.com/@CazeTV
 FEED = f"https://www.youtube.com/feeds/videos.xml?channel_id={CHANNEL_ID}"
@@ -30,6 +31,7 @@ AGENDA = "https://api-portal.agendacazetv.com/api/public/events?esporte=futebol&
 CACHE = "streams.json"
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0 Safari/537.36"
 KEEP_DAYS = 3                                  # forget a stream this long after its start
+VIDEO_ID = re.compile(r"[\w-]{11}")           # the shape of every YouTube video id
 
 # Words that carry no identity ("FC", "de", "Clube"...), removed before comparing names
 FILLER = set("fc cf afc sc ec ca cr se rc rcd ud cd fbc fbpa af fr sad club clube de da do del la "
@@ -105,12 +107,22 @@ def teams_from_title(title):
     return None
 
 def get(url):
-    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept-Language": "pt-BR,pt;q=0.9"})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return r.read().decode("utf-8", "replace")
+    return fetch(url, {"User-Agent": UA, "Accept-Language": "pt-BR,pt;q=0.9"}).decode("utf-8", "replace")
+
+def parse_feed(text):
+    """The feed's XML. A document type declaration is refused before parsing: YouTube's feed never has one,
+    and it is what XML entity-expansion attacks need (see the warnings in Python's xml documentation)."""
+    if "<!DOCTYPE" in text or "<!ENTITY" in text:
+        raise ValueError("the feed contains a document type declaration; refusing to parse it")
+    return ET.fromstring(text)
+
+def is_video_id(s):
+    return isinstance(s, str) and VIDEO_ID.fullmatch(s) is not None
 
 def scheduled_start(video_id):
     """The stream's scheduled start (UTC ISO string) from its watch page, or None if YouTube will not say."""
+    if not is_video_id(video_id):
+        return None
     try:
         m = re.search(r'"startTimestamp":"([^"]+)"', get(f"https://www.youtube.com/watch?v={video_id}"))
         return datetime.fromisoformat(m.group(1)).astimezone(timezone.utc).isoformat() if m else None
@@ -161,17 +173,17 @@ def read_agenda(known):
 
 def update_cache(now, path=CACHE):
     """Reads the feed and the agenda, adds new entries to the cache, drops old ones, saves it."""
-    cache = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else []
+    cache = load_json(path, [])
     known = {s["id"]: s for s in cache}
     try:
         print(f"CazéTV agenda: {read_agenda(known)} football listings read")
     except Exception as e:
         print(f"CazéTV agenda could not be read ({e}); using the listings already known")
     ns = {"a": "http://www.w3.org/2005/Atom", "yt": "http://www.youtube.com/xml/schemas/2015"}
-    root = ET.fromstring(get(FEED))
+    root = parse_feed(get(FEED))
     for e in root.findall("a:entry", ns):
         vid, title = e.findtext("yt:videoId", namespaces=ns), e.findtext("a:title", namespaces=ns)
-        if not teams_from_title(title):
+        if not is_video_id(vid) or not teams_from_title(title or ""):
             continue
         s = known.get(vid)
         if s is None:
@@ -184,7 +196,7 @@ def update_cache(now, path=CACHE):
             return datetime.fromisoformat(s["start"]) > now - timedelta(days=KEEP_DAYS)
         return datetime.fromisoformat(s["published"]) > now - timedelta(days=21)
     cache = sorted((s for s in known.values() if keep(s)), key=lambda s: s.get("start") or s["published"])
-    json.dump(cache, open(path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    save_json(path, cache)
     return cache
 
 def fit(side, team):
@@ -200,7 +212,9 @@ def watch_link(s):
         if s.get("url"):
             return (s["home"], s["away"]), {"url": s["url"], "title": f"{s['home']} x {s['away']}", "kind": "stream"}
         return (s["home"], s["away"]), {"url": CHANNEL, "title": f"{s['home']} x {s['away']}", "kind": "planned"}
-    sides = teams_from_title(s["title"])
+    if not is_video_id(s.get("id")):
+        return None, None                      # never build a link from an id that is not a YouTube video id
+    sides = teams_from_title(s.get("title") or "")
     return sides, sides and {"url": f"https://www.youtube.com/watch?v={s['id']}", "title": s["title"], "kind": "stream"}
 
 def attach(recs, cache):
@@ -239,6 +253,6 @@ def add_streams(recs, now=None):
         cache = update_cache(now)
     except Exception as e:
         print(f"CazéTV feed could not be read ({e}); using the streams already known")
-        cache = json.load(open(CACHE, encoding="utf-8")) if os.path.exists(CACHE) else []
+        cache = load_json(CACHE, [])
     n = attach(recs, cache)
     print(f"CazéTV: {len(cache)} upcoming streams and listings known, {n} linked to matches")

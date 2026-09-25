@@ -23,10 +23,11 @@ Examples
   python3 build_schedule.py
   python3 build_schedule.py --teams "Arsenal,Real Madrid,Brazil" --leagues EPL,BRA
 """
-import argparse, json, hashlib, os, sys, urllib.error, urllib.request
+import argparse, json, hashlib, os, sys, urllib.error
 from datetime import datetime, date, timedelta, timezone
 from zoneinfo import ZoneInfo
 import cazetv
+from common import fetch_json, load_json, save_text
 
 HOME_TZ = ZoneInfo("America/Edmonton")   # all human-readable times are shown in this zone
 OPENFOOTBALL = "https://raw.githubusercontent.com/openfootball/football.json/master"
@@ -52,9 +53,7 @@ def season_folders(style, today):
     return [f"{s}-{str(s + 1)[2:]}" for s in (start, start - 1)]
 
 def get_json(url, headers=None):
-    req = urllib.request.Request(url, headers=headers or {})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.load(r)
+    return fetch_json(url, headers)
 
 def record(comp, code, home, away, day, utc=None, rnd="", venue=None, note=None, uid=None):
     """One match in a common shape. utc is an ISO string, or None when the time is not known."""
@@ -141,6 +140,8 @@ def _utc(date_s, time_s, tz):
 def resolve(reports):
     """Returns (date, utc or None, check) from a list of reports."""
     dates = [r["date"] for r in reports if r.get("date")]
+    if not dates:
+        raise ValueError("every match needs at least one report with a date")
     official_dates = [r["date"] for r in reports if r.get("official") and r.get("date")]
     day = official_dates[0] if official_dates else max(set(dates), key=dates.count)
     timed = [(r, _utc(r["date"], r["time"], r["tz"])) for r in reports if r.get("time") and r.get("tz")]
@@ -171,7 +172,7 @@ def resolve(reports):
 # ---------- source 3: friendlies (hand-maintained, cross-checked) ----------
 def from_friendlies(start, path="friendlies.json"):
     out = []
-    for f in json.load(open(path, encoding="utf-8")):
+    for f in load_json(path):
         day, utc, check = resolve(f["reports"])
         if date.fromisoformat(day) < start:
             continue
@@ -183,9 +184,7 @@ def from_friendlies(start, path="friendlies.json"):
 
 # ---------- league corrections: fills times the main feed has not caught up with ----------
 def apply_overrides(recs, path="overrides.json"):
-    if not os.path.exists(path):
-        return
-    for o in json.load(open(path, encoding="utf-8")):
+    for o in load_json(path, []):
         hits = [r for r in recs if r["code"] == o["code"]
                 and o["home"].lower() in r["home"].lower() and o["away"].lower() in r["away"].lower()]
         if len(hits) != 1:
@@ -307,43 +306,42 @@ def _valid_f1(r):
 def previous_f1(start, path="fixtures.json"):
     """The F1 sessions from the last published fixtures.json: used when Jolpica-F1 cannot be reached."""
     try:
-        old = json.load(open(path, encoding="utf-8"))["matches"]
+        old = load_json(path)["matches"]
     except Exception:
         return []
     recent = (start - timedelta(days=KEEP_DAYS)).isoformat()
     return [r for r in old if isinstance(r, dict) and _valid_f1(r) and r["date"] >= recent]
 
-SOURCES = {}   # which source each league came from, recorded in fixtures.json
-F1_STALE = False   # True when Jolpica-F1 failed and the F1 sessions are the previous build's (the site says so)
-
 def load_all(start):
-    global F1_STALE
+    """Every match and session from `start` on. Returns (records, sources, f1_stale): which source each
+    league came from (shown on the site), and whether the F1 sessions had to be reused from the last build."""
+    sources, f1_stale = {}, False
     token = os.environ.get("FOOTBALL_DATA_TOKEN")
     out = []
     for code, (name, fd_code, filename, style, tz) in LEAGUES.items():
         if token:
             try:
                 out += from_football_data(code, name, fd_code, tz, start, token)
-                SOURCES[code] = "football-data.org"; continue
+                sources[code] = "football-data.org"; continue
             except Exception as e:           # API down or rate-limited: fall back rather than fail
                 print(f"football-data.org failed for {code} ({e}); using openfootball")
         out += from_openfootball(code, name, filename, style, tz, start)
-        SOURCES[code] = "openfootball"
+        sources[code] = "openfootball"
     apply_overrides(out)
     out = [r for r in out if date.fromisoformat(r["date"]) >= start or "result" in r or r.get("started")]
     out += from_friendlies(start)
-    SOURCES["INTL"] = "friendlies.json (hand-maintained, cross-checked)"
+    sources["INTL"] = "friendlies.json (hand-maintained, cross-checked)"
     try:
         f1 = from_f1(start)
-        SOURCES["F1"] = "Jolpica-F1" + (" and OpenF1" if any(r.get("check") for r in f1) else "")
+        sources["F1"] = "Jolpica-F1" + (" and OpenF1" if any(r.get("check") for r in f1) else "")
     except Exception as e:                   # F1 must never stop the football schedule from publishing
         print(f"Jolpica-F1 failed ({e}); keeping the F1 sessions already published")
-        F1_STALE = True
+        f1_stale = True
         f1 = previous_f1(start)
-        SOURCES["F1"] = "Jolpica-F1"
+        sources["F1"] = "Jolpica-F1"
     out += f1
     out.sort(key=lambda r: (r["utc"] or r["date"] + "T99"))
-    return out
+    return out, sources, f1_stale
 
 def apply_filters(recs, leagues=None, teams=None):
     if leagues:
@@ -355,7 +353,10 @@ def apply_filters(recs, leagues=None, teams=None):
 
 # ---------- iCalendar writer (RFC 5545) ----------
 def esc(s):
-    return s.replace("\\", "\\\\").replace(",", "\\,").replace(";", "\\;").replace("\n", "\\n")
+    """Text for an iCalendar value: backslash, comma and semicolon escaped, and every kind of line break
+    (a lone carriage return too) written as \\n, so no text from a feed can start a line of its own."""
+    s = s.replace("\\", "\\\\").replace(",", "\\,").replace(";", "\\;")
+    return s.replace("\r\n", "\\n").replace("\r", "\\n").replace("\n", "\\n")
 
 def fold(line):  # lines longer than 75 bytes must be folded
     b, out = line.encode(), []
@@ -423,17 +424,16 @@ def write_fixtures(meta, path="fixtures.json"):
     one = lambda v: json.dumps(v, ensure_ascii=False, separators=(",", ":"))
     head = [one(k) + ":" + one(v) for k, v in meta.items() if k != "matches"]
     rows = [one({k: v for k, v in r.items() if not (v is None and k in ("venue", "note"))}) for r in meta["matches"]]
-    with open(path, "w", encoding="utf-8") as f:
-        f.write("{" + ",\n".join(head) + ',\n"matches":[\n' + ",\n".join(rows) + "\n]}\n")
+    save_text(path, "{" + ",\n".join(head) + ',\n"matches":[\n' + ",\n".join(rows) + "\n]}\n")
 
-if __name__ == "__main__":
+def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--start", default=datetime.now(HOME_TZ).date().isoformat())
     ap.add_argument("--leagues", help="comma list of EPL,LIGA,BUN,BRA,INTL,F1")
     ap.add_argument("--teams", help="comma list of team-name fragments")
     ap.add_argument("--out", default="soccer.ics")
     a = ap.parse_args()
-    recs = load_all(date.fromisoformat(a.start))
+    recs, sources, f1_stale = load_all(date.fromisoformat(a.start))
     league_count = sum(1 for r in recs if r["code"] not in ("INTL", "F1") and "result" not in r and not r.get("started"))
     if league_count < MIN_MATCHES:
         # exiting with an error stops the workflow before it publishes, so the last good site stays up
@@ -441,11 +441,15 @@ if __name__ == "__main__":
     cazetv.add_streams([r for r in recs if r["code"] != "F1"])   # CazéTV links are for football matches
     recs = apply_filters(recs, a.leagues and a.leagues.split(","), a.teams and a.teams.split(","))
     # "site" fingerprints index.html, so a page left open can tell the site itself was updated and reload
-    site = hashlib.sha256(open("index.html", "rb").read()).hexdigest()[:12]
+    with open("index.html", "rb") as f:
+        site = hashlib.sha256(f.read()).hexdigest()[:12]
     meta = {"generated": datetime.now(timezone.utc).isoformat(timespec="minutes"), "site": site,
-            "sources": SOURCES, "matches": recs}
-    if F1_STALE:
+            "sources": sources, "matches": recs}
+    if f1_stale:
         meta["f1stale"] = True
     write_fixtures(meta)
-    open(a.out, "w", newline="", encoding="utf-8").write(ics([r for r in recs if r["code"] != "F1"]))   # the calendar stays football-only
+    save_text(a.out, ics([r for r in recs if r["code"] != "F1"]), newline="")   # the calendar stays football-only
     print(f"{len(recs)} matches -> {a.out}")
+
+if __name__ == "__main__":
+    main()
