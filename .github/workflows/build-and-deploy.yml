@@ -1,1 +1,95 @@
+# Rebuilds the fixture data, researches missing kick-off times (if an Anthropic API key is set),
+# saves any changes to the repository, and publishes the website.
+name: Build and deploy site
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"      # rebuild: minute 17 of every 6th hour, UTC (4 runs a day)
+    - cron: "5 12 * * *"        # research + rebuild: 12:05 UTC daily (6:05 a.m. MDT / 5:05 a.m. MST)
+  workflow_dispatch:             # adds a "Run workflow" button in the Actions tab
+    inputs:
+      research:
+        description: "Also research missing kick-off times (uses the API key)"
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths: ["friendlies.json", "overrides.json", "build_schedule.py", "research.py", "index.html", ".github/workflows/**"]
+
+permissions:
+  contents: write                # lets the job commit the rebuilt data
+  pages: write                   # lets the job publish to GitHub Pages
+  id-token: write                # proves to Pages that this workflow is allowed to deploy
+
+concurrency:                     # never run two builds at once; a new one waits for the last
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      HAS_RESEARCH_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Research missing kick-off times
+        # only on the daily 12:05 run, or a manual run with the box ticked, and only if the key exists
+        if: env.HAS_RESEARCH_KEY == 'true' && (github.event.schedule == '5 12 * * *' || inputs.research)
+        continue-on-error: true      # a research problem must never stop the site from updating
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          RESEARCH_MAX_CALLS: ${{ vars.RESEARCH_MAX_CALLS || '4' }}
+        run: |
+          pip install --quiet anthropic
+          python research.py
+
+      - name: Build fixtures.json and soccer.ics
+        env:
+          FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}   # optional; empty means openfootball is used
+        run: python build_schedule.py
+
+      - name: Save changes to the repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -N soccer.ics fixtures.json    # lets git diff see the files even on the very first run
+          # DTSTAMP and "generated" change on every run, so ignore them when deciding whether anything real changed
+          if git diff --quiet -I '^DTSTAMP:' -I '"generated"' -- soccer.ics fixtures.json friendlies.json overrides.json; then
+            echo "No fixture changes."
+            # GitHub pauses scheduled workflows after 60 days without repository activity;
+            # an empty commit every 45 quiet days keeps the schedule running
+            if [ $(( $(date +%s) - $(git log -1 --format=%ct) )) -gt $(( 45 * 86400 )) ]; then
+              git commit --allow-empty -m "Keep scheduled runs active"
+              git pull --rebase && git push
+            fi
+          else
+            git add soccer.ics fixtures.json friendlies.json overrides.json
+            git commit -m "Update fixtures $(date -u +%Y-%m-%dT%H:%MZ)"
+            git pull --rebase && git push    # pull first in case you edited a file on GitHub meanwhile
+          fi
+
+      - name: Collect the files that make up the website
+        run: |
+          mkdir -p _site
+          cp index.html fixtures.json soccer.ics _site/
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
 
