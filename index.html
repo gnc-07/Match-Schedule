@@ -169,7 +169,6 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 .url{font:500 12px/1.45 "Azeret Mono",ui-monospace,monospace;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;word-break:break-all;color:var(--ink-2)}
 .toast{font-size:14px;color:var(--accent);font-weight:600}
 .toast:empty{display:none}
-.calpanel details summary{cursor:pointer;font-size:14px;color:var(--ink-2);font-weight:600;min-height:32px;display:flex;align-items:center}
 .calpanel ol{margin:6px 0 0;padding-left:18px;font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:5px}
 
 /* ---------- live now ---------- */
@@ -269,10 +268,12 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
 .pill.live{background:var(--live-bg);color:var(--on-live)}
 .pill.ft{background:var(--ink);color:var(--bg)}
 .srcs{font-size:13.5px;color:var(--muted)}
-.srcs summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink-2);min-height:32px}
-.srcs summary::-webkit-details-marker{display:none}
-.srcs summary::after{content:"";width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px)}
-.srcs[open] summary::after{transform:rotate(-135deg) translate(-1px,-1px)}
+/* Sections that open (sources, "How to subscribe"): text with a small arrow that flips when open */
+.srcs summary,.calpanel details summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink-2);min-height:32px}
+.calpanel details summary{font-size:14px;min-height:44px}
+.srcs summary::-webkit-details-marker,.calpanel details summary::-webkit-details-marker{display:none}
+.srcs summary::after,.calpanel details summary::after{content:"";width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px)}
+.srcs[open] summary::after,.calpanel details[open] summary::after{transform:rotate(-135deg) translate(-1px,-1px)}
 .srcs .body{margin-top:4px;display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line-2)}
 .srcs .reported{color:var(--warn-ink);font-weight:600}
 .srcs ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
@@ -383,6 +384,8 @@ dialog.sheet::backdrop{background:var(--backdrop)}
 
 /* ---------- league tables ---------- */
 .lt-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+@media (min-width:641px){#ltdlg{height:calc(100dvh - 48px)}}   /* a fixed height, so switching leagues never resizes or moves the window */
+#ltbody[aria-busy="true"] .lt-wrap{opacity:.55}   /* the previous table stays in place, dimmed, until the next one arrives */
 .lt-wrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numeric:tabular-nums;color:var(--ink)}
 .lt caption{text-align:left;padding:16px 16px 8px;font:800 1.2rem/1.1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}
@@ -1105,7 +1108,19 @@ function candidates(){ // matches that could be on right now, or finished today 
   });
 }
 // one league's matches on one day (US Eastern date, as ESPN groups them)
-async function board(slug,day){
+// A download still on its way is always reused; a finished one for 25 seconds (scoreboards) or 20 (match summaries).
+// A failed one is forgotten, so the next request tries again.
+function reuse(cache,k,ms,start){
+  const have=cache.get(k);
+  if(have&&Date.now()-have.at<ms) return have.req;
+  const entry={at:Infinity,req:start()};   // "at" is set when the download finishes
+  cache.set(k,entry);
+  entry.req.then(()=>{entry.at=Date.now();},()=>{if(cache.get(k)===entry) cache.delete(k);});
+  return entry.req;
+}
+const BOARDS=new Map();        // "slug|day" -> scoreboard download
+function board(slug,day){ return reuse(BOARDS,slug+"|"+day,25e3,()=>boardFetch(slug,day)); }
+async function boardFetch(slug,day){
   const res=await fetch(ESPN_API+slug+"/scoreboard?dates="+day,{cache:"no-store"});
   if(!res.ok) throw new Error(res.status);
   const js=await res.json(), out=[];
@@ -1170,6 +1185,16 @@ const shareURL=r=>{const u=new URL(location.pathname,location.href); u.searchPar
 const EVID=new Map();          // our match key -> ESPN event (or null when ESPN does not list it)
 let MD=null;                   // the match being shown: {r, root, S, status, timer, venueKey, seen}
 
+const SUMS=new Map();          // ESPN event id -> match summary download
+function summary(ev){
+  return reuse(SUMS,ev.id,20e3,()=>fetch(ESPN_API+ev.slug+"/summary?event="+ev.id,{cache:"no-store"})
+    .then(res=>{if(!res.ok) throw new Error(res.status); return res.json();}).then(parseSummary));
+}
+// Start loading a match's details as soon as the visitor points at, touches or tabs to its button, so they are ready on click.
+function warmMatch(uid){
+  const r=DATA.find(x=>x.uid===uid); if(!r||!ESPN[r.code]) return;
+  findEvent(r).then(ev=>{ if(ev) return summary(ev); }).catch(()=>{});
+}
 async function findEvent(r){
   const slug=ESPN[r.code]; if(!slug) return null;
   const k=keyOf(r), L=LIVE.get(k)||FINAL.get(k);
@@ -1332,8 +1357,8 @@ function openMatch(uid,root){
   if(!r){ root.innerHTML='<div class="md"><p class="md-card md-note">'+esc(T.mdGone)+'</p></div>'; return; }
   MD={r,root,S:null,status:"loading",timer:0,venueKey:null,seen:null};
   root.innerHTML='<article class="md"><section class="md-card md-top"><div id="md-head"></div><div id="md-act"></div></section>'+
-    '<section class="md-card" id="md-ev" hidden></section><section class="md-card" id="md-lu" hidden></section>'+
-    '<section class="md-card venue" id="md-venue" hidden></section><p class="md-state" id="md-state"></p><p class="md-src" id="md-src"></p></article>';
+    '<p class="md-state" id="md-state"></p><section class="md-card" id="md-ev" hidden></section><section class="md-card" id="md-lu" hidden></section>'+
+    '<section class="md-card venue" id="md-venue" hidden></section><p class="md-src" id="md-src"></p></article>';
   paintActions();
   paintMatch(); loadMatch();
 }
@@ -1366,9 +1391,7 @@ async function loadMatch(){
     const ev=await findEvent(m.r);
     if(!ev){ m.status="none"; }
     else{
-      const res=await fetch(ESPN_API+ev.slug+"/summary?event="+ev.id,{cache:"no-store"});
-      if(!res.ok) throw new Error(res.status);
-      m.S=parseSummary(await res.json()); m.status="ok";
+      m.S=await summary(ev); m.status="ok";
     }
   }catch(err){ m.status=m.S?"ok":"error"; }
   if(MD!==m) return;
@@ -1427,6 +1450,9 @@ function showPanel(uid){
   if(!mddlg.open) mddlg.showModal();
   mddlg.querySelector("[data-close]").focus();
 }
+["pointerover","focusin","touchstart"].forEach(t=>listEl.addEventListener(t,e=>{
+  const a=e.target.closest(".md-open"); if(a) warmMatch(a.dataset.uid);
+},{passive:true}));
 listEl.addEventListener("click",e=>{
   const a=e.target.closest(".md-open"); if(!a||e.ctrlKey||e.metaKey||e.shiftKey) return;
   e.preventDefault(); trigger=a.dataset.uid;
@@ -1465,23 +1491,34 @@ document.getElementById("ltchips").addEventListener("click",e=>{
 function openTables(code){
   ltCode=code||ltCode||(ordered().find(l=>TABLE_CODES.includes(l.code)&&on.has(l.code))||{code:"EPL"}).code;
   paintChips(); ltdlg.showModal(); ltdlg.querySelector("[data-close]").focus(); loadTable();
+  TABLE_CODES.forEach(c=>fetchTable(c).catch(()=>{}));   // download the other leagues now, so switching is instant
 }
 document.getElementById("tablesbtn").onclick=()=>openTables();
+const TABLE_REQ=new Map();     // league code -> download in progress, so one league is never fetched twice at once
+function fetchTable(code){
+  const have=TABLES.get(code);
+  if(have&&Date.now()-have.at<=5*60e3) return Promise.resolve();
+  if(TABLE_REQ.has(code)) return TABLE_REQ.get(code);
+  const req=fetch("https://site.api.espn.com/apis/v2/sports/soccer/"+ESPN[code]+"/standings",{cache:"no-store"}).then(async res=>{
+    if(!res.ok) throw new Error(res.status);
+    const js=await res.json(), g=(js.children||[])[0]||js;
+    const rows=(((g.standings||{}).entries)||[]).map(e=>{const s={}; (e.stats||[]).forEach(x=>s[x.name||x.type]=x.value);
+      return {team:(e.team&&(e.team.displayName||e.team.name))||"",rank:s.rank,p:s.gamesPlayed,w:s.wins,d:s.ties,l:s.losses,gd:s.pointDifferential,pts:s.points};});
+    rows.sort((a,b)=>(a.rank??99)-(b.rank??99)||(b.pts-a.pts)||(b.gd-a.gd));
+    TABLES.set(code,{at:Date.now(),rows});
+  }).finally(()=>TABLE_REQ.delete(code));
+  TABLE_REQ.set(code,req); return req;
+}
 async function loadTable(){
-  const code=ltCode, body=document.getElementById("ltbody"), have=TABLES.get(code);
+  const code=ltCode, body=document.getElementById("ltbody");
+  const have=TABLES.get(code);
   if(!have||Date.now()-have.at>5*60e3){
-    body.innerHTML='<p class="md-note">'+esc(T.ltLoading)+'</p>';
-    try{
-      const res=await fetch("https://site.api.espn.com/apis/v2/sports/soccer/"+ESPN[code]+"/standings",{cache:"no-store"});
-      if(!res.ok) throw new Error(res.status);
-      const js=await res.json(), g=(js.children||[])[0]||js;
-      const rows=(((g.standings||{}).entries)||[]).map(e=>{const s={}; (e.stats||[]).forEach(x=>s[x.name||x.type]=x.value);
-        return {team:(e.team&&(e.team.displayName||e.team.name))||"",rank:s.rank,p:s.gamesPlayed,w:s.wins,d:s.ties,l:s.losses,gd:s.pointDifferential,pts:s.points};});
-      rows.sort((a,b)=>(a.rank??99)-(b.rank??99)||(b.pts-a.pts)||(b.gd-a.gd));
-      TABLES.set(code,{at:Date.now(),rows});
-    }catch(err){ if(ltCode===code) body.innerHTML='<p class="md-note">'+esc(T.ltError)+'</p>'; return; }
+    if(body.querySelector(".lt-wrap")) body.setAttribute("aria-busy","true");   // keep the shown table until the new one is ready
+    else body.innerHTML='<p class="md-note">'+esc(T.ltLoading)+'</p>';
+    try{ await fetchTable(code); }
+    catch(err){ if(ltCode===code){ body.removeAttribute("aria-busy"); body.innerHTML='<p class="md-note">'+esc(T.ltError)+'</p>'; } return; }
   }
-  if(ltCode===code) paintTable();
+  if(ltCode===code){ body.removeAttribute("aria-busy"); paintTable(); }
 }
 function paintTable(){
   const t=TABLES.get(ltCode); if(!t) return;
