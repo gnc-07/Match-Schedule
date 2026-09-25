@@ -14,7 +14,7 @@ const outDir = path.join(ROOT, "lighthouse-reports");
 mkdirSync(outDir, { recursive: true });
 
 const server = await startServer();
-const chrome = await chromeLauncher.launch({ chromePath: chromePath(), chromeFlags: ["--headless=new"] });
+const chrome = await chromeLauncher.launch({ chromePath: chromePath(), chromeFlags: ["--headless=new", ...(process.getuid?.() === 0 ? ["--no-sandbox"] : [])] });   // Chromium refuses to run as root without --no-sandbox
 let failed = false;
 
 try {

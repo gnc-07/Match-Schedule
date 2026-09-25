@@ -16,7 +16,8 @@ const widths = [390, 1280];
 const states = ["closed", "setmenu", "calmenu"];
 
 const server = await startServer();
-const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true });
+const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true,
+  args: process.getuid?.() === 0 ? ["--no-sandbox"] : [] });   // Chromium refuses to run as root without this
 let failures = 0, runs = 0;
 
 try {

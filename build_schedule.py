@@ -273,6 +273,16 @@ def ics(recs, alarm_min=30):
     L.append("END:VCALENDAR")
     return "\r\n".join(fold(l) for l in L) + "\r\n"
 
+def write_fixtures(meta, path="fixtures.json"):
+    """Compact JSON, one match per line, leaving out empty venue and note fields: about a quarter smaller
+    for visitors to download and read, while git (and the workflow's change check) still sees each match,
+    and the "generated" time, on a line of its own."""
+    one = lambda v: json.dumps(v, ensure_ascii=False, separators=(",", ":"))
+    head = [one(k) + ":" + one(v) for k, v in meta.items() if k != "matches"]
+    rows = [one({k: v for k, v in r.items() if not (v is None and k in ("venue", "note"))}) for r in meta["matches"]]
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("{" + ",\n".join(head) + ',\n"matches":[\n' + ",\n".join(rows) + "\n]}\n")
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--start", default=datetime.now(HOME_TZ).date().isoformat())
@@ -291,6 +301,6 @@ if __name__ == "__main__":
     site = hashlib.sha256(open("index.html", "rb").read()).hexdigest()[:12]
     meta = {"generated": datetime.now(timezone.utc).isoformat(timespec="minutes"), "site": site,
             "sources": SOURCES, "matches": recs}
-    json.dump(meta, open("fixtures.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    write_fixtures(meta)
     open(a.out, "w", newline="", encoding="utf-8").write(ics(recs))
     print(f"{len(recs)} matches -> {a.out}")
