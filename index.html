@@ -1111,6 +1111,7 @@ function f1Tags(r){
   if(r.when&&now>=r.when.getTime()) return "";
   if(!r.utc) t.push('<span class="pill tbc">'+esc(T.pTbc)+'</span>');
   else if(c&&c.status==="confirmed") t.push('<span class="pill ok">'+ICON.check+esc(T.pVerified)+'</span>');
+  else if(c&&c.status==="conflicting") t.push('<span class="pill warn">'+esc(T.pConflicting)+'</span>');   // Jolpica-F1 and OpenF1 disagree
   if(r.when&&+fmtH.format(r.when)<7) t.push('<span class="pill early">'+ICON.moon+esc(T.pEarly)+'</span>');
   return t.join("");
 }

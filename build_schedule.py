@@ -221,13 +221,15 @@ def from_f1(start, now=None):
     now = now or datetime.now(timezone.utc)
     recent = start - timedelta(days=KEEP_DAYS)
     races = get_json(f"{JOLPICA}/{start.year}/races/?limit=100")["MRData"]["RaceTable"]["Races"]
-    if not any(date.fromisoformat(r["date"]) >= start for r in races):     # season over: next year's calendar
-        races = get_json(f"{JOLPICA}/{start.year + 1}/races/?limit=100")["MRData"]["RaceTable"]["Races"]
-    try:
-        other = get_json(f"{OPENF1}/sessions?year={races[0]['season']}") if races else []
-    except Exception as e:                   # the cross-check is optional: without it times simply stay unverified
-        print(f"OpenF1 could not be read ({e}); F1 times are not cross-checked this run")
-        other = []
+    if not any(date.fromisoformat(r["date"]) >= start for r in races):     # season over: add next year's calendar,
+        races = [r for r in races if date.fromisoformat(r["date"]) >= recent] + \
+                get_json(f"{JOLPICA}/{start.year + 1}/races/?limit=100")["MRData"]["RaceTable"]["Races"]   # keeping the finale a day
+    other = []
+    for season in sorted({r["season"] for r in races}):
+        try:
+            other += get_json(f"{OPENF1}/sessions?year={season}")
+        except Exception as e:               # the cross-check is optional: without it times simply stay unverified
+            print(f"OpenF1 could not be read for {season} ({e}); those F1 times are not cross-checked this run")
     out = []
     for race in races:
         season, rnd, c = race["season"], race["round"], race["Circuit"]
