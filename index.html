@@ -41,6 +41,7 @@ window.FX=fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new 
   --warn-bg:#FFF1CC; --warn-ink:#6B4700; --tbc-bg:#ECEFF5; --tbc-ink:#4A5468; --early-bg:#ECEBFD; --early-ink:#3D3294;
   --star:#B37F00; --star-off:#8B94A7;
   --epl:#6A3DBF; --liga:#B23A0E; --bun:#C4102A; --bra:#0B7A3C; --intl:#06708C; --f1:#3D4452; --crest-ink:#FFFFFF;
+  --t-mcl:#FF8000; --t-fer:#DC0000; --t-rbr:#3671C6; --t-mer:#00A19C; --t-amr:#00665E; --t-alp:#0093CC; --t-wil:#1868DB; --t-rb:#6692FF; --t-haa:#9C9FA2; --t-aud:#B4B7BC; --t-cad:#1E1E1E;
   --on-board:#F2F5FB; --board-muted:#B7C3DD; --board-line:#26375F; --board-well:rgba(0,0,0,.3); --on-live:#FFFFFF;
   --shadow:rgba(10,15,28,.45); --backdrop:rgba(10,15,28,.55);
   --card-yellow:#F5C518; --card-edge:#7A5C00; --card-red:#D0112B; --sub-on:#0B7A3C; --sub-off:#B3142C; --mine:#FFF6D6;
@@ -68,6 +69,7 @@ window.FX=fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new 
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
   --epl:#B79CFF; --liga:#FF9A6E; --bun:#FF8193; --bra:#5BD493; --intl:#5ACDE8; --f1:#C3CAD6; --crest-ink:#0A0F1C;
+  --t-mcl:#FF8000; --t-fer:#FF3B30; --t-rbr:#5B8EE6; --t-mer:#27F4D2; --t-amr:#229971; --t-alp:#2BB5F0; --t-wil:#64A0FF; --t-rb:#8FAEFF; --t-haa:#B6BABD; --t-aud:#C9CCD1; --t-cad:#E8E8E8;
   --on-board:#F2F5FB; --board-muted:#B7C3DD; --board-line:#26375F; --board-well:rgba(0,0,0,.3); --on-live:#FFFFFF;
   --shadow:rgba(0,0,0,.6); --backdrop:rgba(0,0,0,.65);
   --card-yellow:#FFD23F; --card-edge:#FFD23F; --card-red:#FF5A6E; --sub-on:#5BD493; --sub-off:#FF8795; --mine:#2A2412;
@@ -86,6 +88,7 @@ window.FX=fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new 
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
   --epl:#B79CFF; --liga:#FF9A6E; --bun:#FF8193; --bra:#5BD493; --intl:#5ACDE8; --f1:#C3CAD6; --crest-ink:#0A0F1C;
+  --t-mcl:#FF8000; --t-fer:#FF3B30; --t-rbr:#5B8EE6; --t-mer:#27F4D2; --t-amr:#229971; --t-alp:#2BB5F0; --t-wil:#64A0FF; --t-rb:#8FAEFF; --t-haa:#B6BABD; --t-aud:#C9CCD1; --t-cad:#E8E8E8;
   --on-board:#F2F5FB; --board-muted:#B7C3DD; --board-line:#26375F; --board-well:rgba(0,0,0,.3); --on-live:#FFFFFF;
   --shadow:rgba(0,0,0,.6); --backdrop:rgba(0,0,0,.65);
   --card-yellow:#FFD23F; --card-edge:#FFD23F; --card-red:#FF5A6E; --sub-on:#5BD493; --sub-off:#FF8795; --mine:#2A2412;
@@ -324,8 +327,80 @@ footer p{margin:10px 0 0}
 .wk-list{margin:0;font-size:14px;color:var(--muted)}
 .mini-pod{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14.5px;color:var(--ink-2)}
 .mini-pod b{font-family:"Azeret Mono",monospace;color:var(--ink)}
+/* Formula 1 race weekend panel */
+.md-card>.f1-gp{margin:12px 0 0;font:800 2rem/1.05 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;color:var(--ink)}
+.f1b{margin:16px auto 0;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--board);color:var(--on-board);border-radius:12px;padding:12px 16px}
+.f1b .lbl{font:700 11px/1 "Instrument Sans",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.f1b .big{font:800 1.6rem/1.1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;text-align:center}
+.f1b .big small{font:600 13px/1 "Instrument Sans",sans-serif;letter-spacing:.06em;color:var(--board-muted);margin-left:4px}
+.f1b .sub{font-size:13px;color:var(--board-muted)}
+.ss{list-style:none;margin:0;padding:0}
+.ss li{display:grid;grid-template-columns:8.5em minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line-2)}
+.ss li:first-child{border-top:0;padding-top:0}
+.ss .when{font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
+.ss .d{text-transform:capitalize;color:var(--muted);font-weight:600}
+.ss .what b{display:block;color:var(--ink)}
+.ss .what small{display:block;font-size:13.5px;color:var(--ink-2)}
+.ss li.race .what b{font-size:17px}
+.pill.next{background:var(--accent-soft);color:var(--accent)}
+.md-card.flush{padding:0;overflow:hidden}
+.f1-rh{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:16px 16px 12px}
+.f1-rh h3{margin:0;font:800 1.2rem/1.1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}
+.f1-one{margin-left:8px;font-weight:600;color:var(--ink-2)}
+.md .f1-pad{margin:0 16px 12px}
+.f1-more{margin:12px 16px 16px}
+.flush .lt-key{margin:0;padding:12px 16px 16px}
+.pod{list-style:none;margin:0 16px 16px;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:stretch}
+.pod li{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;gap:2px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px 8px}
+.pod li.p1{background:var(--board);border-color:var(--board)}
+.pod li.p2{margin-top:16px}
+.pod li.p3{margin-top:28px}
+.pod .n{font:600 1.5rem/1 "Azeret Mono",monospace;color:var(--ink)}
+.pod .p1 .n{color:var(--gold);font-size:2rem}
+.pod .fn{font-size:13px;color:var(--ink-2)}
+.pod .ln{font:800 1.25rem/1.05 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;overflow-wrap:anywhere;color:var(--ink)}
+.pod small{font-size:12.5px;color:var(--muted)}
+.pod .tt{font:600 12.5px/1.2 "Azeret Mono",monospace;color:var(--ink-2)}
+.pod .p1 .fn,.pod .p1 .ln,.pod .p1 .tt{color:var(--on-board)}
+.pod .p1 small{color:var(--board-muted)}
+.f1t .tm-c{font-weight:400}
+.drv{display:flex;gap:10px;align-items:stretch}
+.tbar{width:4px;border-radius:2px;background:var(--tc);flex:none}
+.drv b{font-weight:600}
+.drv .ns{display:none}
+.drv small{display:block;font-size:13px;color:var(--muted)}
+.drv .star{display:inline-grid;vertical-align:middle;margin-left:2px}
+.f1t td.tt{font-family:"Azeret Mono",monospace;font-size:13px;white-space:nowrap}
+.f1t td.tt small{display:block;font-family:"Instrument Sans",sans-serif;color:var(--muted)}
+.dnf{font-family:"Instrument Sans",sans-serif;font-weight:700;color:var(--warn-ink)}
+.chg{font-size:12.5px;font-weight:700;white-space:nowrap;color:var(--muted)}
+.chg.up{color:var(--sub-on)}
+.chg.dn{color:var(--sub-off)}
+.chg-in,.f1t td.tt .pts-in{display:none}
+.lt-scroll{overflow-x:auto}
+.fl{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:3px 8px;border-radius:999px;font-size:12px;font-weight:600;background:var(--early-bg);color:var(--early-ink)}
+.fl svg{width:13px;height:13px}
+.f1t tr.sep td{padding:8px 16px;background:var(--panel-2);color:var(--muted);font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:left}
+.f1t tr.gap-row td{padding:2px;background:var(--panel-2)}
+@media (max-width:640px){
+  .ss li{grid-template-columns:5.2em minmax(0,1fr) auto}
+  .ss .when{display:flex;flex-direction:column}
+  .md-card>.f1-gp{font-size:1.6rem}
+  .f1-rh .seg{width:100%;display:grid;grid-template-columns:1fr 1fr;overflow:visible}
+  .drv .nl{display:none}
+  .drv .ns{display:inline}
+  .f1t .chg-c{display:none}
+  .chg-in{display:block}
+  .f1t .pts-c{display:none}
+  .f1t td.tt .pts-in{display:block;font-weight:700;color:var(--ink)}
+  .f1t td.tt{font-size:12px}
+  .f1t .pos-c{width:32px}
+  .f1t th,.f1t td{padding-left:4px;padding-right:4px}
+  .f1t tr>:first-child{padding-left:12px}
+  .f1t tr>:last-child{padding-right:12px}
+}
 .btn>svg{width:18px;height:18px;flex:none}
-dialog.sheet{width:min(820px,calc(100vw - 32px));max-height:calc(100dvh - 48px);padding:0;border:1px solid var(--line);border-radius:16px;background:var(--bg);color:var(--ink);box-shadow:0 24px 60px -20px var(--shadow)}
+dialog.sheet{width:min(820px,calc(100% - 32px));max-height:calc(100% - 48px);padding:0;border:1px solid var(--line);border-radius:16px;background:var(--bg);color:var(--ink);box-shadow:0 24px 60px -20px var(--shadow)}
 dialog.sheet::backdrop{background:var(--backdrop)}
 .sheet-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
 .sheet-head h2{margin:0;font:800 1.3rem/1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.03em}
@@ -426,7 +501,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
 
 /* ---------- small screens ---------- */
 @media (max-width:640px){
-  dialog.sheet{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;margin:0;border:0;border-radius:0}
+  dialog.sheet{width:100%;max-width:100%;height:100%;max-height:100%;margin:0;border:0;border-radius:0}   /* %, not vw/dvh: those ignore the page zoom of Large and Extra large text */
   .sheet-body{padding:12px}
   .md{gap:12px}
   .md-board .tm{font-size:1.25rem}
@@ -687,6 +762,16 @@ const I18N={
   f1:"Formula 1",f1Prac:"Include F1 practice sessions",f1Round:r=>"Round "+r,f1SprintWk:"Sprint weekend",f1Weekend:"This weekend:",
   f1Sess:{FP1:"Practice 1",FP2:"Practice 2",FP3:"Practice 3",SQ:"Sprint qualifying",S:"Sprint",Q:"Qualifying",R:"Race"},
   f1Pole:"Pole",f1Winner:"Winner",f1Podium:"Podium",pOn:"on now",pDone:"finished",gp:{},
+  f1WkOpen:"Race weekend",f1WkOpenAria:g=>"Race weekend: "+g,f1WkTitle:"Race weekend",f1Next:"Next session",f1OnNow:"On now",f1NextPill:"next",
+  f1Schedule:"Weekend schedule",f1Results:"Results",f1NoResults:"Results appear here once a qualifying session, sprint or race has finished.",
+  f1Loading:"Loading results…",f1Error:"Results could not be loaded just now. Close and reopen this window to try again.",
+  f1Champ:"Championship",f1Drivers:"Drivers",f1Teams:"Teams",f1After:r=>"After round "+r,f1ShowAll:n=>"Show all "+n+" drivers",f1ShowTop:"Show the top 10",
+  f1Circuit:"Circuit",f1Pos:"Pos",f1PosFull:"Position",f1Driver:"Driver",f1Team:"Team",f1Time:"Time",f1Pts:"Pts",f1PtsFull:"Points",f1PtsIn:n=>n+" pts",f1Grid:"Places gained or lost",
+  f1FastLap:"Fastest lap",f1Out:"Out",f1Lap:n=>"lap "+n,f1Lapped:n=>"+"+n+(n===1?" lap":" laps"),f1Dsq:"Disqualified",f1LappedAny:"Lapped",f1OutQ:n=>"Out in Q"+n,
+  f1Up:n=>"Gained "+n+(n===1?" place":" places"),f1Down:n=>"Lost "+n+(n===1?" place":" places"),
+  f1Key:"▲ ▼ places gained or lost from the starting grid. Starred drivers are highlighted.",
+  f1GridNote:"The race usually starts in qualifying order, but penalties can change it.",f1Dates:(a,b)=>a+" to "+b,
+  f1Src:"Session times: Jolpica-F1, checked against OpenF1. Results and standings: Jolpica-F1, loaded when you open this window. Circuit map: OpenStreetMap.",
   howF1html:'Formula 1 session times come from <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> and are marked verified when <a href="https://openf1.org/" rel="noopener">OpenF1</a> gives the same time. F1 is not in the calendar.',
   f1Stale:"F1 times could not be refreshed at this update; the ones shown are from an earlier update.",
   grpRegion:"Region",grpLook:"Appearance",ctHighLabel:"High contrast",sizeLabel:"Text size",szNormal:"Normal",szLarge:"Large",szXl:"Extra large"},
@@ -758,6 +843,16 @@ const I18N={
     "Azerbaijan Grand Prix":"GP do Azerbaijão","Singapore Grand Prix":"GP de Singapura","United States Grand Prix":"GP dos Estados Unidos",
     "Mexico City Grand Prix":"GP da Cidade do México","São Paulo Grand Prix":"GP de São Paulo","Las Vegas Grand Prix":"GP de Las Vegas",
     "Qatar Grand Prix":"GP do Catar","Abu Dhabi Grand Prix":"GP de Abu Dhabi","Emilia Romagna Grand Prix":"GP da Emília-Romanha"},
+  f1WkOpen:"Fim de semana do GP",f1WkOpenAria:g=>"Fim de semana do GP: "+g,f1WkTitle:"Fim de semana do GP",f1Next:"Próxima sessão",f1OnNow:"Agora",f1NextPill:"próxima",
+  f1Schedule:"Programação",f1Results:"Resultados",f1NoResults:"Os resultados aparecem aqui quando uma classificação, sprint ou corrida terminar.",
+  f1Loading:"Carregando os resultados…",f1Error:"Não foi possível carregar os resultados agora. Feche e abra esta janela de novo para tentar outra vez.",
+  f1Champ:"Campeonato",f1Drivers:"Pilotos",f1Teams:"Equipes",f1After:r=>"Após a etapa "+r,f1ShowAll:n=>"Mostrar os "+n+" pilotos",f1ShowTop:"Mostrar só os 10 primeiros",
+  f1Circuit:"Circuito",f1Pos:"Pos",f1PosFull:"Posição",f1Driver:"Piloto",f1Team:"Equipe",f1Time:"Tempo",f1Pts:"Pts",f1PtsFull:"Pontos",f1PtsIn:n=>n+" pts",f1Grid:"Posições ganhas ou perdidas",
+  f1FastLap:"Volta mais rápida",f1Out:"Abandonou",f1Lap:n=>"volta "+n,f1Lapped:n=>"+"+n+(n===1?" volta":" voltas"),f1Dsq:"Desclassificado",f1LappedAny:"Retardatário",f1OutQ:n=>"Eliminados no Q"+n,
+  f1Up:n=>"Ganhou "+n+(n===1?" posição":" posições"),f1Down:n=>"Perdeu "+n+(n===1?" posição":" posições"),
+  f1Key:"▲ ▼ posições ganhas ou perdidas em relação ao grid de largada. Pilotos favoritos aparecem em destaque.",
+  f1GridNote:"A largada costuma seguir a ordem da classificação, mas punições podem mudá-la.",f1Dates:(a,b)=>a+" a "+b,
+  f1Src:"Horários das sessões: Jolpica-F1, conferidos com o OpenF1. Resultados e classificação: Jolpica-F1, carregados quando você abre esta janela. Mapa do circuito: OpenStreetMap.",
   howF1html:'Os horários das sessões de Fórmula 1 vêm do <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> e são marcados como verificados quando o <a href="https://openf1.org/" rel="noopener">OpenF1</a> informa o mesmo horário. A F1 não entra na agenda.',
   f1Stale:"Os horários da F1 não puderam ser atualizados desta vez; os mostrados são de uma atualização anterior.",
   grpRegion:"Região",grpLook:"Aparência",ctHighLabel:"Contraste alto",sizeLabel:"Tamanho do texto",szNormal:"Normal",szLarge:"Grande",szXl:"Muito grande"}
@@ -765,6 +860,7 @@ const I18N={
 
 /* ---------- small icons ---------- */
 const ICON={
+  clock:'<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="14" r="7"/><path d="M12 14v-4M10 3h4M18.5 7.5 17 9"/></svg>',
   star:'<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.8 2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg>',
   starO:'<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 2.8 2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg>',
   check:'<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>',
@@ -915,6 +1011,7 @@ langsel.onchange=()=>{
   if(!store.get("tz",null)) TZ=defaultTz();      // follow the language until someone picks a zone themselves
   applyLang(); if(META){assignDays();renderStamp();} render();
   if(MD){ paintActions(); paintMatch(); }
+  if(WK) paintWeekend();
   if(ltdlg.open){ paintChips(); paintTable(); }
 };
 tzsel.onchange=()=>{TZ=tzsel.value;store.set("tz",TZ);makeFormatters();if(META){assignDays();renderStamp();}render();if(MD) paintMatch();};
@@ -1157,7 +1254,8 @@ function f1Row(r){
   const extra=r.top?'<ol class="mini-pod" aria-label="'+esc(T.f1Podium)+'">'+r.top.map((n,i)=>'<li><b>'+(i+1)+'</b> '+esc(n)+'</li>').join("")+'</ol>'
     :others.length?'<p class="wk-list">'+esc(T.f1Weekend+" "+others.join(", "))+'</p>':'';
   return '<li class="match" style="--c:'+colorOf("F1")+'">'+time+'<div class="m-main"><h3 class="m-teams"><span class="m-sess">'+esc(S.R)+'</span><span class="m-gp">'+esc(gp)+'</span></h3>'+
-    meta+extra+srcHTML(r)+'</div>'+tags+'</li>';
+    meta+extra+'<p class="m-act"><a class="btn md-open" href="?match='+encodeURIComponent(r.wk)+'" data-uid="'+esc(r.wk)+'" aria-label="'+esc(T.f1WkOpenAria(gp))+'">'+ICON.info+'<span>'+esc(T.f1WkOpen)+'</span></a></p>'+
+    srcHTML(r)+'</div>'+tags+'</li>';
 }
 function assignDays(){ DATA.forEach(r=>{r.day=r.when?dayKey.format(r.when):r.date;}); }
 function renderStamp(){
@@ -1430,24 +1528,217 @@ async function coords(name){
 // The map is a few plain OpenStreetMap tile images with a pin on top: no map program to download,
 // so it opens instantly and costs only the tiles that fit the box, fetched only once the visitor scrolls to them.
 const TILE=256, ZOOM=16;
-async function paintMap(box){
-  let c=null; try{ c=await coords(box.dataset.name); }catch{}
+async function paintMap(box,known,z=ZOOM){   // known: {lat,lon} when the source already gives them (F1 circuits)
+  let c=known||null; if(!c) try{ c=await coords(box.dataset.name); }catch{}
   if(!box.isConnected) return;
   if(!c){ box.innerHTML='<p class="md-note">'+esc(T.mdMapNone)+' <a href="https://www.openstreetmap.org/search?query='+encodeURIComponent(box.dataset.full)+'" target="_blank" rel="noopener">'+esc(T.mdMapFind)+'</a></p>'; return; }
-  const n=2**ZOOM, rad=c.lat*Math.PI/180;
+  const n=2**z, rad=c.lat*Math.PI/180;
   const fx=(c.lon+180)/360*n, fy=(1-Math.log(Math.tan(rad)+1/Math.cos(rad))/Math.PI)/2*n;   // the stadium, in tiles
   const W=box.clientWidth||600, H=240, cx=W/2, cy=H/2;
   const x0=Math.floor(fx-cx/TILE), x1=Math.floor(fx+cx/TILE), y0=Math.floor(fy-cy/TILE), y1=Math.floor(fy+cy/TILE);
   let tiles="";
   for(let x=x0;x<=x1;x++) for(let y=y0;y<=y1;y++)
-    tiles+='<img alt="" loading="lazy" decoding="async" width="256" height="256" style="left:'+Math.round(cx+(x-fx)*TILE)+'px;top:'+Math.round(cy+(y-fy)*TILE)+'px" src="https://tile.openstreetmap.org/'+ZOOM+'/'+x+'/'+y+'.png">';
+    tiles+='<img alt="" loading="lazy" decoding="async" width="256" height="256" style="left:'+Math.round(cx+(x-fx)*TILE)+'px;top:'+Math.round(cy+(y-fy)*TILE)+'px" src="https://tile.openstreetmap.org/'+z+'/'+x+'/'+y+'.png">';
   box.innerHTML='<div class="tiles" role="img" aria-label="'+esc(T.mdMapTitle(box.dataset.full))+'">'+tiles+ICON.pinMap+'</div>'+
-    '<p class="map-foot"><a href="https://www.openstreetmap.org/?mlat='+c.lat+'&amp;mlon='+c.lon+'#map=17/'+c.lat+'/'+c.lon+'" target="_blank" rel="noopener">'+esc(T.mdMapLarger)+'</a>'+
+    '<p class="map-foot"><a href="https://www.openstreetmap.org/?mlat='+c.lat+'&amp;mlon='+c.lon+'#map='+(z+1)+'/'+c.lat+'/'+c.lon+'" target="_blank" rel="noopener">'+esc(T.mdMapLarger)+'</a>'+
     '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">'+esc(T.mdMapCredit)+'</a></p>';
 }
 
+/* ---------- Formula 1 race weekend: schedule, results, championship, circuit (the same panel as match details) ---------- */
+// Results and standings come from Jolpica-F1, fetched by the visitor's browser when the panel opens
+// (it allows any website to read it). One request at a time: Jolpica allows 4 a second.
+const JOL="https://api.jolpi.ca/ergast/f1/";
+const TEAM_C={mclaren:"--t-mcl",ferrari:"--t-fer",red_bull:"--t-rbr",mercedes:"--t-mer",aston_martin:"--t-amr",alpine:"--t-alp",
+  williams:"--t-wil",rb:"--t-rb",haas:"--t-haa",audi:"--t-aud",sauber:"--t-aud",cadillac:"--t-cad"};
+const f1favs=new Set(store.get("f1favs",[]));
+let WK=null;                   // the weekend being shown: {wk, root, list, res, pick, standD, standC, tab, all, timer, state}
+async function jol(path){ const res=await fetch(JOL+path,{cache:"no-store"}); if(!res.ok) throw new Error(res.status); return res.json(); }
+
+function openWeekend(wk,root){
+  document.getElementById("md-h").textContent=T.f1WkTitle;
+  const list=DATA.filter(x=>x.wk===wk).sort((a,b)=>(a.when||0)-(b.when||0));
+  if(!list.length){ root.innerHTML='<div class="md"><p class="md-card md-note">'+esc(T.mdGone)+'</p></div>'; return; }
+  WK={wk,root,list,res:{},pick:null,standD:null,standC:null,tab:"d",all:false,timer:0,state:"loading",venue:false};
+  root.innerHTML='<article class="md"><section class="md-card md-top" id="wk-top"></section><section class="md-card" id="wk-sched"></section>'+
+    '<section class="md-card flush" id="wk-res"></section><section class="md-card flush" id="wk-champ" hidden></section>'+
+    '<section class="md-card venue" id="wk-venue" hidden></section><p class="md-src" id="wk-src"></p></article>';
+  root.onclick=weekendClick;
+  paintWeekend(); loadWeekend();
+}
+function stopWeekend(){ if(WK){ clearTimeout(WK.timer); WK.root.onclick=null; WK=null; } }
+async function loadWeekend(){
+  const w=WK; if(!w) return;
+  const [season,round]=w.wk.split("|").slice(1), now=Date.now();
+  const started=s=>{const r=w.list.find(x=>x.sess===s); return r&&r.when&&now>r.when.getTime();};
+  try{
+    for(const [s,path,key] of [["S","sprint","SprintResults"],["Q","qualifying","QualifyingResults"],["R","results","Results"]]){
+      if(!started(s)) continue;
+      if(WK!==w) return;             // the panel was closed or switched: stop asking
+      const race=(await jol(season+"/"+round+"/"+path+"/?limit=100")).MRData.RaceTable.Races[0];
+      if(race&&(race[key]||[]).length) w.res[s]=race[key];
+    }
+    if(WK!==w) return;
+    w.standD=(await jol(season+"/driverstandings/?limit=100")).MRData.StandingsTable.StandingsLists[0]||null;
+    w.standC=(await jol(season+"/constructorstandings/?limit=100")).MRData.StandingsTable.StandingsLists[0]||null;
+    w.state="ok";
+  }catch(err){ w.state="error"; }
+  if(WK!==w) return;
+  if(!w.res[w.pick]) w.pick=["R","Q","S"].find(s=>w.res[s])||null;   // the latest session with results
+  paintWeekend();
+  // during a weekend's sessions, and for a few hours after each, results can still arrive: look again every 5 minutes
+  if(w.list.some(r=>r.when&&now>r.when.getTime()-15*60e3&&now<r.when.getTime()+4*3600e3)) w.timer=setTimeout(loadWeekend,5*60e3);
+}
+
+const f1Name=d=>d.givenName+" "+d.familyName;
+function f1Lead(r){ // who led a finished session: pole for qualifying, winner for races
+  const rows=WK&&WK.res[r.sess];
+  const name=rows?f1Name(rows[0].Driver):(r.top&&r.top[0]);
+  return name?(r.sess==="Q"?T.f1Pole:T.f1Winner)+": "+name:"";
+}
+function f1State(r,next){
+  const now=Date.now();
+  if(r.when&&now>=r.when.getTime()&&now<r.when.getTime()+F1_MIN[r.sess]*60e3) return "on";
+  if((WK&&WK.res[r.sess])||r.top) return "done";
+  return r===next?"next":"";
+}
+function paintWeekend(){
+  const w=WK; if(!w) return;
+  document.getElementById("md-h").textContent=T.f1WkTitle;
+  paintWkTop(); paintWkSched(); paintWkRes(); paintWkChamp();
+  const race=w.list.find(x=>x.sess==="R"), c=race&&race.circuit, v=w.root.querySelector("#wk-venue");
+  if(c&&!w.venue){
+    w.venue=true;
+    v.innerHTML='<h3>'+esc(T.f1Circuit)+'</h3><p>'+esc(c.name)+'</p>'+(c.locality?'<p class="md-note">'+esc([c.locality,c.country].filter(Boolean).join(", "))+'</p>':'')+
+      '<div class="map" id="wk-map" data-name="'+esc(c.name)+'" data-full="'+esc(c.name)+'"></div>';
+    v.hidden=false;
+    paintMap(v.querySelector("#wk-map"),c.lat!=null?{lat:c.lat,lon:c.lon}:null,14);   // no coordinates: found by name, or a "find it" link
+  }
+  w.root.querySelector("#wk-src").textContent=T.f1Src;
+}
+function paintWkTop(){
+  const w=WK, S=T.f1Sess, now=Date.now(), first=w.list[0], race=w.list.find(x=>x.sess==="R")||w.list[w.list.length-1];
+  const day=(r,o)=>new Intl.DateTimeFormat(T.locale,Object.assign({timeZone:r.when?TZ:"UTC"},o)).format(r.when||new Date(r.date+"T12:00:00Z"));
+  const o={weekday:"short",month:"short",day:"numeric"}, a=day(first,o), b=day(race,o), dates=a===b?a:T.f1Dates(a,b);
+  const on=w.list.find(r=>f1State(r)==="on"), next=w.list.find(r=>r.when&&r.when.getTime()>now), win=w.res.R&&w.res.R[0];
+  let board="";
+  if(on) board='<div class="f1b"><span class="lbl">'+esc(T.f1OnNow)+'</span><span class="big">'+esc(S[on.sess])+'</span></div>';
+  else if(win) board='<div class="f1b"><span class="lbl">'+esc(T.f1Winner)+'</span><span class="big">'+esc(f1Name(win.Driver))+'</span><span class="sub">'+esc(win.Constructor.name)+'</span></div>';
+  else if(next) board='<div class="f1b"><span class="lbl">'+esc(T.f1Next)+'</span><span class="big">'+esc(S[next.sess]+" · "+day(next,{weekday:"short"})+" "+fmtT.format(next.when))+' <small>'+esc(zoneOf(next.when))+'</small></span></div>';
+  const meta=[esc(T.f1Round(race.round))]; if(race.sprint) meta.push(esc(T.f1SprintWk));
+  const top=w.root.querySelector("#wk-top");
+  top.style.setProperty("--c",colorOf("F1"));
+  top.innerHTML='<p class="md-comp"><b><i aria-hidden="true"></i>'+esc(T.f1)+'</b><span>'+meta.join('</span><span>')+'</span></p>'+
+    '<h3 class="f1-gp">'+esc(gpName(race.gp))+'</h3><p class="md-when">'+esc((race.venue?race.venue+" · ":"")+dates)+'</p>'+board+
+    '<div class="md-actions"><button type="button" class="btn" id="wk-share">'+ICON.share+'<span>'+esc(T.share)+'</span></button></div><p class="toast" id="md-toast" role="status"></p>';
+}
+function paintWkSched(){
+  const w=WK, S=T.f1Sess, now=Date.now(), next=w.list.find(r=>r.when&&r.when.getTime()>now);
+  w.root.querySelector("#wk-sched").innerHTML='<h3>'+esc(T.f1Schedule)+'</h3><ol class="ss">'+w.list.map(r=>{
+    const st=f1State(r,next), lead=st==="done"?f1Lead(r):"";
+    const pill=st==="on"?'<span class="pill live"><span class="dot-live" aria-hidden="true"></span>'+esc(T.pOn)+'</span>':
+      st==="done"?'<span class="pill ft">'+esc(T.pDone)+'</span>':st==="next"?'<span class="pill next">'+esc(T.f1NextPill)+'</span>':'';
+    const d=r.when?new Intl.DateTimeFormat(T.locale,{weekday:"short",timeZone:TZ}).format(r.when):"";
+    const t=r.when?'<time datetime="'+esc(r.utc)+'">'+fmtT.format(r.when)+'</time>':esc(T.tbcSmall);
+    return '<li'+(r.sess==="R"?' class="race"':'')+'><span class="when"><span class="d">'+esc(d)+'</span> '+t+'</span>'+
+      '<span class="what"><b>'+esc(S[r.sess])+'</b>'+(lead?'<small>'+esc(lead)+'</small>':'')+'</span>'+pill+'</li>';
+  }).join("")+'</ol>';
+}
+function drvCell(d,team,extra){
+  const fav=f1favs.has(d.driverId), name=f1Name(d);
+  return '<td class="tm-c"><span class="drv"><span class="tbar" style="--tc:var('+(TEAM_C[team.constructorId]||"--line")+')" aria-hidden="true"></span><span>'+
+    '<b><span class="nl">'+esc(name)+'</span><span class="ns">'+esc(d.givenName.charAt(0)+". "+d.familyName)+'</span></b>'+
+    '<button type="button" class="star" data-drv="'+esc(d.driverId)+'" aria-pressed="'+fav+'" aria-label="'+esc((fav?T.unstar:T.star)+" "+name)+'">'+(fav?ICON.star:ICON.starO)+'</button>'+
+    '<small>'+esc(team.name)+'</small>'+(extra||"")+'</span></span></td>';
+}
+function paintWkRes(){
+  const w=WK, box=w.root.querySelector("#wk-res"), S=T.f1Sess, have=w.list.map(r=>r.sess).filter(s=>w.res[s]);
+  let h='<div class="f1-rh"><h3>'+esc(T.f1Results)+'</h3>';
+  if(have.length>1) h+='<div class="seg" role="group" aria-label="'+esc(T.f1Results)+'">'+have.map(s=>'<button type="button" data-s="'+s+'" aria-pressed="'+(s===w.pick)+'">'+esc(S[s])+'</button>').join("")+'</div>';
+  h+='</div>';
+  const rows=w.res[w.pick];
+  if(!rows){
+    box.innerHTML=h+'<p class="md-note f1-pad">'+esc(w.state==="loading"?T.f1Loading:w.state==="error"?T.f1Error:T.f1NoResults)+'</p>'; return;
+  }
+  if(have.length===1) h=h.replace('</h3>','</h3><span class="f1-one">'+esc(S[w.pick])+'</span>');
+  const th=(txt,full,cls)=>'<th scope="col"'+(cls?' class="'+cls+'"':'')+'>'+(full?'<span aria-hidden="true">'+esc(txt)+'</span><span class="sr">'+esc(full)+'</span>':esc(txt))+'</th>';
+  const mine=r=>f1favs.has(r.Driver.driverId)?' class="mine"':'';
+  let t='<div class="lt-scroll"><table class="lt f1t"><caption class="sr">'+esc(T.f1Results+": "+S[w.pick])+'</caption><thead><tr>'+th(T.f1Pos,T.f1PosFull,"pos-c")+th(T.f1Driver,"","tm-c");
+  if(w.pick==="Q"){
+    t+=th(T.f1Time)+'</tr></thead><tbody>';
+    let seg=3;
+    for(const r of rows){
+      const s=r.Q3?3:r.Q2?2:1;
+      if(s<seg&&rows.some(x=>x.Q2)){ t+='<tr class="sep"><td colspan="3">'+esc(T.f1OutQ(s))+'</td></tr>'; }
+      seg=s;
+      t+='<tr'+mine(r)+'><td class="pos-c">'+esc(r.position)+'</td>'+drvCell(r.Driver,r.Constructor)+'<td class="tt">'+esc(r.Q3||r.Q2||r.Q1||"–")+'</td></tr>';
+    }
+    t+='</tbody></table></div>';
+    box.innerHTML=h+(w.res.R?'':'<p class="md-note f1-pad">'+esc(T.f1GridNote)+'</p>')+t; return;
+  }
+  // a race or sprint: podium, then everyone
+  const p=rows.slice(0,3);
+  const pod=p.length===3?'<ol class="pod" aria-label="'+esc(T.f1Podium)+'">'+[p[1],p[0],p[2]].map(r=>'<li class="p'+esc(r.position)+'"><span class="n">'+esc(r.position)+'</span><span class="fn">'+esc(r.Driver.givenName)+'</span><span class="ln">'+esc(r.Driver.familyName)+'</span><small>'+esc(r.Constructor.name)+'</small><span class="tt">'+esc(r.Time?r.Time.time:"")+'</span></li>').join("")+'</ol>':'';
+  t+='<th scope="col" class="chg-c"><span class="sr">'+esc(T.f1Grid)+'</span></th>'+th(T.f1Time)+th(T.f1Pts,T.f1PtsFull,"pts-c")+'</tr></thead><tbody>';
+  for(const r of rows){
+    const num=/^\d+$/.test(r.positionText), pos=+r.position, grid=+r.grid, ch=num&&grid>0?grid-pos:0;
+    const chg=ch?'<span class="chg '+(ch>0?"up":"dn")+'" role="img" aria-label="'+esc(ch>0?T.f1Up(ch):T.f1Down(-ch))+'">'+(ch>0?"▲":"▼")+Math.abs(ch)+'</span>':'<span class="chg" aria-hidden="true">–</span>';
+    const lapped=/^\+(\d+) Laps?$/.exec(r.status||"");   // older results say "+1 Lap"; current ones just "Lapped"
+    const time=r.Time?esc(r.Time.time):lapped?esc(T.f1Lapped(+lapped[1])):r.status==="Lapped"?esc(T.f1LappedAny):r.positionText==="D"?'<span class="dnf">'+esc(T.f1Dsq)+'</span>':
+      '<span class="dnf">'+esc(T.f1Out)+'</span><small>'+esc(T.f1Lap(r.laps))+'</small>';
+    const fl=r.FastestLap&&r.FastestLap.rank==="1"?'<span class="fl">'+ICON.clock+esc(T.f1FastLap)+'</span>':'';
+    t+='<tr'+mine(r)+'><td class="pos-c">'+(num?esc(r.positionText):'–')+'</td>'+drvCell(r.Driver,r.Constructor,(ch?'<span class="chg-in">'+chg+'</span>':'')+fl)+'<td class="chg-c">'+chg+'</td><td class="tt">'+time+(+r.points?'<small class="pts-in">'+esc(T.f1PtsIn(r.points))+'</small>':'')+'</td><td class="pts pts-c">'+(+r.points?esc(r.points):"")+'</td></tr>';
+  }
+  t+='</tbody></table></div><p class="lt-key">'+esc(T.f1Key)+'</p>';
+  box.innerHTML=h+pod+t;
+}
+function paintWkChamp(){
+  const w=WK, box=w.root.querySelector("#wk-champ"), L=w.tab==="d"?w.standD:w.standC;
+  if(!w.standD&&!w.standC){ box.hidden=true; return; }
+  const th=(txt,full,cls)=>'<th scope="col"'+(cls?' class="'+cls+'"':'')+'>'+(full?'<span aria-hidden="true">'+esc(txt)+'</span><span class="sr">'+esc(full)+'</span>':esc(txt))+'</th>';
+  let h='<div class="f1-rh"><h3>'+esc(T.f1Champ)+'</h3><div class="seg" role="group" aria-label="'+esc(T.f1Champ)+'">'+
+    '<button type="button" data-tab="d" aria-pressed="'+(w.tab==="d")+'">'+esc(T.f1Drivers)+'</button><button type="button" data-tab="c" aria-pressed="'+(w.tab==="c")+'">'+esc(T.f1Teams)+'</button></div></div>';
+  if(!L){ box.innerHTML=h; box.hidden=false; return; }
+  h+='<p class="md-note f1-pad">'+esc(T.f1After(L.round))+'</p><table class="lt f1t"><caption class="sr">'+esc(T.f1Champ+": "+(w.tab==="d"?T.f1Drivers:T.f1Teams))+'</caption><thead><tr>'+
+    th(T.f1Pos,T.f1PosFull,"pos-c")+th(w.tab==="d"?T.f1Driver:T.f1Team,"","tm-c")+th(T.f1Pts,T.f1PtsFull)+'</tr></thead><tbody>';
+  if(w.tab==="d"){
+    const all=L.DriverStandings; let gap=false;   // beyond the top 10, only starred drivers, after a thin divider
+    all.forEach((x,i)=>{
+      const fav=f1favs.has(x.Driver.driverId);
+      if(i>=10&&!w.all&&!fav) return;
+      if(i>=10&&!w.all&&!gap){ gap=true; h+='<tr class="gap-row"><td colspan="3"></td></tr>'; }
+      h+='<tr'+(fav?' class="mine"':'')+'><td class="pos-c">'+esc(x.positionText||x.position)+'</td>'+drvCell(x.Driver,(x.Constructors||[])[0]||{name:""})+'<td class="pts">'+esc(x.points)+'</td></tr>';
+    });
+    h+='</tbody></table>'+(all.length>10?'<p class="f1-pad f1-more"><button type="button" class="btn" id="wk-all">'+esc(w.all?T.f1ShowTop:T.f1ShowAll(all.length))+'</button></p>':'');
+  } else {
+    h+=L.ConstructorStandings.map(x=>'<tr><td class="pos-c">'+esc(x.positionText||x.position)+'</td><td class="tm-c"><span class="drv"><span class="tbar" style="--tc:var('+(TEAM_C[x.Constructor.constructorId]||"--line")+')" aria-hidden="true"></span><b>'+esc(x.Constructor.name)+'</b></span></td><td class="pts">'+esc(x.points)+'</td></tr>').join("")+'</tbody></table>';
+  }
+  box.innerHTML=h; box.hidden=false;
+}
+function weekendClick(e){
+  const w=WK; if(!w) return;
+  const b=e.target.closest("button"); if(!b) return;
+  const refocus=sel=>{ const x=w.root.querySelector(sel); if(x) x.focus(); };
+  if(b.dataset.s){ w.pick=b.dataset.s; paintWkRes(); refocus('[data-s="'+w.pick+'"]'); }
+  else if(b.dataset.tab){ w.tab=b.dataset.tab; paintWkChamp(); refocus('[data-tab="'+w.tab+'"]'); }
+  else if(b.id==="wk-all"){ w.all=!w.all; paintWkChamp(); refocus("#wk-all"); }
+  else if(b.id==="wk-share") shareWeekend();
+  else if(b.dataset.drv){
+    const id=b.dataset.drv, inRes=!!b.closest("#wk-res");
+    f1favs.has(id)?f1favs.delete(id):f1favs.add(id); store.set("f1favs",[...f1favs]);
+    paintWkRes(); paintWkChamp();
+    refocus((inRes?"#wk-res":"#wk-champ")+' .star[data-drv="'+CSS.escape(id)+'"]');   // keep keyboard focus on the same star
+  }
+}
+async function shareWeekend(){
+  const race=WK.list.find(x=>x.sess==="R")||WK.list[0], url=shareURL({uid:WK.wk}), text=gpName(race.gp), t=document.getElementById("md-toast");
+  if(navigator.share){ try{ await navigator.share({title:text,text,url}); return; }catch(err){ if(err.name==="AbortError") return; } }
+  try{ await navigator.clipboard.writeText(url); t.textContent=T.linkCopied; }catch{ t.textContent=url; }
+}
+
 function openMatch(uid,root){
-  stopMatch();
+  stopMatch(); stopWeekend();
+  if(uid.startsWith("f1|")) return openWeekend(uid,root);
+  document.getElementById("md-h").textContent=T.mdTitle;
   const r=DATA.find(x=>x.uid===uid);
   if(!r){ root.innerHTML='<div class="md"><p class="md-card md-note">'+esc(T.mdGone)+'</p></div>'; return; }
   MD={r,root,S:null,status:"loading",timer:0,venueKey:null,seen:null};
@@ -1555,7 +1846,7 @@ listEl.addEventListener("click",e=>{
   showPanel(a.dataset.uid);
 });
 mddlg.addEventListener("close",()=>{
-  stopMatch();
+  stopMatch(); stopWeekend();
   if(matchParam()){
     if(pushed){ pushed=false; history.back(); }
     else{ const u=new URL(location.href); u.searchParams.delete("match"); history.replaceState(null,"",u); }   // opened from a shared link
@@ -1646,6 +1937,7 @@ function useData(j){
   META=j; DATA=j.matches; DATA.forEach(r=>{r.when=r.utc?new Date(r.utc):null;}); assignDays();
   renderStamp(); render();
   if(MD){ const r=DATA.find(x=>x.uid===MD.r.uid); if(r){ MD.r=r; paintMatch(); } }
+  if(WK){ const l=DATA.filter(x=>x.wk===WK.wk); if(l.length){ WK.list=l.sort((a,b)=>(a.when||0)-(b.when||0)); paintWkTop(); paintWkSched(); } }
 }
 function refresh(back){
   if(!META||Date.now()-lastCheck<(back?60000:15*60000)) return;

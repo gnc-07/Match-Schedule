@@ -1,12 +1,12 @@
 // Runs axe-core (WCAG 2.2 AA plus best practices) over every combination the
 // project rules require: light and dark theme, English and Portuguese,
 // 390px and 1280px wide, with the menus closed, Settings open, Calendar open, the League tables window
-// and the match details panel, plus high contrast (list and match details), using sample data (mock-data.mjs) in place of ESPN, Wikidata and OpenStreetMap.
+// the match details panel and the F1 race weekend panel (race results; qualifying in high contrast), plus high contrast (list and match details), using sample data (mock-data.mjs) in place of ESPN, Wikidata and OpenStreetMap.
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
 import puppeteer from "puppeteer-core";
 import { BASE, chromePath, startServer } from "./server.mjs";
-import { MATCH, mockNetwork } from "./mock-data.mjs";
+import { F1_WEEKEND, MATCH, mockNetwork } from "./mock-data.mjs";
 
 const require = createRequire(import.meta.url);
 const AXE = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
@@ -15,8 +15,9 @@ const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-prac
 const themes = ["light", "dark"];
 const langs = ["en", "pt"];
 const widths = [390, 1280];
-const states = ["closed", "setmenu", "calmenu", "tables", "details", "high", "high-details"];
-const query = { details: `&match=${encodeURIComponent(MATCH.uid)}`, "high-details": `&match=${encodeURIComponent(MATCH.uid)}` };
+const states = ["closed", "setmenu", "calmenu", "tables", "details", "high", "high-details", "f1", "high-f1"];
+const query = { details: `&match=${encodeURIComponent(MATCH.uid)}`, "high-details": `&match=${encodeURIComponent(MATCH.uid)}`,
+  f1: `&match=${encodeURIComponent(F1_WEEKEND)}`, "high-f1": `&match=${encodeURIComponent(F1_WEEKEND)}` };
 
 const server = await startServer();
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true,
@@ -35,6 +36,8 @@ try {
     if (state === "setmenu" || state === "calmenu") await page.evaluate(id => { document.getElementById(id).open = true; }, state);
     if (state === "tables") { await page.click("#tablesbtn"); await page.waitForSelector("#ltbody table"); }
     if (state.endsWith("details")) await page.waitForSelector("#md-map .tiles");
+    if (state.endsWith("f1")) await page.waitForSelector("#wk-champ table");
+    if (state === "high-f1") { await page.click('#wk-res [data-s="Q"]'); await page.waitForSelector("#wk-res tr.sep"); }   // the qualifying table too
     await page.evaluate(AXE);
     const result = await page.evaluate(tags => axe.run(document, { runOnly: { type: "tag", values: tags } }), TAGS);
     const label = `${theme.padEnd(5)} ${lang} ${String(width).padStart(4)}px ${state.padEnd(12)}`;

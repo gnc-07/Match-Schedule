@@ -16,11 +16,36 @@ const f1 = (wk, sess, h, extra = {}) => ({ comp: "Formula 1", code: "F1", round:
   kind: "f1", sess, gp: wk === "18" ? "Singapore Grand Prix" : "United States Grand Prix", wk: `f1|2026|${wk}`, ...extra });
 const agree = { status: "confirmed", basis: "2 independent sources agree", sources: [{ source: "Jolpica-F1", url: "https://api.jolpi.ca/ergast/f1/2026/19/races/" }, { source: "OpenF1", url: "https://api.openf1.org/v1/sessions" }] };
 export const F1 = [
-  f1("18", "Q", -30, { top: ["Norris"] }), f1("18", "R", -20, { top: ["Russell", "Verstappen", "Norris"], sprint: false }),
+  f1("18", "Q", -30, { top: ["Almeida"] }), f1("18", "R", -20, { top: ["Brandt", "Almeida", "Costa"], sprint: false,
+    circuit: { name: "Marina Bay Street Circuit", locality: "Marina Bay", country: "Singapore", lat: 1.2914, lon: 103.864 } }),
   f1("19", "FP1", 26), f1("19", "SQ", 30), f1("19", "S", 50),
   f1("19", "Q", 54, { check: { ...agree, status: "conflicting", reported: [hrs(54), hrs(54.5)] } }),
   f1("19", "R", 74, { sprint: true, check: agree }),
 ];
+// Jolpica-F1 answers for the finished weekend (round 18): made-up drivers, real team ids (for the team colours).
+export const F1_WEEKEND = "f1|2026|18";
+const TEAMS = [["mclaren", "McLaren"], ["ferrari", "Ferrari"], ["red_bull", "Red Bull"], ["mercedes", "Mercedes"], ["aston_martin", "Aston Martin"],
+  ["alpine", "Alpine F1 Team"], ["williams", "Williams"], ["rb", "RB F1 Team"], ["haas", "Haas F1 Team"], ["audi", "Audi"], ["cadillac", "Cadillac F1 Team"]];
+const GIVEN = ["Ana", "Bruno", "Carla", "Diego", "Elena", "Felipe", "Gina", "Hugo", "Iris", "João", "Kai", "Lara", "Mateo", "Nina", "Omar", "Paula", "Rafael", "Sofia", "Tomás", "Vera", "Wes", "Yara"];
+const FAMILY = ["Almeida", "Brandt", "Costa", "Duarte", "Eriksen", "Ferreira", "Garcia", "Hoffmann", "Ivanova", "Jensen", "Kowalski", "Lima", "Moreau", "Novak", "Okafor", "Pereira", "Quinn", "Rossi", "Santos", "Tanaka", "Ueda", "Vargas"];
+const DRIVERS = GIVEN.map((g, i) => ({ d: { driverId: FAMILY[i].toLowerCase(), code: FAMILY[i].slice(0, 3).toUpperCase(), givenName: g, familyName: FAMILY[i] },
+  c: { constructorId: TEAMS[i >> 1][0], name: TEAMS[i >> 1][1] } }));
+const POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
+const jolRace = (key, rows) => ({ MRData: { RaceTable: { Races: [{ season: "2026", round: "18", [key]: rows }] } } });
+const f1Quali = jolRace("QualifyingResults", DRIVERS.map((x, i) => ({ position: String(i + 1), Driver: x.d, Constructor: x.c,
+  Q1: `1:3${4 + (i >> 3)}.${String(100 + i * 37).slice(-3)}`, ...(i < 16 ? { Q2: `1:33.${String(200 + i * 29).slice(-3)}` } : {}), ...(i < 10 ? { Q3: `1:32.${String(300 + i * 41).slice(-3)}` } : {}) })));
+const order = [1, 0, 2, 4, 3, 5, 7, 6, 9, 8, 10, 12, 11, 13, 15, 14, 17, 16, 19, 18, 20, 21];
+const f1Race = jolRace("Results", order.map((k, i) => {
+  const x = DRIVERS[k], out = i >= 20, lapped = i >= 16 && !out;
+  return { position: String(i + 1), positionText: out ? "R" : String(i + 1), points: String(POINTS[i] || 0), Driver: x.d, Constructor: x.c,
+    grid: String(k + 1), laps: out ? String(30 + i) : lapped ? "61" : "62", status: out ? "Retired" : lapped ? (i % 2 ? "Lapped" : "+1 Lap") : "Finished",   // both forms Jolpica uses
+    ...(out || lapped ? {} : { Time: { time: i === 0 ? "1:40:12.345" : `+${(i * 2.31).toFixed(3)}` } }),
+    ...(i === 3 ? { FastestLap: { rank: "1" } } : {}) };
+}));
+const f1Drivers = { MRData: { StandingsTable: { StandingsLists: [{ season: "2026", round: "18", DriverStandings: DRIVERS.map((x, i) =>
+  ({ position: String(i + 1), positionText: String(i + 1), points: String(400 - i * 17), Driver: x.d, Constructors: [x.c] })) }] } } };
+const f1Teams = { MRData: { StandingsTable: { StandingsLists: [{ season: "2026", round: "18", ConstructorStandings: TEAMS.map(([id, name], i) =>
+  ({ position: String(i + 1), positionText: String(i + 1), points: String(700 - i * 60), Constructor: { constructorId: id, name } })) }] } } };
 const EPL_TEAMS = [...new Set(data.matches.filter(m => m.code === "EPL").flatMap(m => [m.home, m.away]))].slice(0, 20);
 const short = n => n.replace(/\b(FC|AFC)\b/g, "").trim();
 
@@ -92,6 +117,13 @@ export async function mockNetwork(page) {
     if (new URL(u).pathname.endsWith("/fixtures.json"))
       return req.respond({ status: 200, contentType: "application/json", body: JSON.stringify({ ...data, f1stale: true, matches: [...data.matches, ...F1].sort((a, b) => (a.utc || a.date + "T99") < (b.utc || b.date + "T99") ? -1 : 1) }) });   // in time order, as build_schedule.py writes it
     const json = body => req.respond({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(body) });
+    if (u.includes("api.jolpi.ca")) {
+      if (u.includes("/qualifying/")) return json(f1Quali);
+      if (u.includes("/results/")) return json(f1Race);
+      if (u.includes("/driverstandings/")) return json(f1Drivers);
+      if (u.includes("/constructorstandings/")) return json(f1Teams);
+      return json({ MRData: { RaceTable: { Races: [] } } });
+    }
     if (u.includes("espn.com")) {
       if (u.includes("/standings")) return json(standings);
       if (u.includes("/summary")) return json(summary);
