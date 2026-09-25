@@ -51,7 +51,7 @@ git commit -m "<short description>"
 git pull --rebase                       # AFTER committing: fetch the workflow's data commits and replay ours on top
 git push
 ```
-Order matters: `git pull --rebase` refuses to run while there are uncommitted changes, so always commit first. Pushing to `main` starts the workflow, which republishes the site in about two minutes. Tell the owner to check the Actions tab and reload the site with Ctrl+Shift+R.
+Order matters: `git pull --rebase` refuses to run while there are uncommitted changes, so always commit first. Pushing to `main` starts the workflow, which republishes the site in about two minutes. Tell the owner to check the Actions tab. Visitors need no hard refresh: GitHub Pages lets browsers reuse `index.html` for up to 10 minutes (`cache-control: max-age=600`), `fixtures.json` is always fetched fresh, and a page left open re-checks `fixtures.json` when the visitor returns and every 15 minutes, reloading itself (only on return) when the `site` fingerprint of `index.html` changes. The owner can see a change at once with Ctrl+Shift+R, or wait 10 minutes and reload normally.
 
 ## How to talk to the owner
 - Always give instructions step by step, stating exactly what to click or change.
