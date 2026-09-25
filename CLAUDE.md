@@ -34,6 +34,14 @@ python3 -m http.server 8000      # then open http://localhost:8000 ; Ctrl+C stop
 ```
 Check: English and Portuguese (`?lang=pt`), light and dark theme (Settings menu), a phone-width window, keyboard-only use (Tab, Enter, Escape).
 
+Automated checks (needs Node.js; run `npm install` once to download the tools):
+```bash
+npm test                  # axe (24 combinations) then Lighthouse; exits non-zero if anything fails
+npm run test:axe          # axe-core WCAG 2.2 AA: light/dark, en/pt, 390/1280px, menus closed/Settings/Calendar
+npm run test:lighthouse   # mobile and desktop, en and pt; every category must be 90+; HTML reports in lighthouse-reports/
+```
+Run `npm test` after `python3 build_schedule.py` and before every commit that touches `index.html`. The tests start their own server on port 8123 and use the system Chromium (override with `CHROME_PATH`). They do not check the 44px control height; check that by hand. `node_modules/` and `lighthouse-reports/` are git-ignored; `tests/` and `package.json` are never published (the workflow copies only the site files).
+
 ## How to publish
 ```bash
 git restore fixtures.json soccer.ics   # drop local rebuilds of generated files
