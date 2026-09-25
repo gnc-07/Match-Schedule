@@ -1,3 +1,4 @@
 # Local test tools and their output (never published)
 node_modules/
 lighthouse-reports/
+__pycache__/

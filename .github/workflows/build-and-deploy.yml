@@ -14,7 +14,7 @@ on:
         default: false
   push:
     branches: [main]
-    paths: ["friendlies.json", "overrides.json", "build_schedule.py", "research.py", "index.html", "fonts/**", ".github/workflows/**"]
+    paths: ["friendlies.json", "overrides.json", "build_schedule.py", "cazetv.py", "research.py", "index.html", "fonts/**", ".github/workflows/**"]
 
 permissions:
   contents: write                # lets the job commit the rebuilt data
@@ -57,9 +57,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -N soccer.ics fixtures.json    # lets git diff see the files even on the very first run
+          git add -N soccer.ics fixtures.json streams.json    # lets git diff see the files even on the very first run
           # DTSTAMP and "generated" change on every run, so ignore them when deciding whether anything real changed
-          if git diff --quiet -I '^DTSTAMP:' -I '"generated"' -- soccer.ics fixtures.json friendlies.json overrides.json; then
+          if git diff --quiet -I '^DTSTAMP:' -I '"generated"' -- soccer.ics fixtures.json streams.json friendlies.json overrides.json; then
             echo "No fixture changes."
             # GitHub pauses scheduled workflows after 60 days without repository activity;
             # an empty commit every 45 quiet days keeps the schedule running
@@ -68,7 +68,7 @@ jobs:
               git pull --rebase && git push
             fi
           else
-            git add soccer.ics fixtures.json friendlies.json overrides.json
+            git add soccer.ics fixtures.json streams.json friendlies.json overrides.json
             git commit -m "Update fixtures $(date -u +%Y-%m-%dT%H:%MZ)"
             git pull --rebase && git push    # pull first in case you edited a file on GitHub meanwhile
           fi

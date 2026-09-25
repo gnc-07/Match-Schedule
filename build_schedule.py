@@ -14,6 +14,9 @@ Data sources, in order of preference
   3. friendlies.json: national-team friendlies entered by hand. No free feed
      covers friendlies, so this file has to be edited when matches are announced.
 
+Watch links: cazetv.py adds CazéTV's YouTube live-stream link to the matches it
+streams (remembered in streams.json between runs).
+
 Examples
   python3 build_schedule.py
   python3 build_schedule.py --teams "Arsenal,Real Madrid,Brazil" --leagues EPL,BRA
@@ -21,6 +24,7 @@ Examples
 import argparse, json, hashlib, os, sys, urllib.error, urllib.request
 from datetime import datetime, date, timedelta, timezone
 from zoneinfo import ZoneInfo
+import cazetv
 
 HOME_TZ = ZoneInfo("America/Edmonton")   # all human-readable times are shown in this zone
 OPENFOOTBALL = "https://raw.githubusercontent.com/openfootball/football.json/master"
@@ -243,6 +247,8 @@ def ics(recs, alarm_min=30):
             if c.get("note"): desc += "\n" + c["note"]
             for src in c["sources"]:
                 if src.get("url"): desc += f"\n- {src['source']}: {src['url']}"
+        if r.get("watch"):
+            desc += f"\nWatch free on CazéTV (YouTube, Brazil only): {r['watch']['url']}"
         if r.get("provisional"):
             summary = "[time provisional] " + summary
             desc += "\nLeague placeholder time; TV kick-off not announced yet."
@@ -277,6 +283,7 @@ if __name__ == "__main__":
     if league_count < MIN_MATCHES:
         # exiting with an error stops the workflow before it publishes, so the last good site stays up
         sys.exit(f"Only {league_count} upcoming league matches found; refusing to publish. Check the data sources.")
+    cazetv.add_streams(recs)
     recs = apply_filters(recs, a.leagues and a.leagues.split(","), a.teams and a.teams.split(","))
     meta = {"generated": datetime.now(timezone.utc).isoformat(timespec="minutes"),
             "sources": SOURCES, "matches": recs}
