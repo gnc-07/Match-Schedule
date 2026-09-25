@@ -398,6 +398,7 @@ footer p{margin:10px 0 0}
   .f1t th,.f1t td{padding-left:4px;padding-right:4px}
   .f1t tr>:first-child{padding-left:12px}
   .f1t tr>:last-child{padding-right:12px}
+  .track svg{height:220px}
 }
 .btn>svg{width:18px;height:18px;flex:none}
 dialog.sheet{width:min(820px,calc(100% - 32px));max-height:calc(100% - 48px);padding:0;border:1px solid var(--line);border-radius:16px;background:var(--bg);color:var(--ink);box-shadow:0 24px 60px -20px var(--shadow)}
@@ -479,6 +480,15 @@ dialog.sheet::backdrop{background:var(--backdrop)}
 .map-foot{margin:4px 0 0;display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;font-size:13.5px}
 .map-foot a{min-height:32px;display:inline-flex;align-items:center;font-weight:600}
 .map-foot a+a{font-weight:400;color:var(--muted)}
+.track{margin:12px 0 0}
+.track svg{display:block;width:100%;height:280px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px}
+.track path{fill:none;stroke:var(--ink);stroke-width:5px;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.track circle{fill:var(--map-pin);stroke:var(--on-live);stroke-width:3px;vector-effect:non-scaling-stroke}
+.track figcaption{margin:4px 0 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 16px;font-size:13.5px;color:var(--ink-2)}
+.track .sf{display:inline-flex;align-items:center;gap:8px;min-height:32px}
+.track .sf i{width:14px;height:14px;border-radius:50%;background:var(--map-pin)}
+.track figcaption a{min-height:32px;display:inline-flex;align-items:center;font-weight:600}
+.lt-seg{margin-bottom:12px}
 .md-src{margin:0;color:var(--muted);font-size:13.5px}
 
 /* ---------- league tables ---------- */
@@ -766,12 +776,16 @@ const I18N={
   f1Schedule:"Weekend schedule",f1Results:"Results",f1NoResults:"Results appear here once a qualifying session, sprint or race has finished.",
   f1Loading:"Loading results…",f1Error:"Results could not be loaded just now. Close and reopen this window to try again.",
   f1Champ:"Championship",f1Drivers:"Drivers",f1Teams:"Teams",f1After:r=>"After round "+r,f1ShowAll:n=>"Show all "+n+" drivers",f1ShowTop:"Show the top 10",
-  f1Circuit:"Circuit",f1Pos:"Pos",f1PosFull:"Position",f1Driver:"Driver",f1Team:"Team",f1Time:"Time",f1Pts:"Pts",f1PtsFull:"Points",f1PtsIn:n=>n+" pts",f1Grid:"Places gained or lost",
+  f1Circuit:"Circuit",f1Layout:n=>"Track layout of "+n+", with the start and finish line marked",f1StartFinish:"Start and finish",
+  f1MapLink:"Show where it is on a map",f1Length:"Lap length",f1FirstGp:"First Grand Prix",f1Km:m=>(m/1000).toLocaleString("en",{minimumFractionDigits:3})+" km",
+  f1LtD:"Drivers' championship",f1LtC:"Teams' championship",f1Wins:"Wins",f1WinsAbbr:"W",f1LtNone:"The championship table appears after the first race of the season.",
+  f1LtKey:(y,r)=>y+" season, after round "+r+". W wins · Pts points. Starred drivers are highlighted.",f1LtSource:"Source: Jolpica-F1.",
+  f1Pos:"Pos",f1PosFull:"Position",f1Driver:"Driver",f1Team:"Team",f1Time:"Time",f1Pts:"Pts",f1PtsFull:"Points",f1PtsIn:n=>n+" pts",f1Grid:"Places gained or lost",
   f1FastLap:"Fastest lap",f1Out:"Out",f1Lap:n=>"lap "+n,f1Lapped:n=>"+"+n+(n===1?" lap":" laps"),f1Dsq:"Disqualified",f1LappedAny:"Lapped",f1OutQ:n=>"Out in Q"+n,
   f1Up:n=>"Gained "+n+(n===1?" place":" places"),f1Down:n=>"Lost "+n+(n===1?" place":" places"),
   f1Key:"▲ ▼ places gained or lost from the starting grid. Starred drivers are highlighted.",
   f1GridNote:"The race usually starts in qualifying order, but penalties can change it.",f1Dates:(a,b)=>a+" to "+b,
-  f1Src:"Session times: Jolpica-F1, checked against OpenF1. Results and standings: Jolpica-F1, loaded when you open this window. Circuit map: OpenStreetMap.",
+  f1Src:"Session times: Jolpica-F1, checked against OpenF1. Results and standings: Jolpica-F1, loaded when you open this window. Track diagram: f1-circuits by Tomislav Bacinger (MIT licence), unofficial.",
   howF1html:'Formula 1 session times come from <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> and are marked verified when <a href="https://openf1.org/" rel="noopener">OpenF1</a> gives the same time. F1 is not in the calendar.',
   f1Stale:"F1 times could not be refreshed at this update; the ones shown are from an earlier update.",
   grpRegion:"Region",grpLook:"Appearance",ctHighLabel:"High contrast",sizeLabel:"Text size",szNormal:"Normal",szLarge:"Large",szXl:"Extra large"},
@@ -847,12 +861,16 @@ const I18N={
   f1Schedule:"Programação",f1Results:"Resultados",f1NoResults:"Os resultados aparecem aqui quando uma classificação, sprint ou corrida terminar.",
   f1Loading:"Carregando os resultados…",f1Error:"Não foi possível carregar os resultados agora. Feche e abra esta janela de novo para tentar outra vez.",
   f1Champ:"Campeonato",f1Drivers:"Pilotos",f1Teams:"Equipes",f1After:r=>"Após a etapa "+r,f1ShowAll:n=>"Mostrar os "+n+" pilotos",f1ShowTop:"Mostrar só os 10 primeiros",
-  f1Circuit:"Circuito",f1Pos:"Pos",f1PosFull:"Posição",f1Driver:"Piloto",f1Team:"Equipe",f1Time:"Tempo",f1Pts:"Pts",f1PtsFull:"Pontos",f1PtsIn:n=>n+" pts",f1Grid:"Posições ganhas ou perdidas",
+  f1Circuit:"Circuito",f1Layout:n=>"Traçado do circuito "+n+", com a linha de largada e chegada marcada",f1StartFinish:"Largada e chegada",
+  f1MapLink:"Ver onde fica no mapa",f1Length:"Extensão da volta",f1FirstGp:"Primeiro Grande Prêmio",f1Km:m=>(m/1000).toLocaleString("pt-BR",{minimumFractionDigits:3})+" km",
+  f1LtD:"Campeonato de pilotos",f1LtC:"Campeonato de equipes",f1Wins:"Vitórias",f1WinsAbbr:"V",f1LtNone:"A classificação do campeonato aparece depois da primeira corrida da temporada.",
+  f1LtKey:(y,r)=>"Temporada "+y+", após a etapa "+r+". V vitórias · Pts pontos. Pilotos favoritos aparecem em destaque.",f1LtSource:"Fonte: Jolpica-F1.",
+  f1Pos:"Pos",f1PosFull:"Posição",f1Driver:"Piloto",f1Team:"Equipe",f1Time:"Tempo",f1Pts:"Pts",f1PtsFull:"Pontos",f1PtsIn:n=>n+" pts",f1Grid:"Posições ganhas ou perdidas",
   f1FastLap:"Volta mais rápida",f1Out:"Abandonou",f1Lap:n=>"volta "+n,f1Lapped:n=>"+"+n+(n===1?" volta":" voltas"),f1Dsq:"Desclassificado",f1LappedAny:"Retardatário",f1OutQ:n=>"Eliminados no Q"+n,
   f1Up:n=>"Ganhou "+n+(n===1?" posição":" posições"),f1Down:n=>"Perdeu "+n+(n===1?" posição":" posições"),
   f1Key:"▲ ▼ posições ganhas ou perdidas em relação ao grid de largada. Pilotos favoritos aparecem em destaque.",
   f1GridNote:"A largada costuma seguir a ordem da classificação, mas punições podem mudá-la.",f1Dates:(a,b)=>a+" a "+b,
-  f1Src:"Horários das sessões: Jolpica-F1, conferidos com o OpenF1. Resultados e classificação: Jolpica-F1, carregados quando você abre esta janela. Mapa do circuito: OpenStreetMap.",
+  f1Src:"Horários das sessões: Jolpica-F1, conferidos com o OpenF1. Resultados e classificação: Jolpica-F1, carregados quando você abre esta janela. Desenho do circuito: f1-circuits, de Tomislav Bacinger (licença MIT), não oficial.",
   howF1html:'Os horários das sessões de Fórmula 1 vêm do <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> e são marcados como verificados quando o <a href="https://openf1.org/" rel="noopener">OpenF1</a> informa o mesmo horário. A F1 não entra na agenda.',
   f1Stale:"Os horários da F1 não puderam ser atualizados desta vez; os mostrados são de uma atualização anterior.",
   grpRegion:"Região",grpLook:"Aparência",ctHighLabel:"Contraste alto",sizeLabel:"Tamanho do texto",szNormal:"Normal",szLarge:"Grande",szXl:"Muito grande"}
@@ -1608,12 +1626,24 @@ function paintWeekend(){
   const race=w.list.find(x=>x.sess==="R"), c=race&&race.circuit, v=w.root.querySelector("#wk-venue");
   if(c&&!w.venue){
     w.venue=true;
+    const L=c.layout, draw=L&&/^M[\d LZ]+$/.test(L.path||""), facts=[];   // a track outline from build_schedule.py (checked: it goes into the page)
+    if(draw&&L.length) facts.push('<dt>'+esc(T.f1Length)+'</dt><dd>'+esc(T.f1Km(L.length))+'</dd>');
+    if(draw&&L.firstgp) facts.push('<dt>'+esc(T.f1FirstGp)+'</dt><dd>'+esc(L.firstgp)+'</dd>');
     v.innerHTML='<h3>'+esc(T.f1Circuit)+'</h3><p>'+esc(c.name)+'</p>'+(c.locality?'<p class="md-note">'+esc([c.locality,c.country].filter(Boolean).join(", "))+'</p>':'')+
-      '<div class="map" id="wk-map" data-name="'+esc(c.name)+'" data-full="'+esc(c.name)+'"></div>';
+      (facts.length?'<dl>'+facts.join("")+'</dl>':'')+
+      (draw?trackSVG(c):'<div class="map" id="wk-map" data-name="'+esc(c.name)+'" data-full="'+esc(c.name)+'"></div>');
     v.hidden=false;
-    paintMap(v.querySelector("#wk-map"),c.lat!=null?{lat:c.lat,lon:c.lon}:null,14);   // no coordinates: found by name, or a "find it" link
+    if(!draw) paintMap(v.querySelector("#wk-map"),c.lat!=null?{lat:c.lat,lon:c.lon}:null,14);   // no outline: a map (found by name without coordinates, or a "find it" link)
   }
   w.root.querySelector("#wk-src").textContent=T.f1Src;
+}
+// The track outline, north up, with a dot where the outline starts: on the start/finish line.
+function trackSVG(c){
+  const L=c.layout, n=L.path.match(/\d+/g), pad=40;
+  const map=c.lat!=null?'<a href="https://www.openstreetmap.org/?mlat='+c.lat+'&amp;mlon='+c.lon+'#map=15/'+c.lat+'/'+c.lon+'" target="_blank" rel="noopener">'+esc(T.f1MapLink)+'</a>':'';
+  return '<figure class="track"><svg viewBox="'+(-pad)+' '+(-pad)+' '+(L.w+2*pad)+' '+(L.h+2*pad)+'" role="img" aria-label="'+esc(T.f1Layout(c.name))+'">'+
+    '<path d="'+L.path+'"/><circle cx="'+n[0]+'" cy="'+n[1]+'" r="20"/></svg>'+
+    '<figcaption><span class="sf"><i aria-hidden="true"></i>'+esc(T.f1StartFinish)+'</span>'+map+'</figcaption></figure>';
 }
 function paintWkTop(){
   const w=WK, S=T.f1Sess, now=Date.now(), first=w.list[0], race=w.list.find(x=>x.sess==="R")||w.list[w.list.length-1];
@@ -1862,11 +1892,12 @@ addEventListener("popstate",()=>{
   d.addEventListener("click",e=>{ if(e.target===d) d.close(); });     // a click on the dimmed background closes it
 });
 /* ---------- league tables (ESPN standings, fetched when the window opens) ---------- */
-const TABLES=new Map();        // league code -> {at, rows}
-let ltCode=null;
+const TABLES=new Map();        // league code -> {at, rows}; for "F1": {at, d, c} (drivers' and teams' standings)
+const LT_CODES=[...TABLE_CODES,"F1"];   // the Tables window also has the Formula 1 championship
+let ltCode=null, ltF1="d";     // ltF1: the F1 table shown, "d" drivers or "c" teams
 function paintChips(){
   const box=document.getElementById("ltchips");
-  box.innerHTML=ordered().filter(l=>TABLE_CODES.includes(l.code)).map(l=>
+  box.innerHTML=ordered().filter(l=>LT_CODES.includes(l.code)).map(l=>
     '<button type="button" class="chip" data-code="'+l.code+'" aria-pressed="'+(l.code===ltCode)+'" style="--c:var('+l.c+')">'+crestHTML(l)+'<span>'+esc(l.name)+'</span></button>').join("");
 }
 document.getElementById("ltchips").addEventListener("click",e=>{
@@ -1875,9 +1906,9 @@ document.getElementById("ltchips").addEventListener("click",e=>{
 });
 // from the header's Tables button, or a match's league-table button (the table opens over the match; Close goes back to it)
 function openTables(code){
-  ltCode=code||ltCode||(ordered().find(l=>TABLE_CODES.includes(l.code)&&on.has(l.code))||{code:"EPL"}).code;
+  ltCode=code||ltCode||(ordered().find(l=>LT_CODES.includes(l.code)&&on.has(l.code))||{code:"EPL"}).code;
   paintChips(); ltdlg.showModal(); ltdlg.querySelector("[data-close]").focus(); loadTable();
-  TABLE_CODES.forEach(c=>fetchTable(c).catch(()=>{}));   // download the other leagues now, so switching is instant
+  LT_CODES.forEach(c=>fetchTable(c).catch(()=>{}));   // download the other leagues now, so switching is instant
 }
 document.getElementById("tablesbtn").onclick=()=>openTables();
 const TABLE_REQ=new Map();     // league code -> download in progress, so one league is never fetched twice at once
@@ -1885,15 +1916,22 @@ function fetchTable(code){
   const have=TABLES.get(code);
   if(have&&Date.now()-have.at<=5*60e3) return Promise.resolve();
   if(TABLE_REQ.has(code)) return TABLE_REQ.get(code);
-  const req=fetch("https://site.api.espn.com/apis/v2/sports/soccer/"+ESPN[code]+"/standings",{cache:"no-store"}).then(async res=>{
-    if(!res.ok) throw new Error(res.status);
-    const js=await res.json(), g=(js.children||[])[0]||js;
-    const rows=(((g.standings||{}).entries)||[]).map(e=>{const s={}; (e.stats||[]).forEach(x=>s[x.name||x.type]=x.value);
-      return {team:(e.team&&(e.team.displayName||e.team.name))||"",rank:s.rank,p:s.gamesPlayed,w:s.wins,d:s.ties,l:s.losses,gd:s.pointDifferential,pts:s.points};});
-    rows.sort((a,b)=>(a.rank??99)-(b.rank??99)||(b.pts-a.pts)||(b.gd-a.gd));
-    TABLES.set(code,{at:Date.now(),rows});
-  }).finally(()=>TABLE_REQ.delete(code));
+  const req=(code==="F1"?f1Table():espnTable(code)).then(t=>{ t.at=Date.now(); TABLES.set(code,t); }).finally(()=>TABLE_REQ.delete(code));
   TABLE_REQ.set(code,req); return req;
+}
+async function espnTable(code){
+  const res=await fetch("https://site.api.espn.com/apis/v2/sports/soccer/"+ESPN[code]+"/standings",{cache:"no-store"});
+  if(!res.ok) throw new Error(res.status);
+  const js=await res.json(), g=(js.children||[])[0]||js;
+  const rows=(((g.standings||{}).entries)||[]).map(e=>{const s={}; (e.stats||[]).forEach(x=>s[x.name||x.type]=x.value);
+    return {team:(e.team&&(e.team.displayName||e.team.name))||"",rank:s.rank,p:s.gamesPlayed,w:s.wins,d:s.ties,l:s.losses,gd:s.pointDifferential,pts:s.points};});
+  rows.sort((a,b)=>(a.rank??99)-(b.rank??99)||(b.pts-a.pts)||(b.gd-a.gd));
+  return {rows};
+}
+async function f1Table(){   // Jolpica-F1, one request after the other (see jol above)
+  const d=(await jol("current/driverstandings/?limit=100")).MRData.StandingsTable.StandingsLists[0]||null;
+  const c=(await jol("current/constructorstandings/?limit=100")).MRData.StandingsTable.StandingsLists[0]||null;
+  return {d,c};
 }
 async function loadTable(){
   const code=ltCode, body=document.getElementById("ltbody");
@@ -1907,6 +1945,7 @@ async function loadTable(){
   if(ltCode===code){ body.removeAttribute("aria-busy"); paintTable(); }
 }
 function paintTable(){
+  if(ltCode==="F1") return paintF1Table();
   const t=TABLES.get(ltCode); if(!t) return;
   const lg=LEAGUES.find(l=>l.code===ltCode), mine=[...favs].map(tokens);
   const C=T.ltCols, A=T.ltAbbr;
@@ -1922,6 +1961,30 @@ function paintTable(){
     th("p")+th("w","wdl")+th("d","wdl")+th("l","wdl")+th("gd")+th("pts")+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
     '<p class="lt-key">'+esc(T.ltKey)+' '+esc(T.ltSource)+'</p>';
 }
+function paintF1Table(){
+  const t=TABLES.get("F1"); if(!t) return;
+  const drivers=ltF1==="d", L=drivers?t.d:t.c, body=document.getElementById("ltbody");
+  const seg='<div class="seg lt-seg" role="group" aria-label="'+esc(T.f1Champ)+'">'+
+    '<button type="button" data-lt="d" aria-pressed="'+drivers+'">'+esc(T.f1Drivers)+'</button><button type="button" data-lt="c" aria-pressed="'+!drivers+'">'+esc(T.f1Teams)+'</button></div>';
+  if(!L){ body.innerHTML=seg+'<p class="md-note">'+esc(T.f1LtNone)+'</p>'; return; }
+  const th=(txt,full,cls)=>'<th scope="col"'+(cls?' class="'+cls+'"':'')+'>'+(full?'<span aria-hidden="true">'+esc(txt)+'</span><span class="sr">'+esc(full)+'</span>':esc(txt))+'</th>';
+  const name=(id,long,short,sub,fav)=>'<th scope="row" class="tm-c"><span class="drv"><span class="tbar" style="--tc:var('+(TEAM_C[id]||"--line")+')" aria-hidden="true"></span><span><b>'+
+    (short?'<span class="nl">'+esc(long)+'</span><span class="ns">'+esc(short)+'</span>':esc(long))+'</b>'+
+    (fav?ICON.star+'<span class="sr"> ('+esc(T.starred)+')</span>':'')+(sub?'<small>'+esc(sub)+'</small>':'')+'</span></span></th>';
+  const rows=drivers?L.DriverStandings.map(x=>{
+      const d=x.Driver, team=(x.Constructors||[])[0]||{}, fav=f1favs.has(d.driverId);
+      return '<tr'+(fav?' class="mine"':'')+'><td class="pos-c">'+esc(x.positionText||x.position)+'</td>'+
+        name(team.constructorId,f1Name(d),d.givenName.charAt(0)+". "+d.familyName,team.name,fav)+'<td>'+esc(x.wins??"")+'</td><td class="pts">'+esc(x.points)+'</td></tr>';
+    }):L.ConstructorStandings.map(x=>'<tr><td class="pos-c">'+esc(x.positionText||x.position)+'</td>'+name(x.Constructor.constructorId,x.Constructor.name)+
+      '<td>'+esc(x.wins??"")+'</td><td class="pts">'+esc(x.points)+'</td></tr>');
+  body.innerHTML=seg+'<div class="lt-wrap"><table class="lt f1t"><caption>'+esc(drivers?T.f1LtD:T.f1LtC)+'</caption><thead><tr>'+
+    th("#",T.f1PosFull,"pos-c")+th(drivers?T.f1Driver:T.f1Team,"","tm-c")+th(T.f1WinsAbbr,T.f1Wins)+th(T.f1Pts,T.f1PtsFull)+'</tr></thead><tbody>'+rows.join("")+'</tbody></table></div>'+
+    '<p class="lt-key">'+esc(T.f1LtKey(L.season,L.round))+' '+esc(T.f1LtSource)+'</p>';
+}
+document.getElementById("ltbody").addEventListener("click",e=>{
+  const b=e.target.closest("[data-lt]"); if(!b) return;
+  ltF1=b.dataset.lt; paintF1Table(); document.querySelector('#ltbody [data-lt="'+ltF1+'"]').focus();
+});
 
 /* ---------- keep a page left open up to date ---------- */
 // Phones keep tabs in memory and show them again without reloading, so the page checks for new data itself:

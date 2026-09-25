@@ -17,7 +17,8 @@ const f1 = (wk, sess, h, extra = {}) => ({ comp: "Formula 1", code: "F1", round:
 const agree = { status: "confirmed", basis: "2 independent sources agree", sources: [{ source: "Jolpica-F1", url: "https://api.jolpi.ca/ergast/f1/2026/19/races/" }, { source: "OpenF1", url: "https://api.openf1.org/v1/sessions" }] };
 export const F1 = [
   f1("18", "Q", -30, { top: ["Almeida"] }), f1("18", "R", -20, { top: ["Brandt", "Almeida", "Costa"], sprint: false,
-    circuit: { name: "Marina Bay Street Circuit", locality: "Marina Bay", country: "Singapore", lat: 1.2914, lon: 103.864 } }),
+    circuit: { name: "Marina Bay Street Circuit", locality: "Marina Bay", country: "Singapore", lat: 1.2914, lon: 103.864,
+      layout: {"path":"M978 245L1000 416L993 434L964 477L953 480L877 476L769 463L755 451L750 438L747 414L425 395L390 382L284 290L268 291L256 299L244 338L185 632L181 639L170 644L160 642L143 620L137 607L100 576L69 545L63 525L70 500L68 495L46 487L18 469L7 459L0 438L0 427L132 193L146 181L160 178L188 196L252 263L258 266L263 265L327 150L333 141L339 139L536 251L566 262L586 266L840 281L850 279L874 266L881 253L882 242L873 176L841 92L839 79L842 24L849 10L858 1L865 0L872 2L894 27L910 35L950 40L957 56L963 139Z","w":1000,"h":644,"length":4928,"firstgp":2008} } }),   // as build_schedule.py writes it from f1-circuits
   f1("19", "FP1", 26), f1("19", "SQ", 30), f1("19", "S", 50),
   f1("19", "Q", 54, { check: { ...agree, status: "conflicting", reported: [hrs(54), hrs(54.5)] } }),
   f1("19", "R", 74, { sprint: true, check: agree }),
@@ -43,9 +44,9 @@ const f1Race = jolRace("Results", order.map((k, i) => {
     ...(i === 3 ? { FastestLap: { rank: "1" } } : {}) };
 }));
 const f1Drivers = { MRData: { StandingsTable: { StandingsLists: [{ season: "2026", round: "18", DriverStandings: DRIVERS.map((x, i) =>
-  ({ position: String(i + 1), positionText: String(i + 1), points: String(400 - i * 17), Driver: x.d, Constructors: [x.c] })) }] } } };
+  ({ position: String(i + 1), positionText: String(i + 1), points: String(400 - i * 17), wins: String(Math.max(0, 6 - i)), Driver: x.d, Constructors: [x.c] })) }] } } };
 const f1Teams = { MRData: { StandingsTable: { StandingsLists: [{ season: "2026", round: "18", ConstructorStandings: TEAMS.map(([id, name], i) =>
-  ({ position: String(i + 1), positionText: String(i + 1), points: String(700 - i * 60), Constructor: { constructorId: id, name } })) }] } } };
+  ({ position: String(i + 1), positionText: String(i + 1), points: String(700 - i * 60), wins: String(Math.max(0, 8 - 2 * i)), Constructor: { constructorId: id, name } })) }] } } };
 const EPL_TEAMS = [...new Set(data.matches.filter(m => m.code === "EPL").flatMap(m => [m.home, m.away]))].slice(0, 20);
 const short = n => n.replace(/\b(FC|AFC)\b/g, "").trim();
 

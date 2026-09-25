@@ -14,7 +14,8 @@ Data sources, in order of preference
   3. friendlies.json: national-team friendlies entered by hand. No free feed
      covers friendlies, so this file has to be edited when matches are announced.
   4. Formula 1: every session from Jolpica-F1, cross-checked against OpenF1 (both free, no key).
-     F1 is left out of soccer.ics.
+     F1 is left out of soccer.ics. Track outlines for the race weekend panel come from
+     bacinger/f1-circuits on GitHub (MIT licence).
 
 Watch links: cazetv.py adds CazéTV's YouTube live-stream link to the matches it
 streams (remembered in streams.json between runs).
@@ -23,7 +24,7 @@ Examples
   python3 build_schedule.py
   python3 build_schedule.py --teams "Arsenal,Real Madrid,Brazil" --leagues EPL,BRA
 """
-import argparse, json, hashlib, os, sys, urllib.error, urllib.request
+import argparse, json, hashlib, math, os, sys, urllib.error, urllib.request
 from datetime import datetime, date, timedelta, timezone
 from zoneinfo import ZoneInfo
 import cazetv
@@ -218,6 +219,57 @@ def _f1_top(season, rnd, what, key, n):
     rows = races[0].get(key, []) if races else []
     return [x["Driver"]["familyName"] for x in rows[:n]] or None
 
+# Track outlines: the f1-circuits project (https://github.com/bacinger/f1-circuits, MIT licence,
+# Copyright (c) 2019-2025 Tomislav Bacinger) draws each circuit as a line of map points that starts on the
+# start/finish line. Each race gets its circuit's outline as a small SVG path (north up, fitted into a
+# 1000-unit square), so the site can draw it without another download.
+F1_LAYOUTS = "https://raw.githubusercontent.com/bacinger/f1-circuits/master/f1-circuits.geojson"
+
+def _f1_layouts():
+    """Every outline in the f1-circuits file, or [] when it cannot be read (the site then shows a map instead)."""
+    try:
+        return [f for f in get_json(F1_LAYOUTS)["features"]
+                if (f.get("geometry") or {}).get("type") == "LineString" and len(f["geometry"]["coordinates"]) > 3]
+    except Exception as e:
+        print(f"F1 track outlines could not be read ({e}); race weekends show a map instead this run")
+        return []
+
+def _simplify(pts, tol):
+    """Ramer-Douglas-Peucker: keep only the points that bend the line by more than tol, so the path stays small."""
+    keep, stack = {0, len(pts) - 1}, [(0, len(pts) - 1)]
+    while stack:
+        a, b = stack.pop()
+        (ax, ay), (bx, by) = pts[a], pts[b]
+        seg = math.hypot(bx - ax, by - ay)
+        far, far_d = None, tol
+        for i in range(a + 1, b):
+            px, py = pts[i]
+            d = abs((bx - ax) * (ay - py) - (ax - px) * (by - ay)) / seg if seg else math.hypot(px - ax, py - ay)
+            if d > far_d:
+                far, far_d = i, d
+        if far is not None:
+            keep.add(far); stack += [(a, far), (far, b)]
+    return [pts[i] for i in sorted(keep)]
+
+def _f1_outline(layouts, lat, lon):
+    """The outline of the circuit at (lat, lon): {"path", "w", "h", "length" (metres), "firstgp"}, or None
+    when no outline lies within 3 km (a new circuit the project has not drawn yet)."""
+    k = math.cos(math.radians(lat))
+    near = lambda f: min(math.hypot((x - lon) * k, y - lat) for x, y in f["geometry"]["coordinates"]) * 111.2   # km
+    best = min(layouts, key=near, default=None)
+    if best is None or near(best) > 3:
+        return None
+    pts = [((x - lon) * k * 111320, (lat - y) * 110574) for x, y in best["geometry"]["coordinates"]]   # metres, y pointing south
+    if pts[0] == pts[-1]:
+        pts.pop()                            # the loop is closed with "Z" instead
+    x0, y0 = min(x for x, _ in pts), min(y for _, y in pts)
+    scale = 1000 / max(max(x for x, _ in pts) - x0, max(y for _, y in pts) - y0)
+    pts = _simplify([(round((x - x0) * scale), round((y - y0) * scale)) for x, y in pts], 2)
+    props = best.get("properties") or {}
+    return {"path": "M" + "L".join(f"{x} {y}" for x, y in pts) + "Z",
+            "w": max(x for x, _ in pts), "h": max(y for _, y in pts),
+            "length": props.get("length"), "firstgp": props.get("firstgp")}
+
 def from_f1(start, now=None):
     """Every F1 session from yesterday on, as records like the football ones (no teams; kind "f1")."""
     now = now or datetime.now(timezone.utc)
@@ -248,6 +300,7 @@ def from_f1(start, now=None):
             if gap is not None and gap < timedelta(days=4) and (best is None or gap < best[0]):
                 best = (gap, ss)
         return best[1] if best else []
+    layouts = _f1_layouts()
     out = []
     for race in races:
         season, rnd, c = race["season"], race["round"], race["Circuit"]
@@ -268,6 +321,9 @@ def from_f1(start, now=None):
                 r["sprint"] = "Sprint" in race
                 r["circuit"] = {"name": c["circuitName"], "locality": loc.get("locality"), "country": loc.get("country"),
                                 "lat": float(loc["lat"]), "lon": float(loc["long"])} if loc.get("lat") else {"name": c["circuitName"]}
+                layout = _f1_outline(layouts, float(loc["lat"]), float(loc["long"])) if loc.get("lat") and layouts else None
+                if layout:
+                    r["circuit"]["layout"] = layout
             if utc:
                 match = [o for o in weekend if (o.get("session_name") or "").lower() in OPENF1_NAMES[code]]
                 if match:
