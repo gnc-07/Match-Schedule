@@ -72,5 +72,6 @@ When work goes through a branch and pull request, name the branch after what it 
 - Match panel and tables: spacing scale 4, 8, 12, 16px; cards 16px padding and 14px corners; controls 10px corners.
 - Finished matches stay a day with the final score (ESPN, else the league feed's result from `build_schedule.py`).
 - Colours: every colour is a token, including the live box and shadows. The scheme is "Navy and gold"; high contrast (Settings) is the only alternative.
-- Fonts: Big Shoulders Display (headings), Instrument Sans (text, times and league crests), Azeret Mono (scores and code; not needed at first load).
+- League pictures: each league button shows a round picture from `CREST` in `index.html` (the country's flag for the four leagues, a globe for friendlies, the F1 mark from Simple Icons), falling back to the letter badge `abbr`. Flag colours are the `--flag-*` tokens, the same in every theme.
+- Fonts: Big Shoulders Display (headings), Instrument Sans (text, times and letter badges), Azeret Mono (scores and code; not needed at first load).
 - Speed: `fixtures.json` is requested from `<head>`, is written compactly (one match per line), and the list is only redrawn when it changed.
