@@ -11,7 +11,7 @@ A public website listing upcoming Premier League, La Liga, Bundesliga, Brasileir
 | `build_schedule.py` | Downloads league fixtures, applies `overrides.json` and `friendlies.json`, and writes `fixtures.json` (for the site) and `soccer.ics` (for calendar apps). |
 | `friendlies.json` | National-team friendlies, with every source report kept. |
 | `overrides.json` | League kick-offs the main feed has not caught up with, with sources. |
-| `cazetv.py` | Checks CazéTV's public YouTube feed on every build and adds a **Watch on CazéTV** link to matches it will stream (remembered in `streams.json`). No key needed. |
+| `cazetv.py` | Checks CazéTV's public YouTube feed on every build and adds a **Watch on CazéTV** link to matches it will stream. Matches on CazéTV's schedule whose stream does not exist yet (from the fan-made agendacazetv.com, not run by CazéTV) get a **CazéTV on YouTube** link to the channel instead. Both are remembered in `streams.json`. No key needed. |
 | `research.py` | Once a day, asks Claude (with web search) to find sources for missing kick-off times and new friendlies, and adds them to the two files above. Optional: runs only if you add an Anthropic API key. |
 | `.github/workflows/build-and-deploy.yml` | Instructions for GitHub Actions: four times a day, run the script, save any changed data, and publish the site to GitHub Pages; once a day, run the research first. |
 

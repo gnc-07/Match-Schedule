@@ -247,7 +247,9 @@ def ics(recs, alarm_min=30):
             if c.get("note"): desc += "\n" + c["note"]
             for src in c["sources"]:
                 if src.get("url"): desc += f"\n- {src['source']}: {src['url']}"
-        if r.get("watch"):
+        if r.get("watch", {}).get("kind") == "planned":
+            desc += f"\nOn CazéTV's schedule; stream link not created yet (YouTube, usually Brazil only): {r['watch']['url']}"
+        elif r.get("watch"):
             desc += f"\nWatch free on CazéTV (YouTube, Brazil only): {r['watch']['url']}"
         if r.get("provisional"):
             summary = "[time provisional] " + summary
