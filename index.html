@@ -383,6 +383,8 @@ dialog.sheet::backdrop{background:var(--backdrop)}
 
 /* ---------- league tables ---------- */
 .lt-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+@media (min-width:641px){#ltdlg{height:calc(100dvh - 48px)}}   /* a fixed height, so switching leagues never resizes or moves the window */
+#ltbody[aria-busy="true"] .lt-wrap{opacity:.55}   /* the previous table stays in place, dimmed, until the next one arrives */
 .lt-wrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numeric:tabular-nums;color:var(--ink)}
 .lt caption{text-align:left;padding:16px 16px 8px;font:800 1.2rem/1.1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}
@@ -1471,23 +1473,34 @@ document.getElementById("ltchips").addEventListener("click",e=>{
 function openTables(code){
   ltCode=code||ltCode||(ordered().find(l=>TABLE_CODES.includes(l.code)&&on.has(l.code))||{code:"EPL"}).code;
   paintChips(); ltdlg.showModal(); ltdlg.querySelector("[data-close]").focus(); loadTable();
+  TABLE_CODES.forEach(c=>fetchTable(c).catch(()=>{}));   // download the other leagues now, so switching is instant
 }
 document.getElementById("tablesbtn").onclick=()=>openTables();
+const TABLE_REQ=new Map();     // league code -> download in progress, so one league is never fetched twice at once
+function fetchTable(code){
+  const have=TABLES.get(code);
+  if(have&&Date.now()-have.at<=5*60e3) return Promise.resolve();
+  if(TABLE_REQ.has(code)) return TABLE_REQ.get(code);
+  const req=fetch("https://site.api.espn.com/apis/v2/sports/soccer/"+ESPN[code]+"/standings",{cache:"no-store"}).then(async res=>{
+    if(!res.ok) throw new Error(res.status);
+    const js=await res.json(), g=(js.children||[])[0]||js;
+    const rows=(((g.standings||{}).entries)||[]).map(e=>{const s={}; (e.stats||[]).forEach(x=>s[x.name||x.type]=x.value);
+      return {team:(e.team&&(e.team.displayName||e.team.name))||"",rank:s.rank,p:s.gamesPlayed,w:s.wins,d:s.ties,l:s.losses,gd:s.pointDifferential,pts:s.points};});
+    rows.sort((a,b)=>(a.rank??99)-(b.rank??99)||(b.pts-a.pts)||(b.gd-a.gd));
+    TABLES.set(code,{at:Date.now(),rows});
+  }).finally(()=>TABLE_REQ.delete(code));
+  TABLE_REQ.set(code,req); return req;
+}
 async function loadTable(){
-  const code=ltCode, body=document.getElementById("ltbody"), have=TABLES.get(code);
+  const code=ltCode, body=document.getElementById("ltbody");
+  const have=TABLES.get(code);
   if(!have||Date.now()-have.at>5*60e3){
-    body.innerHTML='<p class="md-note">'+esc(T.ltLoading)+'</p>';
-    try{
-      const res=await fetch("https://site.api.espn.com/apis/v2/sports/soccer/"+ESPN[code]+"/standings",{cache:"no-store"});
-      if(!res.ok) throw new Error(res.status);
-      const js=await res.json(), g=(js.children||[])[0]||js;
-      const rows=(((g.standings||{}).entries)||[]).map(e=>{const s={}; (e.stats||[]).forEach(x=>s[x.name||x.type]=x.value);
-        return {team:(e.team&&(e.team.displayName||e.team.name))||"",rank:s.rank,p:s.gamesPlayed,w:s.wins,d:s.ties,l:s.losses,gd:s.pointDifferential,pts:s.points};});
-      rows.sort((a,b)=>(a.rank??99)-(b.rank??99)||(b.pts-a.pts)||(b.gd-a.gd));
-      TABLES.set(code,{at:Date.now(),rows});
-    }catch(err){ if(ltCode===code) body.innerHTML='<p class="md-note">'+esc(T.ltError)+'</p>'; return; }
+    if(body.querySelector(".lt-wrap")) body.setAttribute("aria-busy","true");   // keep the shown table until the new one is ready
+    else body.innerHTML='<p class="md-note">'+esc(T.ltLoading)+'</p>';
+    try{ await fetchTable(code); }
+    catch(err){ if(ltCode===code){ body.removeAttribute("aria-busy"); body.innerHTML='<p class="md-note">'+esc(T.ltError)+'</p>'; } return; }
   }
-  if(ltCode===code) paintTable();
+  if(ltCode===code){ body.removeAttribute("aria-busy"); paintTable(); }
 }
 function paintTable(){
   const t=TABLES.get(ltCode); if(!t) return;
