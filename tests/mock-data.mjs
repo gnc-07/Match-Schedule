@@ -8,6 +8,19 @@ import { ROOT } from "./server.mjs";
 const data = JSON.parse(readFileSync(path.join(ROOT, "fixtures.json"), "utf8"));
 // the sample match: the first Premier League match with a confirmed time
 export const MATCH = data.matches.find(m => m.code === "EPL" && m.utc);
+// Sample Formula 1 sessions, timed around "now" so they sit near the top of the list: one weekend just
+// finished (pole and podium known), and a sprint weekend still to come (one time verified, one conflicting).
+const hrs = h => new Date(Date.now() + h * 3600e3).toISOString().replace(/\.\d+Z$/, "+00:00");
+const f1 = (wk, sess, h, extra = {}) => ({ comp: "Formula 1", code: "F1", round: wk, home: "", away: "", date: hrs(h).slice(0, 10), utc: hrs(h),
+  venue: wk === "18" ? "Marina Bay Street Circuit, Marina Bay" : "Circuit of the Americas, Austin", uid: `f1|2026|${wk}|${sess}`,
+  kind: "f1", sess, gp: wk === "18" ? "Singapore Grand Prix" : "United States Grand Prix", wk: `f1|2026|${wk}`, ...extra });
+const agree = { status: "confirmed", basis: "2 independent sources agree", sources: [{ source: "Jolpica-F1", url: "https://api.jolpi.ca/ergast/f1/2026/19/races/" }, { source: "OpenF1", url: "https://api.openf1.org/v1/sessions" }] };
+export const F1 = [
+  f1("18", "Q", -30, { top: ["Norris"] }), f1("18", "R", -20, { top: ["Russell", "Verstappen", "Norris"], sprint: false }),
+  f1("19", "FP1", 26), f1("19", "SQ", 30), f1("19", "S", 50),
+  f1("19", "Q", 54, { check: { ...agree, status: "conflicting", reported: [hrs(54), hrs(54.5)] } }),
+  f1("19", "R", 74, { sprint: true, check: agree }),
+];
 const EPL_TEAMS = [...new Set(data.matches.filter(m => m.code === "EPL").flatMap(m => [m.home, m.away]))].slice(0, 20);
 const short = n => n.replace(/\b(FC|AFC)\b/g, "").trim();
 
@@ -76,6 +89,8 @@ export async function mockNetwork(page) {
   await page.setRequestInterception(true);
   page.on("request", req => {
     const u = req.url();
+    if (new URL(u).pathname.endsWith("/fixtures.json"))
+      return req.respond({ status: 200, contentType: "application/json", body: JSON.stringify({ ...data, matches: [...data.matches, ...F1].sort((a, b) => (a.utc || a.date + "T99") < (b.utc || b.date + "T99") ? -1 : 1) }) });   // in time order, as build_schedule.py writes it
     const json = body => req.respond({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(body) });
     if (u.includes("espn.com")) {
       if (u.includes("/standings")) return json(standings);

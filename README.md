@@ -1,6 +1,6 @@
 # Matchday Planner
 
-A public website listing upcoming Premier League, La Liga, Bundesliga, Brasileirão and national-team friendly fixtures, with kick-off times cross-checked against official and press sources, and a calendar feed people can subscribe to.
+A public website listing upcoming Premier League, La Liga, Bundesliga, Brasileirão and national-team friendly fixtures, plus every Formula 1 session, with kick-off times cross-checked against official and press sources, and a calendar feed people can subscribe to.
 
 ## How the pieces fit together
 
@@ -8,7 +8,7 @@ A public website listing upcoming Premier League, La Liga, Bundesliga, Brasileir
 |---|---|
 | `fonts/` | The site's typefaces, served from the site itself so visitors' browsers never contact a third-party font service (SIL Open Font Licence; licence files included) |
 | `index.html` | The whole website: layout, styles and the script that draws the list, the match details and the league tables. It has no fixture data of its own; it loads `fixtures.json`. |
-| `build_schedule.py` | Downloads league fixtures, applies `overrides.json` and `friendlies.json`, and writes `fixtures.json` (for the site) and `soccer.ics` (for calendar apps). |
+| `build_schedule.py` | Downloads league fixtures and the Formula 1 calendar, applies `overrides.json` and `friendlies.json`, and writes `fixtures.json` (for the site) and `soccer.ics` (for calendar apps; football only). |
 | `friendlies.json` | National-team friendlies, with every source report kept. |
 | `overrides.json` | League kick-offs the main feed has not caught up with, with sources. |
 | `cazetv.py` | Checks CazéTV's public YouTube feed on every build and adds a **Watch on CazéTV** link to matches it will stream. Matches on CazéTV's schedule whose stream does not exist yet (from the fan-made agendacazetv.com, not run by CazéTV) get a **CazéTV on YouTube** link to the channel instead. Both are remembered in `streams.json`. No key needed. |
@@ -51,6 +51,7 @@ If you already made a repository from the earlier calendar-only instructions, yo
 - **Bad data never replaces good data:** if a build finds fewer than 20 upcoming league matches, it stops and the last good version of the site stays up. GitHub emails you when a run fails.
 - **The schedule stays switched on:** GitHub pauses scheduled workflows after 60 days without repository activity, so the workflow makes an empty commit after 45 quiet days.
 - **Live scores** need no maintenance; they are fetched by each visitor's browser.
+- **Formula 1** needs no maintenance: every session of every race weekend comes from Jolpica-F1 (free, no key), and a time is marked verified when OpenF1 lists the same time. After a race, sprint or qualifying session, the next rebuild adds the winner, podium or pole. If Jolpica-F1 cannot be reached, the F1 sessions already published stay up, and F1 problems never stop the football schedule from publishing.
 - **Match details and league tables** need no maintenance either; they are fetched the same way when a visitor opens them.
 - **Finished matches** stay on the list for a day after kick-off, with the final score.
 

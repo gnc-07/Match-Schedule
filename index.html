@@ -40,7 +40,7 @@ window.FX=fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new 
   --live-bg:#C21A33; --live-ink:#B3142C; --live-soft:#FCEBEE;
   --warn-bg:#FFF1CC; --warn-ink:#6B4700; --tbc-bg:#ECEFF5; --tbc-ink:#4A5468; --early-bg:#ECEBFD; --early-ink:#3D3294;
   --star:#B37F00; --star-off:#8B94A7;
-  --epl:#6A3DBF; --liga:#B23A0E; --bun:#C4102A; --bra:#0B7A3C; --intl:#06708C; --crest-ink:#FFFFFF;
+  --epl:#6A3DBF; --liga:#B23A0E; --bun:#C4102A; --bra:#0B7A3C; --intl:#06708C; --f1:#3D4452; --crest-ink:#FFFFFF;
   --on-board:#F2F5FB; --board-muted:#B7C3DD; --board-line:#26375F; --board-well:rgba(0,0,0,.3); --on-live:#FFFFFF;
   --shadow:rgba(10,15,28,.45); --backdrop:rgba(10,15,28,.55);
   --card-yellow:#F5C518; --card-edge:#7A5C00; --card-red:#D0112B; --sub-on:#0B7A3C; --sub-off:#B3142C; --mine:#FFF6D6;
@@ -65,7 +65,7 @@ window.FX=fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new 
   --live-bg:#C21A33; --live-ink:#FF8795; --live-soft:#2A1320;
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
-  --epl:#B79CFF; --liga:#FF9A6E; --bun:#FF8193; --bra:#5BD493; --intl:#5ACDE8; --crest-ink:#0A0F1C;
+  --epl:#B79CFF; --liga:#FF9A6E; --bun:#FF8193; --bra:#5BD493; --intl:#5ACDE8; --f1:#C3CAD6; --crest-ink:#0A0F1C;
   --on-board:#F2F5FB; --board-muted:#B7C3DD; --board-line:#26375F; --board-well:rgba(0,0,0,.3); --on-live:#FFFFFF;
   --shadow:rgba(0,0,0,.6); --backdrop:rgba(0,0,0,.65);
   --card-yellow:#FFD23F; --card-edge:#FFD23F; --card-red:#FF5A6E; --sub-on:#5BD493; --sub-off:#FF8795; --mine:#2A2412;
@@ -81,7 +81,7 @@ window.FX=fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new 
   --live-bg:#C21A33; --live-ink:#FF8795; --live-soft:#2A1320;
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
-  --epl:#B79CFF; --liga:#FF9A6E; --bun:#FF8193; --bra:#5BD493; --intl:#5ACDE8; --crest-ink:#0A0F1C;
+  --epl:#B79CFF; --liga:#FF9A6E; --bun:#FF8193; --bra:#5BD493; --intl:#5ACDE8; --f1:#C3CAD6; --crest-ink:#0A0F1C;
   --on-board:#F2F5FB; --board-muted:#B7C3DD; --board-line:#26375F; --board-well:rgba(0,0,0,.3); --on-live:#FFFFFF;
   --shadow:rgba(0,0,0,.6); --backdrop:rgba(0,0,0,.65);
   --card-yellow:#FFD23F; --card-edge:#FFD23F; --card-red:#FF5A6E; --sub-on:#5BD493; --sub-off:#FF8795; --mine:#2A2412;
@@ -299,6 +299,18 @@ footer p{margin:10px 0 0}
    One spacing scale throughout: 4, 8, 12, 16px. Cards: 16px padding, 14px corners (like the day lists).
    Controls: 10px corners. Rows inside cards: 10px top and bottom, divided by --line-2. */
 .m-act{margin:2px 0 0;display:flex;flex-wrap:wrap;gap:8px}
+/* Formula 1: a compact row per session, a full card for the race */
+.match.sess{padding-top:10px;padding-bottom:10px;align-items:center}
+.match.sess::before{top:10px;bottom:10px}
+.match.sess .m-time{padding-top:0}
+.sess-line{margin:0;font-size:15px;font-weight:400;line-height:1.35;color:var(--muted)}
+.sess-line b{font-weight:700;color:var(--ink)}
+.sess-res{margin:2px 0 0;font-size:13.5px;color:var(--muted)}
+.m-sess{display:block;font-weight:700}
+.m-gp{display:block;font-weight:500;color:var(--ink-2)}
+.wk-list{margin:0;font-size:14px;color:var(--muted)}
+.mini-pod{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14.5px;color:var(--ink-2)}
+.mini-pod b{font-family:"Azeret Mono",monospace;color:var(--ink)}
 .btn>svg{width:18px;height:18px;flex:none}
 dialog.sheet{width:min(820px,calc(100vw - 32px));max-height:calc(100dvh - 48px);padding:0;border:1px solid var(--line);border-radius:16px;background:var(--bg);color:var(--ink);box-shadow:0 24px 60px -20px var(--shadow)}
 dialog.sheet::backdrop{background:var(--backdrop)}
@@ -546,6 +558,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
     <div class="row">
       <label class="tog"><input type="checkbox" id="favonly"><span id="favlabel">Starred teams only</span></label>
       <label class="tog"><input type="checkbox" id="showtbc" checked><span data-t="showTbc">Include matches without a confirmed time</span></label>
+      <label class="tog" id="f1praclabel"><input type="checkbox" id="f1prac" checked><span data-t="f1Prac">Include F1 practice sessions</span></label>
       <button type="button" class="reset" id="reset" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span data-t="clearFilters">Clear filters</span></button>
     </div>
     <p class="sr" id="summary" role="status"></p>
@@ -575,6 +588,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
         <li data-t="how1html">League fixtures come from <a href="https://www.football-data.org/" rel="noopener">football-data.org</a> (or <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> if it is unavailable) and are rebuilt four times a day. When that feed lags, and for friendlies, times come from official league and club sites and the press, with every source listed under the match.</li>
         <li data-t="how3">Live scores, line-ups, match events and league tables come from ESPN; stadium maps from OpenStreetMap and Wikidata. Live scores appear on this site only, not in the calendar.</li>
         <li data-t="how5">CazéTV buttons lead to its free YouTube streams, found through its channel and the fan-made agendacazetv.com. Most only play in Brazil.</li>
+        <li data-t="howF1html">Formula 1 session times come from <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> and are marked verified when <a href="https://openf1.org/" rel="noopener">OpenF1</a> gives the same time. F1 is not in the calendar.</li>
         <li data-t="how4">Stars and settings are saved in your browser only. Finished matches stay on the list, with the final score, for a day after kick-off.</li>
       </ul>
       <p id="repo" hidden></p>
@@ -655,6 +669,10 @@ const I18N={
   ltSource:"Source: ESPN.",ltLoading:"Loading the table…",ltError:"The table could not be loaded. Try again later.",
   ltCols:{pos:"Position",team:"Team",p:"Played",w:"Won",d:"Drawn",l:"Lost",gd:"Goal difference",pts:"Points"},ltAbbr:{p:"P",w:"W",d:"D",l:"L",gd:"GD",pts:"Pts"},
   ltKey:"P played · W won · D drawn · L lost · GD goal difference · Pts points.",starred:"starred",
+  f1:"Formula 1",f1Prac:"Include F1 practice sessions",f1Round:r=>"Round "+r,f1SprintWk:"Sprint weekend",f1Weekend:"This weekend:",
+  f1Sess:{FP1:"Practice 1",FP2:"Practice 2",FP3:"Practice 3",SQ:"Sprint qualifying",S:"Sprint",Q:"Qualifying",R:"Race"},
+  f1Pole:"Pole",f1Winner:"Winner",f1Podium:"Podium",pOn:"on now",pDone:"finished",gp:{},
+  howF1html:'Formula 1 session times come from <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> and are marked verified when <a href="https://openf1.org/" rel="noopener">OpenF1</a> gives the same time. F1 is not in the calendar.',
   grpRegion:"Region",grpLook:"Appearance",ctHighLabel:"High contrast",sizeLabel:"Text size",szNormal:"Normal",szLarge:"Large",szXl:"Extra large"},
  pt:{locale:"pt-BR",
   skip:"Pular para os jogos",settings:"Ajustes",themeLabel:"Tema",thAuto:"Aparelho",thLight:"Claro",thDark:"Escuro",done:"Fechar",langLabel:"Idioma",tzLabel:"Mostrar horários em",calBtn:"Agenda",calTitle:"Adicione à sua agenda",
@@ -714,6 +732,17 @@ const I18N={
   ltSource:"Fonte: ESPN.",ltLoading:"Carregando a classificação…",ltError:"Não foi possível carregar a classificação. Tente mais tarde.",
   ltCols:{pos:"Posição",team:"Time",p:"Jogos",w:"Vitórias",d:"Empates",l:"Derrotas",gd:"Saldo de gols",pts:"Pontos"},ltAbbr:{p:"J",w:"V",d:"E",l:"D",gd:"SG",pts:"Pts"},
   ltKey:"J jogos · V vitórias · E empates · D derrotas · SG saldo de gols · Pts pontos.",starred:"favorito",
+  f1:"Fórmula 1",f1Prac:"Incluir treinos livres da F1",f1Round:r=>"Etapa "+r,f1SprintWk:"Fim de semana com sprint",f1Weekend:"Neste fim de semana:",
+  f1Sess:{FP1:"Treino livre 1",FP2:"Treino livre 2",FP3:"Treino livre 3",SQ:"Classificação sprint",S:"Corrida sprint",Q:"Classificação",R:"Corrida"},
+  f1Pole:"Pole",f1Winner:"Vencedor",f1Podium:"Pódio",pOn:"agora",pDone:"encerrada",
+  gp:{"Australian Grand Prix":"GP da Austrália","Chinese Grand Prix":"GP da China","Japanese Grand Prix":"GP do Japão","Bahrain Grand Prix":"GP do Bahrein",
+    "Saudi Arabian Grand Prix":"GP da Arábia Saudita","Miami Grand Prix":"GP de Miami","Canadian Grand Prix":"GP do Canadá","Monaco Grand Prix":"GP de Mônaco",
+    "Barcelona-Catalunya Grand Prix":"GP de Barcelona-Catalunha","Spanish Grand Prix":"GP da Espanha","Austrian Grand Prix":"GP da Áustria","British Grand Prix":"GP da Grã-Bretanha",
+    "Belgian Grand Prix":"GP da Bélgica","Hungarian Grand Prix":"GP da Hungria","Dutch Grand Prix":"GP da Holanda","Italian Grand Prix":"GP da Itália",
+    "Azerbaijan Grand Prix":"GP do Azerbaijão","Singapore Grand Prix":"GP de Singapura","United States Grand Prix":"GP dos Estados Unidos",
+    "Mexico City Grand Prix":"GP da Cidade do México","São Paulo Grand Prix":"GP de São Paulo","Las Vegas Grand Prix":"GP de Las Vegas",
+    "Qatar Grand Prix":"GP do Catar","Abu Dhabi Grand Prix":"GP de Abu Dhabi","Emilia Romagna Grand Prix":"GP da Emília-Romanha"},
+  howF1html:'Os horários das sessões de Fórmula 1 vêm do <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> e são marcados como verificados quando o <a href="https://openf1.org/" rel="noopener">OpenF1</a> informa o mesmo horário. A F1 não entra na agenda.',
   grpRegion:"Região",grpLook:"Aparência",ctHighLabel:"Contraste alto",sizeLabel:"Tamanho do texto",szNormal:"Normal",szLarge:"Grande",szXl:"Muito grande"}
 };
 
@@ -818,12 +847,18 @@ sizeRadios.forEach(r=>r.addEventListener("change",()=>{size=r.value;store.set("s
 const LEAGUES=[
   {code:"EPL",name:"Premier League",abbr:"PL",c:"--epl"},{code:"LIGA",name:"La Liga",abbr:"LL",c:"--liga"},
   {code:"BUN",name:"Bundesliga",abbr:"BL",c:"--bun"},{code:"BRA",name:"Brasileirão",abbr:"BR",c:"--bra"},
-  {code:"INTL",name:"Friendlies",abbr:"INT",c:"--intl"}];
+  {code:"INTL",name:"Friendlies",abbr:"INT",c:"--intl"},{code:"F1",name:"Formula 1",abbr:"F1",c:"--f1"}];
 const addDays=(key,n)=>{const d=new Date(key+"T12:00:00Z");d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);};
+const leagueName=l=>l.code==="INTL"?T.friendlies:l.code==="F1"?T.f1:l.name;
 const colorOf=code=>"var("+LEAGUES.find(l=>l.code===code).c+")";
-const ORDER={en:["EPL","LIGA","BUN","BRA","INTL"],pt:["BRA","INTL","EPL","LIGA","BUN"]};
+const ORDER={en:["EPL","LIGA","BUN","BRA","INTL","F1"],pt:["BRA","INTL","F1","EPL","LIGA","BUN"]};
 const ordered=()=>ORDER[LANG].map(c=>LEAGUES.find(l=>l.code===c));
 const on=new Set(store.get("leagues",LEAGUES.map(l=>l.code)));
+{ // a league added to the site since the visitor last chose their leagues starts switched on
+  const seen=store.get("seen",["EPL","LIGA","BUN","BRA","INTL"]), fresh=LEAGUES.filter(l=>!seen.includes(l.code));
+  if(fresh.length){ fresh.forEach(l=>on.add(l.code)); if(store.get("leagues",null)) store.set("leagues",[...on]); }
+  store.set("seen",LEAGUES.map(l=>l.code));
+}
 const favs=new Set(store.get("favs",[]));
 const openSrc=new Set();            // which source lists are open, so a refresh keeps them open
 let range=store.get("range","all"), limit=40, DATA=[], META=null;
@@ -840,7 +875,7 @@ function applyLang(){
   document.getElementById("q").placeholder=T.searchPh;
   document.getElementById("leagues").setAttribute("aria-label",T.leagues);
   document.getElementById("range").setAttribute("aria-label",T.dateRange);
-  ordered().forEach(l=>{const b=document.getElementById("chip-"+l.code); if(b){ b.lastChild.textContent=l.code==="INTL"?T.friendlies:l.name; b.parentNode.appendChild(b); }});
+  ordered().forEach(l=>{const b=document.getElementById("chip-"+l.code); if(b){ b.lastChild.textContent=leagueName(l); b.parentNode.appendChild(b); }});
   document.getElementById("ltchips").setAttribute("aria-label",T.leagues);
   fillZones(); makeFormatters(); applyTheme(); applyContrast(); applySize(); showRepo();
   if(typeof checkDates==="function"){ checkDates(); syncControls(); }
@@ -891,8 +926,8 @@ function showRepo(){
 
 /* ---------- filters ---------- */
 const q=document.getElementById("q"),from=document.getElementById("from"),to=document.getElementById("to"),
-      tbc=document.getElementById("showtbc"),favonly=document.getElementById("favonly");
-q.value=store.get("q",""); tbc.checked=store.get("tbc",true); favonly.checked=store.get("favonly",false);
+      tbc=document.getElementById("showtbc"),favonly=document.getElementById("favonly"),f1prac=document.getElementById("f1prac");
+q.value=store.get("q",""); tbc.checked=store.get("tbc",true); favonly.checked=store.get("favonly",false); f1prac.checked=store.get("f1prac",true);
 const lg=document.getElementById("leagues");
 LEAGUES.forEach(l=>{
   const b=document.createElement("button"); b.type="button"; b.className="chip"; b.id="chip-"+l.code;
@@ -922,18 +957,19 @@ function checkDates(){ // "to" can't be before "from": say so, and ignore the en
 document.querySelectorAll("#range button").forEach(b=>{ b.onclick=()=>setRange(b.dataset.r,true); });
 [from,to].forEach(el=>el.addEventListener("input",()=>{checkDates();limit=40;render();}));
 let typing=0;   // while someone types, redraw once they pause (every key press would redraw the whole list)
-[q,tbc,favonly].forEach(el=>el.addEventListener("input",()=>{store.set("q",q.value);store.set("tbc",tbc.checked);store.set("favonly",favonly.checked);limit=40;
+[q,tbc,favonly,f1prac].forEach(el=>el.addEventListener("input",()=>{store.set("q",q.value);store.set("tbc",tbc.checked);store.set("favonly",favonly.checked);store.set("f1prac",f1prac.checked);limit=40;
   clearTimeout(typing); if(el===q) typing=setTimeout(render,150); else render();}));
 clearq.onclick=()=>{q.value="";store.set("q","");q.focus();limit=40;render();};
 resetBtn.onclick=()=>{
   LEAGUES.forEach(l=>{on.add(l.code);document.getElementById("chip-"+l.code).setAttribute("aria-pressed","true");}); store.set("leagues",[...on]);
-  q.value="";store.set("q",""); favonly.checked=false;store.set("favonly",false); tbc.checked=true;store.set("tbc",true);
+  q.value="";store.set("q",""); favonly.checked=false;store.set("favonly",false); tbc.checked=true;store.set("tbc",true); f1prac.checked=true;store.set("f1prac",true);
   from.value="";to.value=""; setRange("all",false); document.querySelector('#range button[data-r="all"]').focus();
 };
 function syncControls(){ // small bits of UI that depend on the current filters
   clearq.hidden=!q.value; clearq.setAttribute("aria-label",T.clearSearch);
   document.getElementById("favlabel").textContent=T.favCount(favs.size);
-  resetBtn.hidden=on.size===LEAGUES.length&&range==="all"&&!q.value&&!favonly.checked&&tbc.checked;
+  resetBtn.hidden=on.size===LEAGUES.length&&range==="all"&&!q.value&&!favonly.checked&&tbc.checked&&f1prac.checked;
+  document.getElementById("f1praclabel").hidden=!on.has("F1");   // only useful while F1 is shown
 }
 
 // day headers stick just below the filter bar, whatever its height
@@ -955,7 +991,8 @@ function bounds(){
 }
 function live(){ // finished matches stay a day when the final score is known, else two hours; dated days that have passed go
   const now=Date.now(), today=dayKey.format(new Date());
-  return DATA.filter(r=>{const L=liveOf(r); if(L&&L.state==="in") return true;
+  return DATA.filter(r=>{if(r.kind==="f1") return r.when?r.when.getTime()+24*3600e3>now:r.day>=today;
+    const L=liveOf(r); if(L&&L.state==="in") return true;
     if(!r.when) return r.day>=today;
     return r.when.getTime()+(L&&L.state==="post"?24:2)*3600e3>now;});
 }
@@ -963,7 +1000,8 @@ function filtered(){
   const terms=q.value.split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
   const [a,b]=bounds();
   return live().filter(r=>on.has(r.code)
-    &&(!terms.length||terms.some(t=>[r.home,r.away,I18N.pt.teams[r.home]||"",I18N.pt.teams[r.away]||""].some(n=>n.toLowerCase().includes(t))))
+    &&(!terms.length||terms.some(t=>[r.home,r.away,I18N.pt.teams[r.home]||"",I18N.pt.teams[r.away]||"",r.gp||"",r.gp?gpName(r.gp):""].some(n=>n.toLowerCase().includes(t))))
+    &&(r.kind!=="f1"||f1prac.checked||!r.sess.startsWith("FP"))
     &&(!favonly.checked||favs.has(r.home)||favs.has(r.away))
     &&r.day>=a&&r.day<=b&&(tbc.checked||r.utc));
 }
@@ -1011,6 +1049,7 @@ function render(){
       '<ul class="day-list">';
     ms.sort((a,b)=>(a.when?a.when:Infinity)-(b.when?b.when:Infinity));
     for(const r of ms){
+      if(r.kind==="f1"){ html+=f1Row(r); continue; }
       const tags=[], c=r.check, L=liveOf(r);
       const started=L&&L.state!=="pre";     // once a match is on, its score replaces the time labels
       if(L&&L.state==="in") tags.push('<span class="pill live"><span class="dot-live" aria-hidden="true"></span>'+esc(T.pLive)+' '+esc(L.clock)+'</span>');
@@ -1062,6 +1101,33 @@ function detailsBtn(r){
   if(!r.uid) return "";
   return '<p class="m-act"><a class="btn md-open" href="'+esc(matchHref(r))+'" data-uid="'+esc(r.uid)+'" aria-label="'+esc(T.mdOpenAria(teamName(r.home),teamName(r.away)))+'">'+ICON.info+'<span>'+esc(T.mdOpen)+'</span></a></p>';
 }
+/* ---------- Formula 1 sessions: a compact row each, and a full card for the race ---------- */
+const F1_MIN={FP1:60,FP2:60,FP3:60,SQ:45,S:60,Q:60,R:120};   // rough length, for "on now"
+const gpName=n=>T.gp[n]||n;
+function f1Tags(r){
+  const now=Date.now(), c=r.check, t=[];
+  if(r.when&&now>=r.when.getTime()&&now<r.when.getTime()+F1_MIN[r.sess]*60e3) return '<span class="pill live"><span class="dot-live" aria-hidden="true"></span>'+esc(T.pOn)+'</span>';
+  if(r.top) return '<span class="pill ft">'+esc(T.pDone)+'</span>';
+  if(r.when&&now>=r.when.getTime()) return "";
+  if(!r.utc) t.push('<span class="pill tbc">'+esc(T.pTbc)+'</span>');
+  else if(c&&c.status==="confirmed") t.push('<span class="pill ok">'+ICON.check+esc(T.pVerified)+'</span>');
+  if(r.when&&+fmtH.format(r.when)<7) t.push('<span class="pill early">'+ICON.moon+esc(T.pEarly)+'</span>');
+  return t.join("");
+}
+function f1Row(r){
+  const time='<div class="m-time">'+(r.when?'<time datetime="'+r.utc+'">'+fmtT.format(r.when)+'</time><small>'+zoneOf(r.when)+'</small>':'<span aria-hidden="true">– –</span><small>'+esc(T.tbcSmall)+'</small>')+'</div>';
+  const tags='<div class="m-tags">'+f1Tags(r)+'</div>', gp=gpName(r.gp), S=T.f1Sess;
+  if(r.sess!=="R"){
+    const res=r.top?'<p class="sess-res">'+esc((r.sess==="Q"?T.f1Pole:T.f1Winner)+": "+r.top[0])+'</p>':'';
+    return '<li class="match sess" style="--c:'+colorOf("F1")+'">'+time+'<div class="m-main"><h3 class="sess-line"><b>'+esc(S[r.sess])+'</b> · '+esc(gp)+'</h3>'+res+'</div>'+tags+'</li>';
+  }
+  const meta='<div class="m-meta"><span class="comp"><i aria-hidden="true"></i>'+esc(T.f1)+'</span><span>'+esc(T.f1Round(r.round))+'</span>'+(r.sprint?'<span>'+esc(T.f1SprintWk)+'</span>':'')+(r.venue?'<span>'+esc(r.venue)+'</span>':'')+'</div>';
+  const others=DATA.filter(x=>x.wk===r.wk&&x.sess!=="R").map(x=>S[x.sess]);
+  const extra=r.top?'<ol class="mini-pod" aria-label="'+esc(T.f1Podium)+'">'+r.top.map((n,i)=>'<li><b>'+(i+1)+'</b> '+esc(n)+'</li>').join("")+'</ol>'
+    :others.length?'<p class="wk-list">'+esc(T.f1Weekend+" "+others.join(", "))+'</p>':'';
+  return '<li class="match" style="--c:'+colorOf("F1")+'">'+time+'<div class="m-main"><h3 class="m-teams"><span class="m-sess">'+esc(S.R)+'</span><span class="m-gp">'+esc(gp)+'</span></h3>'+
+    meta+extra+srcHTML(r)+'</div>'+tags+'</li>';
+}
 function assignDays(){ DATA.forEach(r=>{r.day=r.when?dayKey.format(r.when):r.date;}); }
 function renderStamp(){
   const src=[...new Set(Object.entries(META.sources||{}).filter(([k])=>k!=="INTL").map(([,v])=>v))].join(", ");
@@ -1076,7 +1142,7 @@ const LIVE=new Map();          // our match key -> {id, state, clock, detail, hs
 const FINAL=new Map();         // finished matches: kept so the final score stays on the card for a day
 const TRIED=new Set();         // matches more than 3 hours old that were already looked up once
 let LIVE_EXTRA=[];             // live league events we could not match to a listed fixture
-const keyOf=r=>r.code+"|"+r.home+"|"+r.away+"|"+r.date;
+const keyOf=r=>r.kind?r.uid:r.code+"|"+r.home+"|"+r.away+"|"+r.date;   // F1 sessions have no teams: their own id
 // ESPN first; else the final score from the league feed (build_schedule.py adds "result" for recent matches)
 const liveOf=r=>LIVE.get(keyOf(r))||FINAL.get(keyOf(r))||(r.result?{state:"post",detail:"FT",clock:"",hs:String(r.result.home),as:String(r.result.away)}:undefined);
 const STOP=new Set(["fc","cf","afc","sc","ac","cd","rc","ud","sd","ca","ec","se","cr","fbpa","club","clube","de","del","la","le","the","and","futbol","football","sport","sporting","esporte","regatas","balompie","calcio","sad","national","team"]);
