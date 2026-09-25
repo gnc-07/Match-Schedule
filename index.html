@@ -450,18 +450,16 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
             <select id="tzsel"></select></div>
           <fieldset class="field"><legend data-t="themeLabel">Theme</legend>
             <div class="choice">
-              <label><input type="radio" name="theme" value="auto"><span data-t="thAuto">Automatic</span></label>
+              <label><input type="radio" name="theme" value="auto"><span data-t="thAuto">Device</span></label>
               <label><input type="radio" name="theme" value="light"><span data-t="thLight">Light</span></label>
               <label><input type="radio" name="theme" value="dark"><span data-t="thDark">Dark</span></label>
             </div>
-            <p class="hint" data-t="thHint">Automatic follows your device.</p>
           </fieldset>
           <fieldset class="field"><legend data-t="contrastLabel">Contrast</legend>
             <div class="choice two">
               <label><input type="radio" name="contrast" value="normal"><span data-t="ctNormal">Normal</span></label>
               <label><input type="radio" name="contrast" value="high"><span data-t="ctHigh">High</span></label>
             </div>
-            <p class="hint" data-t="ctHint">High contrast uses stronger colours and borders, for easier reading.</p>
           </fieldset>
           <fieldset class="field"><legend data-t="sizeLabel">Text size</legend>
             <div class="choice">
@@ -470,7 +468,6 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
               <label><input type="radio" name="size" value="xl"><span data-t="szXl">Extra large</span></label>
             </div>
           </fieldset>
-          <p class="hint" data-t="autoSave">Changes apply straight away and are remembered on this device.</p>
         </div>
       </details>
       <button type="button" class="btn" id="tablesbtn" aria-haspopup="dialog"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16"/></svg><span data-t="tablesBtn">Tables</span></button>
@@ -546,9 +543,9 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
       <h2 id="legend-h" data-t="legendTitle">Reading the list</h2>
       <dl>
         <dt><span class="pill ok"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg><span data-t="pVerified">verified</span></span></dt>
-        <dd data-t="dVerified">An official source (federation, league, club or official ticketing) gives the time, or at least two independent sources agree.</dd>
+        <dd data-t="dVerified">An official source gives the time, or at least two independent sources agree.</dd>
         <dt><span class="pill warn" data-t="pConflicting">conflicting reports</span></dt>
-        <dd data-t="dConflicting">Sources disagree, or only one has reported a time. Open the sources under the match to see each report.</dd>
+        <dd data-t="dConflicting">Sources disagree, or only one has reported a time.</dd>
         <dt><span class="pill warn" data-t="pProvisional">provisional</span></dt>
         <dd data-t="dProvisional">A league placeholder until TV selections are announced.</dd>
         <dt><span class="pill tbc" data-t="pTbc">time TBC</span></dt>
@@ -560,11 +557,9 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
     <section aria-labelledby="how-h">
       <h2 id="how-h" data-t="howTitle">How it works</h2>
       <ul>
-        <li data-t="how1html">League fixtures come from <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> (or football-data.org when configured) and are rebuilt four times a day.</li>
-        <li data-t="how2">When that feed lags, corrections are added from official league and club sites and cross-checked against the press. Friendlies are entered the same way, with every source kept.</li>
-        <li data-t="how3">Live scores come from ESPN's public scoreboard, refreshed every 30 seconds while a match is on. They appear on this site only, not in the calendar.</li>
-        <li data-t="how5">Where CazéTV streams a match free on YouTube, a Watch on CazéTV button appears once the stream is scheduled. Before that, matches on its schedule (taken from the fan-made agendacazetv.com) link to its YouTube channel. Most of its streams only play in Brazil.</li>
-        <li data-t="how6">Line-ups, match events and league tables also come from ESPN. Stadium maps use OpenStreetMap and Wikidata.</li>
+        <li data-t="how1html">League fixtures come from <a href="https://www.football-data.org/" rel="noopener">football-data.org</a> (or <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> if it is unavailable) and are rebuilt four times a day. When that feed lags, and for friendlies, times come from official league and club sites and the press, with every source listed under the match.</li>
+        <li data-t="how3">Live scores, line-ups, match events and league tables come from ESPN; stadium maps from OpenStreetMap and Wikidata. Live scores appear on this site only, not in the calendar.</li>
+        <li data-t="how5">CazéTV buttons lead to its free YouTube streams, found through its channel and the fan-made agendacazetv.com. Most only play in Brazil.</li>
         <li data-t="how4">Stars and settings are saved in your browser only. Finished matches stay on the list, with the final score, for a day after kick-off.</li>
       </ul>
       <p id="repo" hidden></p>
@@ -591,7 +586,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
    ========================================================================= */
 const I18N={
  en:{locale:"en-CA",
-  skip:"Skip to fixtures",settings:"Settings",themeLabel:"Theme",thAuto:"Automatic",thLight:"Light",thDark:"Dark",thHint:"Automatic follows your device.",done:"Close",autoSave:"Changes apply straight away and are remembered on this device.",langLabel:"Language",tzLabel:"Show times in",calBtn:"Calendar",calTitle:"Add to your calendar",
+  skip:"Skip to fixtures",settings:"Settings",themeLabel:"Theme",thAuto:"Device",thLight:"Light",thDark:"Dark",done:"Close",langLabel:"Language",tzLabel:"Show times in",calBtn:"Calendar",calTitle:"Add to your calendar",
   calText:"Subscribe once. Your calendar keeps every time up to date and reminds you 30 minutes before each confirmed kick-off.",
   subscribe:"Subscribe",copy:"Copy link",download:"Download .ics",copied:"Link copied. Paste it into your calendar app.",
   selected:"Link selected. Press Ctrl+C (or Cmd+C) to copy.",calLangNote:"",howTo:"How to subscribe in your app",
@@ -601,9 +596,9 @@ const I18N={
   howOutlook:"Outlook: Add calendar, Subscribe from web. Paste the link.",
   liveNow:"Live now",liveNote:"Updates every 30 seconds · ESPN",nLive:n=>n+" live now",
   filters:"Filters",leagues:"Leagues",dateRange:"Date range",all:"All",today:"Today",weekend:"This weekend",week:"Next 7 days",
-  searchLabel:"Filter by team",searchPh:"Find teams: Arsenal, Flamengo, Canada",favOnly:"Starred teams only",
+  searchLabel:"Filter by team",searchPh:"Find teams: Arsenal, Flamengo, Canada",
   showTbc:"Include matches without a confirmed time",custom:"Custom",fromDate:"From",toDate:"to",clearFilters:"Clear filters",clearSearch:"Clear search",dateErr:"The end date is before the start date. Pick a later end date.",favCount:n=>"Starred teams only"+(n?" ("+n+")":""),
-  matches:"matches",shown:n=>n+(n===1?" match shown":" matches shown"),loading:"Loading fixtures…",loadError:"The fixture list could not be loaded. Reload the page to try again.",
+  shown:n=>n+(n===1?" match shown":" matches shown"),loading:"Loading fixtures…",loadError:"The fixture list could not be loaded. Reload the page to try again.",
   updated:"Updated",leagueData:"League data",tomorrow:"Tomorrow",todayRel:"Today",
   pVerified:"verified",pConflicting:"conflicting reports",pUnconfirmed:"1 unconfirmed report",pProvisional:"provisional",pTbc:"time TBC",
   pEarly:"early",pLive:"LIVE",ft:"FT",liveSmall:"live",finalSmall:"final",tbcSmall:"time TBC",
@@ -613,18 +608,17 @@ const I18N={
   star:"Star",unstar:"Unstar",score:(a,b)=>"Score "+a+" to "+b,
   empty:"No matches fit these filters.",emptyFav:"You have not starred any teams yet; star one from the full list first.",emptyWide:"Try a wider date range, or turn a league back on.",
   more:n=>"Show more ("+n+" left)",
-  legendTitle:"Reading the list",dVerified:"An official source (federation, league, club or official ticketing) gives the time, or at least two independent sources agree.",
-  dConflicting:"Sources disagree, or only one has reported a time. Open the sources under the match to see each report.",
+  legendTitle:"Reading the list",dVerified:"An official source gives the time, or at least two independent sources agree.",
+  dConflicting:"Sources disagree, or only one has reported a time.",
   dProvisional:"A league placeholder until TV selections are announced.",dTbc:"No time published yet.",dEarly:"Kicks off before 7:00 a.m. in the time zone you chose.",
   howTitle:"How it works",
-  how1html:'League fixtures come from <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> (or football-data.org when configured) and are rebuilt four times a day.',
-  how2:"When that feed lags, corrections are added from official league and club sites and cross-checked against the press. Friendlies are entered the same way, with every source kept.",
-  how3:"Live scores come from ESPN's public scoreboard, refreshed every 30 seconds while a match is on. They appear on this site only, not in the calendar.",
-  how5:"Where CazéTV streams a match free on YouTube, a Watch on CazéTV button appears once the stream is scheduled. Before that, matches on its schedule (taken from the fan-made agendacazetv.com) link to its YouTube channel. Most of its streams only play in Brazil.",
+  how1html:'League fixtures come from <a href="https://www.football-data.org/" rel="noopener">football-data.org</a> (or <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> if it is unavailable) and are rebuilt four times a day. When that feed lags, and for friendlies, times come from official league and club sites and the press, with every source listed under the match.',
+  how3:"Live scores, line-ups, match events and league tables come from ESPN; stadium maps from OpenStreetMap and Wikidata. Live scores appear on this site only, not in the calendar.",
+  how5:"CazéTV buttons lead to its free YouTube streams, found through its channel and the fan-made agendacazetv.com. Most only play in Brazil.",
   watch:"Watch on CazéTV",watchNote:"Free on YouTube. Usually only plays in Brazil.",watchAria:(h,a)=>"Watch on CazéTV: "+h+" v "+a+", on YouTube",
-  watchPlanned:"CazéTV on YouTube",watchPlannedNote:"On CazéTV's schedule. The stream link appears once the stream is created. Usually only plays in Brazil.",watchPlannedAria:(h,a)=>h+" v "+a+" is on CazéTV's schedule. Open CazéTV's YouTube channel",
+  watchPlanned:"CazéTV on YouTube",watchPlannedNote:"Stream link coming soon. Usually only plays in Brazil.",watchPlannedAria:(h,a)=>h+" v "+a+" is on CazéTV's schedule. Open CazéTV's YouTube channel",
   how4:"Stars and settings are saved in your browser only. Finished matches stay on the list, with the final score, for a day after kick-off.",
-  repo:"Source code and data:",theme:{auto:"Auto",light:"Light",dark:"Dark"},themeAria:l=>"Colour theme: "+l+". Select to change.",
+  repo:"Source code and data:",
   teams:{},comp:{"International friendly":"International friendly"},friendlies:"Friendlies",round:r=>r,
   notes:{},tzNames:{"America/Edmonton":"Edmonton","America/Sao_Paulo":"São Paulo (Brasília)","America/Toronto":"Toronto","Europe/London":"London","Europe/Madrid":"Madrid","Europe/Berlin":"Berlin","UTC":"UTC"},
   myTz:z=>"My time zone ("+z+")",
@@ -637,19 +631,18 @@ const I18N={
   mdVenue:"Stadium",mdAttendance:"Attendance",mdReferee:"Referee",mdKick:"Kick-off",
   mdMapLarger:"Open the full map",mdMapTitle:v=>"Map showing "+v,mdMapCredit:"© OpenStreetMap contributors",
   mdMapNone:"A small map is not available for this stadium.",mdMapFind:"Find it on OpenStreetMap",mdMapWait:"Finding the stadium on the map…",mdTable:l=>l+" table",
-  mdSrc:"Line-ups and match events come from ESPN and update every 30 seconds during the match.",mdSrcMap:"Stadium location: Wikidata.",
-  addCal:"Add to my calendar",addCalNote:"Saves this one match to your calendar. It will not change if the kick-off time changes; use Subscribe for that.",
+  mdSrc:"Source: ESPN. Updates every 30 seconds during the match.",
+  addCal:"Add to my calendar",addCalNote:"Saves a one-time copy that will not update if the kick-off time changes.",
   share:"Share",linkCopied:"Link copied. Paste it into a message.",
   ev:{goal:"Goal",pen:"Goal (penalty)",og:"Own goal",penMiss:"Penalty missed",yellow:"Yellow card",second:"Second yellow card",red:"Red card",subOn:"Came on",subOff:"Went off",sub:"Substitution",half:"Half-time"},
   subFor:(i,o)=>i+" on, "+o+" off",keyLabel:"Key:",penShort:"pen.",ogShort:"o.g.",
   newEvent:(what,min,who)=>what+", "+min+": "+who,
-  ltSource:"Source: ESPN. Updated each time you open this window.",ltLoading:"Loading the table…",ltError:"The table could not be loaded. Try again later.",
+  ltSource:"Source: ESPN.",ltLoading:"Loading the table…",ltError:"The table could not be loaded. Try again later.",
   ltCols:{pos:"Position",team:"Team",p:"Played",w:"Won",d:"Drawn",l:"Lost",gd:"Goal difference",pts:"Points"},ltAbbr:{p:"P",w:"W",d:"D",l:"L",gd:"GD",pts:"Pts"},
-  ltKey:"P played · W won · D drawn · L lost · GD goal difference · Pts points. Starred teams are highlighted.",starred:"starred",
-  how6:"Line-ups, match events and league tables also come from ESPN. Stadium maps use OpenStreetMap and Wikidata.",
-  contrastLabel:"Contrast",ctNormal:"Normal",ctHigh:"High",ctHint:"High contrast uses stronger colours and borders, for easier reading.",sizeLabel:"Text size",szNormal:"Normal",szLarge:"Large",szXl:"Extra large"},
+  ltKey:"P played · W won · D drawn · L lost · GD goal difference · Pts points.",starred:"starred",
+  contrastLabel:"Contrast",ctNormal:"Normal",ctHigh:"High",sizeLabel:"Text size",szNormal:"Normal",szLarge:"Large",szXl:"Extra large"},
  pt:{locale:"pt-BR",
-  skip:"Pular para os jogos",settings:"Ajustes",themeLabel:"Tema",thAuto:"Automático",thLight:"Claro",thDark:"Escuro",thHint:"Automático segue o seu aparelho.",done:"Fechar",autoSave:"As mudanças valem na hora e ficam salvas neste aparelho.",langLabel:"Idioma",tzLabel:"Mostrar horários em",calBtn:"Agenda",calTitle:"Adicione à sua agenda",
+  skip:"Pular para os jogos",settings:"Ajustes",themeLabel:"Tema",thAuto:"Aparelho",thLight:"Claro",thDark:"Escuro",done:"Fechar",langLabel:"Idioma",tzLabel:"Mostrar horários em",calBtn:"Agenda",calTitle:"Adicione à sua agenda",
   calText:"Assine uma vez. Sua agenda mantém todos os horários atualizados e avisa 30 minutos antes de cada jogo com horário confirmado.",
   subscribe:"Assinar",copy:"Copiar link",download:"Baixar .ics",copied:"Link copiado. Cole no seu aplicativo de agenda.",
   selected:"Link selecionado. Pressione Ctrl+C (ou Cmd+C) para copiar.",calLangNote:"Os eventos da agenda aparecem em inglês.",
@@ -660,9 +653,9 @@ const I18N={
   howOutlook:"Outlook: Adicionar calendário, Assinar da Web. Cole o link.",
   liveNow:"Ao vivo",liveNote:"Atualiza a cada 30 segundos · ESPN",nLive:n=>n+" ao vivo agora",
   filters:"Filtros",leagues:"Ligas",dateRange:"Período",all:"Todos",today:"Hoje",weekend:"Este fim de semana",week:"Próximos 7 dias",
-  searchLabel:"Filtrar por time",searchPh:"Buscar times: Flamengo, Palmeiras, Brasil",favOnly:"Só times favoritos",
+  searchLabel:"Filtrar por time",searchPh:"Buscar times: Flamengo, Palmeiras, Brasil",
   showTbc:"Incluir jogos sem horário confirmado",custom:"Personalizado",fromDate:"De",toDate:"até",clearFilters:"Limpar filtros",clearSearch:"Limpar busca",dateErr:"A data final é anterior à data inicial. Escolha uma data final posterior.",favCount:n=>"Só times favoritos"+(n?" ("+n+")":""),
-  matches:"jogos",shown:n=>n+(n===1?" jogo exibido":" jogos exibidos"),loading:"Carregando jogos…",loadError:"Não foi possível carregar a lista de jogos. Recarregue a página para tentar novamente.",
+  shown:n=>n+(n===1?" jogo exibido":" jogos exibidos"),loading:"Carregando jogos…",loadError:"Não foi possível carregar a lista de jogos. Recarregue a página para tentar novamente.",
   updated:"Atualizado em",leagueData:"Dados das ligas",tomorrow:"Amanhã",todayRel:"Hoje",
   pVerified:"verificado",pConflicting:"relatos conflitantes",pUnconfirmed:"1 relato não confirmado",pProvisional:"provisório",pTbc:"horário a definir",
   pEarly:"cedo",pLive:"AO VIVO",ft:"Encerrado",liveSmall:"ao vivo",finalSmall:"final",tbcSmall:"a definir",
@@ -672,18 +665,17 @@ const I18N={
   star:"Favoritar",unstar:"Desfavoritar",score:(a,b)=>"Placar "+a+" a "+b,
   empty:"Nenhum jogo corresponde a estes filtros.",emptyFav:"Você ainda não favoritou nenhum time; favorite um na lista completa primeiro.",emptyWide:"Tente um período maior ou reative uma liga.",
   more:n=>"Mostrar mais (faltam "+n+")",
-  legendTitle:"Como ler a lista",dVerified:"Uma fonte oficial (federação, liga, clube ou venda oficial de ingressos) informa o horário, ou pelo menos duas fontes independentes concordam.",
-  dConflicting:"As fontes discordam, ou só uma informou o horário. Abra as fontes abaixo do jogo para ver cada relato.",
+  legendTitle:"Como ler a lista",dVerified:"Uma fonte oficial informa o horário, ou pelo menos duas fontes independentes concordam.",
+  dConflicting:"As fontes discordam, ou só uma informou o horário.",
   dProvisional:"Horário provisório da liga até a definição da TV.",dTbc:"Nenhum horário publicado ainda.",dEarly:"Começa antes das 7h no fuso horário escolhido.",
   howTitle:"Como funciona",
-  how1html:'Os jogos das ligas vêm do <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> (ou do football-data.org, quando configurado) e são atualizados quatro vezes por dia.',
-  how2:"Quando essa fonte atrasa, correções são adicionadas a partir dos sites oficiais de ligas e clubes e conferidas com a imprensa. Os amistosos seguem o mesmo processo, e todas as fontes ficam registradas.",
-  how3:"Os placares ao vivo vêm do placar público da ESPN e são atualizados a cada 30 segundos durante o jogo. Aparecem só neste site, não na agenda.",
-  how5:"Quando a CazéTV transmite um jogo de graça no YouTube, aparece o botão Assistir na CazéTV assim que a transmissão é agendada. Antes disso, os jogos da programação (tirada do site de fã agendacazetv.com) levam ao canal dela no YouTube. A maioria das transmissões só funciona no Brasil.",
+  how1html:'Os jogos das ligas vêm do <a href="https://www.football-data.org/" rel="noopener">football-data.org</a> (ou do <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a>, se ele estiver indisponível) e são atualizados quatro vezes por dia. Quando essa fonte atrasa, e nos amistosos, os horários vêm dos sites oficiais de ligas e clubes e da imprensa, com todas as fontes listadas no jogo.',
+  how3:"Placares ao vivo, escalações, lances e classificações vêm da ESPN; os mapas dos estádios, do OpenStreetMap e do Wikidata. Os placares ao vivo aparecem só neste site, não na agenda.",
+  how5:"Os botões da CazéTV levam às transmissões grátis no YouTube, encontradas pelo canal dela e pelo site de fã agendacazetv.com. A maioria só funciona no Brasil.",
   watch:"Assistir na CazéTV",watchNote:"Grátis no YouTube. Em geral só funciona no Brasil.",watchAria:(h,a)=>"Assistir na CazéTV: "+h+" x "+a+", no YouTube",
-  watchPlanned:"CazéTV no YouTube",watchPlannedNote:"Na programação da CazéTV. O link da transmissão aparece quando ela for criada. Em geral só funciona no Brasil.",watchPlannedAria:(h,a)=>h+" x "+a+" está na programação da CazéTV. Abrir o canal da CazéTV no YouTube",
+  watchPlanned:"CazéTV no YouTube",watchPlannedNote:"Link da transmissão em breve. Em geral só funciona no Brasil.",watchPlannedAria:(h,a)=>h+" x "+a+" está na programação da CazéTV. Abrir o canal da CazéTV no YouTube",
   how4:"Favoritos e preferências ficam salvos só no seu navegador. Jogos encerrados continuam na lista, com o placar final, por um dia após o início.",
-  repo:"Código-fonte e dados:",theme:{auto:"Automático",light:"Claro",dark:"Escuro"},themeAria:l=>"Tema de cores: "+l+". Selecione para mudar.",
+  repo:"Código-fonte e dados:",
   teams:{"Brazil":"Brasil","Canada":"Canadá","Bolivia":"Bolívia","India":"Índia","Australia":"Austrália","United States":"Estados Unidos","Mexico":"México","Spain":"Espanha","Benin":"Benin","Burkina Faso":"Burkina Faso","Chile":"Chile","Peru":"Peru","Argentina":"Argentina","England":"Inglaterra","France":"França","Germany":"Alemanha","Italy":"Itália","Netherlands":"Países Baixos","Belgium":"Bélgica","Switzerland":"Suíça","Japan":"Japão","South Korea":"Coreia do Sul","Uruguay":"Uruguai","Colombia":"Colômbia","Ecuador":"Equador","Paraguay":"Paraguai","Venezuela":"Venezuela","Morocco":"Marrocos","Senegal":"Senegal","Nigeria":"Nigéria","Ghana":"Gana","Egypt":"Egito","Croatia":"Croácia","Poland":"Polônia","Denmark":"Dinamarca","Sweden":"Suécia","Norway":"Noruega","Scotland":"Escócia","Wales":"País de Gales","Ireland":"Irlanda","Austria":"Áustria","Czechia":"Tchéquia","Turkey":"Turquia","Greece":"Grécia","Ukraine":"Ucrânia","Serbia":"Sérvia","Hungary":"Hungria","Romania":"Romênia","Finland":"Finlândia","Iceland":"Islândia","Cyprus":"Chipre","Estonia":"Estônia","Andorra":"Andorra"},
   comp:{"International friendly":"Amistoso internacional"},friendlies:"Amistosos",round:r=>r.replace(/^Matchday (\d+)$/,"Rodada $1"),
   notes:{"Messi's farewell match":"Jogo de despedida de Messi","Postponed; new date not set.":"Adiado; nova data não definida."},
@@ -698,17 +690,16 @@ const I18N={
   mdVenue:"Estádio",mdAttendance:"Público",mdReferee:"Árbitro",mdKick:"Início",
   mdMapLarger:"Abrir o mapa completo",mdMapTitle:v=>"Mapa mostrando "+v,mdMapCredit:"© colaboradores do OpenStreetMap",
   mdMapNone:"Não há mapa pequeno disponível para este estádio.",mdMapFind:"Procurar no OpenStreetMap",mdMapWait:"Procurando o estádio no mapa…",mdTable:l=>"Classificação: "+l,
-  mdSrc:"As escalações e os lances vêm da ESPN e são atualizados a cada 30 segundos durante o jogo.",mdSrcMap:"Localização do estádio: Wikidata.",
-  addCal:"Adicionar à minha agenda",addCalNote:"Salva só este jogo na sua agenda. Ele não muda se o horário mudar; para isso, use Assinar.",
+  mdSrc:"Fonte: ESPN. Atualiza a cada 30 segundos durante o jogo.",
+  addCal:"Adicionar à minha agenda",addCalNote:"Salva uma cópia única, que não muda se o horário mudar.",
   share:"Compartilhar",linkCopied:"Link copiado. Cole em uma mensagem.",
   ev:{goal:"Gol",pen:"Gol (pênalti)",og:"Gol contra",penMiss:"Pênalti perdido",yellow:"Cartão amarelo",second:"Segundo amarelo",red:"Cartão vermelho",subOn:"Entrou",subOff:"Saiu",sub:"Substituição",half:"Intervalo"},
   subFor:(i,o)=>"Entrou "+i+", saiu "+o,keyLabel:"Legenda:",penShort:"pên.",ogShort:"contra",
   newEvent:(what,min,who)=>what+", "+min+": "+who,
-  ltSource:"Fonte: ESPN. Atualizada sempre que você abre esta janela.",ltLoading:"Carregando a classificação…",ltError:"Não foi possível carregar a classificação. Tente mais tarde.",
+  ltSource:"Fonte: ESPN.",ltLoading:"Carregando a classificação…",ltError:"Não foi possível carregar a classificação. Tente mais tarde.",
   ltCols:{pos:"Posição",team:"Time",p:"Jogos",w:"Vitórias",d:"Empates",l:"Derrotas",gd:"Saldo de gols",pts:"Pontos"},ltAbbr:{p:"J",w:"V",d:"E",l:"D",gd:"SG",pts:"Pts"},
-  ltKey:"J jogos · V vitórias · E empates · D derrotas · SG saldo de gols · Pts pontos. Times favoritos aparecem destacados.",starred:"favorito",
-  how6:"Escalações, lances e classificações também vêm da ESPN. Os mapas dos estádios usam OpenStreetMap e Wikidata.",
-  contrastLabel:"Contraste",ctNormal:"Normal",ctHigh:"Alto",ctHint:"O alto contraste usa cores e bordas mais fortes, para facilitar a leitura.",sizeLabel:"Tamanho do texto",szNormal:"Normal",szLarge:"Grande",szXl:"Muito grande"}
+  ltKey:"J jogos · V vitórias · E empates · D derrotas · SG saldo de gols · Pts pontos.",starred:"favorito",
+  contrastLabel:"Contraste",ctNormal:"Normal",ctHigh:"Alto",sizeLabel:"Tamanho do texto",szNormal:"Normal",szLarge:"Grande",szXl:"Muito grande"}
 };
 
 /* ---------- small icons ---------- */
@@ -1337,7 +1328,7 @@ function paintMatch(){
     const box=$("md-map"); if(box) paintMap(box); }
   $("md-state").textContent=m.status==="loading"?T.mdLoading:m.status==="none"?T.mdNoData:m.status==="error"?T.mdError:"";
   $("md-state").hidden=!$("md-state").textContent;
-  $("md-src").textContent=[m.S?T.mdSrc:"",ve?T.mdSrcMap:""].filter(Boolean).join(" ");
+  $("md-src").textContent=m.S?T.mdSrc:"";
 }
 async function loadMatch(){
   const m=MD; if(!m) return;
@@ -1477,7 +1468,7 @@ function paintTable(){
   document.getElementById("ltbody").innerHTML='<div class="lt-wrap"><table class="lt"><caption>'+esc(lg.name)+'</caption><thead><tr>'+
     '<th scope="col" class="pos-c"><span aria-hidden="true">#</span><span class="sr">'+esc(C.pos)+'</span></th><th scope="col" class="tm-c">'+esc(C.team)+'</th>'+
     th("p")+th("w","wdl")+th("d","wdl")+th("l","wdl")+th("gd")+th("pts")+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
-    '<p class="lt-key">'+esc(T.ltKey)+'</p><p class="lt-key">'+esc(T.ltSource)+'</p>';
+    '<p class="lt-key">'+esc(T.ltKey)+' '+esc(T.ltSource)+'</p>';
 }
 
 /* ---------- keep a page left open up to date ---------- */
