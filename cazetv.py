@@ -25,7 +25,8 @@ from xml.etree import ElementTree as ET
 CHANNEL_ID = "UCZiYbVptd3PVPf4f6eR6UaQ"     # youtube.com/@CazeTV
 FEED = f"https://www.youtube.com/feeds/videos.xml?channel_id={CHANNEL_ID}"
 CHANNEL = "https://www.youtube.com/@CazeTV"   # link for matches announced before their stream exists
-AGENDA = "https://agendacazetv.com/programacao?sport=futebol"
+# The page agendacazetv.com/programacao is an empty shell; its script loads this public JSON
+AGENDA = "https://api-portal.agendacazetv.com/api/public/events?esporte=futebol&pageSize=100&page="
 CACHE = "streams.json"
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0 Safari/537.36"
 KEEP_DAYS = 3                                  # forget a stream this long after its start
@@ -121,20 +122,37 @@ def youtube_url(url):
     m = re.match(r"https://(?:www\.|m\.)?youtube\.com/(?:watch\?v=|live/)([\w-]{11})|https://youtu\.be/([\w-]{11})", url or "")
     return f"https://www.youtube.com/watch?v={m.group(1) or m.group(2)}" if m else None
 
-def agenda_listings(html):
-    """The football listings on the agenda page, as dicts with 'home', 'away',
-    'start' (UTC ISO string) and optionally 'url' (a YouTube link).
+def agenda_listings(events):
+    """The live-match listings among the agenda's events, as dicts with 'home', 'away',
+    'start' (UTC ISO string) and 'url' (the broadcast link, if any).
 
-    NOT WRITTEN YET: the page could not be inspected when this was added, because
-    the development environment's network blocked agendacazetv.com. Writing a
-    reader without seeing the page would be guesswork, so this returns nothing
-    until it is filled in. Everything else (cache, matching, the site's
-    "announced" button) is already in place and waits for these listings."""
-    return []
+    The agenda labels nearly everything "futebol", including volleyball and replays,
+    so the sport label is not trusted: only titles with "AO VIVO" and two sides count
+    (teams_from_title), and attach() then needs both names to match a real fixture.
+    The title is used rather than 'participants', which is often empty or incomplete."""
+    out = []
+    for e in events:
+        sides = teams_from_title(e.get("title") or "")
+        if not sides or not e.get("startsAt") or e.get("status") in ("encerrado", "cancelado"):
+            continue
+        platforms = e.get("platforms") or []
+        main = next((p for p in platforms if p.get("isPrimary")), platforms[0] if platforms else {})
+        start = datetime.fromisoformat(e["startsAt"].replace("Z", "+00:00")).astimezone(timezone.utc)
+        out.append({"home": sides[0], "away": sides[1], "start": start.isoformat(), "url": main.get("broadcastUrl")})
+    return out
+
+def agenda_events():
+    """Every upcoming event from the agenda's JSON, following its pages."""
+    events, page, pages = [], 1, 1
+    while page <= min(pages, 10):
+        d = json.loads(get(AGENDA + str(page)))
+        events += d["data"]
+        pages, page = d.get("meta", {}).get("totalPages", 1), page + 1
+    return events
 
 def read_agenda(known):
     """Adds the agenda's listings to the cache dict `known`. Returns how many were read."""
-    listings = agenda_listings(get(AGENDA))
+    listings = agenda_listings(agenda_events())
     for a in listings:
         key = "agenda:" + norm(a["home"] + " x " + a["away"]).replace(" ", "-") + ":" + a["start"][:10]
         known[key] = {"id": key, "source": "agenda", "home": a["home"], "away": a["away"],
