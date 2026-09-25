@@ -169,7 +169,6 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 .url{font:500 12px/1.45 "Azeret Mono",ui-monospace,monospace;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;word-break:break-all;color:var(--ink-2)}
 .toast{font-size:14px;color:var(--accent);font-weight:600}
 .toast:empty{display:none}
-.calpanel details summary{cursor:pointer;font-size:14px;color:var(--ink-2);font-weight:600;min-height:32px;display:flex;align-items:center}
 .calpanel ol{margin:6px 0 0;padding-left:18px;font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:5px}
 
 /* ---------- live now ---------- */
@@ -269,10 +268,12 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
 .pill.live{background:var(--live-bg);color:var(--on-live)}
 .pill.ft{background:var(--ink);color:var(--bg)}
 .srcs{font-size:13.5px;color:var(--muted)}
-.srcs summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink-2);min-height:32px}
-.srcs summary::-webkit-details-marker{display:none}
-.srcs summary::after{content:"";width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px)}
-.srcs[open] summary::after{transform:rotate(-135deg) translate(-1px,-1px)}
+/* Sections that open (sources, "How to subscribe"): text with a small arrow that flips when open */
+.srcs summary,.calpanel details summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink-2);min-height:32px}
+.calpanel details summary{font-size:14px;min-height:44px}
+.srcs summary::-webkit-details-marker,.calpanel details summary::-webkit-details-marker{display:none}
+.srcs summary::after,.calpanel details summary::after{content:"";width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px)}
+.srcs[open] summary::after,.calpanel details[open] summary::after{transform:rotate(-135deg) translate(-1px,-1px)}
 .srcs .body{margin-top:4px;display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line-2)}
 .srcs .reported{color:var(--warn-ink);font-weight:600}
 .srcs ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
