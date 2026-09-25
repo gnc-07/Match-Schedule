@@ -133,7 +133,16 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 
 /* calendar menu */
 .calmenu{position:relative}
-.setpanel{gap:16px}
+.setpanel{width:min(400px,calc(100vw - 32px))}
+.setpanel .field{gap:4px}
+.setpanel .field>legend{margin-bottom:4px}
+.set-group{margin:4px 0 -4px;font:700 12px/1.2 "Instrument Sans",system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hc-row{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);font-size:15px;font-weight:600;color:var(--ink);cursor:pointer}
+.hc-row input{width:22px;height:22px;margin:0;flex:none;accent-color:var(--accent)}
+/* each text size choice is shown in roughly the size it gives */
+.sizes span[data-t="szNormal"]{font-size:14px}
+.sizes span[data-t="szLarge"]{font-size:16px}
+.sizes span[data-t="szXl"]{font-size:17.5px}
 .field{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;border:0;min-width:0}
 .field>label,.field>legend{font-size:15px;font-weight:600;color:var(--ink);padding:0;margin-bottom:6px}
 .field>label{margin-bottom:0}
@@ -153,6 +162,7 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 .calmenu>summary{list-style:none}
 .calmenu>summary::-webkit-details-marker{display:none}
 .calpanel{position:absolute;right:0;top:calc(100% + 8px);width:min(360px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 18px 40px -18px var(--shadow)}
+.calpanel:focus{outline:none}
 .calpanel h2{margin:0;font:800 1.3rem/1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.03em}
 .calpanel p{margin:0;color:var(--muted);font-size:14px}
 .cal-actions{display:flex;flex-wrap:wrap;gap:8px}
@@ -425,7 +435,15 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
   .lv-row .clk{grid-column:1/-1;justify-self:center}
   .ctl select{max-width:38vw}
   .calmenu{position:static}
-  .calpanel{left:0;right:0;width:auto}
+  .stamp{gap:2px 10px}
+  .stamp .src{font-size:12.5px}
+  .stamp .src::before{content:"·"/"";margin-right:10px}
+  .stamp .src-l{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  /* Settings and Calendar open as a sheet from the bottom of the screen, over a dimmed page */
+  .calmenu[open]::before{content:"";position:fixed;inset:0;z-index:1;background:var(--backdrop)}
+  .calpanel{position:fixed;z-index:2;left:0;right:0;top:auto;bottom:0;width:auto;max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain;
+    border-width:1px 0 0;border-radius:18px 18px 0 0;padding:16px 16px calc(24px + env(safe-area-inset-bottom,0px));box-shadow:0 -12px 40px -12px var(--shadow)}
+  body:has(.calmenu[open]){overflow:hidden}
 }
 </style>
 </head>
@@ -441,42 +459,36 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
     <div class="tools">
       <details class="calmenu" id="setmenu">
         <summary class="btn"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-t="settings">Settings</span></summary>
-        <div class="calpanel setpanel">
+        <div class="calpanel setpanel" tabindex="-1">
           <div class="panel-head"><h2 data-t="settings">Settings</h2>
             <button type="button" class="close-x" id="setdone"><span data-t="done">Close</span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+          <h3 class="set-group" data-t="grpRegion">Region</h3>
           <div class="field"><label for="langsel" data-t="langLabel">Language</label>
             <select id="langsel"><option value="en" lang="en">English</option><option value="pt" lang="pt-BR">Português (Brasil)</option></select></div>
           <div class="field"><label for="tzsel" data-t="tzLabel">Show times in</label>
             <select id="tzsel"></select></div>
+          <h3 class="set-group" data-t="grpLook">Appearance</h3>
           <fieldset class="field"><legend data-t="themeLabel">Theme</legend>
             <div class="choice">
-              <label><input type="radio" name="theme" value="auto"><span data-t="thAuto">Automatic</span></label>
+              <label><input type="radio" name="theme" value="auto"><span data-t="thAuto">Device</span></label>
               <label><input type="radio" name="theme" value="light"><span data-t="thLight">Light</span></label>
               <label><input type="radio" name="theme" value="dark"><span data-t="thDark">Dark</span></label>
             </div>
-            <p class="hint" data-t="thHint">Automatic follows your device.</p>
           </fieldset>
-          <fieldset class="field"><legend data-t="contrastLabel">Contrast</legend>
-            <div class="choice two">
-              <label><input type="radio" name="contrast" value="normal"><span data-t="ctNormal">Normal</span></label>
-              <label><input type="radio" name="contrast" value="high"><span data-t="ctHigh">High</span></label>
-            </div>
-            <p class="hint" data-t="ctHint">High contrast uses stronger colours and borders, for easier reading.</p>
-          </fieldset>
+          <label class="hc-row"><input type="checkbox" id="hcbox"><span data-t="ctHighLabel">High contrast</span></label>
           <fieldset class="field"><legend data-t="sizeLabel">Text size</legend>
-            <div class="choice">
+            <div class="choice sizes">
               <label><input type="radio" name="size" value="normal"><span data-t="szNormal">Normal</span></label>
               <label><input type="radio" name="size" value="large"><span data-t="szLarge">Large</span></label>
               <label><input type="radio" name="size" value="xl"><span data-t="szXl">Extra large</span></label>
             </div>
           </fieldset>
-          <p class="hint" data-t="autoSave">Changes apply straight away and are remembered on this device.</p>
         </div>
       </details>
       <button type="button" class="btn" id="tablesbtn" aria-haspopup="dialog"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16"/></svg><span data-t="tablesBtn">Tables</span></button>
       <details class="calmenu" id="calmenu">
         <summary class="btn primary"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="15" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4M12 13v4M10 15h4"/></svg><span data-t="calBtn">Calendar</span></summary>
-        <div class="calpanel">
+        <div class="calpanel" tabindex="-1">
           <h2 data-t="calTitle">Add to your calendar</h2>
           <p data-t="calText">Subscribe once. Your calendar keeps every time up to date and reminds you 30 minutes before each confirmed kick-off.</p>
           <div class="cal-actions">
@@ -591,7 +603,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
    ========================================================================= */
 const I18N={
  en:{locale:"en-CA",
-  skip:"Skip to fixtures",settings:"Settings",themeLabel:"Theme",thAuto:"Automatic",thLight:"Light",thDark:"Dark",thHint:"Automatic follows your device.",done:"Close",autoSave:"Changes apply straight away and are remembered on this device.",langLabel:"Language",tzLabel:"Show times in",calBtn:"Calendar",calTitle:"Add to your calendar",
+  skip:"Skip to fixtures",settings:"Settings",themeLabel:"Theme",thAuto:"Device",thLight:"Light",thDark:"Dark",done:"Close",langLabel:"Language",tzLabel:"Show times in",calBtn:"Calendar",calTitle:"Add to your calendar",
   calText:"Subscribe once. Your calendar keeps every time up to date and reminds you 30 minutes before each confirmed kick-off.",
   subscribe:"Subscribe",copy:"Copy link",download:"Download .ics",copied:"Link copied. Paste it into your calendar app.",
   selected:"Link selected. Press Ctrl+C (or Cmd+C) to copy.",calLangNote:"",howTo:"How to subscribe in your app",
@@ -647,9 +659,9 @@ const I18N={
   ltCols:{pos:"Position",team:"Team",p:"Played",w:"Won",d:"Drawn",l:"Lost",gd:"Goal difference",pts:"Points"},ltAbbr:{p:"P",w:"W",d:"D",l:"L",gd:"GD",pts:"Pts"},
   ltKey:"P played · W won · D drawn · L lost · GD goal difference · Pts points. Starred teams are highlighted.",starred:"starred",
   how6:"Line-ups, match events and league tables also come from ESPN. Stadium maps use OpenStreetMap and Wikidata.",
-  contrastLabel:"Contrast",ctNormal:"Normal",ctHigh:"High",ctHint:"High contrast uses stronger colours and borders, for easier reading.",sizeLabel:"Text size",szNormal:"Normal",szLarge:"Large",szXl:"Extra large"},
+  grpRegion:"Region",grpLook:"Appearance",ctHighLabel:"High contrast",sizeLabel:"Text size",szNormal:"Normal",szLarge:"Large",szXl:"Extra large"},
  pt:{locale:"pt-BR",
-  skip:"Pular para os jogos",settings:"Ajustes",themeLabel:"Tema",thAuto:"Automático",thLight:"Claro",thDark:"Escuro",thHint:"Automático segue o seu aparelho.",done:"Fechar",autoSave:"As mudanças valem na hora e ficam salvas neste aparelho.",langLabel:"Idioma",tzLabel:"Mostrar horários em",calBtn:"Agenda",calTitle:"Adicione à sua agenda",
+  skip:"Pular para os jogos",settings:"Ajustes",themeLabel:"Tema",thAuto:"Aparelho",thLight:"Claro",thDark:"Escuro",done:"Fechar",langLabel:"Idioma",tzLabel:"Mostrar horários em",calBtn:"Agenda",calTitle:"Adicione à sua agenda",
   calText:"Assine uma vez. Sua agenda mantém todos os horários atualizados e avisa 30 minutos antes de cada jogo com horário confirmado.",
   subscribe:"Assinar",copy:"Copiar link",download:"Baixar .ics",copied:"Link copiado. Cole no seu aplicativo de agenda.",
   selected:"Link selecionado. Pressione Ctrl+C (ou Cmd+C) para copiar.",calLangNote:"Os eventos da agenda aparecem em inglês.",
@@ -708,7 +720,7 @@ const I18N={
   ltCols:{pos:"Posição",team:"Time",p:"Jogos",w:"Vitórias",d:"Empates",l:"Derrotas",gd:"Saldo de gols",pts:"Pontos"},ltAbbr:{p:"J",w:"V",d:"E",l:"D",gd:"SG",pts:"Pts"},
   ltKey:"J jogos · V vitórias · E empates · D derrotas · SG saldo de gols · Pts pontos. Times favoritos aparecem destacados.",starred:"favorito",
   how6:"Escalações, lances e classificações também vêm da ESPN. Os mapas dos estádios usam OpenStreetMap e Wikidata.",
-  contrastLabel:"Contraste",ctNormal:"Normal",ctHigh:"Alto",ctHint:"O alto contraste usa cores e bordas mais fortes, para facilitar a leitura.",sizeLabel:"Tamanho do texto",szNormal:"Normal",szLarge:"Grande",szXl:"Muito grande"}
+  grpRegion:"Região",grpLook:"Aparência",ctHighLabel:"Contraste alto",sizeLabel:"Tamanho do texto",szNormal:"Normal",szLarge:"Grande",szXl:"Muito grande"}
 };
 
 /* ---------- small icons ---------- */
@@ -769,7 +781,7 @@ function makeFormatters(){
   fmtT=new Intl.DateTimeFormat(L,{hour:"numeric",minute:"2-digit",timeZone:TZ});
   fmtZ=new Intl.DateTimeFormat(L,{timeZoneName:"short",timeZone:TZ});
   fmtH=new Intl.DateTimeFormat("en-CA",{hour:"numeric",hourCycle:"h23",timeZone:TZ});
-  fmtStamp=new Intl.DateTimeFormat(L,{dateStyle:"medium",timeStyle:"short",timeZone:TZ});
+  fmtStamp=new Intl.DateTimeFormat(L,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZone:TZ});
   dayKey=new Intl.DateTimeFormat("en-CA",{year:"numeric",month:"2-digit",day:"2-digit",timeZone:TZ});
   fmtMon=new Intl.DateTimeFormat(L,{month:"short",timeZone:"UTC"});
   fmtWd=new Intl.DateTimeFormat(L,{weekday:"short",timeZone:"UTC"});
@@ -790,13 +802,13 @@ themeRadios.forEach(r=>r.addEventListener("change",()=>{theme=r.value;store.set(
 
 /* ---------- contrast: normal or high (works with any theme) ---------- */
 let contrast=store.get("contrast","normal");
-const contrastRadios=[...document.querySelectorAll('input[name="contrast"]')];
+const hcBox=document.getElementById("hcbox");
 function applyContrast(){
   if(contrast==="high") document.documentElement.setAttribute("data-contrast","high");
   else document.documentElement.removeAttribute("data-contrast");
-  contrastRadios.forEach(r=>r.checked=r.value===contrast);
+  hcBox.checked=contrast==="high";
 }
-contrastRadios.forEach(r=>r.addEventListener("change",()=>{contrast=r.value;store.set("contrast",contrast);applyContrast();}));
+hcBox.addEventListener("change",()=>{contrast=hcBox.checked?"high":"normal";store.set("contrast",contrast);applyContrast();});
 
 /* ---------- text size: normal, large, extra large (the whole page scales) ---------- */
 let size=store.get("size","normal");
@@ -859,9 +871,23 @@ document.getElementById("copy").onclick=async()=>{
 };
 const calmenu=document.getElementById("calmenu"), setmenu=document.getElementById("setmenu"), MENUS=[setmenu,calmenu];
 function closeMenu(m,focus){ m.open=false; if(focus) m.querySelector("summary").focus(); }
-MENUS.forEach(m=>m.addEventListener("toggle",()=>{ if(m.open) MENUS.forEach(o=>{ if(o!==m) o.open=false; }); }));
-document.addEventListener("keydown",e=>{ if(e.key==="Escape") MENUS.forEach(m=>{ if(m.open) closeMenu(m,true); }); });
-document.addEventListener("click",e=>{ MENUS.forEach(m=>{ if(m.open&&!m.contains(e.target)) m.open=false; }); });
+// on phones the menus open as a sheet over a dimmed page: focus moves into the sheet and Tab stays inside it
+const SHEET=matchMedia("(max-width:640px)");
+const tabbable=m=>[...m.querySelectorAll('.calpanel a[href],.calpanel button,.calpanel select,.calpanel input,.calpanel summary')].filter(el=>(el.checkVisibility?el.checkVisibility():el.getClientRects().length>0)&&!(el.type==="radio"&&!el.checked));   // a radio group is one Tab stop
+MENUS.forEach(m=>m.addEventListener("toggle",()=>{ if(!m.open) return;
+  MENUS.forEach(o=>{ if(o!==m) o.open=false; });
+  if(SHEET.matches) m.querySelector(".calpanel").focus(); }));
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape") MENUS.forEach(m=>{ if(m.open) closeMenu(m,true); });
+  const m=MENUS.find(x=>x.open);
+  if(e.key!=="Tab"||!m||!SHEET.matches) return;
+  const t=tabbable(m); if(!t.length) return;
+  const first=t[0], last=t[t.length-1], at=document.activeElement, inside=m.querySelector(".calpanel").contains(at);
+  if(e.shiftKey&&(!inside||at===first||at===m.querySelector(".calpanel"))){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey&&(!inside||at===last)){ e.preventDefault(); first.focus(); }
+});
+// a tap on the dimmed page (the menu's own ::before layer) closes the menu and returns focus to its button
+document.addEventListener("click",e=>{ MENUS.forEach(m=>{ if(!m.open) return; if(e.target===m) closeMenu(m,true); else if(!m.contains(e.target)) m.open=false; }); });
 document.getElementById("setdone").onclick=()=>closeMenu(setmenu,true);
 function showRepo(){
   if(!location.hostname.endsWith("github.io")) return;
@@ -1046,7 +1072,7 @@ function assignDays(){ DATA.forEach(r=>{r.day=r.when?dayKey.format(r.when):r.dat
 function renderStamp(){
   const src=[...new Set(Object.entries(META.sources||{}).filter(([k])=>k!=="INTL").map(([,v])=>v))].join(", ");
   const d=new Date(META.generated);
-  document.getElementById("stamp").innerHTML='<span>'+esc(T.updated)+' <b>'+fmtStamp.format(d)+' '+zoneOf(d)+'</b></span>'+(src?'<span>'+esc(T.leagueData)+': '+esc(src)+'</span>':'');
+  document.getElementById("stamp").innerHTML='<span>'+esc(T.updated)+' <b>'+fmtStamp.format(d)+' '+zoneOf(d)+'</b></span>'+(src?'<span class="src"><span class="src-l">'+esc(T.leagueData)+': </span>'+esc(src)+'</span>':'');
 }
 
 /* ---------- live scores (ESPN public scoreboard, fetched by the visitor's browser) ---------- */
