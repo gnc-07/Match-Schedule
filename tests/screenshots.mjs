@@ -4,7 +4,7 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import puppeteer from "puppeteer-core";
 import { BASE, ROOT, chromePath, startServer } from "./server.mjs";
-import { MATCH, mockNetwork } from "./mock-data.mjs";
+import { F1_WEEKEND, MATCH, mockNetwork } from "./mock-data.mjs";
 
 const out = path.join(ROOT, "screenshots");
 mkdirSync(out, { recursive: true });
@@ -12,7 +12,7 @@ const server = await startServer();
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true,
   args: process.getuid?.() === 0 ? ["--no-sandbox"] : [] });   // Chromium refuses to run as root without this
 const errors = [];
-const uid = encodeURIComponent(MATCH.uid);
+const uid = encodeURIComponent(MATCH.uid), wk = encodeURIComponent(F1_WEEKEND);
 
 // name, width, address, what to do once the page is ready, theme, text size
 const shots = [
@@ -26,6 +26,10 @@ const shots = [
   ["tables-phone", 390, "?lang=en", p => p.click("#tablesbtn"), "light"],
   ["settings-textsize", 1280, "?lang=en", p => p.evaluate(() => { document.getElementById("setmenu").open = true; }), "light"],
   ["list-xl-text-phone", 390, "?lang=en", null, "light", "xl"],
+  ["f1-desktop", 1280, `?match=${wk}`, null, "light"],
+  ["f1-phone", 390, `?match=${wk}`, null, "light"],
+  ["f1-desktop-dark-pt", 1280, `?lang=pt&match=${wk}`, null, "dark"],
+  ["f1-xl-text-phone", 390, `?match=${wk}`, null, "light", "xl"],
 ];
 
 try {
@@ -34,12 +38,13 @@ try {
     page.on("pageerror", e => errors.push(`${name}: ${e.message}`));
     await page.setViewport({ width, height: 900 });
     await page.evaluateOnNewDocument((t, s) => { try { localStorage.setItem("mp.theme", JSON.stringify(t));
-      localStorage.setItem("mp.favs", JSON.stringify(["Arsenal FC"])); if (s) localStorage.setItem("mp.size", JSON.stringify(s)); } catch {} }, theme, size);
+      localStorage.setItem("mp.favs", JSON.stringify(["Arsenal FC"])); if (s) localStorage.setItem("mp.size", JSON.stringify(s)); else localStorage.removeItem("mp.size"); } catch {} }, theme, size);
     await mockNetwork(page);
     await page.goto(BASE + query, { waitUntil: "networkidle0" });
     if (act) { await act(page); await new Promise(r => setTimeout(r, 600)); }
     await new Promise(r => setTimeout(r, 400));
-    if (name.startsWith("details-") && !name.includes("table")) {
+    if (name.startsWith("f1-")) await page.waitForSelector("#wk-champ table");
+    if ((name.startsWith("details-") && !name.includes("table")) || name.startsWith("f1-")) {
       // the panel scrolls on its own; take it in two views, top and further down
       await page.screenshot({ path: path.join(out, name + "-1.png") });
       await page.evaluate(() => { document.querySelector("#mddlg").scrollTop = 900; });
