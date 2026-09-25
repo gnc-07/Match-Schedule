@@ -32,6 +32,10 @@ jobs:
       HAS_RESEARCH_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # the newest commit on the branch, not the one that started this run: a run that waited
+          # behind another one would otherwise rebuild on old data and clash with its saved changes
+          ref: ${{ github.ref_name }}
 
       - uses: actions/setup-python@v5
         with:
