@@ -17,7 +17,7 @@ A public website listing upcoming Premier League, La Liga, Bundesliga, Brasileir
 
 This is a *static site*: GitHub Pages only hands out files, it never runs code on request. The fixture list stays current because GitHub Actions rebuilds the files on a timer. Live scores work differently: the visitor's own browser asks ESPN's public scoreboard for the score every 30 seconds while a listed match is on, so no server of ours is involved.
 
-Match details and league tables work the same way: when a visitor opens them, their browser asks ESPN. Stadium maps are found through Wikidata and drawn with OpenStreetMap map images.
+Match details and league tables work the same way: when a visitor opens them, their browser asks ESPN. Stadium maps are found through Wikidata and drawn with OpenStreetMap map images. Formula 1 track diagrams are drawn from the [f1-circuits](https://github.com/bacinger/f1-circuits) project (MIT licence, Copyright (c) 2019-2025 Tomislav Bacinger; unofficial), which the rebuild reads and stores with each race.
 
 ## Setting it up (web browser only, about 15 minutes)
 
@@ -51,7 +51,7 @@ If you already made a repository from the earlier calendar-only instructions, yo
 - **Bad data never replaces good data:** if a build finds fewer than 20 upcoming league matches, it stops and the last good version of the site stays up. GitHub emails you when a run fails.
 - **The schedule stays switched on:** GitHub pauses scheduled workflows after 60 days without repository activity, so the workflow makes an empty commit after 45 quiet days.
 - **Live scores** need no maintenance; they are fetched by each visitor's browser.
-- **Formula 1** needs no maintenance: every session of every race weekend comes from Jolpica-F1 (free, no key), and a time is marked verified when OpenF1 lists the same time. After a race, sprint or qualifying session, the next rebuild adds the winner, podium or pole. If Jolpica-F1 cannot be reached, the F1 sessions already published stay up, and F1 problems never stop the football schedule from publishing.
+- **Formula 1** needs no maintenance: every session of every race weekend comes from Jolpica-F1 (free, no key), and a time is marked verified when OpenF1 lists the same time. After a race, sprint or qualifying session, the next rebuild adds the winner, podium or pole. Each race also gets its track outline from f1-circuits; a circuit that project has not drawn yet shows a map instead. If Jolpica-F1 cannot be reached, the F1 sessions already published stay up, and F1 problems never stop the football schedule from publishing.
 - **Match details and league tables** need no maintenance either; they are fetched the same way when a visitor opens them.
 - **Finished matches** stay on the list for a day after kick-off, with the final score.
 
@@ -122,7 +122,7 @@ Uploads your commits to GitHub. Because you changed `friendlies.json`, the push 
 
 - Every match card has a **Match details** button. It opens a panel over the list with the score, a timeline of goals, cards and substitutions, the line-ups (formation, coach, and each player's goals, cards and substitutions), the stadium with a small map, and buttons to add that one match to a calendar, share it, or open its league table. During a match it refreshes every 30 seconds.
 - The panel has its own web address (`?match=` followed by the match's code), so the browser's Back button closes it, and a shared link opens the same match.
-- Each Formula 1 race card has a **Race weekend** button. It opens the same kind of panel with the weekend's schedule, the results of qualifying, the sprint and the race (podium, places gained, fastest lap, retirements), the championship (drivers or teams; star a driver to highlight them), and the circuit on a small map. Results and standings come from Jolpica-F1 when the panel opens.
+- Each Formula 1 race card has a **Race weekend** button. It opens the same kind of panel with the weekend's schedule, the results of qualifying, the sprint and the race (podium, places gained, fastest lap, retirements), the championship (drivers or teams; star a driver to highlight them), and a diagram of the track (with the start and finish line, lap length and first Grand Prix, and a link to see it on a map). Results and standings come from Jolpica-F1 when the panel opens.
 
 - The **Tables** button in the header shows the Premier League, La Liga, Bundesliga and Brasileirão tables. Starred teams are highlighted.
 
