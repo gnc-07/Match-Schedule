@@ -7,7 +7,7 @@ A public website listing upcoming Premier League, La Liga, Bundesliga, Brasileir
 | Piece | What it does |
 |---|---|
 | `fonts/` | The site's typefaces, served from the site itself so visitors' browsers never contact a third-party font service (SIL Open Font Licence; licence files included) |
-| `index.html` | The whole website: layout, styles and the script that draws the list. It has no fixture data of its own; it loads `fixtures.json`. |
+| `index.html` | The whole website: layout, styles and the script that draws the list, the match details and the league tables. It has no fixture data of its own; it loads `fixtures.json`. |
 | `build_schedule.py` | Downloads league fixtures, applies `overrides.json` and `friendlies.json`, and writes `fixtures.json` (for the site) and `soccer.ics` (for calendar apps). |
 | `friendlies.json` | National-team friendlies, with every source report kept. |
 | `overrides.json` | League kick-offs the main feed has not caught up with, with sources. |
@@ -16,6 +16,8 @@ A public website listing upcoming Premier League, La Liga, Bundesliga, Brasileir
 | `.github/workflows/build-and-deploy.yml` | Instructions for GitHub Actions: four times a day, run the script, save any changed data, and publish the site to GitHub Pages; once a day, run the research first. |
 
 This is a *static site*: GitHub Pages only hands out files, it never runs code on request. The fixture list stays current because GitHub Actions rebuilds the files on a timer. Live scores work differently: the visitor's own browser asks ESPN's public scoreboard for the score every 30 seconds while a listed match is on, so no server of ours is involved.
+
+Match details and league tables work the same way: when a visitor opens them, their browser asks ESPN. Stadium maps are found through Wikidata and drawn with OpenStreetMap map images.
 
 ## Setting it up (web browser only, about 15 minutes)
 
@@ -49,6 +51,7 @@ If you already made a repository from the earlier calendar-only instructions, yo
 - **Bad data never replaces good data:** if a build finds fewer than 20 upcoming league matches, it stops and the last good version of the site stays up. GitHub emails you when a run fails.
 - **The schedule stays switched on:** GitHub pauses scheduled workflows after 60 days without repository activity, so the workflow makes an empty commit after 45 quiet days.
 - **Live scores** need no maintenance; they are fetched by each visitor's browser.
+- **Match details and league tables** need no maintenance either; they are fetched the same way when a visitor opens them.
 - **Finished matches** stay on the list for a day after kick-off, with the final score.
 
 To have the research run immediately instead of waiting for the daily run: Actions, **Build and deploy site**, **Run workflow**, tick **Also research missing kick-off times**.
@@ -58,6 +61,8 @@ To have the research run immediately instead of waiting for the daily run: Actio
 - **A new friendly is announced, or a time is confirmed:** open `friendlies.json` (or `overrides.json` for league matches) on GitHub, click the pencil icon, add a report, and **Commit changes**. The workflow rebuilds and republishes within a couple of minutes.
 - **Something looks wrong:** the **Actions** tab shows every run; click one and open a step to read its log.
 - **Live scores missing:** they depend on ESPN's public feed, which is unofficial and could change without notice. The rest of the site keeps working if it does.
+- **Line-ups, match events or tables missing:** they come from the same ESPN feed. Line-ups usually appear about an hour before kick-off, and ESPN does not always list the coach. Friendlies often have little or no detail.
+- **A stadium has no map, or the wrong one:** the stadium was not found (or was mistaken for something else) on Wikidata. The rest of the match details still show.
 
 ### Adding a report
 Add an object to the match's `reports` list:
@@ -112,10 +117,16 @@ git push
 ```
 Uploads your commits to GitHub. Because you changed `friendlies.json`, the push starts the workflow, which rebuilds and republishes the site.
 
+## Match details and league tables
+
+- Every match card has a **Match details** button. It opens a panel over the list with the score, a timeline of goals, cards and substitutions, the line-ups (formation, coach, and each player's goals, cards and substitutions), the stadium with a small map, and buttons to add that one match to a calendar, share it, or open its league table. During a match it refreshes every 30 seconds.
+- The panel has its own web address (`?match=` followed by the match's code), so the browser's Back button closes it, and a shared link opens the same match.
+- The **Tables** button in the header shows the Premier League, La Liga, Bundesliga and Brasileirão tables. Starred teams are highlighted.
+
 ## Languages, time zones and accessibility
 
 - The site is in English and Brazilian Portuguese. It follows the visitor's browser language, remembers a choice made in the Settings menu, and can be linked directly with `?lang=pt` or `?lang=en` (for example `https://gnc-07.github.io/Match-Schedule/?lang=pt`).
 - The Settings menu also has **Contrast** (Normal or High, for stronger colours and borders) and **Text size** (Normal, Large or Extra large). Both apply straight away and are remembered on the device.
 - In the Settings menu, times can be shown in Edmonton, São Paulo (Brasília), Toronto, London, Madrid, Berlin, UTC, or the visitor's own zone. Portuguese defaults to São Paulo and English to Edmonton until the visitor picks a zone.
 - To add a language, copy the `en` block in the `I18N` table near the top of the script in `index.html`, translate the values, and add an option to the language list in the Settings menu.
-- Last measured with Lighthouse 12 (mobile and desktop, both languages): performance 93 to 100, accessibility 100, best practices 100, SEO 100. An axe-core scan (WCAG 2.2 AA plus best practices) found no violations in light and dark themes, both languages, at phone and desktop widths, with the Settings and Calendar menus open.
+- Last measured with Lighthouse 12 on a local copy (mobile and desktop, both languages): performance 92 to 100, accessibility 100, SEO 100, best practices 96. Best practices loses points there only because the test machine could not reach ESPN, which Lighthouse counts as an error. An axe-core scan (WCAG 2.2 AA plus best practices) found no violations in 56 combinations: light and dark themes, both languages, phone and desktop widths, with the Settings and Calendar menus open, the league tables, the match details, and high contrast.
