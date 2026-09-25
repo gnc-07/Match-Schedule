@@ -22,7 +22,7 @@ A static website (GitHub Pages) listing upcoming Premier League, La Liga, Bundes
 
 ## Rules that must hold after every change
 1. **Accessibility and quality bar:** Lighthouse 90+ in Performance, Accessibility, Best Practices and SEO on mobile and desktop, in both languages. axe-core: zero WCAG 2.2 AA violations in light and dark themes, English and Portuguese, at 390px and 1280px wide. Controls at least 44px tall (32px minimum for small inline icons like stars). Visible focus rings. Every text colour must meet 4.5:1 contrast on its background in both themes.
-2. **Colours only through the CSS tokens** in `:root` and the two dark-theme blocks. A new colour is added to all three blocks.
+2. **Colours only through the CSS tokens** in `:root` and the two dark-theme blocks. A new colour is added to all three blocks. High contrast (Settings) has its own three blocks (`:root[data-contrast="high"]` and its two dark versions) that override only the tokens needing a stronger value; when a new colour needs one, add it to all three of those too.
 3. **Every visible string goes in the `I18N` table** in `index.html`, in both `en` and `pt` (Brazilian Portuguese). Never hard-code English text in markup or scripts.
 4. **Audience:** the site should be easy for older, less technical visitors. Prefer labelled buttons over icon-only ones, plain wording, large targets, and settings that apply immediately. Keep the design minimal.
 5. **Verification rule for kick-off times** (in `resolve()` in `build_schedule.py`): a time is "verified" only if an official source gives it or at least two independent sources agree. Do not weaken this.
@@ -37,8 +37,8 @@ Check: English and Portuguese (`?lang=pt`), light and dark theme (Settings menu)
 
 Automated checks (needs Node.js; run `npm install` once to download the tools):
 ```bash
-npm test                  # axe (24 combinations) then Lighthouse; exits non-zero if anything fails
-npm run test:axe          # axe-core WCAG 2.2 AA: light/dark, en/pt, 390/1280px, menus closed/Settings/Calendar
+npm test                  # axe (32 combinations) then Lighthouse; exits non-zero if anything fails
+npm run test:axe          # axe-core WCAG 2.2 AA: light/dark, en/pt, 390/1280px; menus closed, Settings, Calendar, high contrast
 npm run test:lighthouse   # mobile and desktop, en and pt; every category must be 90+; HTML reports in lighthouse-reports/
 ```
 Run `npm test` after `python3 build_schedule.py` and before every commit that touches `index.html`. The tests start their own server on port 8123 and use the system Chromium (override with `CHROME_PATH`; when run as root, as in a cloud container, they add Chromium's `--no-sandbox`). They do not check the 44px control height; check that by hand. `node_modules/` and `lighthouse-reports/` are git-ignored; `tests/` and `package.json` are never published (the workflow copies only the site files).
@@ -60,8 +60,9 @@ Order matters: `git pull --rebase` refuses to run while there are uncommitted ch
 - Be honest about limits and anything not tested.
 
 ## Current design (September 2026)
-- Header: brand on the left; **Settings** (language, time zone, theme as three choices, small "Close ×") and **Calendar** buttons on the right. On phones they sit side by side under the brand.
+- Header: brand on the left; **Settings** (language, time zone, theme as three choices, contrast Normal or High, text size Normal, Large or Extra large, small "Close ×") and **Calendar** buttons on the right. On phones they sit side by side under the brand.
 - Filters: league chips (order depends on language; Portuguese puts Brasileirão and friendlies first), date range (All, Today, This weekend, Next 7 days, Custom with inline From/To dates), team search with a clear button, Starred teams only, Include matches without a confirmed time, Clear filters (appears only when filters differ from the defaults). Match counts are announced to screen readers only.
 - List: each day as a small calendar block; match cards with time, teams (star to follow), league, venue, collapsible sources, status pills, and a "Watch on CazéTV" button (with a "usually only plays in Brazil" note) when a CazéTV YouTube stream is scheduled. Live scores from ESPN's public scoreboard, polled every 30 seconds while a listed match could be on.
+- Colours: every colour is a token, including the live box and shadows. The scheme is "Navy and gold"; high contrast (Settings) is the only alternative.
 - Fonts: Big Shoulders Display (headings), Instrument Sans (text, times and league crests), Azeret Mono (scores and code; not needed at first load).
 - Speed: `fixtures.json` is requested from `<head>`, is written compactly (one match per line), and the list is only redrawn when it changed.

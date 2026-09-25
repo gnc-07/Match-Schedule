@@ -41,6 +41,16 @@ window.FX=fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new 
   --warn-bg:#FFF1CC; --warn-ink:#6B4700; --tbc-bg:#ECEFF5; --tbc-ink:#4A5468; --early-bg:#ECEBFD; --early-ink:#3D3294;
   --star:#B37F00; --star-off:#8B94A7;
   --epl:#6A3DBF; --liga:#B23A0E; --bun:#C4102A; --bra:#0B7A3C; --intl:#06708C; --crest-ink:#FFFFFF;
+  --on-board:#F2F5FB; --board-muted:#B7C3DD; --board-line:#26375F; --board-well:rgba(0,0,0,.3); --on-live:#FFFFFF;
+  --shadow:rgba(10,15,28,.45); --backdrop:rgba(10,15,28,.55);
+}
+/* High contrast (Settings): stronger text, borders and colours. Light first; its dark version comes after the dark theme. */
+:root[data-contrast="high"]{
+  --bg:#FFFFFF; --panel-2:#F2F4F7; --ink:#000000; --ink-2:#1A1A1A; --muted:#3D4452; --faint:#454C5A;
+  --line:#8A93A6; --line-2:#C9CFDA; --accent:#0038B8; --accent-soft:#E1E9FF; --board:#000000; --gold:#FFD02E;
+  --live-bg:#B0102A; --live-ink:#A00D25; --live-soft:#FDE8EB; --warn-bg:#FFE9A8; --warn-ink:#4D3300; --tbc-bg:#E6E9EF;
+  --tbc-ink:#2E3440; --early-bg:#E6E3FF; --early-ink:#2C2380; --star:#7A5600; --star-off:#5F687C;
+  --board-muted:#D0D0D0; --board-line:#3A3A3A;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
   color-scheme:dark;
@@ -53,6 +63,8 @@ window.FX=fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new 
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
   --epl:#B79CFF; --liga:#FF9A6E; --bun:#FF8193; --bra:#5BD493; --intl:#5ACDE8; --crest-ink:#0A0F1C;
+  --on-board:#F2F5FB; --board-muted:#B7C3DD; --board-line:#26375F; --board-well:rgba(0,0,0,.3); --on-live:#FFFFFF;
+  --shadow:rgba(0,0,0,.6); --backdrop:rgba(0,0,0,.65);
 }}
 :root[data-theme="dark"]{
   color-scheme:dark;
@@ -65,6 +77,20 @@ window.FX=fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new 
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
   --epl:#B79CFF; --liga:#FF9A6E; --bun:#FF8193; --bra:#5BD493; --intl:#5ACDE8; --crest-ink:#0A0F1C;
+  --on-board:#F2F5FB; --board-muted:#B7C3DD; --board-line:#26375F; --board-well:rgba(0,0,0,.3); --on-live:#FFFFFF;
+  --shadow:rgba(0,0,0,.6); --backdrop:rgba(0,0,0,.65);
+}
+@media (prefers-color-scheme: dark){ :root[data-contrast="high"]:not([data-theme="light"]){
+  --bg:#000000; --panel:#0B0B0B; --panel-2:#161616; --ink:#FFFFFF; --ink-2:#EDEDED; --muted:#C7C7C7;
+  --faint:#BDBDBD; --line:#7A7A7A; --line-2:#333333; --accent:#8FB2FF; --accent-ink:#000000; --accent-soft:#14213F;
+  --board:#111A33; --gold:#FFD84D; --live-ink:#FF9AA6; --live-soft:#2B0E14; --warn-bg:#3D2E00; --warn-ink:#FFE08A;
+  --tbc-bg:#1E1E1E; --tbc-ink:#D0D0D0; --early-bg:#221D4A; --early-ink:#CFC8FF; --star:#FFD84D; --star-off:#9A9A9A;
+}}
+:root[data-contrast="high"][data-theme="dark"]{
+  --bg:#000000; --panel:#0B0B0B; --panel-2:#161616; --ink:#FFFFFF; --ink-2:#EDEDED; --muted:#C7C7C7;
+  --faint:#BDBDBD; --line:#7A7A7A; --line-2:#333333; --accent:#8FB2FF; --accent-ink:#000000; --accent-soft:#14213F;
+  --board:#111A33; --gold:#FFD84D; --live-ink:#FF9AA6; --live-soft:#2B0E14; --warn-bg:#3D2E00; --warn-ink:#FFE08A;
+  --tbc-bg:#1E1E1E; --tbc-ink:#D0D0D0; --early-bg:#221D4A; --early-ink:#CFC8FF; --star:#FFD84D; --star-off:#9A9A9A;
 }
 
 /* ---------- base ---------- */
@@ -85,7 +111,7 @@ button,input,select{font:inherit;color:inherit}
 /* ---------- top bar ---------- */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:6px;position:relative;z-index:15}
 .brand{display:flex;align-items:center;gap:10px}
-.brand-mark{width:36px;height:36px;border-radius:9px;background:var(--board);display:grid;place-items:center}
+.brand-mark{width:36px;height:36px;border-radius:9px;background:var(--board);color:var(--gold);display:grid;place-items:center}
 h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans-serif;letter-spacing:.02em;text-transform:uppercase}
 .tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .ctl{display:inline-flex;align-items:center;gap:6px;min-height:44px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:0 6px 0 10px;color:var(--muted);font-size:14px}
@@ -104,6 +130,7 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 .field>label{margin-bottom:0}
 .field select{min-height:48px;font-size:16px;font-weight:600;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);color:var(--ink);padding:0 12px;cursor:pointer;width:100%}
 .choice{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px}
+.choice.two{grid-template-columns:repeat(2,1fr)}
 .choice label{position:relative;display:block}
 .choice input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
 .choice span{min-height:44px;display:grid;place-items:center;border-radius:8px;font-weight:600;font-size:15px;color:var(--ink-2);text-align:center;padding:0 4px}
@@ -116,7 +143,7 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 .close-x svg{width:16px;height:16px}
 .calmenu>summary{list-style:none}
 .calmenu>summary::-webkit-details-marker{display:none}
-.calpanel{position:absolute;right:0;top:calc(100% + 8px);width:min(360px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 18px 40px -18px rgba(10,15,28,.45)}
+.calpanel{position:absolute;right:0;top:calc(100% + 8px);width:min(360px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 18px 40px -18px var(--shadow)}
 .calpanel h2{margin:0;font:800 1.3rem/1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.03em}
 .calpanel p{margin:0;color:var(--muted);font-size:14px}
 .cal-actions{display:flex;flex-wrap:wrap;gap:8px}
@@ -127,17 +154,17 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 .calpanel ol{margin:6px 0 0;padding-left:18px;font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:5px}
 
 /* ---------- live now ---------- */
-.livebox{background:var(--board);color:#F2F5FB;border-radius:16px;overflow:hidden}
-.live-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 16px;background:var(--live-bg);color:#fff}
+.livebox{background:var(--board);color:var(--on-board);border-radius:16px;overflow:hidden}
+.live-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 16px;background:var(--live-bg);color:var(--on-live)}
 .live-head h2{margin:0;font:800 1.25rem/1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:9px}
 .live-head p{margin:0;font-size:13px}
-.lv-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 16px;border-top:1px solid #26375F}
+.lv-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 16px;border-top:1px solid var(--board-line)}
 .lv-row:first-child{border-top:0}
 .lv-row .h{text-align:right}
 .lv-row .t{font:800 1.3rem/1.05 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase}
-.lv-row small{display:block;font:400 12.5px/1.3 "Instrument Sans",sans-serif;color:#B7C3DD;text-transform:none;margin-top:3px}
-.lv-row .sc{font:600 1.5rem/1 "Azeret Mono",monospace;color:var(--gold);background:rgba(0,0,0,.3);border:1px solid #26375F;border-radius:9px;padding:7px 10px;font-variant-numeric:tabular-nums}
-.lv-row .clk{font:600 13px "Azeret Mono",monospace;color:#fff;background:var(--live-bg);border-radius:6px;padding:4px 8px}
+.lv-row small{display:block;font:400 12.5px/1.3 "Instrument Sans",sans-serif;color:var(--board-muted);text-transform:none;margin-top:3px}
+.lv-row .sc{font:600 1.5rem/1 "Azeret Mono",monospace;color:var(--gold);background:var(--board-well);border:1px solid var(--board-line);border-radius:9px;padding:7px 10px;font-variant-numeric:tabular-nums}
+.lv-row .clk{font:600 13px "Azeret Mono",monospace;color:var(--on-live);background:var(--live-bg);border-radius:6px;padding:4px 8px}
 .dot-live{width:9px;height:9px;border-radius:50%;background:currentColor;display:inline-block;flex:none}
 @media (prefers-reduced-motion:no-preference){.dot-live{animation:pulse 1.6s ease-in-out infinite}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
@@ -220,7 +247,7 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
 .pill.warn{background:var(--warn-bg);color:var(--warn-ink)}
 .pill.tbc{background:var(--tbc-bg);color:var(--tbc-ink)}
 .pill.early{background:var(--early-bg);color:var(--early-ink)}
-.pill.live{background:var(--live-bg);color:#fff}
+.pill.live{background:var(--live-bg);color:var(--on-live)}
 .pill.ft{background:var(--ink);color:var(--bg)}
 .srcs{font-size:13.5px;color:var(--muted)}
 .srcs summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink-2);min-height:32px}
@@ -244,6 +271,10 @@ footer dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:9px 12px;alig
 footer dd{margin:0}
 footer ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:7px}
 footer p{margin:10px 0 0}
+
+/* ---------- text size (Settings): scales the whole page, like the browser's own zoom ---------- */
+:root[data-size="large"]{zoom:1.15}
+:root[data-size="xl"]{zoom:1.3}
 
 /* ---------- small screens ---------- */
 @media (max-width:640px){
@@ -283,7 +314,7 @@ footer p{margin:10px 0 0}
 
   <header class="topbar">
     <div class="brand">
-      <span class="brand-mark" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#F2B829" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="15" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+      <span class="brand-mark" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="15" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
       <h1>Matchday Planner</h1>
     </div>
     <div class="tools">
@@ -303,6 +334,20 @@ footer p{margin:10px 0 0}
               <label><input type="radio" name="theme" value="dark"><span data-t="thDark">Dark</span></label>
             </div>
             <p class="hint" data-t="thHint">Automatic follows your device.</p>
+          </fieldset>
+          <fieldset class="field"><legend data-t="contrastLabel">Contrast</legend>
+            <div class="choice two">
+              <label><input type="radio" name="contrast" value="normal"><span data-t="ctNormal">Normal</span></label>
+              <label><input type="radio" name="contrast" value="high"><span data-t="ctHigh">High</span></label>
+            </div>
+            <p class="hint" data-t="ctHint">High contrast uses stronger colours and borders, for easier reading.</p>
+          </fieldset>
+          <fieldset class="field"><legend data-t="sizeLabel">Text size</legend>
+            <div class="choice">
+              <label><input type="radio" name="size" value="normal"><span data-t="szNormal">Normal</span></label>
+              <label><input type="radio" name="size" value="large"><span data-t="szLarge">Large</span></label>
+              <label><input type="radio" name="size" value="xl"><span data-t="szXl">Extra large</span></label>
+            </div>
           </fieldset>
           <p class="hint" data-t="autoSave">Changes apply straight away and are remembered on this device.</p>
         </div>
@@ -447,7 +492,8 @@ const I18N={
   repo:"Source code and data:",theme:{auto:"Auto",light:"Light",dark:"Dark"},themeAria:l=>"Colour theme: "+l+". Select to change.",
   teams:{},comp:{"International friendly":"International friendly"},friendlies:"Friendlies",round:r=>r,
   notes:{},tzNames:{"America/Edmonton":"Edmonton","America/Sao_Paulo":"São Paulo (Brasília)","America/Toronto":"Toronto","Europe/London":"London","Europe/Madrid":"Madrid","Europe/Berlin":"Berlin","UTC":"UTC"},
-  myTz:z=>"My time zone ("+z+")"},
+  myTz:z=>"My time zone ("+z+")",
+  contrastLabel:"Contrast",ctNormal:"Normal",ctHigh:"High",ctHint:"High contrast uses stronger colours and borders, for easier reading.",sizeLabel:"Text size",szNormal:"Normal",szLarge:"Large",szXl:"Extra large"},
  pt:{locale:"pt-BR",
   skip:"Pular para os jogos",settings:"Ajustes",themeLabel:"Tema",thAuto:"Automático",thLight:"Claro",thDark:"Escuro",thHint:"Automático segue o seu aparelho.",done:"Fechar",autoSave:"As mudanças valem na hora e ficam salvas neste aparelho.",langLabel:"Idioma",tzLabel:"Mostrar horários em",calBtn:"Agenda",calTitle:"Adicione à sua agenda",
   calText:"Assine uma vez. Sua agenda mantém todos os horários atualizados e avisa 30 minutos antes de cada jogo com horário confirmado.",
@@ -488,7 +534,8 @@ const I18N={
   comp:{"International friendly":"Amistoso internacional"},friendlies:"Amistosos",round:r=>r.replace(/^Matchday (\d+)$/,"Rodada $1"),
   notes:{"Messi's farewell match":"Jogo de despedida de Messi","Postponed; new date not set.":"Adiado; nova data não definida."},
   tzNames:{"America/Edmonton":"Edmonton","America/Sao_Paulo":"São Paulo (Brasília)","America/Toronto":"Toronto","Europe/London":"Londres","Europe/Madrid":"Madri","Europe/Berlin":"Berlim","UTC":"UTC"},
-  myTz:z=>"Meu fuso horário ("+z+")"}
+  myTz:z=>"Meu fuso horário ("+z+")",
+  contrastLabel:"Contraste",ctNormal:"Normal",ctHigh:"Alto",ctHint:"O alto contraste usa cores e bordas mais fortes, para facilitar a leitura.",sizeLabel:"Tamanho do texto",szNormal:"Normal",szLarge:"Grande",szXl:"Muito grande"}
 };
 
 /* ---------- small icons ---------- */
@@ -553,6 +600,26 @@ function applyTheme(){
 }
 themeRadios.forEach(r=>r.addEventListener("change",()=>{theme=r.value;store.set("theme",theme);applyTheme();}));
 
+/* ---------- contrast: normal or high (works with any theme) ---------- */
+let contrast=store.get("contrast","normal");
+const contrastRadios=[...document.querySelectorAll('input[name="contrast"]')];
+function applyContrast(){
+  if(contrast==="high") document.documentElement.setAttribute("data-contrast","high");
+  else document.documentElement.removeAttribute("data-contrast");
+  contrastRadios.forEach(r=>r.checked=r.value===contrast);
+}
+contrastRadios.forEach(r=>r.addEventListener("change",()=>{contrast=r.value;store.set("contrast",contrast);applyContrast();}));
+
+/* ---------- text size: normal, large, extra large (the whole page scales) ---------- */
+let size=store.get("size","normal");
+const sizeRadios=[...document.querySelectorAll('input[name="size"]')];
+function applySize(){
+  if(size==="normal") document.documentElement.removeAttribute("data-size");
+  else document.documentElement.setAttribute("data-size",size);
+  sizeRadios.forEach(r=>r.checked=r.value===size);
+}
+sizeRadios.forEach(r=>r.addEventListener("change",()=>{size=r.value;store.set("size",size);applySize();}));
+
 /* ---------- fixtures: shared state ---------- */
 const LEAGUES=[
   {code:"EPL",name:"Premier League",abbr:"PL",c:"--epl"},{code:"LIGA",name:"La Liga",abbr:"LL",c:"--liga"},
@@ -580,7 +647,7 @@ function applyLang(){
   document.getElementById("leagues").setAttribute("aria-label",T.leagues);
   document.getElementById("range").setAttribute("aria-label",T.dateRange);
   ordered().forEach(l=>{const b=document.getElementById("chip-"+l.code); if(b){ b.lastChild.textContent=l.code==="INTL"?T.friendlies:l.name; b.parentNode.appendChild(b); }});
-  fillZones(); makeFormatters(); applyTheme(); showRepo();
+  fillZones(); makeFormatters(); applyTheme(); applyContrast(); applySize(); showRepo();
   if(typeof checkDates==="function"){ checkDates(); syncControls(); }
 }
 langsel.onchange=()=>{
