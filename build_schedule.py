@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 build_schedule.py
-Builds a soccer schedule and writes:
+Builds a soccer (and Formula 1) schedule and writes:
   - fixtures.json  (the merged dataset, used by the web page)
   - soccer.ics     (iCalendar feed for Proton Calendar or any calendar app)
 
@@ -13,6 +13,8 @@ Data sources, in order of preference
      no key needed). Used when there is no token. Times are LOCAL to each league.
   3. friendlies.json: national-team friendlies entered by hand. No free feed
      covers friendlies, so this file has to be edited when matches are announced.
+  4. Formula 1: every session from Jolpica-F1, cross-checked against OpenF1 (both free, no key).
+     F1 is left out of soccer.ics.
 
 Watch links: cazetv.py adds CazéTV's YouTube live-stream link to the matches it
 streams (remembered in streams.json between runs).
@@ -195,9 +197,127 @@ def apply_overrides(recs, path="overrides.json"):
         if check["status"] == "confirmed":
             r["date"], r["utc"], r["provisional"] = day, utc, False
 
+# ---------- Formula 1: every session of every race weekend ----------
+# Jolpica-F1 (volunteer-run successor to the Ergast API; no key) gives each weekend's session times in UTC.
+# OpenF1 lists the same sessions independently; when both agree on a time, resolve() marks it verified.
+# Finished races, sprints and qualifying sessions get their top names ("top") for the list.
+JOLPICA = "https://api.jolpi.ca/ergast/f1"
+OPENF1 = "https://api.openf1.org/v1"
+F1_SESSIONS = [("FirstPractice", "FP1"), ("SecondPractice", "FP2"), ("ThirdPractice", "FP3"),
+               ("SprintQualifying", "SQ"), ("Sprint", "S"), ("Qualifying", "Q"), (None, "R")]   # None: the race's own date
+OPENF1_NAMES = {"FP1": {"practice 1"}, "FP2": {"practice 2"}, "FP3": {"practice 3"},
+                "SQ": {"sprint qualifying", "sprint shootout"}, "S": {"sprint"}, "Q": {"qualifying"}, "R": {"race"}}
+
+def _f1_time(d, t):
+    """A Jolpica date and time ("15:00:00Z") as a UTC datetime, or None when there is no time yet."""
+    return datetime.fromisoformat(f"{d}T{t.rstrip('Z')}").replace(tzinfo=timezone.utc) if t else None
+
+def _f1_top(season, rnd, what, key, n):
+    """Family names of the first n drivers in a finished session, or None when there are no results yet."""
+    races = get_json(f"{JOLPICA}/{season}/{rnd}/{what}/?limit=100")["MRData"]["RaceTable"]["Races"]
+    rows = races[0].get(key, []) if races else []
+    return [x["Driver"]["familyName"] for x in rows[:n]] or None
+
+def from_f1(start, now=None):
+    """Every F1 session from yesterday on, as records like the football ones (no teams; kind "f1")."""
+    now = now or datetime.now(timezone.utc)
+    recent = start - timedelta(days=KEEP_DAYS)
+    races = get_json(f"{JOLPICA}/{start.year}/races/?limit=100")["MRData"]["RaceTable"]["Races"]
+    if not any(date.fromisoformat(r["date"]) >= start for r in races):     # season over: add next year's calendar,
+        races = [r for r in races if date.fromisoformat(r["date"]) >= recent] + \
+                get_json(f"{JOLPICA}/{start.year + 1}/races/?limit=100")["MRData"]["RaceTable"]["Races"]   # keeping the finale a day
+    other = []
+    for season in sorted({r["season"] for r in races}):
+        try:
+            other += get_json(f"{OPENF1}/sessions?year={season}")
+        except Exception as e:               # the cross-check is optional: without it times simply stay unverified
+            print(f"OpenF1 could not be read for {season} ({e}); those F1 times are not cross-checked this run")
+    # OpenF1 groups sessions by race weekend ("meeting"). Each Grand Prix is paired with the meeting whose race starts
+    # closest to it (weekends are at least a week apart), so sessions are then matched by name alone, however far apart
+    # the two sources' times are: a big disagreement still reaches resolve() and shows as conflicting.
+    meetings = {}
+    for o in other:
+        if o.get("meeting_key") is not None and o.get("date_start"):
+            meetings.setdefault(o["meeting_key"], []).append(o)
+    def meeting_of(race):
+        when = _f1_time(race["date"], race.get("time")) or datetime.fromisoformat(race["date"] + "T12:00:00+00:00")
+        best = None
+        for key, ss in meetings.items():
+            rs = [datetime.fromisoformat(o["date_start"]) for o in ss if (o.get("session_name") or "").lower() == "race"]
+            gap = min((abs(t - when) for t in rs), default=None)
+            if gap is not None and gap < timedelta(days=4) and (best is None or gap < best[0]):
+                best = (gap, ss)
+        return best[1] if best else []
+    out = []
+    for race in races:
+        season, rnd, c = race["season"], race["round"], race["Circuit"]
+        weekend = meeting_of(race)
+        loc = c.get("Location", {})
+        for key, code in F1_SESSIONS:
+            s = race if key is None else race.get(key)
+            if not s:
+                continue                     # sprint sessions only exist on sprint weekends, FP2 and FP3 only on others
+            d, t = s["date"], s.get("time")
+            if date.fromisoformat(d) < recent:
+                continue
+            utc = _f1_time(d, t)
+            r = record("Formula 1", "F1", "", "", d, utc.isoformat() if utc else None, rnd,
+                       f"{c['circuitName']}, {loc.get('locality', '')}".rstrip(", "), uid=f"f1|{season}|{rnd}|{code}")
+            r.update(kind="f1", sess=code, gp=race["raceName"], wk=f"f1|{season}|{rnd}")
+            if code == "R":
+                r["sprint"] = "Sprint" in race
+                r["circuit"] = {"name": c["circuitName"], "locality": loc.get("locality"), "country": loc.get("country"),
+                                "lat": float(loc["lat"]), "lon": float(loc["long"])} if loc.get("lat") else {"name": c["circuitName"]}
+            if utc:
+                match = [o for o in weekend if (o.get("session_name") or "").lower() in OPENF1_NAMES[code]]
+                if match:
+                    o = datetime.fromisoformat(match[0]["date_start"]).astimezone(timezone.utc)
+                    r["check"] = resolve([
+                        {"source": "Jolpica-F1", "url": f"{JOLPICA}/{season}/{rnd}/races/", "date": d, "time": t[:5], "tz": "UTC"},
+                        {"source": "OpenF1", "url": f"{OPENF1}/sessions?session_key={match[0].get('session_key')}",
+                         "date": o.date().isoformat(), "time": o.strftime("%H:%M"), "tz": "UTC"}])[2]
+            out.append(r)
+    # names for sessions that have finished (only the last weekend or two, so a few requests)
+    for r in out:
+        done = r["utc"] and datetime.fromisoformat(r["utc"]) + timedelta(hours=1) < now
+        if done and r["sess"] in ("R", "S", "Q"):
+            season, rnd = r["wk"].split("|")[1:]
+            try:
+                what, key, n = {"R": ("results", "Results", 3), "S": ("sprint", "SprintResults", 3),
+                                "Q": ("qualifying", "QualifyingResults", 1)}[r["sess"]]
+                top = _f1_top(season, rnd, what, key, n)
+                if top: r["top"] = top
+            except Exception as e:
+                print(f"F1 results for round {rnd} could not be read ({e})")
+    return out
+
+F1_CODES = {code for _, code in F1_SESSIONS}
+
+def _valid_f1(r):
+    """True for a well-formed F1 record: reused records are checked, not trusted, before they are published again."""
+    try:
+        date.fromisoformat(r["date"])
+        if r.get("utc") is not None:
+            r["utc"] = datetime.fromisoformat(r["utc"]).astimezone(timezone.utc).isoformat()   # normalised, as from_f1 writes it
+        return (r.get("code") == "F1" and r.get("kind") == "f1" and r.get("sess") in F1_CODES
+                and isinstance(r.get("gp"), str) and str(r.get("wk", "")).startswith("f1|") and r.get("uid") == f"{r['wk']}|{r['sess']}")
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return False
+
+def previous_f1(start, path="fixtures.json"):
+    """The F1 sessions from the last published fixtures.json: used when Jolpica-F1 cannot be reached."""
+    try:
+        old = json.load(open(path, encoding="utf-8"))["matches"]
+    except Exception:
+        return []
+    recent = (start - timedelta(days=KEEP_DAYS)).isoformat()
+    return [r for r in old if isinstance(r, dict) and _valid_f1(r) and r["date"] >= recent]
+
 SOURCES = {}   # which source each league came from, recorded in fixtures.json
+F1_STALE = False   # True when Jolpica-F1 failed and the F1 sessions are the previous build's (the site says so)
 
 def load_all(start):
+    global F1_STALE
     token = os.environ.get("FOOTBALL_DATA_TOKEN")
     out = []
     for code, (name, fd_code, filename, style, tz) in LEAGUES.items():
@@ -213,6 +333,15 @@ def load_all(start):
     out = [r for r in out if date.fromisoformat(r["date"]) >= start or "result" in r or r.get("started")]
     out += from_friendlies(start)
     SOURCES["INTL"] = "friendlies.json (hand-maintained, cross-checked)"
+    try:
+        f1 = from_f1(start)
+        SOURCES["F1"] = "Jolpica-F1" + (" and OpenF1" if any(r.get("check") for r in f1) else "")
+    except Exception as e:                   # F1 must never stop the football schedule from publishing
+        print(f"Jolpica-F1 failed ({e}); keeping the F1 sessions already published")
+        F1_STALE = True
+        f1 = previous_f1(start)
+        SOURCES["F1"] = "Jolpica-F1"
+    out += f1
     out.sort(key=lambda r: (r["utc"] or r["date"] + "T99"))
     return out
 
@@ -300,21 +429,23 @@ def write_fixtures(meta, path="fixtures.json"):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--start", default=datetime.now(HOME_TZ).date().isoformat())
-    ap.add_argument("--leagues", help="comma list of EPL,LIGA,BUN,BRA,INTL")
+    ap.add_argument("--leagues", help="comma list of EPL,LIGA,BUN,BRA,INTL,F1")
     ap.add_argument("--teams", help="comma list of team-name fragments")
     ap.add_argument("--out", default="soccer.ics")
     a = ap.parse_args()
     recs = load_all(date.fromisoformat(a.start))
-    league_count = sum(1 for r in recs if r["code"] != "INTL" and "result" not in r and not r.get("started"))
+    league_count = sum(1 for r in recs if r["code"] not in ("INTL", "F1") and "result" not in r and not r.get("started"))
     if league_count < MIN_MATCHES:
         # exiting with an error stops the workflow before it publishes, so the last good site stays up
         sys.exit(f"Only {league_count} upcoming league matches found; refusing to publish. Check the data sources.")
-    cazetv.add_streams(recs)
+    cazetv.add_streams([r for r in recs if r["code"] != "F1"])   # CazéTV links are for football matches
     recs = apply_filters(recs, a.leagues and a.leagues.split(","), a.teams and a.teams.split(","))
     # "site" fingerprints index.html, so a page left open can tell the site itself was updated and reload
     site = hashlib.sha256(open("index.html", "rb").read()).hexdigest()[:12]
     meta = {"generated": datetime.now(timezone.utc).isoformat(timespec="minutes"), "site": site,
             "sources": SOURCES, "matches": recs}
+    if F1_STALE:
+        meta["f1stale"] = True
     write_fixtures(meta)
-    open(a.out, "w", newline="", encoding="utf-8").write(ics(recs))
+    open(a.out, "w", newline="", encoding="utf-8").write(ics([r for r in recs if r["code"] != "F1"]))   # the calendar stays football-only
     print(f"{len(recs)} matches -> {a.out}")
