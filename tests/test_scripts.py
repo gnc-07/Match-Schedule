@@ -5,8 +5,10 @@ so they give the same result every time.
 Run from the project folder:
   python3 -m unittest discover -s tests
 """
-import os, sys, tempfile, unittest
-from datetime import date, datetime, timezone
+import copy, io, json, os, sys, tempfile, unittest
+from contextlib import redirect_stdout
+from datetime import date, datetime, timedelta
+from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import build_schedule as bs
@@ -157,6 +159,84 @@ class Research(unittest.TestCase):
         self.assertEqual(len(research.plain("x" * 500, 60)), 60)
         self.assertEqual(research.plain("a\nb\tc", 60), "a b c")
         self.assertEqual(research.plain(None, 60), "")
+
+
+class FakeReply:
+    """Stands in for the SDK's reply object: the two things research.py uses are .model_dump() and .content."""
+    def __init__(self, blocks, stop="end_turn"):
+        self.content = blocks
+        self._data = {"content": blocks, "stop_reason": stop, "usage": {"input_tokens": 1, "output_tokens": 1}}
+
+    def model_dump(self):
+        return copy.deepcopy(self._data)      # like the SDK: a fresh copy each time, not the reply's own objects
+
+
+class FakeClaude:
+    """Stands in for anthropic.Anthropic(): hands out prepared replies in order and remembers every request,
+    so a test can run research.py from start to finish without an API key, a network or any cost."""
+    replies = []
+    requests = []
+
+    def __init__(self):
+        self.messages = self
+
+    def create(self, **request):
+        FakeClaude.requests.append(request)
+        return FakeClaude.replies.pop(0)
+
+
+class ResearchRun(unittest.TestCase):
+    """research.main() from start to finish against FakeClaude, in a temporary folder with made-up data files.
+    This checks research.py's own logic (reading the reply, the safeguards, merging, saving). It cannot check
+    what only the real API can: that the request is accepted and that real replies have this shape."""
+
+    def run_research(self, replies):
+        day = (datetime.now(research.HOME_TZ).date() + timedelta(days=5)).isoformat()
+        FakeClaude.replies, FakeClaude.requests = list(replies), []
+        with tempfile.TemporaryDirectory() as d:
+            common.save_json(os.path.join(d, "fixtures.json"), {"matches": [
+                {"code": "INTL", "comp": "International friendly", "home": "Canada", "away": "Peru", "date": day,
+                 "utc": None, "round": "", "venue": "Toronto"}]})
+            common.save_json(os.path.join(d, "friendlies.json"), [
+                {"team1": "Canada", "team2": "Peru", "reports": [{"source": "Canada Soccer", "date": day}]}])
+            old = os.getcwd()
+            os.chdir(d)
+            try:
+                with mock.patch.dict(sys.modules, {"anthropic": mock.Mock(Anthropic=FakeClaude)}), \
+                     mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test"}), \
+                     mock.patch.object(research, "MAX_CALLS", 1), redirect_stdout(io.StringIO()):
+                    research.main()
+                return day, common.load_json("friendlies.json")
+            finally:
+                os.chdir(old)
+
+    def reply(self, day, stop="end_turn", note="I'll check."):
+        results = {"type": "web_search_tool_result", "content": [{"type": "web_search_result", "url": "https://news.example/can-per"}]}
+        answer = {"reports": [
+            {"match": "f1", "source": "News", "url": "https://news.example/can-per", "date": day, "time": "19:30", "tz": "America/Toronto"},
+            {"match": "f1", "source": "Invented", "url": "https://invented.example/", "date": day, "time": "20:00", "tz": "America/Toronto"},
+            "not a report"],
+            "new_friendlies": [{"team1": "X" * 200, "team2": "Brazil", "reports": [
+                {"source": "News", "url": "https://news.example/can-per", "date": day, "time": "16:00", "tz": "America/Sao_Paulo"}]}]}
+        return FakeReply([{"type": "text", "text": note + " {not json}"}, results,
+                          {"type": "text", "text": json.dumps(answer)}], stop)
+
+    def test_a_full_run(self):
+        day, friendlies = self.run_research([self.reply(date.today().isoformat())])
+        canada = friendlies[0]["reports"]
+        self.assertEqual([r["source"] for r in canada], ["Canada Soccer", "News"])   # the invented link was dropped
+        self.assertEqual(len(friendlies), 2)
+        self.assertEqual(len(friendlies[1]["team1"]), 60)                            # a long name is cut
+        tool = FakeClaude.requests[0]["tools"][0]
+        self.assertEqual(tool["type"], "web_search_20260209")
+        self.assertNotIn("response_inclusion", tool)                                 # would hide the search results
+
+    def test_a_paused_turn_is_sent_back_unchanged(self):
+        today = date.today().isoformat()
+        paused = FakeReply([{"type": "text", "text": "Searching."}], stop="pause_turn")
+        self.run_research([paused, self.reply(today)])
+        again = FakeClaude.requests[1]["messages"]
+        self.assertIs(again[-1]["content"], paused.content)                          # the very same objects
 
 
 class Common(unittest.TestCase):

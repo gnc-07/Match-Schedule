@@ -112,26 +112,35 @@ FRIENDLY_EXTRA = """- Also look for men's senior international friendlies in the
   Canada or any UEFA member nation that are NOT in the list, and put them in "new_friendlies". Friendlies
   only: never Nations League, World Cup or other qualifiers. Leave "new_friendlies" empty if none."""
 
+# web_search_20260209 adds "dynamic filtering": Claude runs code that sifts the search results before reading
+# them. The raw results still come back as web_search_tool_result blocks, which the safeguard above needs.
+# (web_search_20260318 can leave those blocks out with "response_inclusion": "excluded": never set that here,
+# or every report would be dropped as "URL not in search results".)
+SEARCH_TOOL = {"type": "web_search_20260209", "name": "web_search", "max_uses": MAX_SEARCHES}
+
 def ask(client, prompt):
-    """One request, following 'pause_turn' continuations. Returns (text, urls seen in search results)."""
+    """One request, following 'pause_turn' continuations. Returns (final text, urls seen in search results).
+    Only the text after the last search or code step counts as the answer: notes Claude writes between
+    steps are not part of the JSON."""
     messages = [{"role": "user", "content": prompt}]
     text, seen = "", set()
     for _ in range(4):
-        resp = client.messages.create(
-            model=MODEL, max_tokens=4000, messages=messages,
-            tools=[{"type": "web_search_20250305", "name": "web_search", "max_uses": MAX_SEARCHES}])
+        resp = client.messages.create(model=MODEL, max_tokens=16000, messages=messages, tools=[SEARCH_TOOL])
         data = resp.model_dump()
         u = data.get("usage") or {}
         print(f"  tokens in/out: {u.get('input_tokens')}/{u.get('output_tokens')}, "
               f"searches: {(u.get('server_tool_use') or {}).get('web_search_requests')}")
         for block in data["content"]:
+            if block["type"] == "text":
+                text += block["text"]
+                continue
+            text = ""                              # a search or code step: any earlier text was a note, not the answer
             if block["type"] == "web_search_tool_result" and isinstance(block.get("content"), list):
                 seen.update(norm_url(r["url"]) for r in block["content"] if r.get("url"))
-            elif block["type"] == "text":
-                text += block["text"]
         if data.get("stop_reason") != "pause_turn":
             break
-        messages.append({"role": "assistant", "content": data["content"]})
+        # the API needs the paused turn back exactly as it came, so the SDK's own objects are sent, not the copy
+        messages.append({"role": "assistant", "content": resp.content})
     return text, seen
 
 def parse_json(reply):
