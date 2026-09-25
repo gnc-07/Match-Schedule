@@ -258,13 +258,13 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
 .pill.live{background:var(--live-bg);color:var(--on-live)}
 .pill.ft{background:var(--ink);color:var(--bg)}
 .srcs{font-size:13.5px;color:var(--muted)}
-/* Sections that open (sources, "How to subscribe") look like buttons, with an arrow that flips when open, so it is clear they can be clicked */
-.srcs summary,.calpanel details summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);font-weight:600;font-size:14px;color:var(--ink)}
-.srcs summary:hover,.calpanel details summary:hover{border-color:var(--muted)}
+/* Sections that open (sources, "How to subscribe"): text with a small arrow that flips when open */
+.srcs summary,.calpanel details summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink-2);min-height:32px}
+.calpanel details summary{font-size:14px;min-height:44px}
 .srcs summary::-webkit-details-marker,.calpanel details summary::-webkit-details-marker{display:none}
-.srcs summary::after,.calpanel details summary::after{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px)}
+.srcs summary::after,.calpanel details summary::after{content:"";width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px)}
 .srcs[open] summary::after,.calpanel details[open] summary::after{transform:rotate(-135deg) translate(-1px,-1px)}
-.srcs .body{margin-top:8px;display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line-2)}
+.srcs .body{margin-top:4px;display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line-2)}
 .srcs .reported{color:var(--warn-ink);font-weight:600}
 .srcs ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
 .srcs li{display:flex;gap:4px 10px;flex-wrap:wrap;align-items:baseline}
