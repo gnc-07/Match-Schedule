@@ -9,8 +9,14 @@ with the title, as soon as a stream is scheduled. The feed only holds the 15
 newest uploads, so every stream seen is remembered in streams.json until a few
 days after its match; the four daily builds catch each one while it is in the feed.
 
-A stream is linked to a match only when both team names in its title match the
-fixture and the dates fit. Anything uncertain is left unlinked.
+A second source, the fan-made schedule at agendacazetv.com (not run by CazéTV),
+lists the matches CazéTV plans to show before the YouTube stream exists. Those
+listings are remembered in streams.json too. They only say *that* CazéTV will
+show a match; kick-off times always come from build_schedule.py, never from here.
+
+A stream or listing is linked to a match only when both team names match the
+fixture and the dates fit. Anything uncertain is left unlinked. A real YouTube
+stream always wins over a schedule listing.
 """
 import json, os, re, unicodedata, urllib.request
 from datetime import datetime, timedelta, timezone
@@ -18,6 +24,8 @@ from xml.etree import ElementTree as ET
 
 CHANNEL_ID = "UCZiYbVptd3PVPf4f6eR6UaQ"     # youtube.com/@CazeTV
 FEED = f"https://www.youtube.com/feeds/videos.xml?channel_id={CHANNEL_ID}"
+CHANNEL = "https://www.youtube.com/@CazeTV"   # link for matches announced before their stream exists
+AGENDA = "https://agendacazetv.com/programacao?sport=futebol"
 CACHE = "streams.json"
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0 Safari/537.36"
 KEEP_DAYS = 3                                  # forget a stream this long after its start
@@ -108,10 +116,39 @@ def scheduled_start(video_id):
     except Exception:
         return None
 
+def youtube_url(url):
+    """The URL if it is a YouTube video link, otherwise None (never link visitors to unknown sites)."""
+    m = re.match(r"https://(?:www\.|m\.)?youtube\.com/(?:watch\?v=|live/)([\w-]{11})|https://youtu\.be/([\w-]{11})", url or "")
+    return f"https://www.youtube.com/watch?v={m.group(1) or m.group(2)}" if m else None
+
+def agenda_listings(html):
+    """The football listings on the agenda page, as dicts with 'home', 'away',
+    'start' (UTC ISO string) and optionally 'url' (a YouTube link).
+
+    NOT WRITTEN YET: the page could not be inspected when this was added, because
+    the development environment's network blocked agendacazetv.com. Writing a
+    reader without seeing the page would be guesswork, so this returns nothing
+    until it is filled in. Everything else (cache, matching, the site's
+    "announced" button) is already in place and waits for these listings."""
+    return []
+
+def read_agenda(known):
+    """Adds the agenda's listings to the cache dict `known`. Returns how many were read."""
+    listings = agenda_listings(get(AGENDA))
+    for a in listings:
+        key = "agenda:" + norm(a["home"] + " x " + a["away"]).replace(" ", "-") + ":" + a["start"][:10]
+        known[key] = {"id": key, "source": "agenda", "home": a["home"], "away": a["away"],
+                      "start": a["start"], "url": youtube_url(a.get("url"))}
+    return len(listings)
+
 def update_cache(now, path=CACHE):
-    """Reads the feed, adds new live-match streams to the cache, drops old ones, saves it."""
+    """Reads the feed and the agenda, adds new entries to the cache, drops old ones, saves it."""
     cache = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else []
     known = {s["id"]: s for s in cache}
+    try:
+        print(f"CazéTV agenda: {read_agenda(known)} football listings read")
+    except Exception as e:
+        print(f"CazéTV agenda could not be read ({e}); using the listings already known")
     ns = {"a": "http://www.w3.org/2005/Atom", "yt": "http://www.youtube.com/xml/schemas/2015"}
     root = ET.fromstring(get(FEED))
     for e in root.findall("a:entry", ns):
@@ -139,15 +176,26 @@ def fit(side, team):
         return 0
     return len(a) / len(b)
 
+def watch_link(s):
+    """(sides, watch) for a cache entry: the two team names and what the site should link to."""
+    if s.get("source") == "agenda":
+        if s.get("url"):
+            return (s["home"], s["away"]), {"url": s["url"], "title": f"{s['home']} x {s['away']}", "kind": "stream"}
+        return (s["home"], s["away"]), {"url": CHANNEL, "title": f"{s['home']} x {s['away']}", "kind": "planned"}
+    sides = teams_from_title(s["title"])
+    return sides, sides and {"url": f"https://www.youtube.com/watch?v={s['id']}", "title": s["title"], "kind": "stream"}
+
 def attach(recs, cache):
-    """Adds r['watch'] = {'url', 'title'} to each match a stream belongs to. Returns the count linked."""
+    """Adds r['watch'] = {'url', 'title', 'kind'} to each match a stream or listing belongs to.
+    kind is 'stream' (a YouTube stream link) or 'planned' (on CazéTV's schedule, stream not
+    created yet). Streams are tried first, so a real stream always wins. Returns the count linked."""
     linked = 0
-    for s in cache:
-        sides = teams_from_title(s["title"])
+    for s in sorted(cache, key=lambda s: s.get("source") == "agenda"):
+        sides, watch = watch_link(s)
         if not sides:
             continue
         start = datetime.fromisoformat(s["start"]) if s.get("start") else None
-        pub = datetime.fromisoformat(s["published"])
+        pub = datetime.fromisoformat(s["published"]) if s.get("published") else start
         best = None
         for r in recs:
             kick = datetime.fromisoformat(r["utc"]) if r["utc"] else datetime.fromisoformat(r["date"] + "T15:00:00+00:00")
@@ -162,7 +210,7 @@ def attach(recs, cache):
             if score and (best is None or score > best[0] or (score == best[0] and kick < best[2])):
                 best = (score, r, kick)
         if best and not best[1].get("watch"):
-            best[1]["watch"] = {"url": f"https://www.youtube.com/watch?v={s['id']}", "title": s["title"]}
+            best[1]["watch"] = watch
             linked += 1
     return linked
 
@@ -175,4 +223,4 @@ def add_streams(recs, now=None):
         print(f"CazéTV feed could not be read ({e}); using the streams already known")
         cache = json.load(open(CACHE, encoding="utf-8")) if os.path.exists(CACHE) else []
     n = attach(recs, cache)
-    print(f"CazéTV: {len(cache)} upcoming streams known, {n} linked to matches")
+    print(f"CazéTV: {len(cache)} upcoming streams and listings known, {n} linked to matches")

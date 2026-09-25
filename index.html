@@ -394,7 +394,7 @@ footer p{margin:10px 0 0}
         <li data-t="how1html">League fixtures come from <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> (or football-data.org when configured) and are rebuilt four times a day.</li>
         <li data-t="how2">When that feed lags, corrections are added from official league and club sites and cross-checked against the press. Friendlies are entered the same way, with every source kept.</li>
         <li data-t="how3">Live scores come from ESPN's public scoreboard, refreshed every 30 seconds while a match is on. They appear on this site only, not in the calendar.</li>
-        <li data-t="how5">Where CazéTV streams a match free on YouTube, a Watch on CazéTV button appears once the stream is scheduled. Most of its streams only play in Brazil.</li>
+        <li data-t="how5">Where CazéTV streams a match free on YouTube, a Watch on CazéTV button appears once the stream is scheduled. Before that, matches on its schedule (taken from the fan-made agendacazetv.com) link to its YouTube channel. Most of its streams only play in Brazil.</li>
         <li data-t="how4">Stars and settings are saved in your browser only. Finished matches drop off two hours after kick-off.</li>
       </ul>
       <p id="repo" hidden></p>
@@ -438,8 +438,9 @@ const I18N={
   how1html:'League fixtures come from <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> (or football-data.org when configured) and are rebuilt four times a day.',
   how2:"When that feed lags, corrections are added from official league and club sites and cross-checked against the press. Friendlies are entered the same way, with every source kept.",
   how3:"Live scores come from ESPN's public scoreboard, refreshed every 30 seconds while a match is on. They appear on this site only, not in the calendar.",
-  how5:"Where CazéTV streams a match free on YouTube, a Watch on CazéTV button appears once the stream is scheduled. Most of its streams only play in Brazil.",
+  how5:"Where CazéTV streams a match free on YouTube, a Watch on CazéTV button appears once the stream is scheduled. Before that, matches on its schedule (taken from the fan-made agendacazetv.com) link to its YouTube channel. Most of its streams only play in Brazil.",
   watch:"Watch on CazéTV",watchNote:"Free on YouTube. Usually only plays in Brazil.",watchAria:(h,a)=>"Watch on CazéTV: "+h+" v "+a+", on YouTube",
+  watchPlanned:"CazéTV on YouTube",watchPlannedNote:"On CazéTV's schedule. The stream link appears once the stream is created. Usually only plays in Brazil.",watchPlannedAria:(h,a)=>h+" v "+a+" is on CazéTV's schedule. Open CazéTV's YouTube channel",
   how4:"Stars and settings are saved in your browser only. Finished matches drop off two hours after kick-off.",
   repo:"Source code and data:",theme:{auto:"Auto",light:"Light",dark:"Dark"},themeAria:l=>"Colour theme: "+l+". Select to change.",
   teams:{},comp:{"International friendly":"International friendly"},friendlies:"Friendlies",round:r=>r,
@@ -476,8 +477,9 @@ const I18N={
   how1html:'Os jogos das ligas vêm do <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> (ou do football-data.org, quando configurado) e são atualizados quatro vezes por dia.',
   how2:"Quando essa fonte atrasa, correções são adicionadas a partir dos sites oficiais de ligas e clubes e conferidas com a imprensa. Os amistosos seguem o mesmo processo, e todas as fontes ficam registradas.",
   how3:"Os placares ao vivo vêm do placar público da ESPN e são atualizados a cada 30 segundos durante o jogo. Aparecem só neste site, não na agenda.",
-  how5:"Quando a CazéTV transmite um jogo de graça no YouTube, aparece o botão Assistir na CazéTV assim que a transmissão é agendada. A maioria das transmissões só funciona no Brasil.",
+  how5:"Quando a CazéTV transmite um jogo de graça no YouTube, aparece o botão Assistir na CazéTV assim que a transmissão é agendada. Antes disso, os jogos da programação (tirada do site de fã agendacazetv.com) levam ao canal dela no YouTube. A maioria das transmissões só funciona no Brasil.",
   watch:"Assistir na CazéTV",watchNote:"Grátis no YouTube. Em geral só funciona no Brasil.",watchAria:(h,a)=>"Assistir na CazéTV: "+h+" x "+a+", no YouTube",
+  watchPlanned:"CazéTV no YouTube",watchPlannedNote:"Na programação da CazéTV. O link da transmissão aparece quando ela for criada. Em geral só funciona no Brasil.",watchPlannedAria:(h,a)=>h+" x "+a+" está na programação da CazéTV. Abrir o canal da CazéTV no YouTube",
   how4:"Favoritos e preferências ficam salvos só no seu navegador. Jogos encerrados saem da lista duas horas após o início.",
   repo:"Código-fonte e dados:",theme:{auto:"Automático",light:"Claro",dark:"Escuro"},themeAria:l=>"Tema de cores: "+l+". Selecione para mudar.",
   teams:{"Brazil":"Brasil","Canada":"Canadá","Bolivia":"Bolívia","India":"Índia","Australia":"Austrália","United States":"Estados Unidos","Mexico":"México","Spain":"Espanha","Benin":"Benin","Burkina Faso":"Burkina Faso","Chile":"Chile","Peru":"Peru","Argentina":"Argentina","England":"Inglaterra","France":"França","Germany":"Alemanha","Italy":"Itália","Netherlands":"Países Baixos","Belgium":"Bélgica","Switzerland":"Suíça","Japan":"Japão","South Korea":"Coreia do Sul","Uruguay":"Uruguai","Colombia":"Colômbia","Ecuador":"Equador","Paraguay":"Paraguai","Venezuela":"Venezuela","Morocco":"Marrocos","Senegal":"Senegal","Nigeria":"Nigéria","Ghana":"Gana","Egypt":"Egito","Croatia":"Croácia","Poland":"Polônia","Denmark":"Dinamarca","Sweden":"Suécia","Norway":"Noruega","Scotland":"Escócia","Wales":"País de Gales","Ireland":"Irlanda","Austria":"Áustria","Czechia":"Tchéquia","Turkey":"Turquia","Greece":"Grécia","Ukraine":"Ucrânia","Serbia":"Sérvia","Hungary":"Hungria","Romania":"Romênia","Finland":"Finlândia","Iceland":"Islândia","Cyprus":"Chipre","Estonia":"Estônia","Andorra":"Andorra"},
@@ -764,11 +766,12 @@ listEl.addEventListener("click",e=>{
   const t=s.dataset.team; favs.has(t)?favs.delete(t):favs.add(t); store.set("favs",[...favs]); render();
   const again=[...listEl.querySelectorAll(".star")].find(x=>x.dataset.team===t); if(again) again.focus();   // keep keyboard focus in place
 });
-// CazéTV YouTube stream, when build_schedule.py found one; hidden once the match has finished
+// CazéTV YouTube stream (or, kind "planned", a match on CazéTV's schedule whose stream
+// does not exist yet: links to the channel), when build_schedule.py found one; hidden once the match has finished
 function watchHTML(r,L){
   if(!r.watch||(L&&L.state==="post")) return "";
-  const h=teamName(r.home), a=teamName(r.away);
-  return '<p class="watch"><a class="btn" href="'+esc(r.watch.url)+'" rel="noopener" aria-label="'+esc(T.watchAria(h,a))+'">'+ICON.play+'<span>'+esc(T.watch)+'</span></a><small>'+esc(T.watchNote)+'</small></p>';
+  const h=teamName(r.home), a=teamName(r.away), p=r.watch.kind==="planned";
+  return '<p class="watch"><a class="btn" href="'+esc(r.watch.url)+'" rel="noopener" aria-label="'+esc(p?T.watchPlannedAria(h,a):T.watchAria(h,a))+'">'+ICON.play+'<span>'+esc(p?T.watchPlanned:T.watch)+'</span></a><small>'+esc(p?T.watchPlannedNote:T.watchNote)+'</small></p>';
 }
 function assignDays(){ DATA.forEach(r=>{r.day=r.when?dayKey.format(r.when):r.date;}); }
 function renderStamp(){
