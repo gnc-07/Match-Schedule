@@ -4,16 +4,19 @@
   "description": "Local accessibility and quality checks for Matchday Planner (not part of the published site)",
   "type": "module",
   "scripts": {
+    "format": "node tests/format.mjs",
+    "format:check": "node tests/format.mjs --check",
     "test:py": "python3 -m unittest discover -s tests",
     "test:security": "node tests/security.mjs",
     "test:axe": "node tests/axe.mjs",
     "test:lighthouse": "node tests/lighthouse.mjs",
-    "test": "python3 -m unittest discover -s tests && node tests/security.mjs && node tests/axe.mjs && node tests/lighthouse.mjs"
+    "test": "node tests/format.mjs --check && python3 -m unittest discover -s tests && node tests/security.mjs && node tests/axe.mjs && node tests/lighthouse.mjs"
   },
   "devDependencies": {
     "axe-core": "^4.10.0",
     "chrome-launcher": "^1.1.2",
     "lighthouse": "^12.0.0",
+    "prettier": "3.9.9",
     "puppeteer-core": "^23.0.0"
   }
 }
