@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- Content-Security-Policy: the browser refuses anything not listed here (another site's script, a form sending data away,
+     a download from an unknown server), so a mistake in the page cannot be turned against visitors. A new outside
+     service must be added here: fetch() addresses to connect-src, pictures to img-src. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org; connect-src 'self' https://site.api.espn.com https://www.wikidata.org https://api.jolpi.ca; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <script>/* start downloading the fixtures straight away, while the rest of the page is still being read */
 window.FX=fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});FX.catch(()=>{});</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -132,8 +136,6 @@ button,input,select{font:inherit;color:inherit}
 .brand-mark{width:36px;height:36px;border-radius:9px;background:var(--board);color:var(--gold);display:grid;place-items:center}
 h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans-serif;letter-spacing:.02em;text-transform:uppercase}
 .tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.ctl{display:inline-flex;align-items:center;gap:6px;min-height:44px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:0 6px 0 10px;color:var(--muted);font-size:14px}
-.ctl select{border:0;background:transparent;color:var(--ink);min-height:42px;padding:0 4px;font-weight:600;cursor:pointer;max-width:44vw}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 14px;border-radius:10px;font-weight:600;font-size:14px;line-height:1;cursor:pointer;text-decoration:none;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
 .btn:hover{border-color:var(--muted)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
@@ -535,7 +537,6 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
   .m-tags{grid-column:2;justify-content:flex-start}
   .lv-row{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;padding:12px}
   .lv-row .clk{grid-column:1/-1;justify-self:center}
-  .ctl select{max-width:38vw}
   .calmenu{position:static}
   .stamp{gap:2px 10px}
   .stamp .src{font-size:12.5px}
@@ -866,9 +867,6 @@ const ICON={
   check:'<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>',
   play:'<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.2-6.5a1 1 0 0 0 0-1.7L9.5 4.6A1 1 0 0 0 8 5.5z"/></svg>',
   moon:'<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>',
-  light:'<svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
-  dark:'<svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>',
-  auto:'<svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17A8.5 8.5 0 0 0 12 3.5z" fill="currentColor"/></svg>',
   // match events: the shapes carry the meaning together with a text label, never on their own
   ball:'<svg aria-hidden="true" viewBox="0 0 24 24"><circle class="bf" cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8"/><path d="m12 7.3 3.7 2.7-1.4 4.3H9.7L8.3 10z" fill="currentColor"/><path d="M12 7.3V2.6M15.7 10l4.4-1.5M14.3 14.3l2.8 3.9M9.7 14.3l-2.8 3.9M8.3 10 3.9 8.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
   og:'<svg class="og-i" aria-hidden="true" viewBox="0 0 24 24"><circle class="bf" cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8"/><path d="m12 7.3 3.7 2.7-1.4 4.3H9.7L8.3 10z" fill="currentColor"/><path d="M12 7.3V2.6M15.7 10l4.4-1.5M14.3 14.3l2.8 3.9M9.7 14.3l-2.8 3.9M8.3 10 3.9 8.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
@@ -889,7 +887,10 @@ const ICON={
 /* ---------- settings kept in this browser (the page works without them) ---------- */
 const store={get(k,d){try{const v=localStorage.getItem("mp."+k);return v===null?d:JSON.parse(v);}catch{return d;}},
              set(k,v){try{localStorage.setItem("mp."+k,JSON.stringify(v));}catch{}}};
-const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+// Everything from outside this file (fixtures.json, ESPN, Jolpica-F1, Wikidata) goes through esc() before it becomes HTML,
+// and every outside link through safeUrl(), which only lets web addresses through (never javascript: or data:).
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safeUrl=u=>{ try{ const x=new URL(u); return x.protocol==="https:"||x.protocol==="http:"?x.href:""; }catch{ return ""; } };
 // Pictures for the league buttons: flags for the four leagues, a globe for friendlies and the F1 mark (from
 // Simple Icons, https://simpleicons.org). A league missing here keeps its letter badge (abbr).
 const band=(v,x,y,w,h)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" style="fill:var(--flag-'+v+')"/>';
@@ -976,7 +977,7 @@ const LEAGUES=[
   {code:"INTL",name:"Friendlies",abbr:"INT",c:"--intl"},{code:"F1",name:"Formula 1",abbr:"F1",c:"--f1"}];
 const addDays=(key,n)=>{const d=new Date(key+"T12:00:00Z");d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);};
 const leagueName=l=>l.code==="INTL"?T.friendlies:l.code==="F1"?T.f1:l.name;
-const colorOf=code=>"var("+LEAGUES.find(l=>l.code===code).c+")";
+const colorOf=code=>"var("+((LEAGUES.find(l=>l.code===code)||{c:"--line"}).c)+")";
 const ORDER={en:["EPL","LIGA","BUN","BRA","INTL","F1"],pt:["BRA","INTL","F1","EPL","LIGA","BUN"]};
 const ordered=()=>ORDER[LANG].map(c=>LEAGUES.find(l=>l.code===c));
 const on=new Set(store.get("leagues",LEAGUES.map(l=>l.code)));
@@ -1004,7 +1005,7 @@ function applyLang(){
   ordered().forEach(l=>{const b=document.getElementById("chip-"+l.code); if(b){ b.lastChild.textContent=leagueName(l); b.parentNode.appendChild(b); }});
   document.getElementById("ltchips").setAttribute("aria-label",T.leagues);
   fillZones(); makeFormatters(); applyTheme(); applyContrast(); applySize(); showRepo();
-  if(typeof checkDates==="function"){ checkDates(); syncControls(); }
+  checkDates(); syncControls();
 }
 langsel.onchange=()=>{
   LANG=langsel.value; T=I18N[LANG]; store.set("lang",LANG);
@@ -1048,7 +1049,8 @@ document.getElementById("setdone").onclick=()=>closeMenu(setmenu,true);
 function showRepo(){
   if(!location.hostname.endsWith("github.io")) return;
   const user=location.hostname.split(".")[0], repo=location.pathname.split("/").filter(Boolean)[0];
-  if(repo){const p=document.getElementById("repo");p.innerHTML=esc(T.repo)+' <a href="https://github.com/'+user+'/'+repo+'" rel="noopener">github.com/'+user+'/'+repo+'</a>';p.hidden=false;}
+  if(repo){const p=document.getElementById("repo"), path=esc(user+"/"+repo);
+    p.innerHTML=esc(T.repo)+' <a href="https://github.com/'+path+'" rel="noopener">github.com/'+path+'</a>'; p.hidden=false;}
 }
 
 /* ---------- filters ---------- */
@@ -1145,10 +1147,11 @@ function srcHTML(r){
   const k=keyOf(r), n=c.sources.length;
   let h='<details class="srcs" data-k="'+esc(k)+'"'+(openSrc.has(k)?" open":"")+'><summary>'+esc(c.status==="confirmed"?T.srcVerified(n):T.srcList(n))+'</summary><div class="body">';
   if(c.status==="confirmed"){ const m=/^(\d+) independent/.exec(c.basis||""); h+='<span>'+esc(m?T.basisAgree(+m[1]):T.basisOfficial)+'</span>'; }
-  if(c.reported&&c.reported.length) h+='<span class="reported">'+esc(T.reported)+' '+c.reported.map(u=>{const d=new Date(u);return fmtT.format(d)+' '+zoneOf(d);}).join(T.or)+'</span>';
+  const rep=(Array.isArray(c.reported)?c.reported:[]).map(toDate).filter(Boolean);
+  if(rep.length) h+='<span class="reported">'+esc(T.reported)+' '+rep.map(d=>fmtT.format(d)+' '+zoneOf(d)).join(T.or)+'</span>';
   if(c.note) h+='<span>'+esc(T.noteDiffer)+'</span>';
   h+='<ul>'+c.sources.map(s=>{
-    const name=s.url?'<a href="'+esc(s.url)+'" rel="noopener">'+esc(s.source)+'</a>':'<span>'+esc(s.source)+'</span>';
+    const url=safeUrl(s.url), name=url?'<a href="'+esc(url)+'" rel="noopener">'+esc(s.source)+'</a>':'<span>'+esc(s.source)+'</span>';
     return '<li>'+name+(s.official?'<span class="off">'+esc(T.official)+'</span>':'')+(s.comment?'<span class="note" lang="en">'+esc(s.comment)+'</span>':'')+'</li>';
   }).join("")+'</ul></div></details>';
   return h;
@@ -1220,9 +1223,10 @@ listEl.addEventListener("click",e=>{
 // CazéTV YouTube stream (or, kind "planned", a match on CazéTV's schedule whose stream
 // does not exist yet: links to the channel), when build_schedule.py found one; hidden once the match has finished
 function watchHTML(r,L){
-  if(!r.watch||(L&&L.state==="post")) return "";
+  const url=r.watch&&safeUrl(r.watch.url);
+  if(!url||(L&&L.state==="post")) return "";
   const h=teamName(r.home), a=teamName(r.away), p=r.watch.kind==="planned";
-  return '<p class="watch"><a class="btn" href="'+esc(r.watch.url)+'" rel="noopener" aria-label="'+esc(p?T.watchPlannedAria(h,a):T.watchAria(h,a))+'">'+ICON.play+'<span>'+esc(p?T.watchPlanned:T.watch)+'</span></a><small>'+esc(p?T.watchPlannedNote:T.watchNote)+'</small></p>';
+  return '<p class="watch"><a class="btn" href="'+esc(url)+'" rel="noopener" aria-label="'+esc(p?T.watchPlannedAria(h,a):T.watchAria(h,a))+'">'+ICON.play+'<span>'+esc(p?T.watchPlanned:T.watch)+'</span></a><small>'+esc(p?T.watchPlannedNote:T.watchNote)+'</small></p>';
 }
 function detailsBtn(r){
   if(!r.uid) return "";
@@ -1261,8 +1265,8 @@ function assignDays(){ DATA.forEach(r=>{r.day=r.when?dayKey.format(r.when):r.dat
 function renderStamp(){
   const stale=META.f1stale?'<span class="src">'+esc(T.f1Stale)+'</span>':'';   // Jolpica-F1 was unreachable at the last rebuild
   const src=[...new Set(Object.entries(META.sources||{}).filter(([k])=>k!=="INTL").map(([,v])=>v))].join(", ");
-  const d=new Date(META.generated);
-  document.getElementById("stamp").innerHTML='<span>'+esc(T.updated)+' <b>'+fmtStamp.format(d)+' '+zoneOf(d)+'</b></span>'+(src?'<span class="src"><span class="src-l">'+esc(T.leagueData)+': </span>'+esc(src)+'</span>':'')+stale;
+  const d=toDate(META.generated);
+  document.getElementById("stamp").innerHTML=(d?'<span>'+esc(T.updated)+' <b>'+fmtStamp.format(d)+' '+zoneOf(d)+'</b></span>':'')+(src?'<span class="src"><span class="src-l">'+esc(T.leagueData)+': </span>'+esc(src)+'</span>':'')+stale;
 }
 
 /* ---------- live scores (ESPN public scoreboard, fetched by the visitor's browser) ---------- */
@@ -1380,7 +1384,7 @@ let MD=null;                   // the match being shown: {r, root, S, status, ti
 
 const SUMS=new Map();          // ESPN event id -> match summary download
 function summary(ev){
-  return reuse(SUMS,ev.id,20e3,()=>fetch(ESPN_API+ev.slug+"/summary?event="+ev.id,{cache:"no-store"})
+  return reuse(SUMS,ev.id,20e3,()=>fetch(ESPN_API+ev.slug+"/summary?event="+encodeURIComponent(ev.id),{cache:"no-store"})
     .then(res=>{if(!res.ok) throw new Error(res.status); return res.json();}).then(parseSummary));
 }
 // Start loading a match's details as soon as the visitor points at, touches or tabs to its button, so they are ready on click.
@@ -1531,6 +1535,8 @@ const TILE=256, ZOOM=16;
 async function paintMap(box,known,z=ZOOM){   // known: {lat,lon} when the source already gives them (F1 circuits)
   let c=known||null; if(!c) try{ c=await coords(box.dataset.name); }catch{}
   if(!box.isConnected) return;
+  if(c) c={lat:+c.lat,lon:+c.lon};
+  if(c&&!(Math.abs(c.lat)<=85&&Math.abs(c.lon)<=180)) c=null;   // not two sensible numbers: show the "find it" link instead
   if(!c){ box.innerHTML='<p class="md-note">'+esc(T.mdMapNone)+' <a href="https://www.openstreetmap.org/search?query='+encodeURIComponent(box.dataset.full)+'" target="_blank" rel="noopener">'+esc(T.mdMapFind)+'</a></p>'; return; }
   const n=2**z, rad=c.lat*Math.PI/180;
   const fx=(c.lon+180)/360*n, fy=(1-Math.log(Math.tan(rad)+1/Math.cos(rad))/Math.PI)/2*n;   // the stadium, in tiles
@@ -1590,6 +1596,8 @@ async function loadWeekend(){
 }
 
 const f1Name=d=>d.givenName+" "+d.familyName;
+// a column heading: the short form on screen, the full word for screen readers (when there is one)
+const th=(txt,full,cls)=>'<th scope="col"'+(cls?' class="'+cls+'"':'')+'>'+(full?'<span aria-hidden="true">'+esc(txt)+'</span><span class="sr">'+esc(full)+'</span>':esc(txt))+'</th>';
 function f1Lead(r){ // who led a finished session: pole for qualifying, winner for races
   const rows=WK&&WK.res[r.sess];
   const name=rows?f1Name(rows[0].Driver):(r.top&&r.top[0]);
@@ -1660,7 +1668,6 @@ function paintWkRes(){
     box.innerHTML=h+'<p class="md-note f1-pad">'+esc(w.state==="loading"?T.f1Loading:w.state==="error"?T.f1Error:T.f1NoResults)+'</p>'; return;
   }
   if(have.length===1) h=h.replace('</h3>','</h3><span class="f1-one">'+esc(S[w.pick])+'</span>');
-  const th=(txt,full,cls)=>'<th scope="col"'+(cls?' class="'+cls+'"':'')+'>'+(full?'<span aria-hidden="true">'+esc(txt)+'</span><span class="sr">'+esc(full)+'</span>':esc(txt))+'</th>';
   const mine=r=>f1favs.has(r.Driver.driverId)?' class="mine"':'';
   let t='<div class="lt-scroll"><table class="lt f1t"><caption class="sr">'+esc(T.f1Results+": "+S[w.pick])+'</caption><thead><tr>'+th(T.f1Pos,T.f1PosFull,"pos-c")+th(T.f1Driver,"","tm-c");
   if(w.pick==="Q"){
@@ -1694,7 +1701,6 @@ function paintWkRes(){
 function paintWkChamp(){
   const w=WK, box=w.root.querySelector("#wk-champ"), L=w.tab==="d"?w.standD:w.standC;
   if(!w.standD&&!w.standC){ box.hidden=true; return; }
-  const th=(txt,full,cls)=>'<th scope="col"'+(cls?' class="'+cls+'"':'')+'>'+(full?'<span aria-hidden="true">'+esc(txt)+'</span><span class="sr">'+esc(full)+'</span>':esc(txt))+'</th>';
   let h='<div class="f1-rh"><h3>'+esc(T.f1Champ)+'</h3><div class="seg" role="group" aria-label="'+esc(T.f1Champ)+'">'+
     '<button type="button" data-tab="d" aria-pressed="'+(w.tab==="d")+'">'+esc(T.f1Drivers)+'</button><button type="button" data-tab="c" aria-pressed="'+(w.tab==="c")+'">'+esc(T.f1Teams)+'</button></div></div>';
   if(!L){ box.innerHTML=h; box.hidden=false; return; }
@@ -1729,10 +1735,9 @@ function weekendClick(e){
     refocus((inRes?"#wk-res":"#wk-champ")+' .star[data-drv="'+CSS.escape(id)+'"]');   // keep keyboard focus on the same star
   }
 }
-async function shareWeekend(){
-  const race=WK.list.find(x=>x.sess==="R")||WK.list[0], url=shareURL({uid:WK.wk}), text=gpName(race.gp), t=document.getElementById("md-toast");
-  if(navigator.share){ try{ await navigator.share({title:text,text,url}); return; }catch(err){ if(err.name==="AbortError") return; } }
-  try{ await navigator.clipboard.writeText(url); t.textContent=T.linkCopied; }catch{ t.textContent=url; }
+function shareWeekend(){
+  const race=WK.list.find(x=>x.sess==="R")||WK.list[0];
+  return shareLink(shareURL({uid:WK.wk}),gpName(race.gp));
 }
 
 function openMatch(uid,root){
@@ -1800,7 +1805,7 @@ function announce(m){
 function downloadICS(r){
   const pad=n=>String(n).padStart(2,"0");
   const f=d=>d.getUTCFullYear()+pad(d.getUTCMonth()+1)+pad(d.getUTCDate())+"T"+pad(d.getUTCHours())+pad(d.getUTCMinutes())+"00Z";
-  const e=s=>String(s).replace(/\\/g,"\\\\").replace(/([,;])/g,"\\$1").replace(/\n/g,"\\n");
+  const e=s=>String(s).replace(/\\/g,"\\\\").replace(/([,;])/g,"\\$1").replace(/\r\n|\r|\n/g,"\\n");
   let title=teamName(r.home)+T.vs+teamName(r.away)+" ("+compName(r.comp)+")";
   if(!r.when) title="["+T.pTbc+"] "+title;
   const L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Matchday Planner//EN","CALSCALE:GREGORIAN","METHOD:PUBLISH","BEGIN:VEVENT",
@@ -1822,8 +1827,10 @@ function downloadICS(r){
   a.download=(r.home+"-"+r.away).normalize("NFD").replace(/[^\w]+/g,"-").replace(/^-|-$/g,"").toLowerCase()+".ics";
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),10000);
 }
-async function shareMatch(r){
-  const url=shareURL(r), text=teamName(r.home)+T.vs+teamName(r.away), t=document.getElementById("md-toast");
+const shareMatch=r=>shareLink(shareURL(r),teamName(r.home)+T.vs+teamName(r.away));
+// the phone's own Share sheet where there is one; otherwise the link is copied (or shown, if copying is not allowed)
+async function shareLink(url,text){
+  const t=document.getElementById("md-toast");
   if(navigator.share){ try{ await navigator.share({title:text,text,url}); return; }catch(err){ if(err.name==="AbortError") return; } }
   try{ await navigator.clipboard.writeText(url); t.textContent=T.linkCopied; }catch{ t.textContent=url; }
 }
@@ -1910,16 +1917,16 @@ function paintTable(){
   const t=TABLES.get(ltCode); if(!t) return;
   const lg=LEAGUES.find(l=>l.code===ltCode), mine=[...favs].map(tokens);
   const C=T.ltCols, A=T.ltAbbr;
-  const th=(k,cls)=>'<th scope="col"'+(cls?' class="'+cls+'"':'')+'><span aria-hidden="true">'+esc(A[k])+'</span><span class="sr">'+esc(C[k])+'</span></th>';
+  const col=(k,cls)=>'<th scope="col"'+(cls?' class="'+cls+'"':'')+'><span aria-hidden="true">'+esc(A[k])+'</span><span class="sr">'+esc(C[k])+'</span></th>';
   const rows=t.rows.map((x,i)=>{
     const fav=mine.some(f=>overlap(f,tokens(x.team)));
     const gd=x.gd>0?"+"+x.gd:String(x.gd??"");
-    return '<tr'+(fav?' class="mine"':'')+'><td class="pos-c">'+(x.rank??i+1)+'</td><th scope="row" class="tm-c">'+esc(x.team)+(fav?ICON.star+'<span class="sr"> ('+esc(T.starred)+')</span>':'')+'</th>'+
+    return '<tr'+(fav?' class="mine"':'')+'><td class="pos-c">'+esc(x.rank??i+1)+'</td><th scope="row" class="tm-c">'+esc(x.team)+(fav?ICON.star+'<span class="sr"> ('+esc(T.starred)+')</span>':'')+'</th>'+
       '<td>'+esc(x.p??"")+'</td><td class="wdl">'+esc(x.w??"")+'</td><td class="wdl">'+esc(x.d??"")+'</td><td class="wdl">'+esc(x.l??"")+'</td><td>'+esc(gd)+'</td><td class="pts">'+esc(x.pts??"")+'</td></tr>';
   }).join("");
   document.getElementById("ltbody").innerHTML='<div class="lt-wrap"><table class="lt"><caption>'+esc(lg.name)+'</caption><thead><tr>'+
     '<th scope="col" class="pos-c"><span aria-hidden="true">#</span><span class="sr">'+esc(C.pos)+'</span></th><th scope="col" class="tm-c">'+esc(C.team)+'</th>'+
-    th("p")+th("w","wdl")+th("d","wdl")+th("l","wdl")+th("gd")+th("pts")+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    col("p")+col("w","wdl")+col("d","wdl")+col("l","wdl")+col("gd")+col("pts")+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
     '<p class="lt-key">'+esc(T.ltKey)+' '+esc(T.ltSource)+'</p>';
 }
 
@@ -1933,8 +1940,13 @@ function getData(){
   if(window.FX){ const first=window.FX; window.FX=null; return first; }   // the download started in <head>
   return fetch("fixtures.json",{cache:"no-store"}).then(r=>{if(!r.ok) throw new Error(r.status);return r.json();});
 }
+// A time that is not a real date counts as "no time yet", and a record without its basic fields is left out,
+// so one broken entry in fixtures.json can never stop the rest of the list from showing.
+const toDate=s=>{ const d=s?new Date(s):null; return d&&!isNaN(d)?d:null; };
+const usable=r=>r&&typeof r==="object"&&typeof r.code==="string"&&/^\d{4}-\d\d-\d\d$/.test(r.date)&&typeof r.home==="string"&&typeof r.away==="string";
 function useData(j){
-  META=j; DATA=j.matches; DATA.forEach(r=>{r.when=r.utc?new Date(r.utc):null;}); assignDays();
+  META=j; DATA=(Array.isArray(j.matches)?j.matches:[]).filter(usable);
+  DATA.forEach(r=>{ r.when=toDate(r.utc); if(!r.when) r.utc=null; }); assignDays();
   renderStamp(); render();
   if(MD){ const r=DATA.find(x=>x.uid===MD.r.uid); if(r){ MD.r=r; paintMatch(); } }
   if(WK){ const l=DATA.filter(x=>x.wk===WK.wk); if(l.length){ WK.list=l.sort((a,b)=>(a.when||0)-(b.when||0)); paintWkTop(); paintWkSched(); } }
