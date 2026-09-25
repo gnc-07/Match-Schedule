@@ -1114,14 +1114,18 @@ function candidates(){ // matches that could be on right now, or finished today 
   });
 }
 // one league's matches on one day (US Eastern date, as ESPN groups them)
-const BOARDS=new Map();        // "slug|day" -> {at, req}: a scoreboard fetched in the last 25 seconds is reused
-function board(slug,day){
-  const k=slug+"|"+day, have=BOARDS.get(k);
-  if(have&&Date.now()-have.at<25e3) return have.req;
-  const req=boardFetch(slug,day); BOARDS.set(k,{at:Date.now(),req});
-  req.catch(()=>BOARDS.delete(k));
-  return req;
+// A download still on its way is always reused; a finished one for 25 seconds (scoreboards) or 20 (match summaries).
+// A failed one is forgotten, so the next request tries again.
+function reuse(cache,k,ms,start){
+  const have=cache.get(k);
+  if(have&&Date.now()-have.at<ms) return have.req;
+  const entry={at:Infinity,req:start()};   // "at" is set when the download finishes
+  cache.set(k,entry);
+  entry.req.then(()=>{entry.at=Date.now();},()=>{if(cache.get(k)===entry) cache.delete(k);});
+  return entry.req;
 }
+const BOARDS=new Map();        // "slug|day" -> scoreboard download
+function board(slug,day){ return reuse(BOARDS,slug+"|"+day,25e3,()=>boardFetch(slug,day)); }
 async function boardFetch(slug,day){
   const res=await fetch(ESPN_API+slug+"/scoreboard?dates="+day,{cache:"no-store"});
   if(!res.ok) throw new Error(res.status);
@@ -1187,13 +1191,10 @@ const shareURL=r=>{const u=new URL(location.pathname,location.href); u.searchPar
 const EVID=new Map();          // our match key -> ESPN event (or null when ESPN does not list it)
 let MD=null;                   // the match being shown: {r, root, S, status, timer, venueKey, seen}
 
-const SUMS=new Map();          // ESPN event id -> {at, req}: a match summary fetched in the last 20 seconds is reused
+const SUMS=new Map();          // ESPN event id -> match summary download
 function summary(ev){
-  const have=SUMS.get(ev.id);
-  if(have&&Date.now()-have.at<20e3) return have.req;
-  const req=fetch(ESPN_API+ev.slug+"/summary?event="+ev.id,{cache:"no-store"}).then(res=>{if(!res.ok) throw new Error(res.status); return res.json();}).then(parseSummary);
-  SUMS.set(ev.id,{at:Date.now(),req}); req.catch(()=>SUMS.delete(ev.id));
-  return req;
+  return reuse(SUMS,ev.id,20e3,()=>fetch(ESPN_API+ev.slug+"/summary?event="+ev.id,{cache:"no-store"})
+    .then(res=>{if(!res.ok) throw new Error(res.status); return res.json();}).then(parseSummary));
 }
 // Start loading a match's details as soon as the visitor points at, touches or tabs to its button, so they are ready on click.
 function warmMatch(uid){
