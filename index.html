@@ -588,13 +588,6 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
           <div class="field"><label for="tzsel" data-t="tzLabel">Show times in</label>
             <select id="tzsel"></select></div>
           <h3 class="set-group" data-t="grpLook">Appearance</h3>
-          <fieldset class="field"><legend data-t="themeLabel">Theme</legend>
-            <div class="choice">
-              <label><input type="radio" name="theme" value="auto"><span data-t="thAuto">Device</span></label>
-              <label><input type="radio" name="theme" value="light"><span data-t="thLight">Light</span></label>
-              <label><input type="radio" name="theme" value="dark"><span data-t="thDark">Dark</span></label>
-            </div>
-          </fieldset>
           <label class="hc-row"><input type="checkbox" id="hcbox"><span data-t="ctHighLabel">High contrast</span></label>
           <fieldset class="field"><legend data-t="sizeLabel">Text size</legend>
             <div class="choice sizes">
@@ -723,7 +716,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
    ========================================================================= */
 const I18N={
  en:{locale:"en-CA",
-  skip:"Skip to fixtures",settings:"Settings",themeLabel:"Theme",thAuto:"Device",thLight:"Light",thDark:"Dark",toDark:"Switch to dark theme",toLight:"Switch to light theme",done:"Close",langLabel:"Language",tzLabel:"Show times in",calBtn:"Calendar",calTitle:"Add to your calendar",
+  skip:"Skip to fixtures",settings:"Settings",toDark:"Switch to dark theme",toLight:"Switch to light theme",done:"Close",langLabel:"Language",tzLabel:"Show times in",calBtn:"Calendar",calTitle:"Add to your calendar",
   calText:"Subscribe once. Your calendar keeps every time up to date and reminds you 30 minutes before each confirmed kick-off.",
   subscribe:"Subscribe",copy:"Copy link",download:"Download .ics",copied:"Link copied. Paste it into your calendar app.",
   selected:"Link selected. Press Ctrl+C (or Cmd+C) to copy.",calLangNote:"",howTo:"How to subscribe in your app",
@@ -798,7 +791,7 @@ const I18N={
   f1Stale:"F1 times could not be refreshed at this update; the ones shown are from an earlier update.",
   grpRegion:"Region",grpLook:"Appearance",ctHighLabel:"High contrast",sizeLabel:"Text size",szNormal:"Normal",szLarge:"Large",szXl:"Extra large"},
  pt:{locale:"pt-BR",
-  skip:"Pular para os jogos",settings:"Ajustes",themeLabel:"Tema",thAuto:"Aparelho",thLight:"Claro",thDark:"Escuro",toDark:"Mudar para o tema escuro",toLight:"Mudar para o tema claro",done:"Fechar",langLabel:"Idioma",tzLabel:"Mostrar horários em",calBtn:"Agenda",calTitle:"Adicione à sua agenda",
+  skip:"Pular para os jogos",settings:"Ajustes",toDark:"Mudar para o tema escuro",toLight:"Mudar para o tema claro",done:"Fechar",langLabel:"Idioma",tzLabel:"Mostrar horários em",calBtn:"Agenda",calTitle:"Adicione à sua agenda",
   calText:"Assine uma vez. Sua agenda mantém todos os horários atualizados e avisa 30 minutos antes de cada jogo com horário confirmado.",
   subscribe:"Assinar",copy:"Copiar link",download:"Baixar .ics",copied:"Link copiado. Cole no seu aplicativo de agenda.",
   selected:"Link selecionado. Pressione Ctrl+C (ou Cmd+C) para copiar.",calLangNote:"Os eventos da agenda aparecem em inglês.",
@@ -965,13 +958,11 @@ function makeFormatters(){
 const zoneOf=d=>fmtZ.formatToParts(d).find(p=>p.type==="timeZoneName").value;
 const clean=s=>String(s).replace(/\.$/,"");   // "Mon." -> "Mon"
 
-/* ---------- theme switch: auto (follow the device), light, dark ---------- */
+/* ---------- theme: follows the device until the sun and moon button picks light or dark ---------- */
 let theme=store.get("theme","auto");
-const themeRadios=[...document.querySelectorAll('input[name="theme"]')];
 function applyTheme(){
   if(theme==="auto") document.documentElement.removeAttribute("data-theme");
   else document.documentElement.setAttribute("data-theme",theme);
-  themeRadios.forEach(r=>r.checked=r.value===theme);
   // the sun and moon button: its picture and name describe what a click does
   const dark=theme==="dark"||(theme==="auto"&&DARK.matches);
   document.documentElement.classList.toggle("is-dark",dark);
@@ -979,9 +970,8 @@ function applyTheme(){
   themeBtn.title=dark?T.toLight:T.toDark;
 }
 const DARK=matchMedia("(prefers-color-scheme: dark)"), themeBtn=document.getElementById("themebtn");
-themeRadios.forEach(r=>r.addEventListener("change",()=>{theme=r.value;store.set("theme",theme);applyTheme();}));
 themeBtn.addEventListener("click",()=>{theme=document.documentElement.classList.contains("is-dark")?"light":"dark";store.set("theme",theme);applyTheme();});
-DARK.addEventListener("change",applyTheme);   // "Device" follows the device when it switches by itself (for example at sunset)
+DARK.addEventListener("change",applyTheme);   // until the button is used, follow the device, even when it switches by itself (for example at sunset)
 
 /* ---------- contrast: normal or high (works with any theme) ---------- */
 let contrast=store.get("contrast","normal");

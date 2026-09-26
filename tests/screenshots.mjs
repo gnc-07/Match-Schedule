@@ -40,6 +40,7 @@ const shots = [
   ["theme-button-phone-dark-pt", 390, "?lang=pt", null, "dark"],
   ["theme-button-phone-xl-text", 390, "?lang=en", null, "light", "xl"],
   ["theme-button-after-click", 1280, "?lang=en", p => p.click("#themebtn"), "light"],
+  ["settings-phone-dark-pt", 390, "?lang=pt", p => p.evaluate(() => { document.getElementById("setmenu").open = true; }), "dark"],
   ["theme-button-focus", 1280, "?lang=en", async p => { await p.keyboard.press("Tab"); await p.keyboard.press("Tab"); }, "light"],
 ];
 
