@@ -111,17 +111,20 @@ try {
     await cdp.send("Animation.enable");
     const webm = path.join(out, name + ".webm");
     const rec = await page.screencast({ path: webm, ffmpegPath: FFMPEG });
-    for (const slow of once ? [false] : [false, true]) {
-      // every run starts from the same page
-      await page.goto(BASE + "?lang=en", { waitUntil: "networkidle0" });
-      await overlay(page);
-      await cdp.send("Animation.setPlaybackRate", { playbackRate: slow ? 0.25 : 1 });
-      await caption(page, slow ? "4 times slower" : "Normal speed");
-      await wait(slow ? 400 : 700);
-      await steps(page);
+    try {
+      for (const slow of once ? [false] : [false, true]) {
+        // every run starts from the same page
+        await page.goto(BASE + "?lang=en", { waitUntil: "networkidle0" });
+        await overlay(page);
+        await cdp.send("Animation.setPlaybackRate", { playbackRate: slow ? 0.25 : 1 });
+        await caption(page, slow ? "4 times slower" : "Normal speed");
+        await wait(slow ? 400 : 700);
+        await steps(page);
+      }
+      await wait(300);
+    } finally {
+      await rec.stop();   // even when a step fails, so ffmpeg does not keep running
     }
-    await wait(300);
-    await rec.stop();
     await page.close();
     // H.264 MP4 plays everywhere (phones, GitHub, the Claude app); even width and height are required by the encoder
     execFileSync(FFMPEG, ["-y", "-loglevel", "error", "-i", webm, "-vf", "scale=trunc(iw/2)*2:trunc(ih/2)*2", "-c:v", "libx264",

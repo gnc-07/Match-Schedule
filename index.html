@@ -1667,6 +1667,9 @@ themeBtn.addEventListener("click", () => {
   theme = document.documentElement.classList.contains("is-dark") ? "light" : "dark";
   store.set("theme", theme);
   switchTheme();
+});
+// the new sun or moon turns into place (called once the new theme is applied, so it is the icon now shown)
+const turnIcon = () =>
   move(
     [...themeBtn.querySelectorAll(".ico")].find(i => getComputedStyle(i).display !== "none"),
     [
@@ -1674,14 +1677,17 @@ themeBtn.addEventListener("click", () => {
       { transform: "none", opacity: 1 },
     ],
   );
-});
 // with animations on, the page cross-fades to the new theme. The buttons' own colour changes are paused meanwhile
 // (data-theming): the cross-fade already covers them, and hundreds of them at once would only cost time.
 function switchTheme() {
-  const r = document.documentElement;
-  if (!motionOn() || !document.startViewTransition) return applyTheme();
+  const r = document.documentElement,
+    apply = () => {
+      applyTheme();
+      turnIcon();
+    };
+  if (!motionOn() || !document.startViewTransition) return apply();
   r.setAttribute("data-theming", "");
-  document.startViewTransition(applyTheme).finished.finally(() => r.removeAttribute("data-theming"));
+  document.startViewTransition(apply).finished.finally(() => r.removeAttribute("data-theming"));
 }
 DARK.addEventListener("change", applyTheme); // until the button is used, follow the device, even when it switches by itself (for example at sunset)
 
@@ -1707,11 +1713,23 @@ const motionOn = () => motion === "on" || (motion === "auto" && !CALM.matches);
 // a short animation made by script, at the same speeds as the CSS ones (which data-motion="off" stops instead)
 const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim(),
   DUR = n => parseFloat(cssVar("--dur-" + n)) * 1000;
-const move = (el, frames, o) =>
-  el && motionOn() && el.animate(frames, { duration: DUR("m"), easing: cssVar("--ease"), ...o });
+const MOVING = new Set(); // script animations still running, stopped at once if animations are switched off
+function move(el, frames, o) {
+  if (!el || !motionOn()) return;
+  const a = el.animate(frames, { duration: DUR("m"), easing: cssVar("--ease"), ...o });
+  MOVING.add(a);
+  a.finished.then(
+    () => MOVING.delete(a),
+    () => MOVING.delete(a),
+  );
+  return a;
+}
 function applyMotion() {
   if (motionOn()) document.documentElement.removeAttribute("data-motion");
-  else document.documentElement.setAttribute("data-motion", "off");
+  else {
+    document.documentElement.setAttribute("data-motion", "off");
+    MOVING.forEach(a => a.cancel());
+  }
   mvBox.checked = motionOn();
 }
 mvBox.addEventListener("change", () => {
@@ -2352,12 +2370,14 @@ function render() {
       render();
     };
 }
-// the list only moves after a click or change in the filters (the flag is cleared once that event is handled)
+// the list only moves after a click, change or new date in the filters (the flag is cleared once that event is
+// handled). Typing a team name does not move it: the list redraws at each pause, so it would keep jumping while typing.
 let filterAct = false;
-["click", "change"].forEach(t =>
+["click", "change", "input"].forEach(t =>
   document.getElementById("filters").addEventListener(
     t,
-    () => {
+    e => {
+      if (e.target === q) return;
       filterAct = true;
       setTimeout(() => (filterAct = false));
     },
@@ -2753,6 +2773,7 @@ function renderLive() {
     const L = liveOf(r);
     if (L && L.state === "in" && on.has(r.code))
       rows.push({
+        id: L.id || keyOf(r),
         home: teamName(r.home),
         away: teamName(r.away),
         hs: L.hs,
@@ -2766,6 +2787,7 @@ function renderLive() {
     const code = codeOf[e.slug];
     if (on.has(code))
       rows.push({
+        id: e.id,
         home: e.hn,
         away: e.an,
         hs: e.hs,
@@ -2783,7 +2805,9 @@ function renderLive() {
   list.innerHTML = rows
     .map(
       x =>
-        '<div class="lv-row"><span class="h t">' +
+        '<div class="lv-row" data-id="' +
+        esc(x.id) +
+        '"><span class="h t">' +
         esc(x.home) +
         "<small>" +
         esc(x.comp) +
@@ -2801,7 +2825,7 @@ function renderLive() {
     )
     .join("");
   box.hidden = false;
-  goals(list, ".sc", el => "live|" + el.previousElementSibling.firstChild.textContent);
+  goals(list, ".sc", el => "live|" + el.parentNode.dataset.id); // keyed by ESPN's event id, so two live rows never mix
   const stamp = document.getElementById("stamp");
   if (!lc)
     stamp.insertAdjacentHTML(

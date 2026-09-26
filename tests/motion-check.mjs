@@ -2,6 +2,8 @@
 //   - every animation changes only what the browser can move without redrawing the page (opacity and transform),
 //     apart from the short colour transitions on buttons;
 //   - every duration is one of the two shared speeds (--dur-s, --dur-m) or the goal pulse (3 x --dur-m);
+//   - with animations switched off, nothing moves, and switching them off stops what is moving;
+//   - nothing animates an element that is hidden (for example the sun or moon that is about to disappear);
 // and it prints the slowest frame after each click, with animations on and off, with the processor slowed down 4 times
 // the way Lighthouse tests phones (Chromium only; FULLSPEED=1 for normal speed). Those timings vary from run to run,
 // so they are for reading, not a pass or fail.
@@ -72,6 +74,13 @@ async function run(label, launch) {
     for (const [name, width, act] of cases.filter(c => !ONLY.length || ONLY.includes(c[0]))) {
       const on = await slowest(browser, label, width, act, "on"), off = await slowest(browser, label, width, act, "off");
       console.log(`${label.padEnd(8)} ${name.padEnd(12)} slowest frame: ${on} ms with animations, ${off} ms without`);
+      // with animations switched off, nothing may move at all
+      const still = await open(browser, width, "off");
+      await act(still);
+      await wait(40);
+      const moving = await still.evaluate(() => document.getAnimations().filter(a => a.playState === "running").length);
+      await still.close();
+      if (moving) problems.push(`${label} ${name}: ${moving} animation(s) ran with animations switched off`);
       const page = await open(browser, width, "on");
       await act(page);
       await wait(40);
@@ -82,6 +91,7 @@ async function run(label, launch) {
           what: a.animationName || a.transitionProperty || "script",
           on: String(a.effect?.target?.id || a.effect?.target?.className?.baseVal || a.effect?.target?.className || a.effect?.target?.tagName || "") + (a.effect?.pseudoElement || ""),
           ms: Math.round(a.effect.getComputedTiming().duration),
+          hidden: !!a.effect?.target && !a.effect.pseudoElement && getComputedStyle(a.effect.target).display === "none",
           props: [...new Set(a.effect.getKeyframes().flatMap(Object.keys))].filter(p => !["offset", "easing", "composite", "computedOffset"].includes(p)),
         })) };
       });
@@ -100,9 +110,18 @@ async function run(label, launch) {
         if (!seen.has(line)) console.log(line);
         seen.add(line);
         if (bad.length) problems.push(`${label} ${name}: ${a.what} animates ${bad.join(", ")}`);
+        if (a.hidden) problems.push(`${label} ${name}: ${a.what} runs on ${a.on}, which is hidden`);
         if (!okLen) problems.push(`${label} ${name}: ${a.what} lasts ${a.ms} ms, not one of the shared speeds`);
       }
     }
+    // switching animations off in the middle of one stops it at once (the list rising after a filter change)
+    const page = await open(browser, 1280, "on");
+    await page.click("#chip-F1");
+    const left = await page.evaluate(() => { document.getElementById("mvbox").click();
+      return document.getAnimations().filter(a => a.playState === "running").length; });
+    await page.close();
+    console.log(`${label.padEnd(8)} switch-off   ${left} animation(s) still running after Animations was unticked`);
+    if (left) problems.push(`${label}: ${left} animation(s) kept running after Animations was switched off`);
   } finally {
     await browser.close();
     server.kill();
