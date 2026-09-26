@@ -687,6 +687,8 @@ dialog.sheet[open]:not(:modal){animation-name:slide-in}
    team names too, twice. The light sits behind the text (z-index -1 inside the row, which isolates it) and
    stays inside the match's own row: each pulse starts small and bright at the score and spreads out as it fades. */
 .goal-row{isolation:isolate;overflow:clip}
+/* the match shown beside the list keeps its whole outline: the light is cut to the outline's outer edge instead */
+:root[data-pane] .goal-row:has(.md-open[aria-current="true"]){overflow:visible;clip-path:inset(calc(var(--ring-it,3px) + var(--ring-t,-3px)) -1px calc(var(--ring-ib,3px) + var(--ring-b,-3px)) -1px round var(--ring-rt,13px) var(--ring-rt,13px) var(--ring-rb,13px) var(--ring-rb,13px))}
 .goal{position:relative;display:inline-block;animation:pop var(--dur-m) var(--ease)}
 .goal::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:320px;height:320px;margin:-160px 0 0 -160px;border-radius:50%;pointer-events:none;
   background:radial-gradient(closest-side,var(--glow),transparent);opacity:0;animation:glow-wave calc(var(--dur-m)*3) ease-out 2}
@@ -2403,7 +2405,7 @@ function goals(box, sel, key) {
   box.querySelectorAll(sel).forEach(el => {
     const k = key(el),
       was = SEEN.get(k);
-    if (was !== undefined && was !== el.textContent) {
+    if (was !== undefined && was !== el.textContent && motionOn()) {
       el.classList.add("goal");
       el.closest(".match,.lv-row").classList.add("goal-row");
     }
