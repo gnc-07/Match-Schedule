@@ -10,6 +10,7 @@
     "test:security": "node tests/security.mjs",
     "test:axe": "node tests/axe.mjs",
     "test:lighthouse": "node tests/lighthouse.mjs",
+    "test:motion": "node tests/motion-check.mjs",
     "test": "node tests/format.mjs --check && python3 -m unittest discover -s tests && node tests/security.mjs && node tests/axe.mjs && node tests/lighthouse.mjs"
   },
   "devDependencies": {

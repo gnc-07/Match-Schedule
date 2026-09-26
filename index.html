@@ -672,26 +672,23 @@ dialog.sheet[open]:not(:modal){animation-name:slide-in}
 .star.pop svg{animation:pop var(--dur-m) var(--ease)}
 /* a score that just changed (a goal): the score bounces and a soft gold light pulses out from behind it, under the
    team names too, twice. The light sits behind the text (z-index -1 inside the row, which isolates it) and
-   stays inside the match's own row. MOCKUP: version a breathes in place, version b spreads out in waves. */
+   stays inside the match's own row: each pulse starts small and bright at the score and spreads out as it fades. */
 .goal-row{isolation:isolate;overflow:clip}
 .goal{position:relative;display:inline-block;animation:pop var(--dur-m) var(--ease)}
 .goal::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:320px;height:320px;margin:-160px 0 0 -160px;border-radius:50%;pointer-events:none;
-  background:radial-gradient(closest-side,var(--glow),transparent);opacity:0;animation:glow-breathe calc(var(--dur-m)*3) ease-in-out 2}
-:root[data-goal="b"] .goal::before{animation-name:glow-wave;animation-timing-function:ease-out}
-@keyframes glow-breathe{from{opacity:0;transform:scale(.6)}50%{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.6)}}
+  background:radial-gradient(closest-side,var(--glow),transparent);opacity:0;animation:glow-wave calc(var(--dur-m)*3) ease-out 2}
 @keyframes glow-wave{from{opacity:1;transform:scale(.15)}to{opacity:0;transform:scale(1)}}
 /* buttons and chips change colour gently when hovered or switched */
 .btn,.chip,.seg button,.more,.star,.reset{transition:background-color var(--dur-s),border-color var(--dur-s),color var(--dur-s)}
-/* page changes made with View Transitions (theme switch, list glide): the same speed and easing as the rest.
-   Browsers without View Transitions simply switch. MOCKUP: the theme reveal and wipe draw the new page over the old. */
-::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation-duration:var(--dur-m);animation-timing-function:var(--ease)}
-:root[data-vt="reveal"]::view-transition-old(root),:root[data-vt="reveal"]::view-transition-new(root),
-:root[data-vt="wipe"]::view-transition-old(root),:root[data-vt="wipe"]::view-transition-new(root){animation:none;mix-blend-mode:normal}
+/* the theme switch cross-fades the whole page through View Transitions, at the same speed and easing as the rest
+   (browsers without View Transitions simply switch) */
+::view-transition-old(root),::view-transition-new(root){animation-duration:var(--dur-m);animation-timing-function:var(--ease)}
 @media (max-width:640px){
   /* phones: Settings and Calendar slide up from the bottom as a sheet */
   .calmenu[open]>.calpanel{animation:sheet-up var(--dur-m) var(--ease)}
   .calmenu[open]::before{animation:fade var(--dur-m) ease-out}
 }
+:root[data-theming] *{transition:none!important}
 :root[data-motion="off"] *,:root[data-motion="off"] ::before,:root[data-motion="off"] ::after,:root[data-motion="off"] ::backdrop{animation:none!important;transition:none!important}
 </style>
 </head>
@@ -1678,35 +1675,13 @@ themeBtn.addEventListener("click", () => {
     ],
   );
 });
-// MOCKUP versions: "fade" cross-fades the page, "reveal" draws the new theme in a circle growing from the button,
-// "wipe" draws it from the top down, "icon" changes at once (only the sun or moon turns)
+// with animations on, the page cross-fades to the new theme. The buttons' own colour changes are paused meanwhile
+// (data-theming): the cross-fade already covers them, and hundreds of them at once would only cost time.
 function switchTheme() {
-  const v = MOCK.theme || "fade",
-    r = document.documentElement;
-  if (!motionOn() || !document.startViewTransition || v === "icon") return applyTheme();
-  r.dataset.vt = v;
-  const t = document.startViewTransition(applyTheme);
-  t.finished.finally(() => delete r.dataset.vt);
-  if (v === "fade") return;
-  const b = themeBtn.getBoundingClientRect(),
-    x = b.x + b.width / 2,
-    y = b.y + b.height / 2,
-    far = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-  t.ready.then(() =>
-    r.animate(
-      {
-        clipPath:
-          v === "reveal"
-            ? [`circle(0 at ${x}px ${y}px)`, `circle(${far}px at ${x}px ${y}px)`]
-            : ["inset(0 0 100% 0)", "inset(0)"],
-      },
-      {
-        duration: DUR("m") * (v === "reveal" ? 1.6 : 1.3),
-        easing: cssVar("--ease"),
-        pseudoElement: "::view-transition-new(root)",
-      },
-    ),
-  );
+  const r = document.documentElement;
+  if (!motionOn() || !document.startViewTransition) return applyTheme();
+  r.setAttribute("data-theming", "");
+  document.startViewTransition(applyTheme).finished.finally(() => r.removeAttribute("data-theming"));
 }
 DARK.addEventListener("change", applyTheme); // until the button is used, follow the device, even when it switches by itself (for example at sunset)
 
@@ -1734,9 +1709,6 @@ const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(
   DUR = n => parseFloat(cssVar("--dur-" + n)) * 1000;
 const move = (el, frames, o) =>
   el && motionOn() && el.animate(frames, { duration: DUR("m"), easing: cssVar("--ease"), ...o });
-// MOCKUP (remove once a version is chosen): which version of the theme switch, list change and goal to show
-const MOCK = store.get("mock", {});
-document.documentElement.dataset.goal = MOCK.goal || "a";
 function applyMotion() {
   if (motionOn()) document.documentElement.removeAttribute("data-motion");
   else document.documentElement.setAttribute("data-motion", "off");
@@ -2357,31 +2329,10 @@ function render() {
     html += '<button type="button" class="more" id="more">' + esc(T.more(rows.length - shown)) + "</button>";
   if (html === lastList) return; // the minute-by-minute refresh usually changes nothing: leave the page alone
   lastList = html;
-  const paint = () => {
-    if (lastList !== html) return; // a newer list was drawn while this one waited for its animation
-    list.innerHTML = html;
-    markCurrent();
-    goals(list, ".score[data-uid]", el => el.dataset.uid);
-    const m = document.getElementById("more");
-    if (m)
-      m.onclick = () => {
-        limit += 80;
-        render();
-      };
-  };
-  // a new choice of filters is animated; automatic updates are not
-  const v = filterAct && motionOn() ? MOCK.filter || "fade" : "";
-  if (v === "glide" && document.startViewTransition) {
-    nameCards();
-    document.startViewTransition(() => {
-      paint();
-      nameCards();
-    });
-    return;
-  }
-  paint();
-  if (v === "fade") move(list, [{ opacity: 0 }, { opacity: 1 }], { duration: DUR("s") });
-  if (v === "rise")
+  list.innerHTML = html;
+  // a new choice of filters rises into place, one day after another (only the first few, so it stays short);
+  // automatic updates do not move
+  if (filterAct)
     [...list.querySelectorAll(".day")].slice(0, 6).forEach((d, i) =>
       move(
         d,
@@ -2392,31 +2343,23 @@ function render() {
         { delay: i * 45, fill: "backwards" },
       ),
     );
+  markCurrent();
+  goals(list, ".score[data-uid]", el => el.dataset.uid);
+  const m = document.getElementById("more");
+  if (m)
+    m.onclick = () => {
+      limit += 80;
+      render();
+    };
 }
-// MOCKUP "glide": the cards on screen get a name, so View Transitions can slide each one that stays to its new place,
-// fade out the ones that go and fade in the new ones
-const VTN = new Map();
-function nameCards() {
-  listEl.querySelectorAll(".match").forEach(li => {
-    const b = li.getBoundingClientRect(),
-      k = (li.querySelector("[data-uid]") || {}).dataset?.uid || li.textContent.slice(0, 80);
-    if (!VTN.has(k)) VTN.set(k, "m" + VTN.size);
-    li.style.viewTransitionName = b.bottom > 0 && b.top < innerHeight ? VTN.get(k) : "";
-  });
-}
-// the list only fades after a click or change in the filters (the flag is cleared once that event is handled)
+// the list only moves after a click or change in the filters (the flag is cleared once that event is handled)
 let filterAct = false;
 ["click", "change"].forEach(t =>
   document.getElementById("filters").addEventListener(
     t,
-    e => {
+    () => {
       filterAct = true;
       setTimeout(() => (filterAct = false));
-      // MOCKUP "press": the list changes at once and only the button pressed gives a small push
-      if (e.type === "click" && MOCK.filter === "press")
-        move(e.target.closest(".chip,.seg button"), [{ transform: "scale(.9)" }, { transform: "none" }], {
-          duration: DUR("s"),
-        });
     },
     true,
   ),

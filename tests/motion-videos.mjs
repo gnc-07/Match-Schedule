@@ -49,8 +49,7 @@ const score = (page, hs, as) => page.evaluate((u, hs, as) => {
   render();
 }, uid, hs, as);
 
-// name, width, height, steps (run at normal speed, then again 4 times slower unless once is set), and for design
-// options the versions to compare: [label, what index.html reads from localStorage "mp.mock"]
+// name, width, height, steps (run at normal speed, then again 4 times slower unless once is set)
 const scenes = [
   ["01-match-details", 1280, 800, async p => {
     await click(p, `.md-open[data-uid="${uid}"]`); await wait(1200); await key(p, "Escape"); await wait(800);
@@ -77,19 +76,17 @@ const scenes = [
   }],
   ["06-theme-switch", 1280, 800, async p => {
     await click(p, "#themebtn"); await wait(1300); await click(p, "#themebtn"); await wait(1100);
-  }, false, [["A: cross-fade", { theme: "fade" }], ["B: circle from the button", { theme: "reveal" }],
-    ["C: wipe from the top", { theme: "wipe" }], ["D: only the icon turns", { theme: "icon" }]]],
+  }],
   ["07-filters", 1280, 800, async p => {
     await p.mouse.move(400, 300, { steps: 5 });
     await click(p, "#chip-F1"); await wait(1100); await click(p, "#chip-F1"); await wait(900);
     await click(p, '#range [data-r="weekend"]'); await wait(900); await click(p, '#range [data-r="all"]'); await wait(900);
-  }, false, [["A: quick fade", { filter: "fade" }], ["B: days rise in turn", { filter: "rise" }],
-    ["C: cards glide into place", { filter: "glide" }], ["D: only the button pushes", { filter: "press" }]]],
+  }],
   ["08-goal", 1920, 1000, async p => {
     await score(p, "2", "1"); await wait(400);
-    await p.evaluate(u => document.querySelector(`.score[data-uid="${CSS.escape(u)}"]`).scrollIntoView({ block: "center" }), uid);
+    await p.evaluate(() => document.querySelector("#list .match.is-live").scrollIntoView({ block: "center" }));
     await wait(900); await score(p, "3", "1"); await wait(3200);
-  }, false, [["A: glow breathes", { goal: "a" }], ["B: glow spreads in waves", { goal: "b" }]]],
+  }],
   ["09-animations-off", 1280, 800, async p => {
     await caption(p, "Settings: Animations switched off");
     await click(p, "#setmenu summary"); await wait(700); await click(p, "#mvbox"); await wait(900); await key(p, "Escape"); await wait(500);
@@ -101,7 +98,7 @@ const scenes = [
 
 try {
   const only = process.argv.slice(2);   // optional: names of the videos to record, e.g. 06 07
-  for (const [name, width, height, steps, once, versions = [["", {}]]] of scenes) {
+  for (const [name, width, height, steps, once] of scenes) {
     if (only.length && !only.some(o => name.startsWith(o))) continue;
     const page = await browser.newPage();
     page.on("pageerror", e => errors.push(`${name}: ${e.message}`));
@@ -114,17 +111,15 @@ try {
     await cdp.send("Animation.enable");
     const webm = path.join(out, name + ".webm");
     const rec = await page.screencast({ path: webm, ffmpegPath: FFMPEG });
-    for (const [label, mock] of versions)
-      for (const slow of once ? [false] : [false, true]) {
-        // every run starts from the same page, with the version chosen before it loads
-        await page.evaluate(m => localStorage.setItem("mp.mock", JSON.stringify(m)), mock);
-        await page.goto(BASE + "?lang=en", { waitUntil: "networkidle0" });
-        await overlay(page);
-        await cdp.send("Animation.setPlaybackRate", { playbackRate: slow ? 0.25 : 1 });
-        await caption(page, (label ? label + " · " : "") + (slow ? "4 times slower" : "Normal speed"));
-        await wait(slow ? 400 : 700);
-        await steps(page);
-      }
+    for (const slow of once ? [false] : [false, true]) {
+      // every run starts from the same page
+      await page.goto(BASE + "?lang=en", { waitUntil: "networkidle0" });
+      await overlay(page);
+      await cdp.send("Animation.setPlaybackRate", { playbackRate: slow ? 0.25 : 1 });
+      await caption(page, slow ? "4 times slower" : "Normal speed");
+      await wait(slow ? 400 : 700);
+      await steps(page);
+    }
     await wait(300);
     await rec.stop();
     await page.close();
