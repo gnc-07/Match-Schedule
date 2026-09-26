@@ -24,10 +24,11 @@ const badWidth = race("98", { name: EVIL, lat: 45.5, lon: 9.3,
 const badLat = race("99", { name: EVIL, lat: '45" onmouseover="window.__xss=7', lon: 9.3,
   layout: { path: "M0 0L100 100L0 100Z", w: 100, h: 100, length: 5793, firstgp: EVIL } });
 // Records with a wrong type where the list expects text or a list: each would stop the whole list from drawing
+// (or, for a list used as a source, draw an empty source line)
 const wrong = (extra, i) => ({ comp: "Premier League", code: "EPL", round: "Matchday 7", home: "Wrongtype FC " + i, away: "Chelsea",
   date: soon.slice(0, 10), utc: soon, uid: "wrong-" + i, ...extra });
 const malformed = [wrong({ round: 7 }, 1), wrong({ gp: 7 }, 2), wrong({ check: { status: "confirmed", sources: "x" } }, 3),
-  wrong({ check: { status: "confirmed", sources: [null] } }, 4),
+  wrong({ check: { status: "confirmed", sources: [null] } }, 4), wrong({ check: { status: "confirmed", sources: [[]] } }, 5),
   { ...race("97", { name: "Monza" }), sess: 5 }, { ...race("96", { name: "Monza" }), top: "Almeida" }];
 const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, matches: [bad, badWidth, badLat, ...malformed, ...data.matches] };
 
@@ -67,6 +68,7 @@ try {
         if (!/^(https?|webcal):|^\?|^#|^soccer\.ics$/.test(a.getAttribute("href"))) out.push("unsafe link " + a.getAttribute("href").slice(0, 60));
       for (const s of document.querySelectorAll("script")) if (s.textContent.includes("__xss")) out.push("script element from data");
       if (document.querySelector('#md-map img[src*="NaN"]')) out.push("map drawn from bad coordinates");
+      if ([...document.querySelectorAll("details.srcs li")].some(li => !li.textContent.trim())) out.push("empty source entry");
       return out.concat(window.__csp.map(v => "CSP violation: " + v));
     });
     console.log(`${found.length ? "FAIL" : "PASS"}  ${where}`);

@@ -4198,7 +4198,8 @@ const usable = r =>
   (r.check == null ||
     (typeof r.check === "object" &&
       (r.check.sources == null ||
-        (Array.isArray(r.check.sources) && r.check.sources.every(s => s && typeof s === "object")))));
+        (Array.isArray(r.check.sources) &&
+          r.check.sources.every(s => s && typeof s === "object" && !Array.isArray(s))))));
 function useData(j) {
   META = j;
   DATA = (Array.isArray(j.matches) ? j.matches : []).filter(usable);
