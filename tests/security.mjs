@@ -27,6 +27,7 @@ const badLat = race("99", { name: EVIL, lat: '45" onmouseover="window.__xss=7', 
 const wrong = (extra, i) => ({ comp: "Premier League", code: "EPL", round: "Matchday 7", home: "Wrongtype FC " + i, away: "Chelsea",
   date: soon.slice(0, 10), utc: soon, uid: "wrong-" + i, ...extra });
 const malformed = [wrong({ round: 7 }, 1), wrong({ gp: 7 }, 2), wrong({ check: { status: "confirmed", sources: "x" } }, 3),
+  wrong({ check: { status: "confirmed", sources: [null] } }, 4),
   { ...race("97", { name: "Monza" }), sess: 5 }, { ...race("96", { name: "Monza" }), top: "Almeida" }];
 const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, matches: [bad, badWidth, badLat, ...malformed, ...data.matches] };
 
@@ -99,6 +100,17 @@ try {
   await page.click("#tablesbtn");
   await page.waitForSelector("#ltbody table");
   await check("league tables");
+  // the hostile values must be on screen as plain text, each in its own cell, or the check above would pass
+  // just as well if they had never been drawn at all
+  const cells = await page.evaluate(() => {
+    const row = document.querySelector("#ltbody tbody tr"), text = sel => row?.querySelector(sel)?.textContent || "";
+    return { position: text(".pos-c"), team: text(".tm-c"), points: text(".pts") };
+  });
+  for (const [cell, text] of Object.entries(cells)) {
+    const ok = text.includes(EVIL);
+    console.log(`${ok ? "PASS" : "FAIL"}  league tables: hostile ${cell} shown as text`);
+    if (!ok) problems.push(`league tables: the ${cell} cell does not show the hostile value as text`);
+  }
 } finally {
   await browser.close();
   server.kill();
