@@ -61,7 +61,7 @@ try {
   --ink:#0E1628; --ink-2:#2B3448; --muted:#4F596D; --faint:#5F687C;
   --line:#D5DBE6; --line-2:#E7EBF2;
   --accent:#2446D6; --accent-ink:#FFFFFF; --accent-soft:#E7ECFE;
-  --board:#0F1A33; --gold:#F2B829;
+  --board:#0F1A33; --gold:#F2B829; --glow:color-mix(in srgb,var(--gold) 60%,transparent);
   --live-bg:#C21A33; --live-ink:#B3142C; --live-soft:#FCEBEE;
   --warn-bg:#FFF1CC; --warn-ink:#6B4700; --tbc-bg:#ECEFF5; --tbc-ink:#4A5468; --early-bg:#ECEBFD; --early-ink:#3D3294;
   --star:#B37F00; --star-off:#8B94A7;
@@ -89,7 +89,7 @@ try {
   --ink:#E8ECF4; --ink-2:#CDD4E1; --muted:#A3AEC3; --faint:#97A3B9;
   --line:#28344D; --line-2:#1D273C;
   --accent:#9AACFF; --accent-ink:#0A0F1C; --accent-soft:#1D2849;
-  --board:#0D1630; --gold:#FFC940;
+  --board:#0D1630; --gold:#FFC940; --glow:color-mix(in srgb,var(--gold) 42%,transparent);
   --live-bg:#C21A33; --live-ink:#FF8795; --live-soft:#2A1320;
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
@@ -108,7 +108,7 @@ try {
   --ink:#E8ECF4; --ink-2:#CDD4E1; --muted:#A3AEC3; --faint:#97A3B9;
   --line:#28344D; --line-2:#1D273C;
   --accent:#9AACFF; --accent-ink:#0A0F1C; --accent-soft:#1D2849;
-  --board:#0D1630; --gold:#FFC940;
+  --board:#0D1630; --gold:#FFC940; --glow:color-mix(in srgb,var(--gold) 42%,transparent);
   --live-bg:#C21A33; --live-ink:#FF8795; --live-soft:#2A1320;
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
@@ -650,33 +650,47 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
    animates without laying out or redrawing the page. Nothing moves while the page loads; only what a
    visitor opens, stars or switches, and a score that changes. With animations off (the tick box, or
    the device's "reduce motion" until the tick box is used) :root gets data-motion="off" and the last
-   rule stops everything. Script-made animations (theme switch, list fade) check motionOn() instead.
+   rule stops everything. Script-made animations (theme switch, list) use move() and motionOn() instead.
+   Two speeds keep everything consistent: --dur-s for things that change in place (colours, arrows,
+   menus unfolding), --dur-m for things that arrive or move (panels, sheets, the list, the theme, a bounce).
    ========================================================================= */
+:root{--dur-s:.18s;--dur-m:.28s;--ease:cubic-bezier(.2,.8,.3,1)}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}}
 @keyframes drop{from{opacity:0;transform:translateY(-6px)}}
 @keyframes slide-in{from{opacity:0;transform:translateX(24px)}}
 @keyframes sheet-up{from{transform:translateY(100%)}}
 @keyframes fade{from{opacity:0}}
-@keyframes pop{45%{transform:scale(1.45)}}
-@keyframes goal{25%{transform:scale(1.3);box-shadow:0 0 0 6px var(--gold)}100%{box-shadow:0 0 0 14px transparent}}
+@keyframes pop{45%{transform:scale(1.4)}}
 /* panels: Match details, Race weekend and Tables rise into place over a fading page; beside the list they slide in from the right */
-dialog.sheet[open]{animation:rise .22s cubic-bezier(.2,.8,.3,1)}
-dialog.sheet[open]::backdrop{animation:fade .22s ease-out}
+dialog.sheet[open]{animation:rise var(--dur-m) var(--ease)}
+dialog.sheet[open]::backdrop{animation:fade var(--dur-m) ease-out}
 dialog.sheet[open]:not(:modal){animation-name:slide-in}
 /* Settings and Calendar drop down from their button; sources and "How to subscribe" unfold; the small arrow turns */
-.calmenu[open]>.calpanel,.srcs[open] .body,.calpanel details[open]>ol{animation:drop .18s ease-out}
-.srcs summary::after,.calpanel details summary::after{transition:transform .2s ease}
-/* a star just switched on, and a score that just changed (a goal): a short bounce */
-.star.pop svg{animation:pop .35s ease-out}
-.goal{display:inline-block;border-radius:9px;animation:goal 1s ease-out 2}
+.calmenu[open]>.calpanel,.srcs[open] .body,.calpanel details[open]>ol{animation:drop var(--dur-s) var(--ease)}
+.srcs summary::after,.calpanel details summary::after{transition:transform var(--dur-s) var(--ease)}
+/* a star just switched on: a short bounce */
+.star.pop svg{animation:pop var(--dur-m) var(--ease)}
+/* a score that just changed (a goal): the score bounces and a soft gold light pulses out from behind it, under the
+   team names too, twice. The light sits behind the text (z-index -1 inside the row, which isolates it) and
+   stays inside the match's own row. MOCKUP: version a breathes in place, version b spreads out in waves. */
+.goal-row{isolation:isolate;overflow:clip}
+.goal{position:relative;display:inline-block;animation:pop var(--dur-m) var(--ease)}
+.goal::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:320px;height:320px;margin:-160px 0 0 -160px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,var(--glow),transparent);opacity:0;animation:glow-breathe calc(var(--dur-m)*3) ease-in-out 2}
+:root[data-goal="b"] .goal::before{animation-name:glow-wave;animation-timing-function:ease-out}
+@keyframes glow-breathe{from{opacity:0;transform:scale(.6)}50%{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.6)}}
+@keyframes glow-wave{from{opacity:1;transform:scale(.15)}to{opacity:0;transform:scale(1)}}
 /* buttons and chips change colour gently when hovered or switched */
-.btn,.chip,.seg button,.more,.star,.reset{transition:background-color .15s,border-color .15s,color .15s}
-/* the theme switch cross-fades the whole page (browsers without View Transitions simply switch) */
-::view-transition-old(root),::view-transition-new(root){animation-duration:.3s}
+.btn,.chip,.seg button,.more,.star,.reset{transition:background-color var(--dur-s),border-color var(--dur-s),color var(--dur-s)}
+/* page changes made with View Transitions (theme switch, list glide): the same speed and easing as the rest.
+   Browsers without View Transitions simply switch. MOCKUP: the theme reveal and wipe draw the new page over the old. */
+::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation-duration:var(--dur-m);animation-timing-function:var(--ease)}
+:root[data-vt="reveal"]::view-transition-old(root),:root[data-vt="reveal"]::view-transition-new(root),
+:root[data-vt="wipe"]::view-transition-old(root),:root[data-vt="wipe"]::view-transition-new(root){animation:none;mix-blend-mode:normal}
 @media (max-width:640px){
   /* phones: Settings and Calendar slide up from the bottom as a sheet */
-  .calmenu[open]>.calpanel{animation:sheet-up .26s cubic-bezier(.2,.8,.3,1)}
-  .calmenu[open]::before{animation:fade .26s ease-out}
+  .calmenu[open]>.calpanel{animation:sheet-up var(--dur-m) var(--ease)}
+  .calmenu[open]::before{animation:fade var(--dur-m) ease-out}
 }
 :root[data-motion="off"] *,:root[data-motion="off"] ::before,:root[data-motion="off"] ::after,:root[data-motion="off"] ::backdrop{animation:none!important;transition:none!important}
 </style>
@@ -1655,18 +1669,45 @@ const DARK = matchMedia("(prefers-color-scheme: dark)"),
 themeBtn.addEventListener("click", () => {
   theme = document.documentElement.classList.contains("is-dark") ? "light" : "dark";
   store.set("theme", theme);
-  // with animations on, the page cross-fades to the new theme and the new sun or moon turns into place
-  if (motionOn() && document.startViewTransition) document.startViewTransition(applyTheme);
-  else applyTheme();
+  switchTheme();
   move(
     [...themeBtn.querySelectorAll(".ico")].find(i => getComputedStyle(i).display !== "none"),
     [
       { transform: "rotate(-90deg) scale(.5)", opacity: 0 },
       { transform: "none", opacity: 1 },
     ],
-    350,
   );
 });
+// MOCKUP versions: "fade" cross-fades the page, "reveal" draws the new theme in a circle growing from the button,
+// "wipe" draws it from the top down, "icon" changes at once (only the sun or moon turns)
+function switchTheme() {
+  const v = MOCK.theme || "fade",
+    r = document.documentElement;
+  if (!motionOn() || !document.startViewTransition || v === "icon") return applyTheme();
+  r.dataset.vt = v;
+  const t = document.startViewTransition(applyTheme);
+  t.finished.finally(() => delete r.dataset.vt);
+  if (v === "fade") return;
+  const b = themeBtn.getBoundingClientRect(),
+    x = b.x + b.width / 2,
+    y = b.y + b.height / 2,
+    far = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  t.ready.then(() =>
+    r.animate(
+      {
+        clipPath:
+          v === "reveal"
+            ? [`circle(0 at ${x}px ${y}px)`, `circle(${far}px at ${x}px ${y}px)`]
+            : ["inset(0 0 100% 0)", "inset(0)"],
+      },
+      {
+        duration: DUR("m") * (v === "reveal" ? 1.6 : 1.3),
+        easing: cssVar("--ease"),
+        pseudoElement: "::view-transition-new(root)",
+      },
+    ),
+  );
+}
 DARK.addEventListener("change", applyTheme); // until the button is used, follow the device, even when it switches by itself (for example at sunset)
 
 /* ---------- contrast: normal or high (works with any theme) ---------- */
@@ -1688,8 +1729,14 @@ const CALM = matchMedia("(prefers-reduced-motion: reduce)"),
   mvBox = document.getElementById("mvbox");
 let motion = store.get("motion", "auto");
 const motionOn = () => motion === "on" || (motion === "auto" && !CALM.matches);
-// a short animation made by script (the CSS ones are stopped by data-motion="off" instead)
-const move = (el, frames, ms) => el && motionOn() && el.animate(frames, { duration: ms, easing: "ease-out" });
+// a short animation made by script, at the same speeds as the CSS ones (which data-motion="off" stops instead)
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim(),
+  DUR = n => parseFloat(cssVar("--dur-" + n)) * 1000;
+const move = (el, frames, o) =>
+  el && motionOn() && el.animate(frames, { duration: DUR("m"), easing: cssVar("--ease"), ...o });
+// MOCKUP (remove once a version is chosen): which version of the theme switch, list change and goal to show
+const MOCK = store.get("mock", {});
+document.documentElement.dataset.goal = MOCK.goal || "a";
 function applyMotion() {
   if (motionOn()) document.documentElement.removeAttribute("data-motion");
   else document.documentElement.setAttribute("data-motion", "off");
@@ -2310,36 +2357,80 @@ function render() {
     html += '<button type="button" class="more" id="more">' + esc(T.more(rows.length - shown)) + "</button>";
   if (html === lastList) return; // the minute-by-minute refresh usually changes nothing: leave the page alone
   lastList = html;
-  list.innerHTML = html;
-  if (filterAct) move(list, [{ opacity: 0 }, { opacity: 1 }], 200); // a new choice of filters fades in; updates do not
-  markCurrent();
-  goals(list, ".score[data-uid]", el => el.dataset.uid);
-  const m = document.getElementById("more");
-  if (m)
-    m.onclick = () => {
-      limit += 80;
-      render();
-    };
+  const paint = () => {
+    if (lastList !== html) return; // a newer list was drawn while this one waited for its animation
+    list.innerHTML = html;
+    markCurrent();
+    goals(list, ".score[data-uid]", el => el.dataset.uid);
+    const m = document.getElementById("more");
+    if (m)
+      m.onclick = () => {
+        limit += 80;
+        render();
+      };
+  };
+  // a new choice of filters is animated; automatic updates are not
+  const v = filterAct && motionOn() ? MOCK.filter || "fade" : "";
+  if (v === "glide" && document.startViewTransition) {
+    nameCards();
+    document.startViewTransition(() => {
+      paint();
+      nameCards();
+    });
+    return;
+  }
+  paint();
+  if (v === "fade") move(list, [{ opacity: 0 }, { opacity: 1 }], { duration: DUR("s") });
+  if (v === "rise")
+    [...list.querySelectorAll(".day")].slice(0, 6).forEach((d, i) =>
+      move(
+        d,
+        [
+          { opacity: 0, transform: "translateY(10px)" },
+          { opacity: 1, transform: "none" },
+        ],
+        { delay: i * 45, fill: "backwards" },
+      ),
+    );
+}
+// MOCKUP "glide": the cards on screen get a name, so View Transitions can slide each one that stays to its new place,
+// fade out the ones that go and fade in the new ones
+const VTN = new Map();
+function nameCards() {
+  listEl.querySelectorAll(".match").forEach(li => {
+    const b = li.getBoundingClientRect(),
+      k = (li.querySelector("[data-uid]") || {}).dataset?.uid || li.textContent.slice(0, 80);
+    if (!VTN.has(k)) VTN.set(k, "m" + VTN.size);
+    li.style.viewTransitionName = b.bottom > 0 && b.top < innerHeight ? VTN.get(k) : "";
+  });
 }
 // the list only fades after a click or change in the filters (the flag is cleared once that event is handled)
 let filterAct = false;
 ["click", "change"].forEach(t =>
   document.getElementById("filters").addEventListener(
     t,
-    () => {
+    e => {
       filterAct = true;
       setTimeout(() => (filterAct = false));
+      // MOCKUP "press": the list changes at once and only the button pressed gives a small push
+      if (e.type === "click" && MOCK.filter === "press")
+        move(e.target.closest(".chip,.seg button"), [{ transform: "scale(.9)" }, { transform: "none" }], {
+          duration: DUR("s"),
+        });
     },
     true,
   ),
 );
-// a score that changed since the last update (a goal) bounces with a gold ring; nothing moves on the first load
+// a score that changed since the last update (a goal) bounces with a gold glow; nothing moves on the first load
 const SEEN = new Map();
 function goals(box, sel, key) {
   box.querySelectorAll(sel).forEach(el => {
     const k = key(el),
       was = SEEN.get(k);
-    if (was !== undefined && was !== el.textContent) el.classList.add("goal");
+    if (was !== undefined && was !== el.textContent) {
+      el.classList.add("goal");
+      el.closest(".match,.lv-row").classList.add("goal-row");
+    }
     SEEN.set(k, el.textContent);
   });
 }
