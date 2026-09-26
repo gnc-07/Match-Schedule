@@ -41,11 +41,32 @@ try {
     if (state === "tables-f1") { await page.click('#ltchips [data-code="F1"]'); await page.waitForSelector("#ltbody .f1t"); }
     if (state.endsWith("details")) await page.waitForSelector("#md-map .tiles");
     if (state === "f1" || state === "high-f1") await page.waitForSelector("#wk-champ table");
+    let podium = null;
+    if (state === "f1" || state === "high-f1") {
+      // The winner's card must stand out from the panel behind it: its edge or its fill needs 3:1 contrast
+      // (WCAG 1.4.11). axe cannot check this, because neither is text.
+      await page.waitForSelector("#wk-res .pod li.p1");
+      podium = await page.evaluate(() => {
+        const rgb = c => c.match(/[\d.]+/g).slice(0, 4).map(Number);
+        const lum = ([r, g, b]) => [r, g, b].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; })
+          .reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);
+        const li = document.querySelector("#wk-res .pod li.p1");
+        let back = li.parentElement;
+        while (back && (rgb(getComputedStyle(back).backgroundColor)[3] ?? 1) === 0) back = back.parentElement;
+        const ratio = (x, y) => (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+        const s = getComputedStyle(li), b = lum(rgb(getComputedStyle(back || document.body).backgroundColor));
+        return Math.max(ratio(lum(rgb(s.borderTopColor)), b), ratio(lum(rgb(s.backgroundColor)), b));
+      });
+    }
     if (state === "high-f1") { await page.click('#wk-res [data-s="Q"]'); await page.waitForSelector("#wk-res tr.sep"); }   // the qualifying table too
     await page.evaluate(AXE);
     const result = await page.evaluate(tags => axe.run(document, { runOnly: { type: "tag", values: tags } }), TAGS);
     const label = `${theme.padEnd(5)} ${lang} ${String(width).padStart(4)}px ${state.padEnd(14)}`;
     runs++;
+    if (podium !== null && podium < 3) {
+      result.violations.push({ impact: "serious", id: "podium-winner-edge", nodes: [{ target: ["#wk-res .pod li.p1"] }],
+        help: `Winner's card (edge or fill) has only ${podium.toFixed(2)}:1 contrast with the panel behind it; needs 3:1` });
+    }
     if (result.violations.length === 0) {
       console.log(`PASS  ${label}`);
     } else {
