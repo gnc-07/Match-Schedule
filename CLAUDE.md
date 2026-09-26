@@ -36,7 +36,7 @@ A static website (GitHub Pages) listing upcoming Premier League, La Liga, Bundes
 python3 build_schedule.py        # builds fixtures.json and soccer.ics locally (do not commit these)
 python3 -m http.server 8000      # then open http://localhost:8000 ; Ctrl+C stops it
 ```
-Check: English and Portuguese (`?lang=pt`), light and dark theme (Settings menu), a phone-width window, keyboard-only use (Tab, Enter, Escape).
+Check: English and Portuguese (`?lang=pt`), light and dark theme (the sun and moon button), a phone-width window, keyboard-only use (Tab, Enter, Escape).
 
 Automated checks (needs Node.js; run `npm install` once to download the tools):
 ```bash
@@ -69,7 +69,7 @@ When work goes through a branch and pull request, name the branch after what it 
 - Be honest about limits and anything not tested.
 
 ## Current design (September 2026)
-- Header: brand on the left; **Settings** (two small group headings, Region: language and time zone; Appearance: theme as Device, Light or Dark, a "High contrast" tick box, text size Normal, Large or Extra large with each choice shown in its own size; small "Close ×"; no explanatory hints), **Tables** and **Calendar** buttons on the right. On phones the three sit side by side under the brand (Calendar moves to its own row at Large and Extra large text), and Settings and Calendar open as a sheet from the bottom of the screen over a dimmed page (tapping the dimmed page closes it); Tables and Match details take the whole screen.
+- Header: brand on the left; a sun and moon button (icon only, 44px, 48px on phones; named "Switch to dark theme" or "Switch to light theme" for screen readers and as a tooltip) that flips between light and dark (the only theme control; until it is used the site follows the device), sitting on the brand's row on phones; **Settings** (two small group headings, Region: language and time zone; Appearance: a "High contrast" tick box, text size Normal, Large or Extra large with each choice shown in its own size; small "Close ×"; no explanatory hints), **Tables** and **Calendar** buttons on the right. On phones the three sit side by side under the brand (Calendar moves to its own row at Large and Extra large text), and Settings and Calendar open as a sheet from the bottom of the screen over a dimmed page (tapping the dimmed page closes it); Tables and Match details take the whole screen.
 - Under the header, one line: "Updated" time (no year) and the league data source. On phones the source is smaller, after a dot, with its "League data:" label kept for screen readers only.
 - Filters: league chips (order depends on language; Portuguese puts Brasileirão, friendlies and F1 first; a league added to the site starts switched on for returning visitors), date range (All, Today, This weekend, Next 7 days, Custom with inline From/To dates), team search with a clear button, Starred teams only, Include matches without a confirmed time, Include F1 practice sessions (shown only while the F1 chip is on), Clear filters (appears only when filters differ from the defaults). Match counts are announced to screen readers only.
 - List: each day as a small calendar block; match cards with time, teams (star to follow), league, venue, collapsible sources, status pills, and a "Watch on CazéTV" button (with a "usually only plays in Brazil" note) when a CazéTV YouTube stream is scheduled. Live scores from ESPN's public scoreboard, polled every 30 seconds while a listed match could be on.
