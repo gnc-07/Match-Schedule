@@ -12,18 +12,27 @@ A public website listing upcoming Premier League, La Liga, Bundesliga, Brasileir
 | `friendlies.json` | National-team friendlies, with every source report kept. |
 | `overrides.json` | League kick-offs the main feed has not caught up with, with sources. |
 | `cazetv.py` | Checks CazéTV's public YouTube feed on every build and adds a **Watch on CazéTV** link to matches it will stream. Matches on CazéTV's schedule whose stream does not exist yet (from the fan-made agendacazetv.com, not run by CazéTV) get a **CazéTV on YouTube** link to the channel instead. Both are remembered in `streams.json`. No key needed. |
+| `common.py` | Small helpers the three scripts share: downloading (HTTPS only, with a size limit) and saving data files in one step, so a build that stops halfway never leaves a half-written file. |
+| `tests/` | Checks that are never published: `test_scripts.py` (the Python scripts, including the rule for when a time counts as verified), `security.mjs` (hostile data must never run in the page), `format.mjs` (lays out the page's JavaScript; run `npm run format` after editing `index.html`), and the accessibility and Lighthouse checks. |
 | `research.py` | Once a day, asks Claude (with web search) to find sources for missing kick-off times and new friendlies, and adds them to the two files above. Optional: runs only if you add an Anthropic API key. |
-| `.github/workflows/build-and-deploy.yml` | Instructions for GitHub Actions: four times a day, run the script, save any changed data, and publish the site to GitHub Pages; once a day, run the research first. |
+| `.github/workflows/build-and-deploy.yml` | Instructions for GitHub Actions: four times a day, check the scripts, run them, save any changed data, and publish the site to GitHub Pages; once a day, run the research first. |
 
 This is a *static site*: GitHub Pages only hands out files, it never runs code on request. The fixture list stays current because GitHub Actions rebuilds the files on a timer. Live scores work differently: the visitor's own browser asks ESPN's public scoreboard for the score every 30 seconds while a listed match is on, so no server of ours is involved.
 
 Match details and league tables work the same way: when a visitor opens them, their browser asks ESPN. Stadium maps are found through Wikidata and drawn with OpenStreetMap map images. Formula 1 track diagrams are drawn from the [f1-circuits](https://github.com/bacinger/f1-circuits) project (MIT licence, Copyright (c) 2019-2025 Tomislav Bacinger; unofficial), which the rebuild reads and stores with each race.
 
+## Security
+
+- **The page treats every outside answer as untrusted.** Names, venues and scores from the feeds, ESPN, Jolpica-F1 and Wikidata are escaped before they are shown, and outside links are only used if they are ordinary web addresses. `npm run test:security` checks this with deliberately hostile data.
+- **A Content-Security-Policy** (a `<meta>` tag at the top of `index.html`) tells browsers which servers the page may contact. If you add a new outside service, add its address there, or browsers will block it.
+- **The workflow has the least access it needs.** Each job gets only its own permissions, the push key is handed to git only in the step that saves data, and the `anthropic` package is installed at a fixed version (change the version number in the workflow to update it).
+- **Nothing secret is in the repository.** The optional keys live in GitHub's encrypted secrets (Settings, Secrets and variables, Actions).
+
 ## Setting it up (web browser only, about 15 minutes)
 
 1. **Use your repository `gnc-07/Match-Schedule`.** It must be **Public** for free GitHub Pages: check under **Settings**, **General**, at the bottom (**Danger Zone**, Change visibility).
 
-2. **Upload the files.** On the new repository's page, click **uploading an existing file**. Drag in `index.html`, `build_schedule.py`, `research.py`, `friendlies.json`, `overrides.json`, `README.md` and the whole `fonts` folder (drag the folder itself; GitHub keeps it as a folder), then click **Commit changes**.
+2. **Upload the files.** On the new repository's page, click **uploading an existing file**. Drag in `index.html`, `build_schedule.py`, `cazetv.py`, `common.py`, `research.py`, `friendlies.json`, `overrides.json`, `README.md` and the whole `fonts` and `tests` folders (drag each folder itself; GitHub keeps them as folders; the workflow runs the checks in `tests` before every build), then click **Commit changes**.
 
 3. **Add the workflow file.** Folders whose names start with a dot are hidden by most file managers (in Dolphin on Fedora KDE, press Ctrl+H to show them), and they are easy to miss when dragging. The reliable way: click **Add file**, then **Create new file**. In the name box type `.github/workflows/build-and-deploy.yml` (typing each `/` creates a folder). Paste in the contents of that file, then **Commit changes**.
 
@@ -133,4 +142,4 @@ Uploads your commits to GitHub. Because you changed `friendlies.json`, the push 
 - The Settings menu also has **Contrast** (Normal or High, for stronger colours and borders) and **Text size** (Normal, Large or Extra large). Both apply straight away and are remembered on the device.
 - In the Settings menu, times can be shown in Edmonton, São Paulo (Brasília), Toronto, London, Madrid, Berlin, UTC, or the visitor's own zone. Portuguese defaults to São Paulo and English to Edmonton until the visitor picks a zone.
 - To add a language, copy the `en` block in the `I18N` table near the top of the script in `index.html`, translate the values, and add an option to the language list in the Settings menu.
-- Last measured with Lighthouse 12 on a local copy (mobile and desktop, both languages): performance 92 to 100, accessibility 100, SEO 100, best practices 96. Best practices loses points there only because the test machine could not reach ESPN, which Lighthouse counts as an error. An axe-core scan (WCAG 2.2 AA plus best practices) found no violations in 80 combinations: light and dark themes, both languages, phone and desktop widths, with the Settings and Calendar menus open, the league tables (a league and the F1 championship), the match details, the F1 race weekend, and high contrast.
+- Last measured with Lighthouse 12 on a local copy (mobile and desktop, both languages): performance 91 to 100, accessibility 100, SEO 100, best practices 96. The test server compresses the page the way GitHub Pages does, so these scores reflect what visitors actually download. Best practices loses points there only because the test machine could not reach ESPN, which Lighthouse counts as an error. An axe-core scan (WCAG 2.2 AA plus best practices) found no violations in 80 combinations: light and dark themes, both languages, phone and desktop widths, with the Settings and Calendar menus open, the league tables (a league and the F1 championship), the match details, the F1 race weekend, and high contrast.

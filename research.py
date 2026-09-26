@@ -15,6 +15,8 @@ Safeguards
     the OFFICIAL_DOMAINS list below.
   - A time is kept only with a valid IANA time zone; otherwise it becomes a comment.
   - Spending is capped: at most MAX_CALLS requests per run and MAX_SEARCHES searches each.
+  - Everything in a reply is treated as untrusted text: wrong types are skipped one by one,
+    and names and comments are cut to a sensible length.
 
 Settings (optional environment variables)
   RESEARCH_MODEL         default claude-sonnet-5
@@ -25,6 +27,7 @@ import json, os, re, sys
 from datetime import datetime, date, timedelta
 from urllib.parse import urlparse
 from zoneinfo import ZoneInfo, available_timezones
+from common import load_json, save_json
 
 MODEL = os.environ.get("RESEARCH_MODEL", "claude-sonnet-5")
 MAX_CALLS = int(os.environ.get("RESEARCH_MAX_CALLS", "4"))
@@ -52,11 +55,15 @@ def is_official(url):
 def norm_url(u):
     return u.split("#")[0].rstrip("/").lower()
 
+def plain(v, limit):
+    """A reply value as one line of plain text, at most `limit` characters ("" for anything that is not text)."""
+    return " ".join(v.split())[:limit] if isinstance(v, str) else ""
+
 # ---------- finding the gaps ----------
 def find_gaps(today):
     """Matches that need research, from the last build's fixtures.json."""
     try:
-        matches = json.load(open("fixtures.json", encoding="utf-8"))["matches"]
+        matches = load_json("fixtures.json")["matches"]
     except FileNotFoundError:
         return [], []
     league_end = (today + timedelta(days=LEAGUE_WINDOW_DAYS)).isoformat()
@@ -105,38 +112,57 @@ FRIENDLY_EXTRA = """- Also look for men's senior international friendlies in the
   Canada or any UEFA member nation that are NOT in the list, and put them in "new_friendlies". Friendlies
   only: never Nations League, World Cup or other qualifiers. Leave "new_friendlies" empty if none."""
 
+# web_search_20260209 adds "dynamic filtering": Claude runs code that sifts the search results before reading
+# them. The raw results still come back as web_search_tool_result blocks, which the safeguard above needs.
+# (web_search_20260318 can leave those blocks out with "response_inclusion": "excluded": never set that here,
+# or every report would be dropped as "URL not in search results".)
+SEARCH_TOOL = {"type": "web_search_20260209", "name": "web_search", "max_uses": MAX_SEARCHES}
+
 def ask(client, prompt):
-    """One request, following 'pause_turn' continuations. Returns (text, urls seen in search results)."""
+    """One request, following 'pause_turn' continuations. Returns (final text, urls seen in search results).
+    Only the text after the last search or code step counts as the answer: notes Claude writes between
+    steps are not part of the JSON."""
     messages = [{"role": "user", "content": prompt}]
     text, seen = "", set()
     for _ in range(4):
-        resp = client.messages.create(
-            model=MODEL, max_tokens=4000, messages=messages,
-            tools=[{"type": "web_search_20250305", "name": "web_search", "max_uses": MAX_SEARCHES}])
+        resp = client.messages.create(model=MODEL, max_tokens=16000, messages=messages, tools=[SEARCH_TOOL])
         data = resp.model_dump()
         u = data.get("usage") or {}
         print(f"  tokens in/out: {u.get('input_tokens')}/{u.get('output_tokens')}, "
               f"searches: {(u.get('server_tool_use') or {}).get('web_search_requests')}")
         for block in data["content"]:
+            if block["type"] == "text":
+                text += block["text"]
+                continue
+            text = ""                              # a search or code step: any earlier text was a note, not the answer
             if block["type"] == "web_search_tool_result" and isinstance(block.get("content"), list):
                 seen.update(norm_url(r["url"]) for r in block["content"] if r.get("url"))
-            elif block["type"] == "text":
-                text += block["text"]
         if data.get("stop_reason") != "pause_turn":
             break
-        messages.append({"role": "assistant", "content": data["content"]})
+        # the API needs the paused turn back exactly as it came, so the SDK's own objects are sent, not the copy
+        messages.append({"role": "assistant", "content": resp.content})
     return text, seen
 
-def parse_json(text):
-    start, end = text.find("{"), text.rfind("}")
+def parse_json(reply):
+    start, end = reply.find("{"), reply.rfind("}")
     if start < 0 or end < start:
         raise ValueError("no JSON object in reply")
-    return json.loads(text[start:end + 1])
+    data = json.loads(reply[start:end + 1])
+    if not isinstance(data, dict):
+        raise ValueError("the reply is not a JSON object")
+    return data
+
+def items(reply, key):
+    """The dicts in reply[key]: anything else the model wrote there is skipped."""
+    v = reply.get(key)
+    return [x for x in v if isinstance(x, dict)] if isinstance(v, list) else []
 
 def clean(rep, seen, today):
     """Validate one report. Returns a tidy dict, or None to drop it."""
-    url, source = str(rep.get("url") or ""), str(rep.get("source") or "").strip()[:80]
-    if not source or not url.startswith(("http://", "https://")):
+    if not isinstance(rep, dict):
+        return None
+    url, source = plain(rep.get("url"), 2000), plain(rep.get("source"), 80)
+    if not source or not url.startswith(("http://", "https://")) or not urlparse(url).hostname:
         return None
     if norm_url(url) not in seen:
         print(f"  dropped (URL not in search results): {url}"); return None
@@ -148,10 +174,11 @@ def clean(rep, seen, today):
         return None
     out = {"source": source, "url": url, "date": d.isoformat()}
     t, tz = rep.get("time"), rep.get("tz")
-    comment = str(rep.get("comment") or "").strip()[:300]
-    if t and tz and re.fullmatch(r"\d{2}:\d{2}", str(t)) and tz in TZS:
+    comment = plain(rep.get("comment"), 300)
+    if isinstance(t, str) and isinstance(tz, str) and re.fullmatch(r"([01]\d|2[0-3]):[0-5]\d", t) and tz in TZS:
         out["time"], out["tz"] = str(t), tz
     elif t:
+        t, tz = plain(str(t), 20), plain(str(tz or ""), 60)
         comment = (comment + f" Shows {t}" + (f" ({tz})" if tz else "") + " without a usable time zone; not counted.").strip()
     if is_official(url):
         out["official"] = True
@@ -178,8 +205,8 @@ def main():
     client = anthropic.Anthropic()
     today = datetime.now(HOME_TZ).date()
     rounds, friendly_gaps = find_gaps(today)
-    friendlies = json.load(open("friendlies.json", encoding="utf-8"))
-    overrides = json.load(open("overrides.json", encoding="utf-8")) if os.path.exists("overrides.json") else []
+    friendlies = load_json("friendlies.json")
+    overrides = load_json("overrides.json", [])
     calls, changes = 0, []
 
     # 1) friendlies: fill gaps and look for new ones (one request)
@@ -192,22 +219,22 @@ def main():
                                                         extra=FRIENDLY_EXTRA.format(days=FRIENDLY_WINDOW_DAYS)))
             calls += 1
             reply = parse_json(text)
-            for rep in reply.get("reports", []):
+            for rep in items(reply, "reports"):
                 m = ids.get(rep.get("match")); c = m and clean(rep, seen, today)
                 if not c: continue
                 entry = next((f for f in friendlies if f["team1"] == m["home"] and f["team2"] == m["away"]
                               and any(r.get("date") == m["date"] for r in f["reports"])), None)
                 if entry and add_reports(entry["reports"], [c]):
                     changes.append(f"{m['home']} v {m['away']}: report from {c['source']}")
-            for nf in reply.get("new_friendlies", []):
-                reps = [c for c in (clean(r, seen, today) for r in nf.get("reports", [])) if c]
-                t1, t2 = str(nf.get("team1") or "").strip(), str(nf.get("team2") or "").strip()
+            for nf in items(reply, "new_friendlies"):
+                reps = [c for c in (clean(r, seen, today) for r in items(nf, "reports")) if c]
+                t1, t2 = plain(nf.get("team1"), 60), plain(nf.get("team2"), 60)
                 if not (t1 and t2 and reps):
                     continue
                 dup = any({f["team1"].lower(), f["team2"].lower()} == {t1.lower(), t2.lower()}
                           and any(r.get("date") == reps[0]["date"] for r in f["reports"]) for f in friendlies)
                 if not dup:
-                    friendlies.append({"team1": t1, "team2": t2, "venue": str(nf.get("venue") or "")[:120], "reports": reps})
+                    friendlies.append({"team1": t1, "team2": t2, "venue": plain(nf.get("venue"), 120), "reports": reps})
                     changes.append(f"New friendly: {t1} v {t2} ({reps[0]['date']})")
         except Exception as e:
             print(f"  friendlies research failed: {e}")
@@ -222,7 +249,7 @@ def main():
         try:
             text, seen = ask(client, INSTRUCTIONS.format(today=today, matches=listing, extra=""))
             calls += 1
-            for rep in parse_json(text).get("reports", []):
+            for rep in items(parse_json(text), "reports"):
                 m = ids.get(rep.get("match")); c = m and clean(rep, seen, today)
                 if not c: continue
                 entry = next((o for o in overrides if o["code"] == code and o["home"].lower() in m["home"].lower()
@@ -235,8 +262,8 @@ def main():
         except Exception as e:
             print(f"  {code} {rnd} research failed: {e}")
 
-    json.dump(friendlies, open("friendlies.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    json.dump(overrides, open("overrides.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    save_json("friendlies.json", friendlies)
+    save_json("overrides.json", overrides)
     print(f"{calls} request(s) made; {len(changes)} change(s).")
     for c in changes:
         print("  " + c)
