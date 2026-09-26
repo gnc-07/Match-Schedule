@@ -31,7 +31,7 @@ AGENDA = "https://api-portal.agendacazetv.com/api/public/events?esporte=futebol&
 CACHE = "streams.json"
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0 Safari/537.36"
 KEEP_DAYS = 3                                  # forget a stream this long after its start
-VIDEO_ID = re.compile(r"[\w-]{11}")           # the shape of every YouTube video id
+VIDEO_ID = re.compile(r"[A-Za-z0-9_-]{11}")   # the shape of every YouTube video id (plain letters only: \w would allow é)
 
 # Words that carry no identity ("FC", "de", "Clube"...), removed before comparing names
 FILLER = set("fc cf afc sc ec ca cr se rc rcd ud cd fbc fbpa af fr sad club clube de da do del la "

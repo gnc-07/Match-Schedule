@@ -113,6 +113,8 @@ class CazeTV(unittest.TestCase):
     def test_cache_entries_with_a_bad_id_get_no_link(self):
         entry = {"id": 'x"><img src=x>', "title": "AO VIVO: FLAMENGO X PALMEIRAS"}
         self.assertEqual(cazetv.watch_link(entry), (None, None))
+        self.assertFalse(cazetv.is_video_id("éabcdefghij"))                 # 11 characters, but not a YouTube id
+        self.assertTrue(cazetv.is_video_id("aB3_-xYz09Q"))
 
     def test_feed_with_a_doctype_is_refused(self):
         with self.assertRaises(ValueError):

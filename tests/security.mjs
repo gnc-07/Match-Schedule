@@ -23,7 +23,12 @@ const badWidth = race("98", { name: EVIL, lat: 45.5, lon: 9.3,
   layout: { path: "M0 0L100 100L0 100Z", w: '100" onload="window.__xss=6', h: 100, length: EVIL, firstgp: EVIL } });
 const badLat = race("99", { name: EVIL, lat: '45" onmouseover="window.__xss=7', lon: 9.3,
   layout: { path: "M0 0L100 100L0 100Z", w: 100, h: 100, length: 5793, firstgp: EVIL } });
-const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, matches: [bad, badWidth, badLat, ...data.matches] };
+// Records with a wrong type where the list expects text or a list: each would stop the whole list from drawing
+const wrong = (extra, i) => ({ comp: "Premier League", code: "EPL", round: "Matchday 7", home: "Wrongtype FC " + i, away: "Chelsea",
+  date: soon.slice(0, 10), utc: soon, uid: "wrong-" + i, ...extra });
+const malformed = [wrong({ round: 7 }, 1), wrong({ gp: 7 }, 2), wrong({ check: { status: "confirmed", sources: "x" } }, 3),
+  { ...race("97", { name: "Monza" }), sess: 5 }, { ...race("96", { name: "Monza" }), top: "Almeida" }];
+const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, matches: [bad, badWidth, badLat, ...malformed, ...data.matches] };
 
 const server = await startServer();
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true,
@@ -31,6 +36,7 @@ const browser = await puppeteer.launch({ executablePath: chromePath(), headless:
 const problems = [];
 try {
   const page = await browser.newPage();
+  page.on("pageerror", e => { console.log("FAIL  page error: " + e.message); problems.push(e.message); });
   await page.setViewport({ width: 1280, height: 900 });
   await page.evaluateOnNewDocument(() => {
     window.__csp = [];
@@ -70,6 +76,11 @@ try {
   await page.waitForSelector("details.srcs");
   await page.evaluate(() => document.querySelectorAll("details.srcs").forEach(d => { d.open = true; }));
   await check("fixture list");
+  // Portuguese (T.round rewrites the round) and a search (every name is compared as text): the list must still draw
+  await page.goto(`${BASE}?lang=pt`, { waitUntil: "networkidle0" });
+  await page.type("#q", "a");
+  await page.waitForFunction(() => document.querySelectorAll("#list .match").length > 0);
+  await check("fixture list, Portuguese, with a search");
   await page.goto(`${BASE}?lang=en&match=test-hostile`, { waitUntil: "networkidle0" });
   // the panel must really be showing the hostile match (as text), or the check below would prove nothing
   await page.waitForFunction(() => {
