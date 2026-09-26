@@ -69,7 +69,7 @@ Follow `.github/pull_request_template.md` (GitHub fills it in when a pull reques
 - Anything that behaves or feels different, even with no visible change (a speed fix, a bug fix, an animation): a before and an after video of the same steps, recorded on the same machine. For speed, add the Lighthouse numbers too.
 - Only changes a visitor cannot see or feel (tests, workflow, documentation, data sources) may say "No visible change", with the reason.
 
-Pictures and videos are attached to the pull request, never committed (`screenshots/` is git-ignored). If you cannot upload them yourself, send them to the owner in the session, leave the table cells saying "owner to attach", and tell the owner step by step how to drag them in (Edit on the pull request description, drag the file into the box, Update comment).
+Pictures and videos are attached to the pull request, never committed (`screenshots/` is git-ignored). If you cannot upload them yourself, send them to the owner in the session, write "owner to attach" in the empty table cells and after the Before and After video lines, and tell the owner step by step how to drag them in (Edit on the pull request description, drag the file into the box, Update comment).
 
 ## How to talk to the owner
 - Always give instructions step by step, stating exactly what to click or change.

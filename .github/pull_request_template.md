@@ -1,5 +1,5 @@
 <!--
-Fill in every section. Lines between these arrow brackets are hidden once the pull request is posted,
+Fill in every applicable section. Lines between these arrow brackets are hidden once the pull request is posted,
 so they can stay. Write in plain words; no em dashes.
 -->
 
