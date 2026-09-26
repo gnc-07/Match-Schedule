@@ -9,14 +9,21 @@ MAX_BYTES = 16 * 1024 * 1024   # no feed this site reads is anywhere near this; 
 TIMEOUT = 30                   # seconds to wait for a server before giving up
 SECRET_HEADERS = {"x-auth-token", "authorization"}   # keys that must only ever reach the server they were meant for
 
+def _origin(url):
+    """(scheme, host, port) of an address, with the scheme's usual port filled in: two addresses are the
+    same site only if all three match."""
+    u = urllib.parse.urlsplit(url)
+    return u.scheme, u.hostname, u.port or {"https": 443, "http": 80}.get(u.scheme)
+
 class _SafeRedirect(urllib.request.HTTPRedirectHandler):
     """Python follows redirects and copies every header along, API keys included, to wherever the redirect
-    points. This refuses a redirect to anything but https://, and drops the keys if it leaves the original site."""
+    points. This refuses a redirect to anything but https://, and drops the keys if it leaves the original
+    site (another host, or the same host on another port)."""
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         if not newurl.startswith("https://"):
             raise ValueError(f"refusing a redirect to a non-HTTPS address: {newurl}")
         new = super().redirect_request(req, fp, code, msg, headers, newurl)
-        if new is not None and urllib.parse.urlsplit(newurl).hostname != urllib.parse.urlsplit(req.full_url).hostname:
+        if new is not None and _origin(newurl) != _origin(req.full_url):
             for k in [k for k in new.headers if k.lower() in SECRET_HEADERS]:
                 del new.headers[k]
         return new

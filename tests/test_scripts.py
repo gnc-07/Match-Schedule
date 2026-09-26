@@ -255,8 +255,12 @@ class Common(unittest.TestCase):
             handler.redirect_request(req(), None, 302, "Found", {}, "http://api.football-data.org/v4/x")
         moved = handler.redirect_request(req(), None, 302, "Found", {}, "https://elsewhere.example/x")
         self.assertNotIn("secret", moved.headers.values())
+        other_port = handler.redirect_request(req(), None, 302, "Found", {}, "https://api.football-data.org:8443/x")
+        self.assertNotIn("secret", other_port.headers.values())
         same = handler.redirect_request(req(), None, 301, "Moved", {}, "https://api.football-data.org/v4/y")
         self.assertIn("secret", same.headers.values())
+        same_port = handler.redirect_request(req(), None, 301, "Moved", {}, "https://api.football-data.org:443/v4/y")
+        self.assertIn("secret", same_port.headers.values())                  # 443 is https's usual port
         self.assertTrue(any(isinstance(h, common._SafeRedirect) for h in common._OPENER.handlers))
 
     def test_save_replaces_the_whole_file(self):
