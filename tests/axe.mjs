@@ -30,6 +30,9 @@ try {
     if (state === "sidebar-hidden" && width < 1100) continue;   // phones have no sidebar
     const page = await browser.newPage();
     await page.setViewport({ width, height: 900 });
+    // Check the settled page: with the device asking for less motion, panels appear at once instead of fading in,
+    // so colour contrast is not measured halfway through an animation.
+    await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
     // Save the theme the same way the Settings menu does, before the page loads.
     await page.evaluateOnNewDocument((t, high, side) => { try { localStorage.setItem("mp.theme", JSON.stringify(t));
       if (high) localStorage.setItem("mp.contrast", JSON.stringify("high")); localStorage.setItem("mp.side", JSON.stringify(side)); } catch {} },
