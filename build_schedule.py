@@ -225,11 +225,25 @@ def _f1_top(season, rnd, what, key, n):
 # 1000-unit square), so the site can draw it without another download.
 F1_LAYOUTS = "https://raw.githubusercontent.com/bacinger/f1-circuits/master/f1-circuits.geojson"
 
+def _point(p):
+    """A GeoJSON position as (longitude, latitude), or None when it is not one (an altitude, if any, is dropped)."""
+    if not isinstance(p, (list, tuple)) or len(p) < 2:
+        return None
+    x, y = p[0], p[1]
+    ok = all(isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) for v in (x, y))
+    return (x, y) if ok and -180 <= x <= 180 and -90 <= y <= 90 else None
+
 def _f1_layouts():
-    """Every outline in the f1-circuits file, or [] when it cannot be read (the site then shows a map instead)."""
+    """Every well-formed outline in the f1-circuits file, as {"points", "props"}, or [] when it cannot be read
+    (the site then shows a map instead). An outline with a malformed position is skipped, never matched."""
     try:
-        return [f for f in get_json(F1_LAYOUTS)["features"]
-                if (f.get("geometry") or {}).get("type") == "LineString" and len(f["geometry"]["coordinates"]) > 3]
+        out = []
+        for f in get_json(F1_LAYOUTS)["features"]:
+            g = (f or {}).get("geometry") or {}
+            pts = [_point(p) for p in g.get("coordinates") or []] if g.get("type") == "LineString" else []
+            if len(pts) > 3 and None not in pts:
+                out.append({"points": pts, "props": f.get("properties") or {}})
+        return out
     except Exception as e:
         print(f"F1 track outlines could not be read ({e}); race weekends show a map instead this run")
         return []
@@ -255,17 +269,17 @@ def _f1_outline(layouts, lat, lon):
     """The outline of the circuit at (lat, lon): {"path", "w", "h", "length" (metres), "firstgp"}, or None
     when no outline lies within 3 km (a new circuit the project has not drawn yet)."""
     k = math.cos(math.radians(lat))
-    near = lambda f: min(math.hypot((x - lon) * k, y - lat) for x, y in f["geometry"]["coordinates"]) * 111.2   # km
+    near = lambda f: min(math.hypot((x - lon) * k, y - lat) for x, y in f["points"]) * 111.2   # km
     best = min(layouts, key=near, default=None)
     if best is None or near(best) > 3:
         return None
-    pts = [((x - lon) * k * 111320, (lat - y) * 110574) for x, y in best["geometry"]["coordinates"]]   # metres, y pointing south
+    pts = [((x - lon) * k * 111320, (lat - y) * 110574) for x, y in best["points"]]   # metres, y pointing south
     if pts[0] == pts[-1]:
         pts.pop()                            # the loop is closed with "Z" instead
     x0, y0 = min(x for x, _ in pts), min(y for _, y in pts)
     scale = 1000 / max(max(x for x, _ in pts) - x0, max(y for _, y in pts) - y0)
     pts = _simplify([(round((x - x0) * scale), round((y - y0) * scale)) for x, y in pts], 2)
-    props = best.get("properties") or {}
+    props = best["props"]
     return {"path": "M" + "L".join(f"{x} {y}" for x, y in pts) + "Z",
             "w": max(x for x, _ in pts), "h": max(y for _, y in pts),
             "length": props.get("length"), "firstgp": props.get("firstgp")}
@@ -321,7 +335,11 @@ def from_f1(start, now=None):
                 r["sprint"] = "Sprint" in race
                 r["circuit"] = {"name": c["circuitName"], "locality": loc.get("locality"), "country": loc.get("country"),
                                 "lat": float(loc["lat"]), "lon": float(loc["long"])} if loc.get("lat") else {"name": c["circuitName"]}
-                layout = _f1_outline(layouts, float(loc["lat"]), float(loc["long"])) if loc.get("lat") and layouts else None
+                try:                         # the diagram is optional: a problem with it never holds up the F1 sessions
+                    layout = _f1_outline(layouts, float(loc["lat"]), float(loc["long"])) if loc.get("lat") and layouts else None
+                except (ValueError, ZeroDivisionError) as e:
+                    print(f"No track outline for {c['circuitName']} ({e}); the site shows a map instead")
+                    layout = None
                 if layout:
                     r["circuit"]["layout"] = layout
             if utc:
