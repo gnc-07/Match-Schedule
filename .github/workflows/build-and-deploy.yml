@@ -69,7 +69,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          # git gets the push key only for each pull and push, as a one-off setting on its command line (the way
+          # actions/checkout does it), so the key is never written to .git/config for later steps to read
+          auth() { git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" "$@"; }
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -N soccer.ics fixtures.json streams.json    # lets git diff see the files even on the very first run
@@ -80,12 +82,12 @@ jobs:
             # an empty commit every 45 quiet days keeps the schedule running
             if [ $(( $(date +%s) - $(git log -1 --format=%ct) )) -gt $(( 45 * 86400 )) ]; then
               git commit --allow-empty -m "Keep scheduled runs active"
-              git pull --rebase && git push
+              auth pull --rebase && auth push
             fi
           else
             git add soccer.ics fixtures.json streams.json friendlies.json overrides.json
             git commit -m "Update fixtures $(date -u +%Y-%m-%dT%H:%MZ)"
-            git pull --rebase && git push    # pull first in case you edited a file on GitHub meanwhile
+            auth pull --rebase && auth push    # pull first in case you edited a file on GitHub meanwhile
           fi
 
       - name: Collect the files that make up the website

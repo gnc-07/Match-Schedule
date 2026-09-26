@@ -64,6 +64,12 @@ try {
   await page.evaluate(() => document.querySelectorAll("details.srcs").forEach(d => { d.open = true; }));
   await check("fixture list");
   await page.goto(`${BASE}?lang=en&match=test-hostile`, { waitUntil: "networkidle0" });
+  // the panel must really be showing the hostile match (as text), or the check below would prove nothing
+  await page.waitForFunction(() => {
+    const body = document.querySelector("#mdbody"), text = sel => body?.querySelector(sel)?.textContent || "";
+    return document.querySelector("#mddlg")?.open && text("#md-head").includes("Arsenal") && text("#md-head").includes("Chelsea")
+      && text("#md-venue").includes("Stadium");
+  });
   await page.waitForFunction(() => !document.querySelector("#md-map") || !/Finding|Procurando/.test(document.querySelector("#md-map").textContent));
   await check("match details");
   await page.goto(`${BASE}?lang=en`, { waitUntil: "networkidle0" });

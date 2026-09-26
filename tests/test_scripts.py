@@ -5,7 +5,7 @@ so they give the same result every time.
 Run from the project folder:
   python3 -m unittest discover -s tests
 """
-import copy, io, json, os, sys, tempfile, unittest
+import copy, io, json, os, sys, tempfile, unittest, urllib.request
 from contextlib import redirect_stdout
 from datetime import date, datetime, timedelta
 from unittest import mock
@@ -245,6 +245,19 @@ class Common(unittest.TestCase):
             common.fetch("http://example.com/")
         with self.assertRaises(ValueError):
             common.fetch("file:///etc/passwd")
+
+    def test_redirects_never_leak_the_api_key(self):
+        """A server that answers "moved, go there instead" must not be able to pull the football-data key
+        onto plain http:// or onto another site."""
+        handler = common._SafeRedirect()
+        req = lambda: urllib.request.Request("https://api.football-data.org/v4/x", headers={"X-Auth-Token": "secret"})
+        with self.assertRaises(ValueError):
+            handler.redirect_request(req(), None, 302, "Found", {}, "http://api.football-data.org/v4/x")
+        moved = handler.redirect_request(req(), None, 302, "Found", {}, "https://elsewhere.example/x")
+        self.assertNotIn("secret", moved.headers.values())
+        same = handler.redirect_request(req(), None, 301, "Moved", {}, "https://api.football-data.org/v4/y")
+        self.assertIn("secret", same.headers.values())
+        self.assertTrue(any(isinstance(h, common._SafeRedirect) for h in common._OPENER.handlers))
 
     def test_save_replaces_the_whole_file(self):
         with tempfile.TemporaryDirectory() as d:
