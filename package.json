@@ -10,8 +10,9 @@
     "test:security": "node tests/security.mjs",
     "test:axe": "node tests/axe.mjs",
     "test:corners": "node tests/corners.mjs",
+    "test:layout": "node tests/layout.mjs",
     "test:lighthouse": "node tests/lighthouse.mjs",
-    "test": "node tests/format.mjs --check && python3 -m unittest discover -s tests && node tests/security.mjs && node tests/axe.mjs && node tests/corners.mjs && node tests/lighthouse.mjs"
+    "test": "node tests/format.mjs --check && python3 -m unittest discover -s tests && node tests/security.mjs && node tests/axe.mjs && node tests/corners.mjs && node tests/layout.mjs && node tests/lighthouse.mjs"
   },
   "devDependencies": {
     "axe-core": "^4.10.0",
