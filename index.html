@@ -14,6 +14,21 @@ window.FX = fetch("fixtures.json", { cache: "no-store" }).then(r => {
 });
 FX.catch(() => {});
 </script>
+<script>
+/* wide screens: pick the layout before the first paint, so nothing jumps once the page is ready (applyWide keeps it
+   up to date). z is the text-size zoom, which media queries ignore: filters in a sidebar from 1100px, a right-hand column from 1600px */
+function wideMode(z) {
+  const w = innerWidth / z;
+  return w >= 1600 ? "full" : w >= 1100 ? "side" : "";
+}
+try {
+  const r = document.documentElement,
+    g = k => JSON.parse(localStorage.getItem("mp." + k)),
+    m = wideMode({ large: 1.15, xl: 1.3 }[g("size")] || 1);
+  if (m) r.dataset.wide = m;
+  r.dataset.side = g("side") === "closed" ? "closed" : "open";
+} catch {}
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Matchday Planner</title>
 <meta name="description" content="Upcoming Premier League, La Liga, Bundesliga, Brasileirão and national-team friendly fixtures, with cross-checked kick-off times, live scores and a calendar you can subscribe to. In English and Brazilian Portuguese.">
@@ -314,15 +329,74 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
 
 /* ---------- footer ---------- */
 footer{margin-top:10px;border-top:1px solid var(--line);padding-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px 36px;color:var(--muted);font-size:14px}
-footer h2{font:800 1.2rem/1.1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.04em;color:var(--ink);margin:0 0 10px}
-footer dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:9px 12px;align-items:baseline}
-footer dd{margin:0}
+footer h2,.legend h2{font:800 1.2rem/1.1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.04em;color:var(--ink);margin:0 0 10px}
+footer dl,.legend dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:9px 12px;align-items:baseline}
+footer dd,.legend dd{margin:0}
 footer ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:7px}
 footer p{margin:10px 0 0}
 
+/* ---------- wide screens ----------
+   The script sets data-wide from the width left after the text-size zoom (media queries ignore the zoom; see wideMode), so
+   Large and Extra large text fall back to fewer columns by themselves (applyWide).
+   "side" (laptops): the filters move to a sidebar on the left, which can be hidden (data-side="closed").
+   "full" (monitors): also a right-hand column with Live now and the key, and Match details opens beside the list
+   (data-pane) instead of over it. Grid items are spaced with a bottom margin, not row-gap, so an empty row adds no gap.
+   Where a column spans two rows, the list's row is 1fr: only it grows to the column's height, so the row above
+   (Live now, or the bar) never stretches and the list never jumps while the page loads. */
+.side-head{display:contents}
+.side-bar,#sidehide,.side-lab,.rail{display:none}
+:root{--pane:min(600px,40%)}
+:root[data-wide] .wrap{max-width:1320px;display:grid;grid-template-columns:290px minmax(0,1fr);gap:0 28px;align-items:start;
+  grid-template-rows:auto auto auto 1fr auto;grid-template-areas:"head head" "stamp stamp" "side live" "side list" "foot foot"}
+:root[data-wide] .wrap>*{margin-bottom:18px}
+:root[data-wide] .topbar{grid-area:head}
+:root[data-wide] .stamp{grid-area:stamp}
+:root[data-wide] .livebox{grid-area:live}
+:root[data-wide] #list{grid-area:list;min-height:0}
+:root[data-wide] footer{grid-area:foot;margin-bottom:0}
+:root[data-wide] .filters{grid-area:side;position:sticky;top:16px;margin:0 0 18px;max-height:calc(100vh / var(--z) - 32px);overflow-y:auto;overscroll-behavior:contain;
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px 16px;gap:8px}
+:root[data-wide] .side-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+:root[data-wide] #filters-h{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto;white-space:normal;
+  font:800 1.3rem/1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.03em}
+:root[data-wide] #sidehide{display:inline-flex;padding:0 12px 0 8px}
+:root[data-wide] .side-lab{display:block;margin:8px 0 0;font:700 12px/1 "Instrument Sans",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+:root[data-wide] .filters .row{flex-direction:column;flex-wrap:nowrap;align-items:stretch}   /* nowrap: a wrapping column would stretch items to their widest content, past the sidebar */
+:root[data-wide] #leagues .chip{justify-content:flex-start}
+:root[data-wide] #range{display:grid;grid-template-columns:1fr 1fr}
+:root[data-wide] #range button:last-child{grid-column:1/-1}
+:root[data-wide] .filters .search{flex:none}
+:root[data-wide] .filters .reset{margin-left:0;align-self:flex-start}
+/* filters hidden: a bar above the list says what is shown, with a button to bring them back */
+:root[data-wide][data-side="closed"] .wrap{max-width:1100px;grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"head" "stamp" "bar" "live" "list" "foot"}
+:root[data-wide][data-side="closed"] .filters{display:none}
+:root[data-wide][data-side="closed"] .side-bar{grid-area:bar;display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;position:sticky;top:0;z-index:10;
+  padding:10px 0;background:var(--bg);border-bottom:1px solid var(--line)}
+.side-bar p{margin:0;color:var(--muted);font-size:14.5px}
+/* monitors: the right-hand column */
+:root[data-wide="full"] .wrap{max-width:1680px;grid-template-columns:290px minmax(0,1fr) 360px;
+  grid-template-rows:none;grid-template-areas:"head head head" "stamp stamp stamp" "side list rail" "foot foot foot"}
+:root[data-wide="full"][data-side="closed"] .wrap{max-width:1400px;grid-template-columns:minmax(0,1fr) 360px;
+  grid-template-rows:auto auto auto 1fr auto;grid-template-areas:"head head" "stamp stamp" "bar rail" "list rail" "foot foot"}
+:root[data-wide="full"] .rail{grid-area:rail;display:flex;flex-direction:column;gap:18px;position:sticky;top:16px}
+.rail.tall{position:static}   /* taller than the window (many live matches): it scrolls with the page, so its end stays reachable */
+.rail .livebox{flex:none}
+.rail .lv-row{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;padding:12px}
+.rail .lv-row .clk{grid-column:1/-1;justify-self:center}
+.rail .legend{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;color:var(--muted);font-size:14px}
+/* monitors: Match details beside the list, in place of the right-hand column */
+:root[data-pane] body{padding-right:calc(var(--pane) + 28px)}
+:root[data-pane] .rail{display:none}
+:root[data-pane][data-wide="full"] .wrap{max-width:1320px;grid-template-columns:290px minmax(0,1fr);grid-template-rows:none;grid-template-areas:"head head" "stamp stamp" "side list" "foot foot"}
+:root[data-pane][data-wide="full"][data-side="closed"] .wrap{max-width:1100px;grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"head" "stamp" "bar" "list" "foot"}
+:root[data-pane] #mddlg{position:fixed;inset:0 0 0 auto;z-index:20;margin:0;width:var(--pane);max-width:none;height:100%;max-height:none;overflow-y:auto;overscroll-behavior:contain;
+  border-width:0 0 0 1px;border-radius:0;box-shadow:-16px 0 40px -24px var(--shadow)}
+:root[data-pane] .match:has(.md-open[aria-current="true"]){box-shadow:inset 0 0 0 3px var(--accent)}
+
 /* ---------- text size (Settings): scales the whole page, like the browser's own zoom ---------- */
-:root[data-size="large"]{zoom:1.15}
-:root[data-size="xl"]{zoom:1.3}
+:root{--z:1}   /* the zoom again, for viewport units (vh), which the zoom scales up too */
+:root[data-size="large"]{zoom:1.15;--z:1.15}
+:root[data-size="xl"]{zoom:1.3;--z:1.3}
 
 /* ---------- match details: the button on each card, and the panel ----------
    One spacing scale throughout: 4, 8, 12, 16px. Cards: 16px padding, 14px corners (like the day lists).
@@ -640,9 +714,17 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
     <div id="livelist"></div>
   </section>
 
+  <section class="side-bar" id="side-bar" aria-labelledby="filters-h">
+    <button type="button" class="btn" id="sideshow" aria-controls="filters" aria-expanded="false"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span data-t="showFilters">Show filters</span></button>
+    <p id="sidesum"></p>
+  </section>
+
   <section class="filters" id="filters" aria-labelledby="filters-h">
-    <h2 class="sr" id="filters-h" data-t="filters">Filters</h2>
+    <div class="side-head"><h2 class="sr" id="filters-h" data-t="filters">Filters</h2>
+      <button type="button" class="btn" id="sidehide" aria-controls="filters" aria-expanded="true"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg><span data-t="hideFilters">Hide filters</span></button></div>
+    <p class="side-lab" data-t="leagues" aria-hidden="true">Leagues</p>
     <div class="row" id="leagues" role="group" aria-label="Leagues"></div>
+    <p class="side-lab" data-t="sideDates" aria-hidden="true">Dates and teams</p>
     <div class="row">
       <div class="seg" role="group" id="range" aria-label="Date range">
         <button type="button" data-r="all" data-t="all">All</button>
@@ -663,6 +745,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
       </div>
       <p class="date-err" id="date-err" role="alert"></p>
     </div>
+    <p class="side-lab" data-t="sideShow" aria-hidden="true">Show</p>
     <div class="row">
       <label class="tog"><input type="checkbox" id="favonly"><span id="favlabel">Starred teams only</span></label>
       <label class="tog"><input type="checkbox" id="showtbc" checked><span data-t="showTbc">Include matches without a confirmed time</span></label>
@@ -672,10 +755,12 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
     <p class="sr" id="summary" role="status"></p>
   </section>
 
+  <div class="rail" id="rail"></div>
+
   <main id="list" tabindex="-1"><p class="status" data-t="loading">Loading fixtures…</p></main>
 
   <footer>
-    <section aria-labelledby="legend-h">
+    <section class="legend" id="legend" aria-labelledby="legend-h">
       <h2 id="legend-h" data-t="legendTitle">Reading the list</h2>
       <dl>
         <dt><span class="pill ok"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg><span data-t="pVerified">verified</span></span></dt>
@@ -750,6 +835,16 @@ const I18N = {
     liveNote: "Updates every 30 seconds · ESPN",
     nLive: n => n + " live now",
     filters: "Filters",
+    showFilters: "Show filters",
+    hideFilters: "Hide filters",
+    sideDates: "Dates and teams",
+    sideShow: "Show",
+    showing: "Showing:",
+    sumAll: "all leagues",
+    sumSome: (n, t) => n + " of " + t + " leagues",
+    sumDates: "all dates",
+    sumCustom: "chosen dates",
+    sumStarred: "starred teams only",
     leagues: "Leagues",
     dateRange: "Date range",
     all: "All",
@@ -1016,6 +1111,16 @@ const I18N = {
     liveNote: "Atualiza a cada 30 segundos · ESPN",
     nLive: n => n + " ao vivo agora",
     filters: "Filtros",
+    showFilters: "Mostrar filtros",
+    hideFilters: "Ocultar filtros",
+    sideDates: "Datas e times",
+    sideShow: "Exibir",
+    showing: "Exibindo:",
+    sumAll: "todas as ligas",
+    sumSome: (n, t) => n + " de " + t + " ligas",
+    sumDates: "todas as datas",
+    sumCustom: "datas escolhidas",
+    sumStarred: "só times favoritos",
     leagues: "Ligas",
     dateRange: "Período",
     all: "Todos",
@@ -1544,6 +1649,7 @@ sizeRadios.forEach(r =>
     size = r.value;
     store.set("size", size);
     applySize();
+    applyWide();
   }),
 );
 
@@ -1857,12 +1963,29 @@ function syncControls() {
   resetBtn.hidden =
     on.size === LEAGUES.length && range === "all" && !q.value && !favonly.checked && tbc.checked && f1prac.checked;
   document.getElementById("f1praclabel").hidden = !on.has("F1"); // only useful while F1 is shown
+  const sum = [
+    on.size === LEAGUES.length ? T.sumAll : T.sumSome(on.size, LEAGUES.length),
+    range === "all" ? T.sumDates : range === "custom" ? T.sumCustom : T[range],
+  ];
+  if (q.value.trim()) sum.push("“" + q.value.trim() + "”");
+  if (favonly.checked) sum.push(T.sumStarred);
+  document.getElementById("sidesum").textContent = T.showing + " " + sum.join(" · "); // in the bar shown while the filter sidebar is hidden
 }
 
-// day headers stick just below the filter bar, whatever its height
-const filtersEl = document.getElementById("filters");
-const setFH = () => document.documentElement.style.setProperty("--filters-h", filtersEl.offsetHeight + 12 + "px");
-if (window.ResizeObserver) new ResizeObserver(setFH).observe(filtersEl);
+// day headers stick just below the filter bar, whatever its height (on wide screens: below the bar shown while the
+// sidebar is hidden, or near the top of the window while the filters are in the sidebar)
+const filtersEl = document.getElementById("filters"),
+  sideBar = document.getElementById("side-bar");
+const setFH = () => {
+  const r = document.documentElement,
+    el = !r.dataset.wide ? filtersEl : r.dataset.side === "closed" ? sideBar : null;
+  r.style.setProperty("--filters-h", (el ? el.offsetHeight + 12 : 16) + "px");
+};
+if (window.ResizeObserver) {
+  const ro = new ResizeObserver(setFH);
+  ro.observe(filtersEl);
+  ro.observe(sideBar);
+}
 setFH();
 
 function bounds() {
@@ -2119,6 +2242,7 @@ function render() {
   if (html === lastList) return; // the minute-by-minute refresh usually changes nothing: leave the page alone
   lastList = html;
   list.innerHTML = html;
+  markCurrent();
   const m = document.getElementById("more");
   if (m)
     m.onclick = () => {
@@ -3821,15 +3945,34 @@ async function shareLink(url, text) {
   }
 }
 
-// The details open as a panel over the list. The address changes too, so Back closes it and the link can be shared.
+// The details open as a panel over the list, or on monitors beside it (not modal, so the list stays usable).
+// The address changes too, so Back closes it and the link can be shared.
 const mddlg = document.getElementById("mddlg"),
   ltdlg = document.getElementById("ltdlg");
 let pushed = false,
   trigger = null;
 function showPanel(uid) {
   openMatch(uid, document.getElementById("mdbody"));
-  if (!mddlg.open) mddlg.showModal();
+  openDialog();
+  const a = listEl.querySelector('.md-open[aria-current="true"]');
+  if (a) a.closest(".match").scrollIntoView({ block: "center" });
   mddlg.querySelector("[data-close]").focus();
+}
+function openDialog() {
+  if (!mddlg.open) {
+    if (document.documentElement.dataset.wide === "full") mddlg.show();
+    else mddlg.showModal();
+  }
+  document.documentElement.toggleAttribute("data-pane", mddlg.open && !mddlg.matches(":modal"));
+  markCurrent();
+}
+// the card whose details are shown beside the list is outlined, and screen readers hear "current" on its button
+function markCurrent() {
+  const u = document.documentElement.hasAttribute("data-pane") ? matchParam() : null;
+  document.querySelectorAll("#list .md-open").forEach(a => {
+    if (a.dataset.uid === u) a.setAttribute("aria-current", "true");
+    else a.removeAttribute("aria-current");
+  });
 }
 ["pointerover", "focusin", "touchstart"].forEach(t =>
   listEl.addEventListener(
@@ -3846,11 +3989,18 @@ listEl.addEventListener("click", e => {
   if (!a || e.ctrlKey || e.metaKey || e.shiftKey) return;
   e.preventDefault();
   trigger = a.dataset.uid;
-  history.pushState({ match: a.dataset.uid }, "", a.getAttribute("href"));
-  pushed = true;
+  // with the details already open beside the list, switching matches replaces the address, so Back still closes the panel
+  if (mddlg.open) history.replaceState({ match: a.dataset.uid }, "", a.getAttribute("href"));
+  else {
+    history.pushState({ match: a.dataset.uid }, "", a.getAttribute("href"));
+    pushed = true;
+  }
   showPanel(a.dataset.uid);
 });
 mddlg.addEventListener("close", () => {
+  if (mddlg.open) return; // reopened straight away because the window changed width (applyWide)
+  document.documentElement.removeAttribute("data-pane");
+  markCurrent();
   stopMatch();
   stopWeekend();
   if (matchParam()) {
@@ -3878,9 +4028,63 @@ addEventListener("popstate", () => {
 [mddlg, ltdlg].forEach(d => {
   d.querySelector("[data-close]").onclick = () => d.close();
   d.addEventListener("click", e => {
-    if (e.target === d) d.close();
+    if (e.target === d && d.matches(":modal")) d.close();
   }); // a click on the dimmed background closes it
 });
+// Escape closes the details beside the list too (only a panel over the page closes by itself). Checked before the
+// menus' own Escape handler runs, so closing Settings or Calendar leaves the details open.
+document.addEventListener(
+  "keydown",
+  e => {
+    if (e.key !== "Escape" || !mddlg.open || mddlg.matches(":modal") || ltdlg.open || MENUS.some(m => m.open)) return;
+    if (e.target.matches && e.target.matches("input,select") && !mddlg.contains(e.target)) return; // Escape in the search box clears the search
+    mddlg.close();
+  },
+  true,
+);
+
+/* ---------- wide screens: filters in a sidebar that can be hidden (laptops), plus a right-hand column and the
+   match details beside the list (monitors). The widths are in wideMode, in <head>. ---------- */
+const rail = document.getElementById("rail"),
+  liveBox = document.getElementById("livebox"),
+  legendEl = document.getElementById("legend");
+let side = store.get("side", "open") === "closed" ? "closed" : "open"; // remembered between visits
+function applyWide() {
+  const r = document.documentElement,
+    mode = wideMode(parseFloat(getComputedStyle(r).zoom) || 1);
+  if (mode) r.dataset.wide = mode;
+  else delete r.dataset.wide;
+  r.dataset.side = side;
+  // on monitors Live now and the key move to the right-hand column; elsewhere they sit above the filters and in the footer
+  if (mode === "full" && liveBox.parentNode !== rail) rail.append(liveBox, legendEl);
+  else if (mode !== "full" && liveBox.parentNode === rail) {
+    sideBar.before(liveBox);
+    document.querySelector("footer").prepend(legendEl);
+  }
+  // an open panel switches between over the list and beside it
+  if (mddlg.open && mddlg.matches(":modal") === (mode === "full")) {
+    mddlg.close();
+    openDialog();
+  }
+  setFH();
+  fitRail();
+}
+// taller than the window (many live matches): the right-hand column scrolls with the page, so its end stays reachable
+const fitRail = () =>
+  rail.classList.toggle(
+    "tall",
+    rail.offsetHeight > innerHeight / (parseFloat(getComputedStyle(document.documentElement).zoom) || 1) - 32,
+  );
+if (window.ResizeObserver) new ResizeObserver(fitRail).observe(rail);
+function setSide(s) {
+  side = s;
+  store.set("side", s);
+  applyWide();
+  document.getElementById(s === "open" ? "sidehide" : "sideshow").focus(); // the button pressed disappears: focus goes to its opposite
+}
+document.getElementById("sidehide").onclick = () => setSide("closed");
+document.getElementById("sideshow").onclick = () => setSide("open");
+addEventListener("resize", applyWide);
 /* ---------- league tables (ESPN standings, fetched when the window opens) ---------- */
 const TABLES = new Map(); // league code -> {at, rows}; for "F1": {at, d, c} (drivers' and teams' standings)
 const LT_CODES = [...TABLE_CODES, "F1"]; // the Tables window also has the Formula 1 championship
@@ -4244,6 +4448,7 @@ setInterval(() => refresh(false), 60000);
 
 /* ---------- start ---------- */
 applyLang();
+applyWide();
 setRange(range, false);
 getData()
   .then(j => {
