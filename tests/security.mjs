@@ -16,7 +16,14 @@ const bad = { comp: "Premier League", code: "EPL", round: EVIL, home: "Arsenal" 
   check: { status: "confirmed", basis: "official source", sources: [
     { source: EVIL, url: "javascript:window.__xss=4", official: true, comment: EVIL },
     { source: "Data link", url: "data:text/html,<script>window.__xss=5</script>" }] } };
-const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, matches: [bad, ...data.matches] };
+// F1 race weekends whose track outline (width) and circuit position (latitude) carry markup instead of numbers
+const race = (rnd, circuit) => ({ comp: "Formula 1", code: "F1", round: rnd, home: "", away: "", date: soon.slice(0, 10), utc: soon,
+  venue: EVIL, uid: `f1|2026|${rnd}|R`, kind: "f1", sess: "R", gp: EVIL, wk: `f1|2026|${rnd}`, sprint: false, circuit });
+const badWidth = race("98", { name: EVIL, lat: 45.5, lon: 9.3,
+  layout: { path: "M0 0L100 100L0 100Z", w: '100" onload="window.__xss=6', h: 100, length: EVIL, firstgp: EVIL } });
+const badLat = race("99", { name: EVIL, lat: '45" onmouseover="window.__xss=7', lon: 9.3,
+  layout: { path: "M0 0L100 100L0 100Z", w: 100, h: 100, length: 5793, firstgp: EVIL } });
+const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, matches: [bad, badWidth, badLat, ...data.matches] };
 
 const server = await startServer();
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true,
@@ -72,6 +79,11 @@ try {
   });
   await page.waitForFunction(() => !document.querySelector("#md-map") || !/Finding|Procurando/.test(document.querySelector("#md-map").textContent));
   await check("match details");
+  for (const wk of ["98", "99"]) {
+    await page.goto(`${BASE}?lang=en&match=${encodeURIComponent("f1|2026|" + wk)}`, { waitUntil: "networkidle0" });
+    await page.waitForFunction(() => document.querySelector("#mddlg")?.open && document.querySelector("#wk-venue:not([hidden])"));
+    await check("F1 race weekend (round " + wk + ")");
+  }
   await page.goto(`${BASE}?lang=en`, { waitUntil: "networkidle0" });
   await page.click("#tablesbtn");
   await page.waitForSelector("#ltbody table");

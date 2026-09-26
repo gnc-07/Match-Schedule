@@ -24,6 +24,10 @@ const shots = [
   ["details-then-table", 1280, `?match=${uid}`, p => p.click("#md-table"), "light"],
   ["tables-desktop", 1280, "?lang=en", p => p.click("#tablesbtn"), "light"],
   ["tables-phone", 390, "?lang=en", p => p.click("#tablesbtn"), "light"],
+  ["tables-f1-desktop", 1280, "?lang=en", async p => { await p.click("#tablesbtn"); await p.click('#ltchips [data-code="F1"]'); }, "light"],
+  ["tables-f1-phone", 390, "?lang=en", async p => { await p.click("#tablesbtn"); await p.click('#ltchips [data-code="F1"]'); }, "light"],
+  ["tables-f1-teams-dark-pt", 1280, "?lang=pt", async p => { await p.click("#tablesbtn"); await p.click('#ltchips [data-code="F1"]');
+    await p.waitForSelector('#ltbody [data-lt="c"]'); await p.click('#ltbody [data-lt="c"]'); }, "dark"],
   ["settings-textsize", 1280, "?lang=en", p => p.evaluate(() => { document.getElementById("setmenu").open = true; }), "light"],
   ["list-xl-text-phone", 390, "?lang=en", null, "light", "xl"],
   ["f1-desktop", 1280, `?match=${wk}`, null, "light"],
@@ -38,7 +42,7 @@ try {
     page.on("pageerror", e => errors.push(`${name}: ${e.message}`));
     await page.setViewport({ width, height: 900 });
     await page.evaluateOnNewDocument((t, s) => { try { localStorage.setItem("mp.theme", JSON.stringify(t));
-      localStorage.setItem("mp.favs", JSON.stringify(["Arsenal FC"])); if (s) localStorage.setItem("mp.size", JSON.stringify(s)); else localStorage.removeItem("mp.size"); } catch {} }, theme, size);
+      localStorage.setItem("mp.favs", JSON.stringify(["Arsenal FC"])); localStorage.setItem("mp.f1favs", JSON.stringify(["lima"])); if (s) localStorage.setItem("mp.size", JSON.stringify(s)); else localStorage.removeItem("mp.size"); } catch {} }, theme, size);
     await mockNetwork(page);
     await page.goto(BASE + query, { waitUntil: "networkidle0" });
     if (act) { await act(page); await new Promise(r => setTimeout(r, 600)); }
