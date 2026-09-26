@@ -33,9 +33,10 @@ try {
     // Check the settled page: with the device asking for less motion, panels appear at once instead of fading in,
     // so colour contrast is not measured halfway through an animation.
     await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
-    // Save the theme the same way the Settings menu does, before the page loads.
+    // Save the theme the same way the Settings menu does, before the page loads. Contrast is always set: the pages
+    // share one storage, so a high contrast view would otherwise carry into the views after it.
     await page.evaluateOnNewDocument((t, high, side) => { try { localStorage.setItem("mp.theme", JSON.stringify(t));
-      if (high) localStorage.setItem("mp.contrast", JSON.stringify("high")); localStorage.setItem("mp.side", JSON.stringify(side)); } catch {} },
+      localStorage.setItem("mp.contrast", JSON.stringify(high ? "high" : "normal")); localStorage.setItem("mp.side", JSON.stringify(side)); } catch {} },
       theme, state.startsWith("high"), state === "sidebar-hidden" ? "closed" : "open");
     await mockNetwork(page);
     await page.goto(`${BASE}?lang=${lang}${query[state] || ""}`, { waitUntil: "networkidle0" });
