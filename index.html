@@ -760,7 +760,7 @@ const I18N={
   ltSource:"Source: ESPN.",ltLoading:"Loading the table…",ltError:"The table could not be loaded. Try again later.",
   ltCols:{pos:"Position",team:"Team",p:"Played",w:"Won",d:"Drawn",l:"Lost",gd:"Goal difference",pts:"Points"},ltAbbr:{p:"P",w:"W",d:"D",l:"L",gd:"GD",pts:"Pts"},
   ltKey:"P played · W won · D drawn · L lost · GD goal difference · Pts points.",starred:"starred",
-  f1LtD:"Drivers' championship",f1LtC:"Teams' championship",f1Wins:"Wins",f1WinsAbbr:"W",f1LtNone:"The championship table appears after the first race of the season.",
+  f1Rank:"#",f1LtD:"Drivers' championship",f1LtC:"Teams' championship",f1Wins:"Wins",f1WinsAbbr:"W",f1LtNone:"The championship table appears after the first race of the season.",
   f1LtKey:(y,r)=>y+" season, after round "+r+". W wins · Pts points. Starred drivers are highlighted.",f1LtSource:"Source: Jolpica-F1.",
   f1:"Formula 1",f1Prac:"Include F1 practice sessions",f1Round:r=>"Round "+r,f1SprintWk:"Sprint weekend",f1Weekend:"This weekend:",
   f1Sess:{FP1:"Practice 1",FP2:"Practice 2",FP3:"Practice 3",SQ:"Sprint qualifying",S:"Sprint",Q:"Qualifying",R:"Race"},
@@ -836,7 +836,7 @@ const I18N={
   ltSource:"Fonte: ESPN.",ltLoading:"Carregando a classificação…",ltError:"Não foi possível carregar a classificação. Tente mais tarde.",
   ltCols:{pos:"Posição",team:"Time",p:"Jogos",w:"Vitórias",d:"Empates",l:"Derrotas",gd:"Saldo de gols",pts:"Pontos"},ltAbbr:{p:"J",w:"V",d:"E",l:"D",gd:"SG",pts:"Pts"},
   ltKey:"J jogos · V vitórias · E empates · D derrotas · SG saldo de gols · Pts pontos.",starred:"favorito",
-  f1LtD:"Campeonato de pilotos",f1LtC:"Campeonato de equipes",f1Wins:"Vitórias",f1WinsAbbr:"V",f1LtNone:"A classificação do campeonato aparece depois da primeira corrida da temporada.",
+  f1Rank:"#",f1LtD:"Campeonato de pilotos",f1LtC:"Campeonato de equipes",f1Wins:"Vitórias",f1WinsAbbr:"V",f1LtNone:"A classificação do campeonato aparece depois da primeira corrida da temporada.",
   f1LtKey:(y,r)=>"Temporada "+y+", após a etapa "+r+". V vitórias · Pts pontos. Pilotos favoritos aparecem em destaque.",f1LtSource:"Fonte: Jolpica-F1.",
   f1:"Fórmula 1",f1Prac:"Incluir treinos livres da F1",f1Round:r=>"Etapa "+r,f1SprintWk:"Fim de semana com sprint",f1Weekend:"Neste fim de semana:",
   f1Sess:{FP1:"Treino livre 1",FP2:"Treino livre 2",FP3:"Treino livre 3",SQ:"Classificação sprint",S:"Corrida sprint",Q:"Classificação",R:"Corrida"},
@@ -1889,7 +1889,7 @@ document.getElementById("tablesbtn").onclick=()=>openTables();
 const TABLE_REQ=new Map();     // league code -> download in progress, so one league is never fetched twice at once
 function fetchTable(code){
   const have=TABLES.get(code);
-  if(have&&Date.now()-have.at<=5*60e3) return Promise.resolve();
+  if(have&&!have.partial&&Date.now()-have.at<=5*60e3) return Promise.resolve();
   if(TABLE_REQ.has(code)) return TABLE_REQ.get(code);
   const req=(code==="F1"?f1Table():espnTable(code)).then(t=>{ t.at=Date.now(); TABLES.set(code,t); }).finally(()=>TABLE_REQ.delete(code));
   TABLE_REQ.set(code,req); return req;
@@ -1904,14 +1904,17 @@ async function espnTable(code){
   return {rows};
 }
 async function f1Table(){   // Jolpica-F1, one request after the other (see jol above)
-  const d=(await jol("current/driverstandings/?limit=100")).MRData.StandingsTable.StandingsLists[0]||null;
-  const c=(await jol("current/constructorstandings/?limit=100")).MRData.StandingsTable.StandingsLists[0]||null;
-  return {d,c};
+  // Each table stands on its own: undefined means it could not be loaded (the other one is still shown),
+  // null that there are no standings yet. Only when both fail does the window show the error.
+  const get=async what=>{ try{ return (await jol("current/"+what+"/?limit=100")).MRData.StandingsTable.StandingsLists[0]||null; }catch{ return undefined; } };
+  const d=await get("driverstandings"), c=await get("constructorstandings");
+  if(d===undefined&&c===undefined) throw new Error("F1 standings could not be loaded");
+  return {d,c,partial:d===undefined||c===undefined};   // partial: asked for again the next time the window opens
 }
 async function loadTable(){
   const code=ltCode, body=document.getElementById("ltbody");
   const have=TABLES.get(code);
-  if(!have||Date.now()-have.at>5*60e3){
+  if(!have||have.partial||Date.now()-have.at>5*60e3){
     if(body.querySelector(".lt-wrap")) body.setAttribute("aria-busy","true");   // keep the shown table until the new one is ready
     else body.innerHTML='<p class="md-note">'+esc(T.ltLoading)+'</p>';
     try{ await fetchTable(code); }
@@ -1941,19 +1944,20 @@ function paintF1Table(){
   const drivers=ltF1==="d", L=drivers?t.d:t.c, body=document.getElementById("ltbody");
   const seg='<div class="seg lt-seg" role="group" aria-label="'+esc(T.f1Champ)+'">'+
     '<button type="button" data-lt="d" aria-pressed="'+drivers+'">'+esc(T.f1Drivers)+'</button><button type="button" data-lt="c" aria-pressed="'+!drivers+'">'+esc(T.f1Teams)+'</button></div>';
-  if(!L){ body.innerHTML=seg+'<p class="md-note">'+esc(T.f1LtNone)+'</p>'; return; }
+  if(!L){ body.innerHTML=seg+'<p class="md-note">'+esc(L===undefined?T.ltError:T.f1LtNone)+'</p>'; return; }
   const th=(txt,full,cls)=>'<th scope="col"'+(cls?' class="'+cls+'"':'')+'>'+(full?'<span aria-hidden="true">'+esc(txt)+'</span><span class="sr">'+esc(full)+'</span>':esc(txt))+'</th>';
   const name=(id,long,short,sub,fav)=>'<th scope="row" class="tm-c"><span class="drv"><span class="tbar" style="--tc:var('+(TEAM_C[id]||"--line")+')" aria-hidden="true"></span><span><b>'+
     (short?'<span class="nl">'+esc(long)+'</span><span class="ns">'+esc(short)+'</span>':esc(long))+'</b>'+
     (fav?ICON.star+'<span class="sr"> ('+esc(T.starred)+')</span>':'')+(sub?'<small>'+esc(sub)+'</small>':'')+'</span></span></th>';
   const rows=drivers?L.DriverStandings.map(x=>{
-      const d=x.Driver, team=(x.Constructors||[])[0]||{}, fav=f1favs.has(d.driverId);
+      // Jolpica lists every team the driver raced for this season, in no set order: after a move, all of them and a plain bar
+      const d=x.Driver, teams=x.Constructors||[], team=teams.length===1?teams[0]:{name:teams.map(t=>t.name).join(" / ")}, fav=f1favs.has(d.driverId);
       return '<tr'+(fav?' class="mine"':'')+'><td class="pos-c">'+esc(x.positionText||x.position)+'</td>'+
         name(team.constructorId,f1Name(d),d.givenName.charAt(0)+". "+d.familyName,team.name,fav)+'<td>'+esc(x.wins??"")+'</td><td class="pts">'+esc(x.points)+'</td></tr>';
     }):L.ConstructorStandings.map(x=>'<tr><td class="pos-c">'+esc(x.positionText||x.position)+'</td>'+name(x.Constructor.constructorId,x.Constructor.name)+
       '<td>'+esc(x.wins??"")+'</td><td class="pts">'+esc(x.points)+'</td></tr>');
   body.innerHTML=seg+'<div class="lt-wrap"><table class="lt f1t"><caption>'+esc(drivers?T.f1LtD:T.f1LtC)+'</caption><thead><tr>'+
-    th("#",T.f1PosFull,"pos-c")+th(drivers?T.f1Driver:T.f1Team,"","tm-c")+th(T.f1WinsAbbr,T.f1Wins)+th(T.f1Pts,T.f1PtsFull)+'</tr></thead><tbody>'+rows.join("")+'</tbody></table></div>'+
+    th(T.f1Rank,T.f1PosFull,"pos-c")+th(drivers?T.f1Driver:T.f1Team,"","tm-c")+th(T.f1WinsAbbr,T.f1Wins)+th(T.f1Pts,T.f1PtsFull)+'</tr></thead><tbody>'+rows.join("")+'</tbody></table></div>'+
     '<p class="lt-key">'+esc(T.f1LtKey(L.season,L.round))+' '+esc(T.f1LtSource)+'</p>';
 }
 document.getElementById("ltbody").addEventListener("click",e=>{
