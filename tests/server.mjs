@@ -1,14 +1,23 @@
-// Starts Python's built-in web server on a spare port so the tests see the site
-// exactly as a browser would, and finds the Chromium browser to test with.
-import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
-import net from "node:net";
-import { fileURLToPath } from "node:url";
+// A small web server for the tests, so they see the site the way visitors get it from GitHub Pages:
+// text files (the page, fixtures.json, the calendar) are sent gzip-compressed, fonts as they are.
+// Without compression Lighthouse would count every byte of index.html, which visitors never download.
+// It also finds the Chromium browser to test with.
+import { existsSync, readFileSync, statSync } from "node:fs";
+import http from "node:http";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+import zlib from "node:zlib";
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const PORT = Number(process.env.PORT || 8123);
 export const BASE = `http://localhost:${PORT}/`;
+
+const TYPES = {
+  ".html": "text/html; charset=utf-8", ".json": "application/json; charset=utf-8", ".ics": "text/calendar; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
+  ".svg": "image/svg+xml", ".txt": "text/plain; charset=utf-8", ".png": "image/png", ".woff2": "font/woff2",
+};
+const COMPRESS = /^(text\/|application\/json|image\/svg)/;   // what GitHub Pages compresses; fonts and pictures already are
 
 export function chromePath() {
   const candidates = [process.env.CHROME_PATH, "/usr/bin/chromium-browser", "/usr/bin/chromium",
@@ -18,23 +27,32 @@ export function chromePath() {
   return found;
 }
 
-export async function startServer() {
+// The file a request asks for, or null: only files inside the project, and never a hidden one (.git, .github).
+function fileFor(url) {
+  let rel;
+  try { rel = decodeURIComponent(new URL(url, BASE).pathname); } catch { return null; }
+  if (rel.endsWith("/")) rel += "index.html";
+  if (rel.split("/").some(part => part.startsWith("."))) return null;
+  const file = path.join(ROOT, rel);
+  return file.startsWith(ROOT + path.sep) && existsSync(file) && statSync(file).isFile() ? file : null;
+}
+
+export function startServer() {
   if (!existsSync(path.join(ROOT, "fixtures.json"))) {
     throw new Error("fixtures.json is missing. Run: python3 build_schedule.py");
   }
-  const proc = spawn("python3", ["-m", "http.server", String(PORT), "--bind", "127.0.0.1"],
-    { cwd: ROOT, stdio: "ignore" });
-  // Wait until the port accepts connections. (A plain socket, because Node's
-  // fetch occasionally crashes on the way Python's server closes connections.)
-  const listening = () => new Promise(resolve => {
-    const s = net.connect(PORT, "127.0.0.1");
-    s.once("connect", () => { s.destroy(); resolve(true); });
-    s.once("error", () => resolve(false));
+  const server = http.createServer((req, res) => {
+    const file = fileFor(req.url);
+    if (!file) { res.writeHead(404, { "content-type": "text/plain; charset=utf-8" }).end("Not found"); return; }
+    const type = TYPES[path.extname(file)] || "application/octet-stream";
+    const gzip = COMPRESS.test(type) && /\bgzip\b/.test(req.headers["accept-encoding"] || "");
+    const body = gzip ? zlib.gzipSync(readFileSync(file)) : readFileSync(file);
+    res.writeHead(200, { "content-type": type, "content-length": body.length,
+      ...(gzip ? { "content-encoding": "gzip", vary: "accept-encoding" } : {}) });
+    res.end(req.method === "HEAD" ? undefined : body);
   });
-  for (let i = 0; i < 50; i++) {
-    if (await listening()) return proc;
-    await new Promise(r => setTimeout(r, 100));
-  }
-  proc.kill();
-  throw new Error(`The local web server did not start on port ${PORT}. Is something else using it?`);
+  return new Promise((resolve, reject) => {
+    server.once("error", e => reject(new Error(`The local web server did not start on port ${PORT} (${e.code}). Is something else using it?`)));
+    server.listen(PORT, "127.0.0.1", () => resolve({ kill: () => { server.closeAllConnections(); server.close(); } }));
+  });
 }
