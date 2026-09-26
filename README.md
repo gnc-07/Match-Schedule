@@ -21,7 +21,7 @@ Matchday Planner is a free website that lists upcoming matches from the **Premie
 
 Friendly and early-season kick-off times are often announced late, and different websites sometimes disagree. Matchday Planner therefore marks a time as **verified** only when an official source (a league, federation, club or official ticket seller) gives it, or when **at least two independent sources agree**. Until then, the match is shown as "time to be confirmed", together with the times that have been reported and where each one came from. Every match card has a **Sources** section, so you can always see where a time came from.
 
-The fixture list is refreshed automatically four times a day.
+The fixture list is refreshed automatically at least four times a day.
 
 ## Languages, time zones and accessibility
 

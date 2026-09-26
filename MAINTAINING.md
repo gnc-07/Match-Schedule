@@ -32,13 +32,13 @@ Match details and league tables work the same way: when a visitor opens them, th
 
 1. **Use your repository `gnc-07/Match-Schedule`.** It must be **Public** for free GitHub Pages: check under **Settings**, **General**, at the bottom (**Danger Zone**, Change visibility).
 
-2. **Upload the files.** On the new repository's page, click **uploading an existing file**. Drag in `index.html`, `build_schedule.py`, `cazetv.py`, `common.py`, `research.py`, `friendlies.json`, `overrides.json`, `README.md` and the whole `fonts` and `tests` folders (drag each folder itself; GitHub keeps them as folders; the workflow runs the checks in `tests` before every build), then click **Commit changes**.
+2. **Upload the files.** On the new repository's page, click **uploading an existing file**. Drag in `index.html`, `build_schedule.py`, `cazetv.py`, `common.py`, `research.py`, `friendlies.json`, `overrides.json`, `README.md`, `MAINTAINING.md` and the whole `fonts` and `tests` folders (drag each folder itself; GitHub keeps them as folders; the workflow runs the checks in `tests` before every build), then click **Commit changes**.
 
 3. **Add the workflow file.** Folders whose names start with a dot are hidden by most file managers (in Dolphin on Fedora KDE, press Ctrl+H to show them), and they are easy to miss when dragging. The reliable way: click **Add file**, then **Create new file**. In the name box type `.github/workflows/build-and-deploy.yml` (typing each `/` creates a folder). Paste in the contents of that file, then **Commit changes**.
 
 4. **Turn on GitHub Pages.** Go to **Settings**, then **Pages** (left sidebar). Under **Build and deployment**, set **Source** to **GitHub Actions**.
 
-5. **Check workflow permissions.** Go to **Settings**, **Actions**, **General**. Under **Workflow permissions**, choose **Read and write permissions** and click **Save**. The workflow asks for write access itself, but this makes sure nothing overrides it.
+5. **Check workflow permissions.** Go to **Settings**, **Actions**, **General**. Under **Workflow permissions**, choose **Read repository contents permission** and click **Save**. This keeps the default key read-only, so a workflow gets write access only when it asks for it; `build-and-deploy.yml` asks for exactly what each of its jobs needs.
 
 6. **(Optional) Add the football-data.org key.** If you registered for one, go to **Settings**, **Secrets and variables**, **Actions**, **New repository secret**. Name: `FOOTBALL_DATA_TOKEN`; value: your key. Secrets are encrypted and never appear in the public files or logs. Without a key the site uses openfootball.
 
