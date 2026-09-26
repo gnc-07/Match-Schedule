@@ -392,6 +392,10 @@ footer p{margin:10px 0 0}
 :root[data-pane] #mddlg{position:fixed;inset:0 0 0 auto;z-index:20;margin:0;width:var(--pane);max-width:none;height:100%;max-height:none;overflow-y:auto;overscroll-behavior:contain;
   border-width:0 0 0 1px;border-radius:0;box-shadow:-16px 0 40px -24px var(--shadow)}
 :root[data-pane] .match:has(.md-open[aria-current="true"]){box-shadow:inset 0 0 0 3px var(--accent)}
+/* the ring follows the day box's rounded corners (14px less its 1px border), and the league stripe sits inside it, not over it */
+:root[data-pane] .match:first-child:has(.md-open[aria-current="true"]){border-top-left-radius:13px;border-top-right-radius:13px}
+:root[data-pane] .match:last-child:has(.md-open[aria-current="true"]){border-bottom-left-radius:13px;border-bottom-right-radius:13px}
+:root[data-pane] .match:has(.md-open[aria-current="true"])::before{left:3px}
 
 /* ---------- text size (Settings): scales the whole page, like the browser's own zoom ---------- */
 :root{--z:1}   /* the zoom again, for viewport units (vh), which the zoom scales up too */
