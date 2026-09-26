@@ -342,13 +342,18 @@ footer p{margin:10px 0 0}
    "full" (monitors): also a right-hand column with Live now and the key, and Match details opens beside the list
    (data-pane) instead of over it. Grid items are spaced with a bottom margin, not row-gap, so an empty row adds no gap.
    Where a column spans two rows, the list's row is 1fr: only it grows to the column's height, so the row above
-   (Live now, or the bar) never stretches and the list never jumps while the page loads. */
+   (Live now, or the bar) never stretches and the list never jumps while the page loads.
+   The columns live in .mid, not .wrap: a sticky box is held inside its parent, so in .wrap the sidebar and the
+   right-hand column would slide over the footer at the end of the page. .mid ends with the list. */
+.mid{display:contents}   /* narrow screens: its children are part of .wrap's single column, as if .mid were not there */
 .side-head{display:contents}
 .side-bar,#sidehide,.side-lab,.rail{display:none}
 :root{--pane:min(600px,40%)}
-:root[data-wide] .wrap{max-width:1320px;display:grid;grid-template-columns:290px minmax(0,1fr);gap:0 28px;align-items:start;
-  grid-template-rows:auto auto auto 1fr auto;grid-template-areas:"head head" "stamp stamp" "side live" "side list" "foot foot"}
-:root[data-wide] .wrap>*{margin-bottom:18px}
+:root[data-wide] .wrap{max-width:1320px;display:grid;grid-template-columns:minmax(0,1fr);gap:0;grid-template-areas:"head" "stamp" "mid" "foot"}
+:root[data-wide] .mid{grid-area:mid;display:grid;grid-template-columns:290px minmax(0,1fr);gap:0 28px;align-items:start;
+  grid-template-rows:auto 1fr;grid-template-areas:"side live" "side list"}
+:root[data-wide] .wrap>*,:root[data-wide] .mid>*{margin-bottom:18px}
+:root[data-wide] .wrap>.mid{margin-bottom:0}   /* its children carry the gap */
 :root[data-wide] .topbar{grid-area:head}
 :root[data-wide] .stamp{grid-area:stamp}
 :root[data-wide] .livebox{grid-area:live}
@@ -368,16 +373,17 @@ footer p{margin:10px 0 0}
 :root[data-wide] .filters .search{flex:none}
 :root[data-wide] .filters .reset{margin-left:0;align-self:flex-start}
 /* filters hidden: a bar above the list says what is shown, with a button to bring them back */
-:root[data-wide][data-side="closed"] .wrap{max-width:1100px;grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"head" "stamp" "bar" "live" "list" "foot"}
+:root[data-wide][data-side="closed"] .wrap{max-width:1100px}
+:root[data-wide][data-side="closed"] .mid{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"bar" "live" "list"}
 :root[data-wide][data-side="closed"] .filters{display:none}
 :root[data-wide][data-side="closed"] .side-bar{grid-area:bar;display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;position:sticky;top:0;z-index:10;
   padding:10px 0;background:var(--bg);border-bottom:1px solid var(--line)}
 .side-bar p{margin:0;color:var(--muted);font-size:14.5px}
 /* monitors: the right-hand column */
-:root[data-wide="full"] .wrap{max-width:1680px;grid-template-columns:290px minmax(0,1fr) 360px;
-  grid-template-rows:none;grid-template-areas:"head head head" "stamp stamp stamp" "side list rail" "foot foot foot"}
-:root[data-wide="full"][data-side="closed"] .wrap{max-width:1400px;grid-template-columns:minmax(0,1fr) 360px;
-  grid-template-rows:auto auto auto 1fr auto;grid-template-areas:"head head" "stamp stamp" "bar rail" "list rail" "foot foot"}
+:root[data-wide="full"] .wrap{max-width:1680px}
+:root[data-wide="full"] .mid{grid-template-columns:290px minmax(0,1fr) 360px;grid-template-rows:none;grid-template-areas:"side list rail"}
+:root[data-wide="full"][data-side="closed"] .wrap{max-width:1400px}
+:root[data-wide="full"][data-side="closed"] .mid{grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto 1fr;grid-template-areas:"bar rail" "list rail"}
 :root[data-wide="full"] .rail{grid-area:rail;display:flex;flex-direction:column;gap:18px;position:sticky;top:16px}
 .rail.tall{position:static}   /* taller than the window (many live matches): it scrolls with the page, so its end stays reachable */
 .rail .livebox{flex:none}
@@ -387,8 +393,10 @@ footer p{margin:10px 0 0}
 /* monitors: Match details beside the list, in place of the right-hand column */
 :root[data-pane] body{padding-right:calc(var(--pane) + 28px)}
 :root[data-pane] .rail{display:none}
-:root[data-pane][data-wide="full"] .wrap{max-width:1320px;grid-template-columns:290px minmax(0,1fr);grid-template-rows:none;grid-template-areas:"head head" "stamp stamp" "side list" "foot foot"}
-:root[data-pane][data-wide="full"][data-side="closed"] .wrap{max-width:1100px;grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"head" "stamp" "bar" "list" "foot"}
+:root[data-pane][data-wide="full"] .wrap{max-width:1320px}
+:root[data-pane][data-wide="full"] .mid{grid-template-columns:290px minmax(0,1fr);grid-template-rows:none;grid-template-areas:"side list"}
+:root[data-pane][data-wide="full"][data-side="closed"] .wrap{max-width:1100px}
+:root[data-pane][data-wide="full"][data-side="closed"] .mid{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"bar" "list"}
 :root[data-pane] #mddlg{position:fixed;inset:0 0 0 auto;z-index:20;margin:0;width:var(--pane);max-width:none;height:100%;max-height:none;overflow-y:auto;overscroll-behavior:contain;
   border-width:0 0 0 1px;border-radius:0;box-shadow:-16px 0 40px -24px var(--shadow)}
 :root[data-pane] #mddlg .sheet-head>.btn{border-radius:10px}   /* square panel corners: the usual control corner */
@@ -770,6 +778,9 @@ dialog.sheet[open]:not(:modal){animation-name:slide-in}
 
   <p class="stamp" id="stamp" aria-live="polite">Loading fixtures…</p>
 
+  <!-- the middle of the page: on wide screens its own grid, so the sticky sidebar and right-hand column stop where the
+       list ends instead of sliding over the footer (a sticky box is held inside its parent, not its grid row) -->
+  <div class="mid">
   <section class="livebox" id="livebox" hidden aria-labelledby="live-h">
     <div class="live-head"><h2 id="live-h"><span class="dot-live" aria-hidden="true"></span><span data-t="liveNow">Live now</span></h2><p data-t="liveNote">Updates every 30 seconds · ESPN</p></div>
     <div id="livelist"></div>
@@ -819,6 +830,7 @@ dialog.sheet[open]:not(:modal){animation-name:slide-in}
   <div class="rail" id="rail"></div>
 
   <main id="list" tabindex="-1"><p class="status" data-t="loading">Loading fixtures…</p></main>
+  </div>
 
   <footer>
     <section class="legend" id="legend" aria-labelledby="legend-h">
