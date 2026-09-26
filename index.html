@@ -61,7 +61,7 @@ try {
   --ink:#0E1628; --ink-2:#2B3448; --muted:#4F596D; --faint:#5F687C;
   --line:#D5DBE6; --line-2:#E7EBF2;
   --accent:#2446D6; --accent-ink:#FFFFFF; --accent-soft:#E7ECFE;
-  --board:#0F1A33; --gold:#F2B829;
+  --board:#0F1A33; --gold:#F2B829; --glow:color-mix(in srgb,var(--gold) 60%,transparent);
   --live-bg:#C21A33; --live-ink:#B3142C; --live-soft:#FCEBEE;
   --warn-bg:#FFF1CC; --warn-ink:#6B4700; --tbc-bg:#ECEFF5; --tbc-ink:#4A5468; --early-bg:#ECEBFD; --early-ink:#3D3294;
   --star:#B37F00; --star-off:#8B94A7;
@@ -89,7 +89,7 @@ try {
   --ink:#E8ECF4; --ink-2:#CDD4E1; --muted:#A3AEC3; --faint:#97A3B9;
   --line:#28344D; --line-2:#1D273C;
   --accent:#9AACFF; --accent-ink:#0A0F1C; --accent-soft:#1D2849;
-  --board:#0D1630; --gold:#FFC940;
+  --board:#0D1630; --gold:#FFC940; --glow:color-mix(in srgb,var(--gold) 42%,transparent);
   --live-bg:#C21A33; --live-ink:#FF8795; --live-soft:#2A1320;
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
@@ -108,7 +108,7 @@ try {
   --ink:#E8ECF4; --ink-2:#CDD4E1; --muted:#A3AEC3; --faint:#97A3B9;
   --line:#28344D; --line-2:#1D273C;
   --accent:#9AACFF; --accent-ink:#0A0F1C; --accent-soft:#1D2849;
-  --board:#0D1630; --gold:#FFC940;
+  --board:#0D1630; --gold:#FFC940; --glow:color-mix(in srgb,var(--gold) 42%,transparent);
   --live-bg:#C21A33; --live-ink:#FF8795; --live-soft:#2A1320;
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
@@ -221,7 +221,7 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 .lv-row .sc{font:600 1.5rem/1 "Azeret Mono",monospace;color:var(--gold);background:var(--board-well);border:1px solid var(--board-line);border-radius:9px;padding:7px 10px;font-variant-numeric:tabular-nums}
 .lv-row .clk{font:600 13px "Azeret Mono",monospace;color:var(--on-live);background:var(--live-bg);border-radius:6px;padding:4px 8px}
 .dot-live{width:9px;height:9px;border-radius:50%;background:currentColor;display:inline-block;flex:none}
-@media (prefers-reduced-motion:no-preference){.dot-live{animation:pulse 1.6s ease-in-out infinite}}
+.dot-live{animation:pulse 1.6s ease-in-out infinite}   /* stopped with the other animations (see "Motion" at the end) */
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .livecount{color:var(--live-ink);font-weight:700;display:inline-flex;align-items:center;gap:6px}
 
@@ -315,7 +315,7 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
 .srcs summary,.calpanel details summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink-2);min-height:32px}
 .calpanel details summary{font-size:14px;min-height:44px}
 .srcs summary::-webkit-details-marker,.calpanel details summary::-webkit-details-marker{display:none}
-.srcs summary::after,.calpanel details summary::after{content:"";width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px)}
+.srcs summary::after,.calpanel details summary::after{content:"";width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translate(0,-2px)}
 .srcs[open] summary::after,.calpanel details[open] summary::after{transform:rotate(-135deg) translate(-1px,-1px)}
 .srcs .body{margin-top:4px;display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line-2)}
 .srcs .reported{color:var(--warn-ink);font-weight:600}
@@ -666,6 +666,53 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
     border-width:1px 0 0;border-radius:18px 18px 0 0;padding:16px 16px calc(24px + env(safe-area-inset-bottom,0px));box-shadow:0 -12px 40px -12px var(--shadow)}
   body:has(.calmenu[open]){overflow:hidden}
 }
+/* =========================================================================
+   Motion (Settings, Animations). Short, and almost only opacity and transform, which the browser
+   animates without laying out or redrawing the page. Nothing moves while the page loads; only what a
+   visitor opens, stars or switches, and a score that changes. With animations off (the tick box, or
+   the device's "reduce motion" until the tick box is used) :root gets data-motion="off" and the last
+   rule stops everything. Script-made animations (theme switch, list) use move() and motionOn() instead.
+   Two speeds keep everything consistent: --dur-s for things that change in place (colours, arrows,
+   menus unfolding), --dur-m for things that arrive or move (panels, sheets, the list, the theme, a bounce).
+   ========================================================================= */
+:root{--dur-s:.18s;--dur-m:.28s;--ease:cubic-bezier(.2,.8,.3,1)}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}}
+@keyframes drop{from{opacity:0;transform:translateY(-6px)}}
+@keyframes slide-in{from{opacity:0;transform:translateX(24px)}}
+@keyframes sheet-up{from{transform:translateY(100%)}}
+@keyframes fade{from{opacity:0}}
+@keyframes pop{45%{transform:scale(1.4)}}
+/* panels: Match details, Race weekend and Tables rise into place over a fading page; beside the list they slide in from the right */
+dialog.sheet[open]{animation:rise var(--dur-m) var(--ease)}
+dialog.sheet[open]::backdrop{animation:fade var(--dur-m) ease-out}
+dialog.sheet[open]:not(:modal){animation-name:slide-in}
+/* Settings and Calendar drop down from their button; sources and "How to subscribe" unfold; the small arrow turns */
+.calmenu[open]>.calpanel,.srcs[open] .body,.calpanel details[open]>ol{animation:drop var(--dur-s) var(--ease)}
+.srcs summary::after,.calpanel details summary::after{transition:transform var(--dur-s) var(--ease)}
+/* a star just switched on: a short bounce */
+.star.pop svg{animation:pop var(--dur-m) var(--ease)}
+/* a score that just changed (a goal): the score bounces and a soft gold light pulses out from behind it, under the
+   team names too, twice. The light sits behind the text (z-index -1 inside the row, which isolates it) and
+   stays inside the match's own row: each pulse starts small and bright at the score and spreads out as it fades. */
+.goal-row{isolation:isolate;overflow:clip}
+/* the match shown beside the list keeps its whole outline: the light is cut to the outline's outer edge instead */
+:root[data-pane] .goal-row:has(.md-open[aria-current="true"]){overflow:visible;clip-path:inset(calc(var(--ring-it,3px) + var(--ring-t,-3px)) -1px calc(var(--ring-ib,3px) + var(--ring-b,-3px)) -1px round var(--ring-rt,13px) var(--ring-rt,13px) var(--ring-rb,13px) var(--ring-rb,13px))}
+.goal{position:relative;display:inline-block;animation:pop var(--dur-m) var(--ease)}
+.goal::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:320px;height:320px;margin:-160px 0 0 -160px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,var(--glow),transparent);opacity:0;animation:glow-wave calc(var(--dur-m)*3) ease-out 2}
+@keyframes glow-wave{from{opacity:1;transform:scale(.15)}to{opacity:0;transform:scale(1)}}
+/* buttons and chips change colour gently when hovered or switched */
+.btn,.chip,.seg button,.more,.star,.reset{transition:background-color var(--dur-s),border-color var(--dur-s),color var(--dur-s)}
+/* the theme switch cross-fades the whole page through View Transitions, at the same speed and easing as the rest
+   (browsers without View Transitions simply switch) */
+::view-transition-old(root),::view-transition-new(root){animation-duration:var(--dur-m);animation-timing-function:var(--ease)}
+@media (max-width:640px){
+  /* phones: Settings and Calendar slide up from the bottom as a sheet */
+  .calmenu[open]>.calpanel{animation:sheet-up var(--dur-m) var(--ease)}
+  .calmenu[open]::before{animation:fade var(--dur-m) ease-out}
+}
+:root[data-theming] *{transition:none!important}
+:root[data-motion="off"] *,:root[data-motion="off"] ::before,:root[data-motion="off"] ::after,:root[data-motion="off"] ::backdrop{animation:none!important;transition:none!important}
 </style>
 </head>
 <body>
@@ -691,6 +738,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
             <select id="tzsel"></select></div>
           <h3 class="set-group" data-t="grpLook">Appearance</h3>
           <label class="hc-row"><input type="checkbox" id="hcbox"><span data-t="ctHighLabel">High contrast</span></label>
+          <label class="hc-row"><input type="checkbox" id="mvbox"><span data-t="motionLabel">Animations</span></label>
           <fieldset class="field"><legend data-t="sizeLabel">Text size</legend>
             <div class="choice sizes">
               <label><input type="radio" name="size" value="normal"><span data-t="szNormal">Normal</span></label>
@@ -1102,6 +1150,7 @@ const I18N = {
     grpRegion: "Region",
     grpLook: "Appearance",
     ctHighLabel: "High contrast",
+    motionLabel: "Animations",
     sizeLabel: "Text size",
     szNormal: "Normal",
     szLarge: "Large",
@@ -1462,6 +1511,7 @@ const I18N = {
     grpRegion: "Região",
     grpLook: "Aparência",
     ctHighLabel: "Contraste alto",
+    motionLabel: "Animações",
     sizeLabel: "Tamanho do texto",
     szNormal: "Normal",
     szLarge: "Grande",
@@ -1643,8 +1693,34 @@ const DARK = matchMedia("(prefers-color-scheme: dark)"),
 themeBtn.addEventListener("click", () => {
   theme = document.documentElement.classList.contains("is-dark") ? "light" : "dark";
   store.set("theme", theme);
-  applyTheme();
+  switchTheme();
 });
+// the new sun or moon turns into place (called once the new theme is applied, so it is the icon now shown)
+const turnIcon = () =>
+  move(
+    [...themeBtn.querySelectorAll(".ico")].find(i => getComputedStyle(i).display !== "none"),
+    [
+      { transform: "rotate(-90deg) scale(.5)", opacity: 0 },
+      { transform: "none", opacity: 1 },
+    ],
+  );
+// with animations on, the page cross-fades to the new theme. The buttons' own colour changes are paused meanwhile
+// (data-theming): the cross-fade already covers them, and hundreds of them at once would only cost time.
+function switchTheme() {
+  const r = document.documentElement,
+    apply = () => {
+      applyTheme();
+      turnIcon();
+    };
+  if (!motionOn() || !document.startViewTransition) return apply();
+  r.setAttribute("data-theming", "");
+  const t = (fading = document.startViewTransition(apply));
+  t.finished.finally(() => {
+    r.removeAttribute("data-theming");
+    if (fading === t) fading = null;
+  });
+}
+let fading = null; // the theme cross-fade under way, ended at once if animations are switched off
 DARK.addEventListener("change", applyTheme); // until the button is used, follow the device, even when it switches by itself (for example at sunset)
 
 /* ---------- contrast: normal or high (works with any theme) ---------- */
@@ -1660,6 +1736,41 @@ hcBox.addEventListener("change", () => {
   store.set("contrast", contrast);
   applyContrast();
 });
+
+/* ---------- animations: on, unless the device asks for less motion, until the Animations box is used ---------- */
+const CALM = matchMedia("(prefers-reduced-motion: reduce)"),
+  mvBox = document.getElementById("mvbox");
+let motion = store.get("motion", "auto");
+const motionOn = () => motion === "on" || (motion === "auto" && !CALM.matches);
+// a short animation made by script, at the same speeds as the CSS ones (which data-motion="off" stops instead)
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim(),
+  DUR = n => parseFloat(cssVar("--dur-" + n)) * 1000;
+const MOVING = new Set(); // script animations still running, stopped at once if animations are switched off
+function move(el, frames, o) {
+  if (!el || !motionOn()) return;
+  const a = el.animate(frames, { duration: DUR("m"), easing: cssVar("--ease"), ...o });
+  MOVING.add(a);
+  a.finished.then(
+    () => MOVING.delete(a),
+    () => MOVING.delete(a),
+  );
+  return a;
+}
+function applyMotion() {
+  if (motionOn()) document.documentElement.removeAttribute("data-motion");
+  else {
+    document.documentElement.setAttribute("data-motion", "off");
+    MOVING.forEach(a => a.cancel());
+    if (fading) fading.skipTransition(); // the new theme stays; only the cross-fade stops
+  }
+  mvBox.checked = motionOn();
+}
+mvBox.addEventListener("change", () => {
+  motion = mvBox.checked ? "on" : "off";
+  store.set("motion", motion);
+  applyMotion();
+});
+CALM.addEventListener("change", applyMotion);
 
 /* ---------- text size: normal, large, extra large (the whole page scales) ---------- */
 let size = store.get("size", "normal");
@@ -1748,6 +1859,7 @@ function applyLang() {
   makeFormatters();
   applyTheme();
   applyContrast();
+  applyMotion();
   applySize();
   showRepo();
   checkDates();
@@ -2210,7 +2322,9 @@ function render() {
           tags.push('<span class="pill early">' + ICON.moon + esc(T.pEarly) + "</span>");
       }
       const timeCell = started
-        ? '<span class="score" role="img" aria-label="' +
+        ? '<span class="score" data-uid="' +
+          esc(r.uid) +
+          '" role="img" aria-label="' +
           esc(T.score(L.hs, L.as)) +
           '">' +
           esc(L.hs) +
@@ -2267,13 +2381,54 @@ function render() {
   if (html === lastList) return; // the minute-by-minute refresh usually changes nothing: leave the page alone
   lastList = html;
   list.innerHTML = html;
+  // a new choice of filters rises into place, one day after another (only the first few, so it stays short);
+  // automatic updates do not move
+  if (filterAct)
+    [...list.querySelectorAll(".day")].slice(0, 6).forEach((d, i) =>
+      move(
+        d,
+        [
+          { opacity: 0, transform: "translateY(10px)" },
+          { opacity: 1, transform: "none" },
+        ],
+        { delay: i * 45, fill: "backwards" },
+      ),
+    );
   markCurrent();
+  goals(list, ".score[data-uid]", el => el.dataset.uid);
   const m = document.getElementById("more");
   if (m)
     m.onclick = () => {
       limit += 80;
       render();
     };
+}
+// the list only moves after a click, change or new date in the filters (the flag is cleared once that event is
+// handled). Typing a team name does not move it: the list redraws at each pause, so it would keep jumping while typing.
+let filterAct = false;
+["click", "change", "input"].forEach(t =>
+  document.getElementById("filters").addEventListener(
+    t,
+    e => {
+      if (e.target === q) return;
+      filterAct = true;
+      setTimeout(() => (filterAct = false));
+    },
+    true,
+  ),
+);
+// a score that changed since the last update (a goal) bounces with a gold glow; nothing moves on the first load
+const SEEN = new Map();
+function goals(box, sel, key) {
+  box.querySelectorAll(sel).forEach(el => {
+    const k = key(el),
+      was = SEEN.get(k);
+    if (was !== undefined && was !== el.textContent && motionOn()) {
+      el.classList.add("goal");
+      el.closest(".match,.lv-row").classList.add("goal-row");
+    }
+    SEEN.set(k, el.textContent);
+  });
 }
 const listEl = document.getElementById("list");
 listEl.addEventListener("click", e => {
@@ -2284,7 +2439,10 @@ listEl.addEventListener("click", e => {
   store.set("favs", [...favs]);
   render();
   const again = [...listEl.querySelectorAll(".star")].find(x => x.dataset.team === t);
-  if (again) again.focus(); // keep keyboard focus in place
+  if (again) {
+    again.focus(); // keep keyboard focus in place
+    if (favs.has(t)) again.classList.add("pop");
+  }
 });
 // CazéTV YouTube stream (or, kind "planned", a match on CazéTV's schedule whose stream
 // does not exist yet: links to the channel), when build_schedule.py found one; hidden once the match has finished
@@ -2648,6 +2806,7 @@ function renderLive() {
     const L = liveOf(r);
     if (L && L.state === "in" && on.has(r.code))
       rows.push({
+        id: L.id || keyOf(r),
         home: teamName(r.home),
         away: teamName(r.away),
         hs: L.hs,
@@ -2661,6 +2820,7 @@ function renderLive() {
     const code = codeOf[e.slug];
     if (on.has(code))
       rows.push({
+        id: e.id,
         home: e.hn,
         away: e.an,
         hs: e.hs,
@@ -2678,7 +2838,9 @@ function renderLive() {
   list.innerHTML = rows
     .map(
       x =>
-        '<div class="lv-row"><span class="h t">' +
+        '<div class="lv-row" data-id="' +
+        esc(x.id) +
+        '"><span class="h t">' +
         esc(x.home) +
         "<small>" +
         esc(x.comp) +
@@ -2696,6 +2858,7 @@ function renderLive() {
     )
     .join("");
   box.hidden = false;
+  goals(list, ".sc", el => "live|" + el.parentNode.dataset.id); // keyed by ESPN's event id, so two live rows never mix
   const stamp = document.getElementById("stamp");
   if (!lc)
     stamp.insertAdjacentHTML(

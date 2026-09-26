@@ -27,7 +27,7 @@ The fixture list is refreshed automatically at least four times a day.
 
 - Available in **English** and **Brazilian Portuguese**. The site follows your browser's language; you can change it under **Settings**.
 - Times can be shown in Edmonton, São Paulo (Brasília), Toronto, London, Madrid, Berlin, UTC or your device's own time zone.
-- **Settings** also offers larger text (Large or Extra large) and a high-contrast mode. The sun and moon button switches between the light and dark theme.
+- **Settings** also offers larger text (Large or Extra large), a high-contrast mode, and a switch for the short animations (they start switched off if your device asks for reduced motion). The sun and moon button switches between the light and dark theme.
 - The site is designed to be easy to use for everyone: large buttons with written labels, full keyboard support, and screen reader support. It is tested against the WCAG 2.2 AA accessibility standard in both languages, both themes, and at phone, laptop and monitor widths.
 
 ## Privacy
