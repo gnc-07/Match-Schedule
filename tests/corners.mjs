@@ -19,8 +19,9 @@ try {
   for (const width of [390, 1280, 1920]) for (const [state, q] of Object.entries(states)) for (const high of [false, true]) {
     const page = await browser.newPage();
     await page.setViewport({ width, height: 900 });
+    // contrast is always set: the pages share one storage, so a high contrast view would carry into the next
     await page.evaluateOnNewDocument(h => { try { localStorage.setItem("mp.favs", JSON.stringify(["Arsenal FC"]));
-      if (h) localStorage.setItem("mp.contrast", JSON.stringify("high")); } catch {} }, high);
+      localStorage.setItem("mp.contrast", JSON.stringify(h ? "high" : "normal")); } catch {} }, high);
     await mockNetwork(page);
     await page.goto(`${BASE}?lang=en${q}`, { waitUntil: "networkidle0" });
     if (state === "setmenu" || state === "calmenu") await page.evaluate(id => { document.getElementById(id).open = true; }, state);
