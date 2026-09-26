@@ -111,13 +111,21 @@ const wdSearch = { search: [{ id: "Q1" }] };
 const wdEntities = { entities: { Q1: { descriptions: { en: { value: "football stadium in London" } },
   claims: { P625: [{ mainsnak: { datavalue: { value: { latitude: 51.555, longitude: -0.108611 } } } }] } } } };
 
+// The list the test server hands out: the real matches, with the sample F1 weekends in place of any real sessions of
+// the same weekends (fixtures.json gains real rounds over the season; two sessions with one uid would show twice).
+const SAMPLE_WK = new Set(F1.map(m => m.wk));
+const MATCHES = [...data.matches.filter(m => !SAMPLE_WK.has(m.wk)), ...F1]
+  .sort((a, b) => (a.utc || a.date + "T99") < (b.utc || b.date + "T99") ? -1 : 1);   // in time order, as build_schedule.py writes it
+const dupes = MATCHES.map(m => m.uid).filter((u, i, all) => all.indexOf(u) !== i);
+if (dupes.length) throw new Error(`Sample data has more than one match with the same uid: ${[...new Set(dupes)].join(", ")}`);
+
 // Answers each outside request with sample data (only the sample match's league has a match on the scoreboard).
 export async function mockNetwork(page) {
   await page.setRequestInterception(true);
   page.on("request", req => {
     const u = req.url();
     if (new URL(u).pathname.endsWith("/fixtures.json"))
-      return req.respond({ status: 200, contentType: "application/json", body: JSON.stringify({ ...data, f1stale: true, matches: [...data.matches, ...F1].sort((a, b) => (a.utc || a.date + "T99") < (b.utc || b.date + "T99") ? -1 : 1) }) });   // in time order, as build_schedule.py writes it
+      return req.respond({ status: 200, contentType: "application/json", body: JSON.stringify({ ...data, f1stale: true, matches: MATCHES }) });
     const json = body => req.respond({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(body) });
     if (u.includes("api.jolpi.ca")) {
       if (u.includes("/qualifying/")) return json(f1Quali);
