@@ -184,11 +184,11 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 .field>label,.field>legend{font-size:15px;font-weight:600;color:var(--ink);padding:0;margin-bottom:6px}
 .field>label{margin-bottom:0}
 .field select{min-height:48px;font-size:16px;font-weight:600;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);color:var(--ink);padding:0 12px;cursor:pointer;width:100%}
-.choice{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px}
+.choice{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px}   /* inner corners parallel to the box's: 10px less its 1px border and 4px padding = 5px */
 .choice.two{grid-template-columns:repeat(2,1fr)}
 .choice label{position:relative;display:block}
 .choice input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
-.choice span{min-height:44px;display:grid;place-items:center;border-radius:8px;font-weight:600;font-size:15px;color:var(--ink-2);text-align:center;padding:0 4px}
+.choice span{min-height:44px;display:grid;place-items:center;border-radius:5px;font-weight:600;font-size:15px;color:var(--ink-2);text-align:center;padding:0 4px}
 .choice input:checked+span{background:var(--ink);color:var(--bg)}
 .choice input:focus-visible+span{outline:3px solid var(--accent);outline-offset:2px}
 .hint{margin:6px 0 0;font-size:13.5px;color:var(--muted)}
@@ -241,7 +241,7 @@ h1{margin:0;font:800 1.7rem/1 "Big Shoulders Display","Arial Narrow",Impact,sans
 .chip .crest.mark svg{width:17px;height:17px;margin:auto;fill:currentColor}
 .chip[aria-pressed="false"] .crest.flag{filter:grayscale(1);opacity:.55}
 .seg{display:inline-flex;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
-.seg button{min-height:38px;font-size:14px;font-weight:600;border:0;background:transparent;color:var(--ink-2);padding:0 12px;border-radius:7px;cursor:pointer}
+.seg button{min-height:38px;font-size:14px;font-weight:600;border:0;background:transparent;color:var(--ink-2);padding:0 12px;border-radius:6px;cursor:pointer}   /* 10px less the 1px border and 3px padding, parallel to the box */
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .search{flex:1 1 240px;min-width:0;min-height:44px;display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:0 10px;color:var(--muted)}
 .search input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);min-height:42px;outline:none}
@@ -274,7 +274,7 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
 .cal-block .num{font:800 2.5rem/1 "Big Shoulders Display","Arial Narrow",sans-serif;padding-top:6px;color:var(--ink)}
 .cal-block .wd{font:600 12px/1 "Instrument Sans",sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:3px 0 9px}
 .cal-block .rel{width:100%;text-align:center;font:700 11px/1 "Instrument Sans",sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:5px 0;background:var(--accent-soft);color:var(--accent)}
-.day-list{margin:0;padding:0;list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.day-list{margin:0;padding:0;list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;overflow:clip;overflow-clip-margin:1px}   /* clip at the border's outer edge, so the outline of the match shown can cover the border */
 
 .match{position:relative;display:grid;grid-template-columns:92px minmax(0,1fr) auto;gap:6px 16px;align-items:start;padding:14px 16px 14px 20px;border-top:1px solid var(--line-2)}
 .match:first-child{border-top:0}
@@ -391,11 +391,18 @@ footer p{margin:10px 0 0}
 :root[data-pane][data-wide="full"][data-side="closed"] .wrap{max-width:1100px;grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"head" "stamp" "bar" "list" "foot"}
 :root[data-pane] #mddlg{position:fixed;inset:0 0 0 auto;z-index:20;margin:0;width:var(--pane);max-width:none;height:100%;max-height:none;overflow-y:auto;overscroll-behavior:contain;
   border-width:0 0 0 1px;border-radius:0;box-shadow:-16px 0 40px -24px var(--shadow)}
-:root[data-pane] .match:has(.md-open[aria-current="true"]){box-shadow:inset 0 0 0 3px var(--accent)}
-/* the ring follows the day box's rounded corners (14px less its 1px border), and the league stripe sits inside it, not over it */
-:root[data-pane] .match:first-child:has(.md-open[aria-current="true"]){border-top-left-radius:13px;border-top-right-radius:13px}
-:root[data-pane] .match:last-child:has(.md-open[aria-current="true"]){border-bottom-left-radius:13px;border-bottom-right-radius:13px}
-:root[data-pane] .match:has(.md-open[aria-current="true"])::before{left:3px}
+:root[data-pane] #mddlg .sheet-head>.btn{border-radius:10px}   /* square panel corners: the usual control corner */
+/* the match shown is outlined in its league colour, thicker on the left where the league stripe was, with 13px corners
+   on both its outer and inner edges. Where it meets the day box's edge it covers that box's 1px grey border (the box lets
+   it, with overflow-clip-margin), so the box's own curve is the outline's outer corner: two curves on top of each other
+   would leave a pale seam. The ring is the shadow of a 13px-round box set in by the ring's width, cut to the card's shape. */
+:root[data-pane] .match:has(.md-open[aria-current="true"]){border-radius:13px}
+:root[data-pane] .match:has(.md-open[aria-current="true"])::before{display:none}
+:root[data-pane] .match:has(.md-open[aria-current="true"])::after{content:"";position:absolute;inset:var(--ring-it,3px) 2px var(--ring-ib,3px) 5px;
+  border-radius:13px;pointer-events:none;box-shadow:0 0 0 8px var(--c);
+  clip-path:inset(var(--ring-t,-3px) -3px var(--ring-b,-3px) -6px round var(--ring-rt,13px) var(--ring-rt,13px) var(--ring-rb,13px) var(--ring-rb,13px))}
+:root[data-pane] .match:first-child:has(.md-open[aria-current="true"]){--ring-it:2px;--ring-t:-9px;--ring-rt:0px}
+:root[data-pane] .match:last-child:has(.md-open[aria-current="true"]){--ring-ib:2px;--ring-b:-9px;--ring-rb:0px}
 
 /* ---------- text size (Settings): scales the whole page, like the browser's own zoom ---------- */
 :root{--z:1}   /* the zoom again, for viewport units (vh), which the zoom scales up too */
@@ -494,6 +501,7 @@ footer p{margin:10px 0 0}
 dialog.sheet{width:min(820px,calc(100% - 32px));max-height:calc(100% - 48px);padding:0;border:1px solid var(--line);border-radius:16px;background:var(--bg);color:var(--ink);box-shadow:0 24px 60px -20px var(--shadow)}
 dialog.sheet::backdrop{background:var(--backdrop)}
 .sheet-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+.sheet-head>.btn{border-radius:7px}   /* in the window's corner: its 16px less the 1px border and 8px padding, so the curves are parallel */
 .sheet-head h2{margin:0;font:800 1.3rem/1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.03em}
 .sheet-body{padding:16px}
 .md{display:flex;flex-direction:column;gap:16px}
@@ -603,6 +611,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
 @media (max-width:640px){
   .track svg{height:220px}   /* after the base .track rule, so it wins */
   dialog.sheet{width:100%;max-width:100%;height:100%;max-height:100%;margin:0;border:0;border-radius:0}   /* %, not vw/dvh: those ignore the page zoom of Large and Extra large text */
+  .sheet-head>.btn{border-radius:10px}   /* square window corners: the usual control corner */
   .sheet-body{padding:12px}
   .md{gap:12px}
   .md-board .tm{font-size:1.25rem}
