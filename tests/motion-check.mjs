@@ -69,7 +69,13 @@ async function slowest(browser, label, width, act, motion) {
 }
 async function run(label, launch) {
   const server = await startServer();
-  const browser = await puppeteer.launch(launch);
+  let browser;
+  try {
+    browser = await puppeteer.launch(launch);
+  } catch (e) {
+    server.kill();   // otherwise the server keeps the command running
+    throw e;
+  }
   try {
     for (const [name, width, act] of cases.filter(c => !ONLY.length || ONLY.includes(c[0]))) {
       const on = await slowest(browser, label, width, act, "on"), off = await slowest(browser, label, width, act, "off");
@@ -122,6 +128,17 @@ async function run(label, launch) {
     await page.close();
     console.log(`${label.padEnd(8)} switch-off   ${left} animation(s) still running after Animations was unticked`);
     if (left) problems.push(`${label}: ${left} animation(s) kept running after Animations was switched off`);
+    // the same during the theme cross-fade: it stops, and the new theme stays
+    const theme = await open(browser, 1280, "on");
+    await theme.click("#themebtn");
+    await wait(60);
+    const [fading, dark] = await theme.evaluate(() => { document.getElementById("mvbox").click();
+      return [document.getAnimations().filter(a => a.playState === "running").length, document.documentElement.classList.contains("is-dark")]; });
+    await wait(60);
+    const stillFading = await theme.evaluate(() => document.getAnimations().filter(a => a.playState === "running").length);
+    await theme.close();
+    console.log(`${label.padEnd(8)} switch-off   theme cross-fade: ${stillFading} animation(s) running after unticking, dark theme kept: ${dark}`);
+    if (stillFading || !dark) problems.push(`${label}: unticking Animations during the theme cross-fade left ${stillFading} running (dark theme kept: ${dark})`);
   } finally {
     await browser.close();
     server.kill();

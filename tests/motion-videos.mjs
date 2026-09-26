@@ -14,8 +14,14 @@ const FFMPEG = process.env.FFMPEG || "ffmpeg";
 const out = path.join(ROOT, "screenshots", "motion");
 mkdirSync(out, { recursive: true });
 const server = await startServer();
-const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true,
-  args: process.getuid?.() === 0 ? ["--no-sandbox"] : [] });   // Chromium refuses to run as root without this
+let browser;
+try {
+  browser = await puppeteer.launch({ executablePath: chromePath(), headless: true,
+    args: process.getuid?.() === 0 ? ["--no-sandbox"] : [] });   // Chromium refuses to run as root without this
+} catch (e) {
+  server.kill();   // otherwise the server keeps the command running
+  throw e;
+}
 const errors = [];
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const uid = MATCH.uid;
@@ -104,7 +110,7 @@ try {
     page.on("pageerror", e => errors.push(`${name}: ${e.message}`));
     await page.setViewport({ width, height });
     await page.evaluateOnNewDocument(() => { try { localStorage.setItem("mp.theme", JSON.stringify("light"));
-      localStorage.setItem("mp.favs", "[]"); localStorage.removeItem("mp.motion"); } catch {} });
+      localStorage.setItem("mp.favs", "[]"); localStorage.setItem("mp.motion", '"on"'); } catch {} });   // animations on, whatever the device asks
     await mockNetwork(page);
     await page.goto(BASE + "?lang=en", { waitUntil: "networkidle0" });
     const cdp = await page.createCDPSession();

@@ -1702,8 +1702,13 @@ function switchTheme() {
     };
   if (!motionOn() || !document.startViewTransition) return apply();
   r.setAttribute("data-theming", "");
-  document.startViewTransition(apply).finished.finally(() => r.removeAttribute("data-theming"));
+  const t = (fading = document.startViewTransition(apply));
+  t.finished.finally(() => {
+    r.removeAttribute("data-theming");
+    if (fading === t) fading = null;
+  });
 }
+let fading = null; // the theme cross-fade under way, ended at once if animations are switched off
 DARK.addEventListener("change", applyTheme); // until the button is used, follow the device, even when it switches by itself (for example at sunset)
 
 /* ---------- contrast: normal or high (works with any theme) ---------- */
@@ -1744,6 +1749,7 @@ function applyMotion() {
   else {
     document.documentElement.setAttribute("data-motion", "off");
     MOVING.forEach(a => a.cancel());
+    if (fading) fading.skipTransition(); // the new theme stays; only the cross-fade stops
   }
   mvBox.checked = motionOn();
 }
