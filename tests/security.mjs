@@ -1,7 +1,8 @@
 // Feeds the page hostile data, the way a broken or tampered feed might, and checks that none of it runs:
 // script-like team names and venues stay text, javascript: links never become clickable, odd map
 // coordinates give no map, and the browser reports no Content-Security-Policy violations.
-// Covers the fixture list, the match details panel and the League tables window.
+// Covers the fixture list, the match details panel and the League tables window, and then the same with ESPN
+// not answering, so the backups are used: OpenLigaDB (Bundesliga) and the tables saved in fixtures.json.
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import puppeteer from "puppeteer-core";
@@ -30,7 +31,22 @@ const wrong = (extra, i) => ({ comp: "Premier League", code: "EPL", round: "Matc
 const malformed = [wrong({ round: 7 }, 1), wrong({ gp: 7 }, 2), wrong({ check: { status: "confirmed", sources: "x" } }, 3),
   wrong({ check: { status: "confirmed", sources: [null] } }, 4), wrong({ check: { status: "confirmed", sources: [[]] } }, 5),
   { ...race("97", { name: "Monza" }), sess: 5 }, { ...race("96", { name: "Monza" }), top: "Almeida" }];
-const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, matches: [bad, badWidth, badLat, ...malformed, ...data.matches] };
+// a Bundesliga match on now, for the OpenLigaDB backup; and saved tables with markup and wrong types in them
+const kick = new Date(Date.now() - 30 * 60e3).toISOString().replace(/\.\d+Z$/, "+00:00");
+const bunLive = { comp: "Bundesliga", code: "BUN", round: "Matchday 5", home: "Borussia Dortmund", away: "FC Bayern München",
+  date: kick.slice(0, 10), utc: kick, uid: "test-backup" };
+const tables = { EPL: [{ team: "Arsenal" + EVIL, rank: EVIL, p: 3, w: 3, d: 0, l: 0, gd: EVIL, pts: 9 }, { team: 7 }, null, "x"] };
+const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, tables,
+  matches: [bad, badWidth, badLat, bunLive, ...malformed, ...data.matches] };
+// OpenLigaDB's answers: the match on now (a scorer with markup) and malformed entries that must be skipped quietly
+const oldbMatch = { matchID: 424242, matchDateTimeUTC: kick.replace("+00:00", "Z"), matchIsFinished: false,
+  team1: { teamName: "Borussia Dortmund" + EVIL, shortName: EVIL }, team2: { teamName: "FC Bayern München", shortName: "Bayern" },
+  matchResults: [{ resultTypeID: 2, pointsTeam1: EVIL, pointsTeam2: 0 }],
+  goals: [{ goalID: 1, scoreTeam1: 1, scoreTeam2: 0, matchMinute: 12, goalGetterName: EVIL, isPenalty: false, isOwnGoal: false },
+    { goalID: 2, scoreTeam1: 1, scoreTeam2: 1, matchMinute: EVIL, goalGetterName: "Kane", isPenalty: true, isOwnGoal: false }] };
+const oldbBoard = [oldbMatch, { matchID: EVIL, team1: {}, team2: {} }, null, { matchID: 5, matchDateTimeUTC: EVIL, goals: EVIL }];
+const oldbTable = [{ teamName: "Borussia Dortmund" + EVIL, matches: 4, won: 4, draw: 0, lost: 0, goalDiff: EVIL, points: EVIL }, { teamName: 3 }];
+let espnDown = false;
 
 const server = await startServer();
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true,
@@ -49,6 +65,10 @@ try {
     const u = req.url();
     const json = body => req.respond({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(body) });
     if (new URL(u).pathname.endsWith("/fixtures.json")) return json(fixtures);
+    if (u.includes("espn.com") && espnDown) return req.respond({ status: 503, body: "" });
+    if (u.includes("api.openligadb.de/getmatchdata/424242")) return json(oldbMatch);
+    if (u.includes("api.openligadb.de/getmatchdata/bl1")) return json(oldbBoard);
+    if (u.includes("api.openligadb.de/getbltable")) return json(oldbTable);
     if (u.includes("espn.com") && u.includes("/standings")) return json({ children: [{ standings: { entries: [
       { team: { displayName: "Arsenal" + EVIL }, stats: [{ name: "rank", value: EVIL }, { name: "points", value: EVIL }] }] } }] });
     if (u.includes("espn.com")) return json({ events: [] });
@@ -112,6 +132,40 @@ try {
     const ok = text.includes(EVIL);
     console.log(`${ok ? "PASS" : "FAIL"}  league tables: hostile ${cell} shown as text`);
     if (!ok) problems.push(`league tables: the ${cell} cell does not show the hostile value as text`);
+  }
+
+  // ESPN not answering: the backups take over, and their answers get the same treatment
+  espnDown = true;
+  const shows = (what, ok) => {
+    console.log(`${ok ? "PASS" : "FAIL"}  ${what}`);
+    if (!ok) problems.push(what);
+  };
+  await page.goto(`${BASE}?lang=en`, { waitUntil: "networkidle0" });
+  await page.waitForFunction(() => !document.querySelector("#livebox").hidden, { timeout: 15000 }).catch(() => {});
+  const live = await page.evaluate(() => ({ list: document.querySelector("#livelist")?.textContent || "",
+    note: document.querySelector("#livenote")?.textContent || "" }));
+  shows("ESPN down: the Bundesliga score comes from OpenLigaDB, marked LIVE (it has no match clock)",
+    live.list.includes("1–1") && live.list.includes("LIVE") && live.note.includes("OpenLigaDB"));
+  await check("ESPN down: live scores from OpenLigaDB");
+  await page.goto(`${BASE}?lang=en&match=test-backup`, { waitUntil: "networkidle0" });
+  await page.waitForFunction(() => document.querySelector("#md-src")?.textContent.includes("OpenLigaDB"), { timeout: 15000 }).catch(() => {});
+  const md = await page.evaluate(() => ({ ev: document.querySelector("#md-ev")?.textContent || "",
+    src: document.querySelector("#md-src")?.textContent || "", lineups: !document.querySelector("#md-lu")?.hidden }));
+  shows("ESPN down: match details list OpenLigaDB's goals, the hostile scorer as text", md.ev.includes(EVIL) && md.src.includes("OpenLigaDB"));
+  shows("ESPN down: no line-ups box (OpenLigaDB has none)", !md.lineups);
+  await check("ESPN down: match details from OpenLigaDB");
+  await page.goto(`${BASE}?lang=en`, { waitUntil: "networkidle0" });
+  for (const code of ["BUN", "EPL"]) {
+    const from = code === "BUN" ? "OpenLigaDB" : "worked out";
+    await page.evaluate(c => openTables(c), code);
+    // the window keeps the last table on screen until the new one is ready: wait for this league's source line
+    await page.waitForFunction(f => document.querySelector("#ltbody .lt-key")?.textContent.includes(f), { timeout: 15000 }, from).catch(() => {});
+    const t = await page.evaluate(() => ({ team: document.querySelector("#ltbody tbody .tm-c")?.textContent || "",
+      rows: document.querySelectorAll("#ltbody tbody tr").length, key: document.querySelector("#ltbody .lt-key")?.textContent || "" }));
+    shows(`ESPN down: ${code} table from the backup (${from}), wrong rows left out, hostile name as text`,
+      t.team.includes(EVIL) && t.rows === 1 && t.key.includes(from));
+    await check(`ESPN down: ${code} table`);
+    await page.keyboard.press("Escape");
   }
 } finally {
   await browser.close();
