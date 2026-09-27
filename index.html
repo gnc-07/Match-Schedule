@@ -367,7 +367,7 @@ footer p{margin:10px 0 0}
 :root[data-wide] #sidehide{display:inline-flex;padding:0 12px 0 8px}
 :root[data-wide] .side-lab{display:block;margin:8px 0 0;font:700 12px/1 "Instrument Sans",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 :root[data-wide] .filters .row{flex-direction:column;flex-wrap:nowrap;align-items:stretch}   /* nowrap: a wrapping column would stretch items to their widest content, past the sidebar */
-:root[data-wide] #leagues .chip{justify-content:flex-start}
+:root[data-wide] #leagues .chip{justify-content:flex-start;border-radius:10px;padding-left:9px}   /* full width in the sidebar: the usual control corner, like the date range and search below, not a long pill; the round picture sits 9px in (the corner's 10px less the 1px border), past the corner's curve, so it needs no parallel corner */
 :root[data-wide] #range{display:grid;grid-template-columns:1fr 1fr}
 :root[data-wide] #range button:last-child{grid-column:1/-1}
 :root[data-wide] .filters .search{flex:none}
