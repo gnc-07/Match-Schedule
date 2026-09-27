@@ -90,27 +90,38 @@ async function run(label, launch) {
       await still.close();
       if (moving) problems.push(`${label} ${name}: ${moving} animation(s) ran with animations switched off`);
       const page = await open(browser, width, "on");
-      await act(page);
-      // wait for the animation to begin (up to a second) rather than a fixed moment: the theme cross-fade starts a frame
-      // or two after the click, later still on a busy computer, and a fixed 40 ms wait then found nothing moving
-      await page.waitForFunction(() => document.getAnimations().some(a => a.playState === "running" && a.animationName !== "pulse"),
-        { timeout: 1000 }).catch(() => {});
-      await wait(40);
-      // what is animating: every animation's properties and length (the live dot's pulse was there before)
-      const anims = await page.evaluate(() => {
-        const speeds = ["--dur-s", "--dur-m"].map(n => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n)) * 1000);
-        return { speeds, list: document.getAnimations().filter(a => a.playState === "running" && a.animationName !== "pulse").map(a => ({
-          what: a.animationName || a.transitionProperty || "script",
-          on: String(a.effect?.target?.id || a.effect?.target?.className?.baseVal || a.effect?.target?.className || a.effect?.target?.tagName || "") + (a.effect?.pseudoElement || ""),
-          ms: Math.round(a.effect.getComputedTiming().duration),
-          hidden: !!a.effect?.target && !a.effect.pseudoElement && getComputedStyle(a.effect.target).display === "none",
-          props: [...new Set(a.effect.getKeyframes().flatMap(Object.keys))].filter(p => !["offset", "easing", "composite", "computedOffset"].includes(p)),
-        })) };
+      // Record every animation as it starts, on every frame from the click until things settle, rather than looking at
+      // one moment: on a busy computer a 280 ms animation can begin and end between a look and the next.
+      // What is recorded: each animation's properties and length (not the live dot's pulse, which was there before).
+      await page.evaluate(() => {
+        const seen = window.__seen = new Map();
+        const tick = () => {
+          for (const a of document.getAnimations()) {
+            if (a.playState !== "running" || a.animationName === "pulse" || seen.has(a)) continue;
+            seen.set(a, {
+              what: a.animationName || a.transitionProperty || "script",
+              on: String(a.effect?.target?.id || a.effect?.target?.className?.baseVal || a.effect?.target?.className || a.effect?.target?.tagName || "") + (a.effect?.pseudoElement || ""),
+              ms: Math.round(a.effect.getComputedTiming().duration),
+              hidden: !!a.effect?.target && !a.effect.pseudoElement && getComputedStyle(a.effect.target).display === "none",
+              props: [...new Set(a.effect.getKeyframes().flatMap(Object.keys))].filter(p => !["offset", "easing", "composite", "computedOffset"].includes(p)),
+            });
+          }
+          if (!window.__stop) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
       });
+      await act(page);
+      // wait for the animation to begin (up to a second): the theme cross-fade starts a frame or two after the click
+      await page.waitForFunction(() => window.__seen.size > 0, { timeout: 1000 }).catch(() => {});
+      await wait(40);
       // pause everything partway through for the picture (the goal glow earlier, while it is brightest)
       await page.evaluate(() => document.getAnimations().forEach(a => { const t = a.effect.getComputedTiming();
         a.pause(); a.currentTime = (t.delay || 0) + t.duration * (a.animationName === "glow-wave" ? 0.3 : 0.5); }));
       await page.screenshot({ path: path.join(out, `${name}-${label}.png`) });
+      await wait(600);   // anything that starts a little later (the recorder keeps watching), then stop
+      const anims = await page.evaluate(() => { window.__stop = true;
+        return { speeds: ["--dur-s", "--dur-m"].map(n => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n)) * 1000),
+          list: [...window.__seen.values()] }; });
       await page.close();
       if (!anims.list.length) problems.push(`${label} ${name}: no animation ran`);
       const seen = new Set();
@@ -137,11 +148,12 @@ async function run(label, launch) {
     // the same during the theme cross-fade: it stops, and the new theme stays
     const theme = await open(browser, 1280, "on");
     await theme.click("#themebtn");
+    // untick once the cross-fade is under way (up to a second): on a busy computer it starts later than a fixed wait
+    await theme.waitForFunction(() => document.getAnimations().some(a => a.playState === "running"), { timeout: 1000 }).catch(() => {});
+    await theme.evaluate(() => document.getElementById("mvbox").click());
     await wait(60);
-    const [fading, dark] = await theme.evaluate(() => { document.getElementById("mvbox").click();
-      return [document.getAnimations().filter(a => a.playState === "running").length, document.documentElement.classList.contains("is-dark")]; });
-    await wait(60);
-    const stillFading = await theme.evaluate(() => document.getAnimations().filter(a => a.playState === "running").length);
+    const [stillFading, dark] = await theme.evaluate(() =>
+      [document.getAnimations().filter(a => a.playState === "running").length, document.documentElement.classList.contains("is-dark")]);
     await theme.close();
     console.log(`${label.padEnd(8)} switch-off   theme cross-fade: ${stillFading} animation(s) running after unticking, dark theme kept: ${dark}`);
     if (stillFading || !dark) problems.push(`${label}: unticking Animations during the theme cross-fade left ${stillFading} running (dark theme kept: ${dark})`);
