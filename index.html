@@ -397,9 +397,10 @@ footer p{margin:10px 0 0}
 :root[data-pane][data-wide="full"] .mid{grid-template-columns:290px minmax(0,1fr);grid-template-rows:none;grid-template-areas:"side list"}
 :root[data-pane][data-wide="full"][data-side="closed"] .wrap{max-width:1100px}
 :root[data-pane][data-wide="full"][data-side="closed"] .mid{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"bar" "list"}
-:root[data-pane] #mddlg{position:fixed;inset:0 0 0 auto;z-index:20;margin:0;width:var(--pane);max-width:none;height:100%;max-height:none;overflow-y:auto;overscroll-behavior:contain;
+:root:is([data-pane],[data-pane-out]) #mddlg{position:fixed;inset:0 0 0 auto;z-index:20;margin:0;width:var(--pane);max-width:none;height:100%;max-height:none;overflow-y:auto;overscroll-behavior:contain;
   border-width:0 0 0 1px;border-radius:0;box-shadow:-16px 0 40px -24px var(--shadow)}
-:root[data-pane] #mddlg .sheet-head>.btn{border-radius:10px}   /* square panel corners: the usual control corner */
+:root:is([data-pane],[data-pane-out]) #mddlg .sheet-head>.btn{border-radius:10px}   /* square panel corners: the usual control corner */
+/* data-pane-out: the panel keeps its place beside the list while it slides out, and the page glides back meanwhile */
 /* the match shown is outlined in its league colour, thicker on the left where the league stripe was, with 14px outer
    corners like the day box's. Where it meets the day box's edge it covers that box's 1px grey border (the box lets it,
    with overflow-clip-margin), so the box's own curve is the outline's outer corner: two curves on top of each other
@@ -676,11 +677,15 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
    rule stops everything. Script-made animations (theme switch, list, closing, the filter sidebar) use
    move() and motionOn() instead.
    Two speeds keep everything consistent: --dur-s for things that change in place (colours, arrows,
-   menus unfolding) and for everything closing or going away (leave(): it moves out, then goes), --dur-m
-   for things that arrive or move (panels, sheets, the list, the theme, a bounce, the page gliding when
-   the filter sidebar or the panel beside the list comes or goes).
+   menus unfolding), --dur-m for things that arrive or move (panels, sheets, the list, the theme, a bounce,
+   the page gliding when the filter sidebar or the panel beside the list comes or goes). Whatever closes
+   or goes away takes as long as it took to arrive (leave(): it moves out, then goes).
+   Two curves: --ease for what arrives (it comes in briskly and settles softly), --ease-soft for what
+   leaves and for the page gliding a long way (it starts and ends gently, so nothing lurches: with
+   --ease a closing panel would lose a third of itself in the first frame, and the list would jump
+   50px at once).
    ========================================================================= */
-:root{--dur-s:.18s;--dur-m:.28s;--ease:cubic-bezier(.2,.8,.3,1)}
+:root{--dur-s:.18s;--dur-m:.28s;--ease:cubic-bezier(.2,.8,.3,1);--ease-soft:cubic-bezier(.3,0,.2,1)}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}}
 @keyframes drop{from{opacity:0;transform:translateY(-6px)}}
 @keyframes slide-in{from{opacity:0;transform:translateX(24px)}}
@@ -1777,10 +1782,12 @@ function move(el, frames, o) {
   );
   return a;
 }
-// something closing or going away moves out first, at the shorter speed, and only then goes (done); with animations
-// off it goes at once. Opened again meanwhile (stay), it stops leaving and stays where it is.
-function leave(el, frames, done) {
-  const a = move(el, frames, { duration: DUR("s"), fill: "forwards" });
+// something closing or going away moves out first, and only then goes (done); with animations off it goes at once.
+// It takes as long as it took to arrive (speed: "s" or "m"), on the soft curve, so it starts and ends gently.
+// Opened again meanwhile (stay), it stops leaving and stays where it is.
+const SOFT = () => ({ easing: cssVar("--ease-soft") });
+function leave(el, frames, done, speed = "s") {
+  const a = move(el, frames, { duration: DUR(speed), fill: "forwards", ...SOFT() });
   if (!a) return done();
   el.leaving = a;
   const end = () => {
@@ -1823,19 +1830,27 @@ const riseDays = days =>
   );
 // a layout change (the filter sidebar hidden or shown): what moves glides from its old place to the new one, with
 // transform only. Positions are measured on screen, so they are divided by the text-size zoom.
-function glide(els, change) {
+// The list is followed by a match on screen, not by its own edge: when the list gets narrower or wider, the matches
+// above the window change height and the browser scrolls to keep what is read in place, so the list's top edge can
+// move thousands of pixels while what is on screen barely moves.
+// pin: the match to follow, when one matters (the one whose details open or close beside the list)
+const onScreen = el =>
+  (el === listEl && [...el.querySelectorAll(".match")].find(m => m.getBoundingClientRect().bottom > 0)) || el;
+function glide(els, change, pin) {
   const z = parseFloat(getComputedStyle(document.documentElement).zoom) || 1,
-    was = els.map(el => el.getBoundingClientRect());
+    pins = els.map(el => (el === listEl && pin && pin.isConnected ? pin : onScreen(el))),
+    was = els.map((el, i) => [el.getBoundingClientRect(), pins[i].getBoundingClientRect()]);
   change();
   els.forEach((el, i) => {
-    const a = was[i],
+    const [a, pa] = was[i],
       b = el.getBoundingClientRect(),
-      dx = (a.left - b.left) / z,
-      dy = (a.top - b.top) / z;
+      pb = pins[i].getBoundingClientRect(),
+      dx = (pa.left - pb.left) / z,
+      dy = (pa.top - pb.top) / z;
     if (!a.width && b.width)
       move(el, [{ opacity: 0 }, { opacity: 1 }]); // just shown: it fades in where it is
     else if (a.width && b.width && (Math.abs(dx) > 1 || Math.abs(dy) > 1))
-      move(el, [{ transform: "translate(" + dx + "px," + dy + "px)" }, { transform: "none" }]);
+      move(el, [{ transform: "translate(" + dx + "px," + dy + "px)" }, { transform: "none" }], SOFT()); // a long way: gently
   });
 }
 // the page cross-fades to a new look (theme, contrast, text size, language, time zone). The buttons' own colour
@@ -2022,17 +2037,24 @@ const SHEET = matchMedia("(max-width:640px)");
 function foldMenu(m) {
   const p = m.querySelector(".calpanel");
   if (!m.open || p.leaving) return;
-  if (SHEET.matches)
+  const sheet = SHEET.matches; // a sheet slid up at the longer speed; a menu dropped down at the shorter one
+  if (sheet)
     move(m, [{ opacity: 1 }, { opacity: 0 }], {
-      duration: DUR("s"),
+      duration: DUR("m"),
       fill: "forwards",
       pseudoElement: "::before",
       id: "undim",
+      ...SOFT(),
     });
-  leave(p, SHEET.matches ? [{ transform: "none" }, { transform: "translateY(100%)" }] : LIFT, () => {
-    undim(m); // first: once closed, the dimmed layer and its animation are gone from the menu
-    m.open = false;
-  });
+  leave(
+    p,
+    sheet ? [{ transform: "none" }, { transform: "translateY(100%)" }] : LIFT,
+    () => {
+      undim(m); // first: once closed, the dimmed layer and its animation are gone from the menu
+      m.open = false;
+    },
+    sheet ? "m" : "s",
+  );
 }
 const undim = m => m.getAnimations({ subtree: true }).forEach(a => a.id === "undim" && a.cancel());
 function closeMenu(m, focus) {
@@ -4441,39 +4463,67 @@ let pushed = false,
   trigger = null;
 function showPanel(uid) {
   openMatch(uid, document.getElementById("mdbody"));
-  openDialog();
-  const a = listEl.querySelector('.md-open[aria-current="true"]');
-  if (a) a.closest(".match").scrollIntoView({ block: "center" });
+  // the match shown is brought to the middle of the window (beside the list, it glides there)
+  openDialog(() => {
+    const c = shownCard();
+    if (c) c.scrollIntoView({ block: "center" });
+  });
   mddlg.querySelector("[data-close]").focus();
 }
-function openDialog() {
+// the card of the match in the address (?match=)
+const shownCard = () => {
+  const a = [...listEl.querySelectorAll(".md-open")].find(x => x.dataset.uid === matchParam());
+  return a && a.closest(".match");
+};
+function openDialog(then) {
+  const r = document.documentElement;
   stay(mddlg); // opened again while closing
   undim(mddlg);
-  const beside = document.documentElement.dataset.wide === "full",
+  r.removeAttribute("data-pane-out");
+  const beside = r.dataset.wide === "full",
     show = () => {
       if (!mddlg.open) {
-        if (beside) mddlg.show();
-        else mddlg.showModal();
+        if (beside) {
+          r.setAttribute("data-pane", ""); // placed beside the list before it opens, so moving focus into it scrolls nothing
+          mddlg.show();
+        } else mddlg.showModal();
       }
-      document.documentElement.toggleAttribute("data-pane", mddlg.open && !mddlg.matches(":modal"));
+      r.toggleAttribute("data-pane", mddlg.open && !mddlg.matches(":modal"));
+      markCurrent();
+      if (then) then();
     };
-  // beside the list, the page makes room for the panel: the list and the sidebar glide over instead of jumping
-  if (beside && !mddlg.open) glide(pageParts(), show);
+  // beside the list, the page makes room for the panel and the match shown comes to the middle: the list and the
+  // sidebar glide there instead of jumping, following that match
+  if (beside) glide(pageParts(), show, shownCard());
   else show();
-  markCurrent();
 }
 // a panel closing sinks and fades over its fading page (beside the list: slides back out to the right, and the page
 // glides back), then closes
 function shut(d) {
   if (!d.open || d.leaving) return;
-  const modal = d.matches(":modal");
+  const r = document.documentElement,
+    modal = d.matches(":modal");
   if (modal)
     move(d, [{ opacity: 1 }, { opacity: 0 }], {
-      duration: DUR("s"),
+      duration: DUR("m"),
       fill: "forwards",
       pseudoElement: "::backdrop",
       id: "undim",
+      ...SOFT(),
     });
+  else {
+    // beside the list, the opening played backwards: the page glides back while the panel slides out, the panel
+    // keeping its place meanwhile (data-pane-out)
+    r.setAttribute("data-pane-out", "");
+    glide(
+      pageParts(),
+      () => {
+        r.removeAttribute("data-pane");
+        markCurrent();
+      },
+      shownCard(),
+    );
+  }
   leave(
     d,
     [
@@ -4482,12 +4532,10 @@ function shut(d) {
     ],
     () => {
       undim(d);
-      if (modal) return d.close();
-      glide(pageParts(), () => {
-        d.close();
-        document.documentElement.removeAttribute("data-pane"); // at once: the close event comes a moment later
-      });
+      d.close();
+      r.removeAttribute("data-pane-out");
     },
+    "m",
   );
 }
 // the card whose details are shown beside the list is outlined, and screen readers hear "current" on its button
@@ -4517,7 +4565,12 @@ listEl.addEventListener("click", e => {
   const switching = mddlg.open && !mddlg.leaving;
   if (mddlg.open) history.replaceState({ match: a.dataset.uid }, "", a.getAttribute("href"));
   else {
+    // coming Back to the list (Close or Escape go Back) leaves the page where it is, instead of jumping to where it
+    // was before the details opened: the list's own history entry is told not to restore its scroll (the new entry,
+    // for the details, keeps the usual behaviour)
+    history.scrollRestoration = "manual";
     history.pushState({ match: a.dataset.uid }, "", a.getAttribute("href"));
+    history.scrollRestoration = "auto";
     pushed = true;
   }
   showPanel(a.dataset.uid);
@@ -4544,6 +4597,9 @@ mddlg.addEventListener("close", () => {
 });
 addEventListener("popstate", () => {
   const uid = matchParam();
+  // back on the list: once the browser has left the scroll alone (it decides just after this event), the list's entry
+  // restores its scroll again as usual, for example after a reload
+  if (!uid) setTimeout(() => (history.scrollRestoration = "auto"));
   if (uid) {
     if (DATA.length) showPanel(uid);
   } else if (mddlg.open) {

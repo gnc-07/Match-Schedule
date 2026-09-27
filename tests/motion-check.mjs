@@ -4,6 +4,9 @@
 //   - every duration is one of the two shared speeds (--dur-s, --dur-m) or the goal pulse (3 x --dur-m);
 //   - with animations switched off, nothing moves, and switching them off stops what is moving;
 //   - nothing animates an element that is hidden (for example the sun or moon that is about to disappear);
+//   - closing and gliding stay gentle, followed frame by frame (see "smooth" below): a closing starts softly (at most
+//     a tenth of its fade, or 20px, in the first frame), the page never jumps while something closes, and the list
+//     never glides more than 50px in one frame (a match on screen is followed, as a visitor sees it);
 // and it prints the slowest frame after each click, with animations on and off, with the processor slowed down 4 times
 // the way Lighthouse tests phones (Chromium only; FULLSPEED=1 for normal speed). Those timings vary from run to run,
 // so they are for reading, not a pass or fail.
@@ -62,6 +65,20 @@ const cases = [
   }],
 ];
 
+// name, width, what to follow, what to do first, what starts the movement (for the frame-by-frame "smooth" check)
+const smooth = [
+  ["beside-open", 1920, ["#list", "#mddlg"], async () => {}, p => p.click(`.md-open[data-uid="${uid}"]`)],
+  ["beside-switch", 1920, ["#list"], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); },
+    p => p.evaluate(u => { const all = [...document.querySelectorAll("#list .md-open")], i = all.findIndex(x => x.dataset.uid === u);
+      (all.slice(i + 1).find(x => x.getBoundingClientRect().top < innerHeight - 60) || all[i + 1]).click(); }, uid)],
+  ["beside-close", 1920, ["#list", "#mddlg"], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
+  ["panel-close", 1280, ["#mddlg"], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); }, p => p.click("#mddlg [data-close]"), "closing"],
+  ["tables-close", 1280, ["#ltdlg"], async p => { await p.click("#tablesbtn"); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
+  ["sheet-close", 390, ["#setmenu .calpanel"], async p => { await p.click("#setmenu summary"); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
+  ["menu-close", 1280, ["#setmenu .calpanel"], async p => { await p.click("#setmenu summary"); await wait(900); }, p => p.click("#setmenu summary"), "closing"],
+  ["sidebar-hide", 1280, ["#list", "#filters"], async () => {}, p => p.click("#sidehide"), "closing"],
+  ["sidebar-show", 1280, ["#list"], async p => { await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
+];
 const problems = [];
 const ONLY = process.argv.slice(2);   // optional: names of the cases to run, e.g. theme goal
 // Opens the page ready for one case: light theme, nothing starred, animations on or off
@@ -164,6 +181,43 @@ async function run(label, launch) {
     await theme.close();
     console.log(`${label.padEnd(8)} switch-off   theme cross-fade: ${stillFading} animation(s) running after unticking, dark theme kept: ${dark}`);
     if (stillFading || !dark) problems.push(`${label}: unticking Animations during the theme cross-fade left ${stillFading} running (dark theme kept: ${dark})`);
+    // smooth: each frame, where the things that move are and how visible they are
+    for (const [name, width, sels, prep, act, closing] of smooth.filter(c => !ONLY.length || ONLY.includes(c[0]) || ONLY.includes("smooth"))) {
+      const page = await open(browser, width, "on");
+      await prep(page);
+      await page.evaluate(sels => {
+        window.__tr = [];
+        const t0 = performance.now(), pin = [...document.querySelectorAll("#list .match")].find(m => m.getBoundingClientRect().bottom > 0);
+        const tick = () => {
+          window.__tr.push({ y: scrollY, at: sels.map(s => { const e = document.querySelector(s), r = (s === "#list" ? pin : e).getBoundingClientRect();
+            return [r.left, r.top, e.checkVisibility() ? +getComputedStyle(e).opacity : 0]; }) });
+          if (performance.now() - t0 < 900) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }, sels);
+      await act(page);
+      await wait(1000);
+      const tr = await page.evaluate(() => window.__tr);
+      await page.close();
+      const jumped = closing && tr.some((f, i) => i && f.y !== tr[i - 1].y);
+      const lines = sels.map((s, k) => {
+        let big = 0, first = null;
+        for (let i = 1; i < tr.length; i++) {
+          const a = tr[i - 1].at[k], c = tr[i].at[k];
+          if (!a[2] || !c[2] || tr[i].y !== tr[i - 1].y) continue;   // invisible, or the page scrolled (checked apart)
+          const d = Math.hypot(c[0] - a[0], c[1] - a[1]), o = Math.abs(c[2] - a[2]);
+          if (first === null && (d > 0.5 || o > 0.005)) first = [d, o];
+          big = Math.max(big, d);
+        }
+        if (closing && first && (first[0] > 20 || first[1] > 0.1))
+          problems.push(`${label} smooth ${name}: ${s} starts closing with a jump (${first[0].toFixed(0)}px, opacity ${first[1].toFixed(2)} in the first frame)`);
+        // the list is what is being read: it never glides more than 50px in a frame (a sheet leaving the screen may go faster)
+        if (s === "#list" && big > 50) problems.push(`${label} smooth ${name}: ${s} moves ${big.toFixed(0)}px in one frame`);
+        return `${s} biggest step ${big.toFixed(0)}px` + (first ? `, first ${first[0].toFixed(0)}px / opacity ${first[1].toFixed(2)}` : "");
+      });
+      if (jumped) problems.push(`${label} smooth ${name}: the page jumped while closing`);
+      console.log(`${label.padEnd(8)} smooth ${name.padEnd(13)} ${lines.join("; ")}${jumped ? "; the page jumped" : ""}`);
+    }
   } finally {
     await browser.close();
     server.kill();
