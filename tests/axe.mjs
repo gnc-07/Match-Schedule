@@ -30,10 +30,19 @@ const views = [];
 for (const theme of themes) for (const lang of langs) for (const width of widths) for (const state of states)
   if (!(state === "sidebar-hidden" && width < 1100)) views.push([theme, lang, width, state]);   // phones have no sidebar
 
-async function checkView([theme, lang, width, state]) {
-  // its own private window: views checked at the same time must not share saved settings (theme, contrast)
+// Each view in its own private window: views checked at the same time must not share saved settings (theme, contrast).
+// The window is closed however the check ends, so a view that fails partway does not leave it open.
+async function checkView(view) {
   const context = await browser.createBrowserContext();
-  const page = await context.newPage();
+  try {
+    return await inspect(await context.newPage(), view);
+  } finally {
+    // closing can fail on a busy computer (Puppeteer loses track of the tab), which says nothing about the page
+    await context.close().catch(() => {});
+  }
+}
+
+async function inspect(page, [theme, lang, width, state]) {
   await page.setViewport({ width, height: 900 });
   // Check the settled page: with the device asking for less motion, panels appear at once instead of fading in,
   // so colour contrast is not measured halfway through an animation.
@@ -80,9 +89,6 @@ async function checkView([theme, lang, width, state]) {
     for (const n of v.nodes.slice(0, 5)) lines.push(`        at ${n.target.join(" ")}`);
     if (v.nodes.length > 5) lines.push(`        ...and ${v.nodes.length - 5} more`);
   }
-  // the result is in; closing can fail on a busy computer (Puppeteer loses track of the tab), which says nothing about the page
-  await page.close().catch(() => {});
-  await context.close().catch(() => {});
   return { ok: !result.violations.length, text: lines.join("\n") };
 }
 

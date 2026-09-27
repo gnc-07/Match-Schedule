@@ -80,8 +80,9 @@ async function runStep(g, [label, cmd, cmdArgs], port) {
   if (serial) console.log(`\n==== ${g.name}: ${label} ====`);
   const { code, text } = await run(cmd, cmdArgs, { PORT: String(port), TIMINGS: "0" }, serial);
   const secs = secsSince(t);
-  // 3 from browsers.mjs: everything that ran passed, but a browser is not installed
-  const result = code === 0 ? "PASS" : code === 3 ? "PART" : "FAIL";
+  // 3 from browsers.mjs: everything that ran passed, but a browser did not start. On GitHub (CI is set there) every browser
+  // is installed, so a browser that did not start is a failure, not a PART
+  const result = code === 0 ? "PASS" : code === 3 && !process.env.CI ? "PART" : "FAIL";
   if (!serial) {
     const lines = text.trimEnd().split("\n");
     const shown = verbose || result === "FAIL" ? lines : result === "PART" ? lines.filter(l => /^SKIP|checks passed|Skipped/.test(l)) : lines.slice(-1);

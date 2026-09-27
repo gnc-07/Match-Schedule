@@ -148,8 +148,12 @@ async function run(label, launch) {
     // the same during the theme cross-fade: it stops, and the new theme stays
     const theme = await open(browser, 1280, "on");
     await theme.click("#themebtn");
-    // untick once the cross-fade is under way (up to a second): on a busy computer it starts later than a fixed wait
-    await theme.waitForFunction(() => document.getAnimations().some(a => a.playState === "running"), { timeout: 1000 }).catch(() => {});
+    // untick once the cross-fade itself is under way (up to a second): on a busy computer it starts later than a fixed wait.
+    // A browser with View Transitions that shows no cross-fade is a problem; one without them has none by design.
+    const fading = await theme.waitForFunction(() => document.getAnimations().some(a => a.playState === "running" &&
+      /view-transition/.test(a.effect?.pseudoElement || "")), { timeout: 1000 }).then(() => true, () => false);
+    if (!fading && await theme.evaluate(() => "startViewTransition" in document))
+      problems.push(`${label}: the theme cross-fade did not start within a second, so unticking during it was not tested`);
     await theme.evaluate(() => document.getElementById("mvbox").click());
     await wait(60);
     const [stillFading, dark] = await theme.evaluate(() =>
