@@ -23,67 +23,89 @@ const query = { details: `&match=${encodeURIComponent(MATCH.uid)}`, "high-detail
 const server = await startServer();
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true,
   args: process.getuid?.() === 0 ? ["--no-sandbox"] : [] });   // Chromium refuses to run as root without this
-let failures = 0, runs = 0;
+// Several views are checked at the same time, each in its own private window (AXE_WORKERS, default 6), which takes about a quarter
+// of the time of one after another; each view still has its own storage settings and waits until it has settled.
+const WORKERS = Math.max(1, Number(process.env.AXE_WORKERS) || 6);
+const views = [];
+for (const theme of themes) for (const lang of langs) for (const width of widths) for (const state of states)
+  if (!(state === "sidebar-hidden" && width < 1100)) views.push([theme, lang, width, state]);   // phones have no sidebar
 
-try {
-  for (const theme of themes) for (const lang of langs) for (const width of widths) for (const state of states) {
-    if (state === "sidebar-hidden" && width < 1100) continue;   // phones have no sidebar
-    const page = await browser.newPage();
-    await page.setViewport({ width, height: 900 });
-    // Check the settled page: with the device asking for less motion, panels appear at once instead of fading in,
-    // so colour contrast is not measured halfway through an animation.
-    await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
-    // Save the theme the same way the Settings menu does, before the page loads. Contrast is always set: the pages
-    // share one storage, so a high contrast view would otherwise carry into the views after it.
-    await page.evaluateOnNewDocument((t, high, side) => { try { localStorage.setItem("mp.theme", JSON.stringify(t));
-      localStorage.setItem("mp.contrast", JSON.stringify(high ? "high" : "normal")); localStorage.setItem("mp.side", JSON.stringify(side)); } catch {} },
-      theme, state.startsWith("high"), state === "sidebar-hidden" ? "closed" : "open");
-    await mockNetwork(page);
-    await page.goto(`${BASE}?lang=${lang}${query[state] || ""}`, { waitUntil: "networkidle0" });
-    if (state === "setmenu" || state === "calmenu") await page.evaluate(id => { document.getElementById(id).open = true; }, state);
-    if (state.startsWith("tables")) { await page.click("#tablesbtn"); await page.waitForSelector("#ltbody table"); }
-    if (state === "tables-f1") { await page.click('#ltchips [data-code="F1"]'); await page.waitForSelector("#ltbody .f1t"); }
-    if (state.endsWith("details")) await page.waitForSelector("#md-map .tiles");
-    if (state === "f1" || state === "high-f1") await page.waitForSelector("#wk-champ table");
-    let podium = null;
-    if (state === "f1" || state === "high-f1") {
-      // The winner's card must stand out from the panel behind it: its edge or its fill needs 3:1 contrast
-      // (WCAG 1.4.11). axe cannot check this, because neither is text.
-      await page.waitForSelector("#wk-res .pod li.p1");
-      podium = await page.evaluate(() => {
-        const rgb = c => c.match(/[\d.]+/g).slice(0, 4).map(Number);
-        const lum = ([r, g, b]) => [r, g, b].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; })
-          .reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);
-        const li = document.querySelector("#wk-res .pod li.p1");
-        let back = li.parentElement;
-        while (back && (rgb(getComputedStyle(back).backgroundColor)[3] ?? 1) === 0) back = back.parentElement;
-        const ratio = (x, y) => (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
-        const s = getComputedStyle(li), b = lum(rgb(getComputedStyle(back || document.body).backgroundColor));
-        return Math.max(ratio(lum(rgb(s.borderTopColor)), b), ratio(lum(rgb(s.backgroundColor)), b));
-      });
-    }
-    if (state === "high-f1") { await page.click('#wk-res [data-s="Q"]'); await page.waitForSelector("#wk-res tr.sep"); }   // the qualifying table too
-    await page.evaluate(AXE);
-    const result = await page.evaluate(tags => axe.run(document, { runOnly: { type: "tag", values: tags } }), TAGS);
-    const label = `${theme.padEnd(5)} ${lang} ${String(width).padStart(4)}px ${state.padEnd(14)}`;
-    runs++;
-    if (podium !== null && podium < 3) {
-      result.violations.push({ impact: "serious", id: "podium-winner-edge", nodes: [{ target: ["#wk-res .pod li.p1"] }],
-        help: `Winner's card (edge or fill) has only ${podium.toFixed(2)}:1 contrast with the panel behind it; needs 3:1` });
-    }
-    if (result.violations.length === 0) {
-      console.log(`PASS  ${label}`);
-    } else {
-      failures++;
-      console.log(`FAIL  ${label}`);
-      for (const v of result.violations) {
-        console.log(`      [${v.impact}] ${v.id}: ${v.help}`);
-        for (const n of v.nodes.slice(0, 5)) console.log(`        at ${n.target.join(" ")}`);
-        if (v.nodes.length > 5) console.log(`        ...and ${v.nodes.length - 5} more`);
-      }
-    }
-    await page.close();
+// Each view in its own private window: views checked at the same time must not share saved settings (theme, contrast).
+// The window is closed however the check ends, so a view that fails partway does not leave it open.
+async function checkView(view) {
+  const context = await browser.createBrowserContext();
+  try {
+    return await inspect(await context.newPage(), view);
+  } finally {
+    // closing can fail on a busy computer (Puppeteer loses track of the tab), which says nothing about the page
+    await context.close().catch(() => {});
   }
+}
+
+async function inspect(page, [theme, lang, width, state]) {
+  await page.setViewport({ width, height: 900 });
+  // Check the settled page: with the device asking for less motion, panels appear at once instead of fading in,
+  // so colour contrast is not measured halfway through an animation.
+  await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+  // Save the theme the same way the Settings menu does, before the page loads (contrast and the sidebar too).
+  await page.evaluateOnNewDocument((t, high, side) => { try { localStorage.setItem("mp.theme", JSON.stringify(t));
+    localStorage.setItem("mp.contrast", JSON.stringify(high ? "high" : "normal")); localStorage.setItem("mp.side", JSON.stringify(side)); } catch {} },
+    theme, state.startsWith("high"), state === "sidebar-hidden" ? "closed" : "open");
+  await mockNetwork(page);
+  await page.goto(`${BASE}?lang=${lang}${query[state] || ""}`, { waitUntil: "networkidle0" });
+  if (state === "setmenu" || state === "calmenu") await page.evaluate(id => { document.getElementById(id).open = true; }, state);
+  if (state.startsWith("tables")) { await page.click("#tablesbtn"); await page.waitForSelector("#ltbody table"); }
+  if (state === "tables-f1") { await page.click('#ltchips [data-code="F1"]'); await page.waitForSelector("#ltbody .f1t"); }
+  if (state.endsWith("details")) await page.waitForSelector("#md-map .tiles");
+  if (state === "f1" || state === "high-f1") await page.waitForSelector("#wk-champ table");
+  let podium = null;
+  if (state === "f1" || state === "high-f1") {
+    // The winner's card must stand out from the panel behind it: its edge or its fill needs 3:1 contrast
+    // (WCAG 1.4.11). axe cannot check this, because neither is text.
+    await page.waitForSelector("#wk-res .pod li.p1");
+    podium = await page.evaluate(() => {
+      const rgb = c => c.match(/[\d.]+/g).slice(0, 4).map(Number);
+      const lum = ([r, g, b]) => [r, g, b].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; })
+        .reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);
+      const li = document.querySelector("#wk-res .pod li.p1");
+      let back = li.parentElement;
+      while (back && (rgb(getComputedStyle(back).backgroundColor)[3] ?? 1) === 0) back = back.parentElement;
+      const ratio = (x, y) => (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+      const s = getComputedStyle(li), b = lum(rgb(getComputedStyle(back || document.body).backgroundColor));
+      return Math.max(ratio(lum(rgb(s.borderTopColor)), b), ratio(lum(rgb(s.backgroundColor)), b));
+    });
+  }
+  if (state === "high-f1") { await page.click('#wk-res [data-s="Q"]'); await page.waitForSelector("#wk-res tr.sep"); }   // the qualifying table too
+  await page.evaluate(AXE);
+  const result = await page.evaluate(tags => axe.run(document, { runOnly: { type: "tag", values: tags } }), TAGS);
+  const label = `${theme.padEnd(5)} ${lang} ${String(width).padStart(4)}px ${state.padEnd(14)}`;
+  if (podium !== null && podium < 3) {
+    result.violations.push({ impact: "serious", id: "podium-winner-edge", nodes: [{ target: ["#wk-res .pod li.p1"] }],
+      help: `Winner's card (edge or fill) has only ${podium.toFixed(2)}:1 contrast with the panel behind it; needs 3:1` });
+  }
+  const lines = [`${result.violations.length ? "FAIL" : "PASS"}  ${label}`];
+  for (const v of result.violations) {
+    lines.push(`      [${v.impact}] ${v.id}: ${v.help}`);
+    for (const n of v.nodes.slice(0, 5)) lines.push(`        at ${n.target.join(" ")}`);
+    if (v.nodes.length > 5) lines.push(`        ...and ${v.nodes.length - 5} more`);
+  }
+  return { ok: !result.violations.length, text: lines.join("\n") };
+}
+
+let failures = 0, runs = 0;
+try {
+  let next = 0;
+  await Promise.all(Array.from({ length: WORKERS }, async () => {
+    while (next < views.length) {
+      const view = views[next++];
+      let r;
+      try { r = await checkView(view); }
+      catch (e) { r = { ok: false, text: `FAIL  ${view.join(" ")}\n      could not check: ${e.message.split("\n")[0]}` }; }
+      runs++;
+      if (!r.ok) failures++;
+      console.log(r.text);
+    }
+  }));
 } finally {
   await browser.close();
   server.kill();
