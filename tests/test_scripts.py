@@ -132,6 +132,17 @@ class BackupTables(unittest.TestCase):
         self.assertEqual([(r["home"], r["away"]) for r in recs], [("A", "C")])   # but only the upcoming match is listed
 
 
+    def test_last_seasons_results_are_not_this_seasons_table(self):
+        old = {"matches": [{"date": "2026-05-20", "time": "15:00", "team1": "A", "team2": "B", "score": {"ft": [2, 1]}}]}
+        def get_json(url):
+            if "/2026-27/" in url:
+                raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)   # this season's file not there yet
+            return old
+        with mock.patch.object(bs, "get_json", get_json):
+            recs, results = bs.from_openfootball("EPL", "Premier League", "en.1.json", "split", "Europe/London", date(2026, 8, 1))
+        self.assertEqual(results, [])
+
+
 class CazeTV(unittest.TestCase):
     def test_teams_from_title(self):
         self.assertEqual(cazetv.teams_from_title("AO VIVO E COM IMAGENS: FLAMENGO X PALMEIRAS | BRASILEIRÃO 2026"),

@@ -95,20 +95,23 @@ def from_football_data(code, name, fd_code, tz, start, token):
 
 # ---------- source 2: openfootball ----------
 def from_openfootball(code, name, filename, style, tz, start):
-    """Returns (records, results), like from_football_data."""
+    """Returns (records, results), like from_football_data. Results come only from this season's file: when it
+    does not exist yet, the last season's file still gives the matches, but its results are not this season's table."""
     data = None
-    for folder in season_folders(style, start):
+    folders = season_folders(style, start)
+    for folder in folders:
         try:
             data = get_json(f"{OPENFOOTBALL}/{folder}/{filename}"); break
         except urllib.error.HTTPError as e:
             if e.code != 404: raise                     # only "file not there yet" means try the older season
     if data is None:
         print(f"{code}: no openfootball file found"); return [], []
+    current = folder == folders[0]
     out, results, recent = [], [], start - timedelta(days=KEEP_DAYS)
     for m in data["matches"]:
         ft = _ft(m.get("score"))
         played = ft is not None
-        if played:
+        if played and current:
             results.append((m["team1"], m["team2"], ft[0], ft[1]))
         if date.fromisoformat(m["date"]) < (recent if played else start):
             continue
