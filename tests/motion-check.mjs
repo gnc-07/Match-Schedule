@@ -155,11 +155,12 @@ async function run(label, launch) {
     // the same during the theme cross-fade: it stops, and the new theme stays
     const theme = await open(browser, 1280, "on");
     await theme.click("#themebtn");
+    // the cross-fade first takes a picture of the page, then switches the theme: untick once it is under way
+    await theme.waitForFunction(() => document.documentElement.classList.contains("is-dark"));
+    await theme.evaluate(() => document.getElementById("mvbox").click());
     await wait(60);
-    const [fading, dark] = await theme.evaluate(() => { document.getElementById("mvbox").click();
-      return [document.getAnimations().filter(a => a.playState === "running").length, document.documentElement.classList.contains("is-dark")]; });
-    await wait(60);
-    const stillFading = await theme.evaluate(() => document.getAnimations().filter(a => a.playState === "running").length);
+    const [stillFading, dark] = await theme.evaluate(() => [document.getAnimations().filter(a => a.playState === "running").length,
+      document.documentElement.classList.contains("is-dark")]);
     await theme.close();
     console.log(`${label.padEnd(8)} switch-off   theme cross-fade: ${stillFading} animation(s) running after unticking, dark theme kept: ${dark}`);
     if (stillFading || !dark) problems.push(`${label}: unticking Animations during the theme cross-fade left ${stillFading} running (dark theme kept: ${dark})`);
