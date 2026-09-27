@@ -3,6 +3,7 @@
 // so the space between the two curves stays even. Covers the list, Settings, Calendar, the League tables window
 // (a league and F1), match details and the F1 race weekend, at 390px, 1280px and 1920px, with and without high contrast.
 // Shapes further in than the outer corner's curve, and fully round shapes inside fully round ones, are left alone.
+// Also checks the outline of the match shown beside the list on monitors: its inner curve parallel to its outer one.
 import puppeteer from "puppeteer-core";
 import { BASE, chromePath, startServer } from "./server.mjs";
 import { F1_WEEKEND, MATCH, mockNetwork } from "./mock-data.mjs";
@@ -61,6 +62,29 @@ try {
           if (Math.abs(have - want) > 0.75)
             out.push(`${name(a)} > ${name(e)}, ${c}: ${have}px, want ${+want.toFixed(1)}px (outer ${rad(sa, c, ra)}px, gap ${+g.toFixed(1)}px)`);
         }
+      }
+      // the outline of the match shown beside the list: a ring drawn as the shadow of the card's ::after, cut by its
+      // clip-path or by the day box. Its inner curve (the ::after's corners) must be the outer curve less the ring's
+      // width on each side, or the corners come out thicker than the sides, and thicker at one end than the other.
+      const cur = document.querySelector('.day-list .md-open[aria-current="true"]')?.closest(".match");
+      if (cur && document.documentElement.hasAttribute("data-pane")) {
+        const s = getComputedStyle(cur, "::after"), m = cur.getBoundingClientRect();
+        const list = cur.parentElement, lr = list.getBoundingClientRect(), ls = getComputedStyle(list);
+        const four = v => { const a = v.trim().split(/\s+/).map(px); return [a[0], a[1] ?? a[0], a[2] ?? a[0], a[3] ?? a[1] ?? a[0]]; };
+        const [, box, rnd = "0px"] = s.clipPath.match(/inset\((.*?)(?: round (.*))?\)$/) || [];
+        const clip = four(box), clipR = four(rnd.split("/")[0]);   // top right bottom left; corners TL TR BR BL
+        const inner = { Top: m.top + px(s.top), Right: m.right - px(s.right), Bottom: m.bottom - px(s.bottom), Left: m.left + px(s.left) };
+        const edge = { Top: Math.max(inner.Top + clip[0], lr.top), Right: Math.min(inner.Right - clip[1], lr.right),
+          Bottom: Math.min(inner.Bottom - clip[2], lr.bottom), Left: Math.max(inner.Left + clip[3], lr.left) };
+        ["TopLeft", "TopRight", "BottomRight", "BottomLeft"].forEach((c, i) => {
+          const y = c.startsWith("Top") ? "Top" : "Bottom", x = c.endsWith("Left") ? "Left" : "Right";
+          // a corner not cut by the clip-path is cut by the day box, whose clip is its border's outer edge
+          const outer = clipR[i] > 0 ? clipR[i] : px(ls[`border${c}Radius`]);
+          const [h, v = h] = s[`border${c}Radius`].split(" ").map(px);
+          const want = [outer - Math.abs(edge[x] - inner[x]), outer - Math.abs(edge[y] - inner[y])];
+          if (Math.abs(h - want[0]) > 0.5 || Math.abs(v - want[1]) > 0.5)
+            out.push(`outline of the match shown, ${c}: ${h}px ${v}px, want ${+want[0].toFixed(1)}px ${+want[1].toFixed(1)}px (outer ${outer}px)`);
+        });
       }
       return out;
     });
