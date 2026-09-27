@@ -13,6 +13,8 @@ Data sources, in order of preference
      no key needed). Used when there is no token. Times are LOCAL to each league.
   3. friendlies.json: national-team friendlies entered by hand. No free feed
      covers friendlies, so this file has to be edited when matches are announced.
+  Both league sources also give every result of the season so far, from which a backup league table is
+  worked out (standings() below) for when ESPN's tables cannot be reached.
   4. Formula 1: every session from Jolpica-F1, cross-checked against OpenF1 (both free, no key).
      F1 is left out of soccer.ics. Track outlines for the race weekend panel come from
      bacinger/f1-circuits on GitHub (MIT licence).
@@ -63,11 +65,15 @@ def record(comp, code, home, away, day, utc=None, rnd="", venue=None, note=None,
 
 # ---------- source 1: football-data.org ----------
 def from_football_data(code, name, fd_code, tz, start, token):
+    """Returns (records, results): the matches to list, and every finished match of the season for standings()."""
     data = get_json(f"{FD_API}/competitions/{fd_code}/matches", {"X-Auth-Token": token})
-    out = []
+    out, results = [], []
     recent = start - timedelta(days=KEEP_DAYS)
     for m in data["matches"]:
         played = m["status"] in ("IN_PLAY", "PAUSED", "FINISHED")
+        ft = (m.get("score") or {}).get("fullTime") or {}
+        if m["status"] == "FINISHED" and ft.get("home") is not None:
+            results.append((m["homeTeam"]["name"], m["awayTeam"]["name"], ft["home"], ft["away"]))
         if m["status"] not in ("SCHEDULED", "TIMED", "POSTPONED") and not played:
             continue                      # skip cancelled, suspended
         kick = datetime.fromisoformat(m["utcDate"].replace("Z", "+00:00"))
@@ -80,16 +86,16 @@ def from_football_data(code, name, fd_code, tz, start, token):
                    kick.isoformat() if confirmed else None,
                    f"Matchday {m['matchday']}" if m.get("matchday") else "",
                    m.get("venue"), note, uid=f"fd-{m['id']}")
-        ft = (m.get("score") or {}).get("fullTime") or {}
         if m["status"] == "FINISHED" and ft.get("home") is not None:
             r["result"] = {"home": ft["home"], "away": ft["away"]}
         elif played:
             r["started"] = True           # on now: the site gets the live score from ESPN
         out.append(r)
-    return out
+    return out, results
 
 # ---------- source 2: openfootball ----------
 def from_openfootball(code, name, filename, style, tz, start):
+    """Returns (records, results), like from_football_data."""
     data = None
     for folder in season_folders(style, start):
         try:
@@ -97,10 +103,13 @@ def from_openfootball(code, name, filename, style, tz, start):
         except urllib.error.HTTPError as e:
             if e.code != 404: raise                     # only "file not there yet" means try the older season
     if data is None:
-        print(f"{code}: no openfootball file found"); return []
-    out, recent = [], start - timedelta(days=KEEP_DAYS)
+        print(f"{code}: no openfootball file found"); return [], []
+    out, results, recent = [], [], start - timedelta(days=KEEP_DAYS)
     for m in data["matches"]:
-        played = "score" in m
+        ft = _ft(m.get("score"))
+        played = ft is not None
+        if played:
+            results.append((m["team1"], m["team2"], ft[0], ft[1]))
         if date.fromisoformat(m["date"]) < (recent if played else start):
             continue
         utc = None
@@ -108,12 +117,42 @@ def from_openfootball(code, name, filename, style, tz, start):
             local = datetime.fromisoformat(f"{m['date']}T{m['time']}").replace(tzinfo=ZoneInfo(tz))
             utc = local.astimezone(timezone.utc).isoformat()
         r = record(name, code, m["team1"], m["team2"], m["date"], utc, m.get("round", ""), m.get("ground"))
-        ft = (m.get("score") or {}).get("ft")
-        if played and ft:
+        if played:
             r["result"] = {"home": ft[0], "away": ft[1]}
         out.append(r)
     mark_provisional([r for r in out if "result" not in r])
-    return out
+    return out, results
+
+# ---------- backup league tables ----------
+def standings(results):
+    """A league table worked out from finished matches, given as (home, away, home goals, away goals):
+    3 points a win and 1 a draw, then goal difference, then goals scored. Leagues break exact ties in
+    their own ways (head-to-head, number of wins) and the feeds do not carry points deductions, so the
+    page uses this only when ESPN's table cannot be reached, and says it is worked out from results."""
+    rows = {}
+    for home, away, hg, ag in results:
+        if not (isinstance(hg, int) and isinstance(ag, int)):
+            continue
+        for team, f, a in ((home, hg, ag), (away, ag, hg)):
+            t = rows.setdefault(team, {"team": team, "p": 0, "w": 0, "d": 0, "l": 0, "gf": 0, "ga": 0})
+            t["p"] += 1; t["gf"] += f; t["ga"] += a
+            t["w" if f > a else "d" if f == a else "l"] += 1
+    for t in rows.values():
+        t["gd"] = t["gf"] - t["ga"]
+        t["pts"] = 3 * t["w"] + t["d"]
+    table = sorted(rows.values(), key=lambda t: (-t["pts"], -t["gd"], -t["gf"], t["team"]))
+    for i, t in enumerate(table, 1):
+        t["rank"] = i
+    return table
+
+def _ft(score):
+    """The full-time score from an openfootball match as [home, away], or None when it has not been played.
+    The feed usually writes {"ft": [2, 1], "ht": [1, 0]}, but some results (often 0-0) as a bare [0, 0],
+    and matches not yet played as null or with no score at all."""
+    ft = score.get("ft") if isinstance(score, dict) else score
+    if isinstance(ft, list) and len(ft) == 2 and all(isinstance(x, int) for x in ft):
+        return ft
+    return None
 
 def mark_provisional(recs):
     """openfootball fills unannounced kick-offs with a placeholder (e.g. every EPL match
@@ -387,19 +426,24 @@ def previous_f1(start, path="fixtures.json"):
     return [r for r in old if isinstance(r, dict) and _valid_f1(r) and r["date"] >= recent]
 
 def load_all(start):
-    """Every match and session from `start` on. Returns (records, sources, f1_stale): which source each
-    league came from (shown on the site), and whether the F1 sessions had to be reused from the last build."""
-    sources, f1_stale = {}, False
+    """Every match and session from `start` on. Returns (records, sources, tables, f1_stale): which source each
+    league came from (shown on the site), each league's backup table (standings()), and whether the F1 sessions
+    had to be reused from the last build."""
+    sources, tables, f1_stale = {}, {}, False
     token = os.environ.get("FOOTBALL_DATA_TOKEN")
     out = []
     for code, (name, fd_code, filename, style, tz) in LEAGUES.items():
         if token:
             try:
-                out += from_football_data(code, name, fd_code, tz, start, token)
+                recs, results = from_football_data(code, name, fd_code, tz, start, token)
+                out += recs
+                tables[code] = standings(results)
                 sources[code] = "football-data.org"; continue
             except Exception as e:           # API down or rate-limited: fall back rather than fail
                 print(f"football-data.org failed for {code} ({e}); using openfootball")
-        out += from_openfootball(code, name, filename, style, tz, start)
+        recs, results = from_openfootball(code, name, filename, style, tz, start)
+        out += recs
+        tables[code] = standings(results)
         sources[code] = "openfootball"
     apply_overrides(out)
     out = [r for r in out if date.fromisoformat(r["date"]) >= start or "result" in r or r.get("started")]
@@ -415,7 +459,7 @@ def load_all(start):
         sources["F1"] = "Jolpica-F1"
     out += f1
     out.sort(key=lambda r: (r["utc"] or r["date"] + "T99"))
-    return out, sources, f1_stale
+    return out, sources, tables, f1_stale
 
 def apply_filters(recs, leagues=None, teams=None):
     if leagues:
@@ -507,7 +551,7 @@ def main():
     ap.add_argument("--teams", help="comma list of team-name fragments")
     ap.add_argument("--out", default="soccer.ics")
     a = ap.parse_args()
-    recs, sources, f1_stale = load_all(date.fromisoformat(a.start))
+    recs, sources, tables, f1_stale = load_all(date.fromisoformat(a.start))
     league_count = sum(1 for r in recs if r["code"] not in ("INTL", "F1") and "result" not in r and not r.get("started"))
     if league_count < MIN_MATCHES:
         # exiting with an error stops the workflow before it publishes, so the last good site stays up
@@ -518,7 +562,7 @@ def main():
     with open("index.html", "rb") as f:
         site = hashlib.sha256(f.read()).hexdigest()[:12]
     meta = {"generated": datetime.now(timezone.utc).isoformat(timespec="minutes"), "site": site,
-            "sources": sources, "matches": recs}
+            "sources": sources, "tables": {c: t for c, t in tables.items() if t}, "matches": recs}
     if f1_stale:
         meta["f1stale"] = True
     write_fixtures(meta)

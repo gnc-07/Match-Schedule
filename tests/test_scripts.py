@@ -97,6 +97,41 @@ class Calendar(unittest.TestCase):
         self.assertNotIn("\n", out.replace("\r\n", ""))           # every line ends in CRLF
 
 
+class BackupTables(unittest.TestCase):
+    """The league tables the page falls back to when ESPN does not answer (standings() in build_schedule.py)."""
+
+    def test_points_goal_difference_then_goals(self):
+        table = bs.standings([("A", "B", 2, 0), ("C", "D", 1, 1), ("B", "C", 3, 1), ("D", "A", 0, 0)])
+        self.assertEqual([(t["team"], t["pts"]) for t in table], [("A", 4), ("B", 3), ("D", 2), ("C", 1)])
+        a = table[0]
+        self.assertEqual((a["p"], a["w"], a["d"], a["l"], a["gf"], a["ga"], a["gd"], a["rank"]), (2, 1, 1, 0, 2, 0, 2, 1))
+
+    def test_level_teams_are_split_by_goal_difference_and_goals(self):
+        table = bs.standings([("A", "X", 1, 0), ("B", "Y", 3, 2), ("C", "Z", 2, 1)])
+        self.assertEqual([t["team"] for t in table[:3]], ["B", "C", "A"])   # all +1: 3 goals, then 2, then 1
+
+    def test_a_score_that_is_not_a_number_is_skipped(self):
+        table = bs.standings([("A", "B", "2", 0), ("A", "B", None, None), ("A", "B", 1, 0)])
+        self.assertEqual(table[0]["p"], 1)
+
+    def test_openfootball_score_shapes(self):
+        self.assertEqual(bs._ft({"ft": [2, 1], "ht": [1, 0]}), [2, 1])
+        self.assertEqual(bs._ft([0, 0]), [0, 0])            # the feed writes some results this way
+        for unplayed in (None, {}, {"ht": [0, 0]}, [1], ["1", 0], "2-1"):
+            self.assertIsNone(bs._ft(unplayed))
+
+    def test_openfootball_results_include_the_whole_season(self):
+        feed = {"matches": [
+            {"date": "2026-08-20", "time": "15:00", "team1": "A", "team2": "B", "score": {"ft": [2, 1]}},
+            {"date": "2026-08-27", "team1": "B", "team2": "A", "score": [0, 0]},
+            {"date": "2026-10-03", "time": "15:00", "team1": "A", "team2": "C", "score": None},
+        ]}
+        with mock.patch.object(bs, "get_json", return_value=feed):
+            recs, results = bs.from_openfootball("EPL", "Premier League", "en.1.json", "split", "Europe/London", date(2026, 9, 27))
+        self.assertEqual(results, [("A", "B", 2, 1), ("B", "A", 0, 0)])   # old results count for the table
+        self.assertEqual([(r["home"], r["away"]) for r in recs], [("A", "C")])   # but only the upcoming match is listed
+
+
 class CazeTV(unittest.TestCase):
     def test_teams_from_title(self):
         self.assertEqual(cazetv.teams_from_title("AO VIVO E COM IMAGENS: FLAMENGO X PALMEIRAS | BRASILEIRÃO 2026"),

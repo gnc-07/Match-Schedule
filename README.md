@@ -41,6 +41,7 @@ The site has no accounts, no advertising and no tracking. Your preferences (star
 | League fixtures | [openfootball](https://github.com/openfootball/football.json) (public domain), or [football-data.org](https://www.football-data.org/) when a key is configured |
 | Friendlies and corrected kick-off times | Official announcements and press reports, each one recorded with its link |
 | Live scores, match details and league tables | ESPN's public scoreboard (unofficial; it could change without notice) |
+| Backup when ESPN does not answer | Bundesliga scores, goals and table: [OpenLigaDB](https://www.openligadb.de/) (free, community-run). Other leagues' tables: worked out by the site from the league fixtures source's results, four times a day |
 | Formula 1 sessions, results and standings | [Jolpica-F1](https://github.com/jolpica/jolpica-f1), cross-checked with [OpenF1](https://openf1.org/) |
 | F1 track drawings | [f1-circuits](https://github.com/bacinger/f1-circuits) by Tomislav Bacinger (MIT licence; unofficial) |
 | Stadium locations and maps | [Wikidata](https://www.wikidata.org/) and [OpenStreetMap](https://www.openstreetmap.org/copyright) |
