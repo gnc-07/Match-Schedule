@@ -4,6 +4,10 @@
 //   - every duration is one of the two shared speeds (--dur-s, --dur-m) or the goal pulse (3 x --dur-m);
 //   - with animations switched off, nothing moves, and switching them off stops what is moving;
 //   - nothing animates an element that is hidden (for example the sun or moon that is about to disappear);
+//   - closing and gliding stay gentle, followed frame by frame (see "smooth" below): a closing starts softly (at most
+//     a tenth of its fade, or 20px, in the first sixtieth of a second), the page never jumps while something closes,
+//     and the list never glides more than 50px in a sixtieth of a second (a match on screen is followed, as a visitor
+//     sees it; measured per sixtieth, not per frame, so frames a busy computer skips do not count as jumps);
 // and it prints the slowest frame after each click, with animations on and off, with the processor slowed down 4 times
 // the way Lighthouse tests phones (Chromium only; FULLSPEED=1 for normal speed). Those timings vary from run to run,
 // so they are for reading, not a pass or fail; TIMINGS=0 skips them (npm test does, which saves about a minute).
@@ -13,7 +17,7 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import puppeteer from "puppeteer-core";
 import { BASE, ROOT, chromePath, startServer } from "./server.mjs";
-import { MATCH, mockNetwork } from "./mock-data.mjs";
+import { F1_WEEKEND, MATCH, mockNetwork } from "./mock-data.mjs";
 
 const out = path.join(ROOT, "screenshots", "motion-check");
 mkdirSync(out, { recursive: true });
@@ -29,8 +33,31 @@ const cases = [
   ["sheet-phone", 390, p => p.click("#setmenu summary")],
   ["sources", 1280, async p => { await p.evaluate(() => document.querySelector("#list .srcs").scrollIntoView({ block: "center" })); await p.click("#list .srcs summary"); }],
   ["star", 1280, async p => { await p.evaluate(() => document.querySelector('#list .star[aria-pressed="false"]').scrollIntoView({ block: "center" })); await p.click('#list .star[aria-pressed="false"]'); }],
-  ["theme", 1280, p => p.click("#themebtn")],
+  ["theme", 1280, async p => { await p.click("#themebtn");
+    await p.waitForFunction(() => document.documentElement.classList.contains("is-dark")); }],   // the cross-fade first takes a picture of the page
   ["filters", 1280, p => p.click("#chip-F1")],
+  // closing: each moves out first, then goes
+  ["panel-close", 1280, async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(600); await p.click("#mddlg [data-close]"); }],
+  ["beside-close", 1920, async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(600); await p.keyboard.press("Escape"); }],
+  ["tables-close", 1280, async p => { await p.click("#tablesbtn"); await wait(600); await p.keyboard.press("Escape"); }],
+  ["settings-close", 1280, async p => { await p.click("#setmenu summary"); await wait(400); await p.click("#setmenu summary"); }],
+  ["sheet-close", 390, async p => { await p.click("#setmenu summary"); await wait(600); await p.keyboard.press("Escape"); }],
+  ["sources-close", 1280, async p => { await p.evaluate(() => document.querySelector("#list .srcs").scrollIntoView({ block: "center" }));
+    await p.click("#list .srcs summary"); await wait(400); await p.click("#list .srcs summary"); }],
+  // the filter sidebar (laptops): hidden, then shown again
+  ["sidebar-hide", 1280, p => p.click("#sidehide")],
+  ["sidebar-show", 1280, async p => { await p.click("#sidehide"); await wait(900); await p.click("#sideshow"); }],
+  // small filter controls coming (the Custom dates, Clear filters) and going
+  ["controls", 1280, p => p.click('#range [data-r="custom"]')],
+  ["controls-go", 1280, async p => { await p.click('#range [data-r="custom"]'); await wait(600); await p.click('#range [data-r="all"]'); }],
+  // new content in the same place, and the days added by "Show more"
+  ["table-switch", 1280, async p => { await p.click("#tablesbtn"); await wait(900); await p.click('#ltchips [data-code="LIGA"]'); await wait(20); }],
+  ["weekend-switch", 1280, async p => { await p.click(`.md-open[data-uid="${F1_WEEKEND}"]`); await wait(900); await p.click('#wk-res [data-s="Q"]'); }],
+  ["driver-star", 1280, async p => { await p.click(`.md-open[data-uid="${F1_WEEKEND}"]`); await wait(900); await p.click('#wk-res .star[aria-pressed="false"]'); }],
+  ["show-more", 1280, async p => { await p.evaluate(() => document.getElementById("more").scrollIntoView({ block: "center" })); await p.click("#more"); }],
+  // Settings that change the whole page cross-fade like the theme
+  ["contrast", 1280, async p => { await p.click("#setmenu summary"); await wait(400); await p.click("#hcbox");
+    await p.waitForFunction(() => document.documentElement.dataset.contrast === "high"); }],   // the cross-fade first takes a picture of the page
   ["goal", 1920, async p => {
     await p.evaluate(u => { const r = DATA.find(x => x.uid === u); LIVE.set(keyOf(r), { id: "1", state: "in", clock: "67'", detail: "", hs: "2", as: "1" }); render();
       document.querySelector(`.score[data-uid="${CSS.escape(u)}"]`).scrollIntoView({ block: "center" }); }, uid);
@@ -39,6 +66,20 @@ const cases = [
   }],
 ];
 
+// name, width, what to follow, what to do first, what starts the movement (for the frame-by-frame "smooth" check)
+const smooth = [
+  ["beside-open", 1920, ["#list", "#mddlg"], async () => {}, p => p.click(`.md-open[data-uid="${uid}"]`)],
+  ["beside-switch", 1920, ["#list"], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); },
+    p => p.evaluate(u => { const all = [...document.querySelectorAll("#list .md-open")], i = all.findIndex(x => x.dataset.uid === u);
+      (all.slice(i + 1).find(x => x.getBoundingClientRect().top < innerHeight - 60) || all[i + 1]).click(); }, uid)],
+  ["beside-close", 1920, ["#list", "#mddlg"], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
+  ["panel-close", 1280, ["#mddlg"], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); }, p => p.click("#mddlg [data-close]"), "closing"],
+  ["tables-close", 1280, ["#ltdlg"], async p => { await p.click("#tablesbtn"); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
+  ["sheet-close", 390, ["#setmenu .calpanel"], async p => { await p.click("#setmenu summary"); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
+  ["menu-close", 1280, ["#setmenu .calpanel"], async p => { await p.click("#setmenu summary"); await wait(900); }, p => p.click("#setmenu summary"), "closing"],
+  ["sidebar-hide", 1280, ["#list", "#filters"], async () => {}, p => p.click("#sidehide"), "closing"],
+  ["sidebar-show", 1280, ["#list"], async p => { await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
+];
 const problems = [];
 const ONLY = process.argv.slice(2);   // optional: names of the cases to run, e.g. theme goal
 // Opens the page ready for one case: light theme, nothing starred, animations on or off
@@ -46,6 +87,7 @@ async function open(browser, width, motion) {
   const page = await browser.newPage();
   await page.setViewport({ width, height: 900 });
   await page.evaluateOnNewDocument(m => { try { localStorage.setItem("mp.theme", '"light"'); localStorage.setItem("mp.favs", "[]");
+    localStorage.setItem("mp.side", '"open"'); localStorage.setItem("mp.contrast", '"normal"'); localStorage.setItem("mp.range", '"all"');
     localStorage.setItem("mp.motion", JSON.stringify(m)); } catch {} }, motion);
   await mockNetwork(page);
   await page.goto(BASE + "?lang=en", { waitUntil: "networkidle0" });
@@ -128,7 +170,10 @@ async function run(label, launch) {
       for (const a of anims.list) {
         const inner = /^-ua-|^-moz-|view-transition/.test(a.what);   // the browser's own steps inside a View Transition
         const bad = inner ? [] : a.props.filter(p => !OK_PROPS.has(p) && !/color$/i.test(p));
-        const [s, m] = anims.speeds, okLen = inner || [s, m, 3 * m].some(x => Math.abs(a.ms - x) < 2);
+        // a button's colour change that is undone half way (the pointer leaves it as a panel opens over it) runs back in
+        // the time it had run, as the CSS rules say, so it may be shorter than the shared speed; never longer
+        const [s, m] = anims.speeds, undone = /color$/i.test(a.what) && a.ms > 0 && a.ms < s,
+          okLen = inner || undone || [s, m, 3 * m].some(x => Math.abs(a.ms - x) < 2);
         const line = `           ${a.what.padEnd(34)} ${a.on.slice(0, 40).padEnd(40)} ${String(a.ms).padStart(4)} ms  ${a.props.join(", ")}`;
         if (!seen.has(line)) console.log(line);
         seen.add(line);
@@ -161,6 +206,45 @@ async function run(label, launch) {
     await theme.close();
     console.log(`${label.padEnd(8)} switch-off   theme cross-fade: ${stillFading} animation(s) running after unticking, dark theme kept: ${dark}`);
     if (stillFading || !dark) problems.push(`${label}: unticking Animations during the theme cross-fade left ${stillFading} running (dark theme kept: ${dark})`);
+    // smooth: each frame, where the things that move are and how visible they are
+    for (const [name, width, sels, prep, act, closing] of smooth.filter(c => !ONLY.length || ONLY.includes(c[0]) || ONLY.includes("smooth"))) {
+      const page = await open(browser, width, "on");
+      await prep(page);
+      await page.evaluate(sels => {
+        window.__tr = [];
+        const t0 = performance.now(), pin = [...document.querySelectorAll("#list .match")].find(m => m.getBoundingClientRect().bottom > 0);
+        const tick = now => {   // now: the frame's own time, the clock the animations move by
+          window.__tr.push({ t: now, y: scrollY, at: sels.map(s => { const e = document.querySelector(s), r = (s === "#list" ? pin : e).getBoundingClientRect();
+            return [r.left, r.top, e.checkVisibility() ? +getComputedStyle(e).opacity : 0]; }) });
+          if (now - t0 < 900) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }, sels);
+      await act(page);
+      await wait(1000);
+      const tr = await page.evaluate(() => window.__tr);
+      await page.close();
+      const jumped = closing && tr.some((f, i) => i && f.y !== tr[i - 1].y);
+      const lines = sels.map((s, k) => {
+        let big = 0, first = null;
+        for (let i = 1; i < tr.length; i++) {
+          const a = tr[i - 1].at[k], c = tr[i].at[k];
+          if (!a[2] || !c[2] || tr[i].y !== tr[i - 1].y) continue;   // invisible, or the page scrolled (checked apart)
+          // per sixtieth of a second, so a frame a busy computer skips does not count as one big step
+          const per = 1000 / 60 / Math.max(tr[i].t - tr[i - 1].t, 1000 / 60),
+            d = Math.hypot(c[0] - a[0], c[1] - a[1]) * per, o = Math.abs(c[2] - a[2]) * per;
+          if (first === null && (d > 0.5 || o > 0.005)) first = [d, o];
+          big = Math.max(big, d);
+        }
+        if (closing && first && (first[0] > 20 || first[1] > 0.1))
+          problems.push(`${label} smooth ${name}: ${s} starts closing with a jump (${first[0].toFixed(0)}px, opacity ${first[1].toFixed(2)} in the first frame)`);
+        // the list is what is being read: it never glides more than 50px in a frame (a sheet leaving the screen may go faster)
+        if (s === "#list" && big > 50) problems.push(`${label} smooth ${name}: ${s} moves ${big.toFixed(0)}px in one frame`);
+        return `${s} biggest step ${big.toFixed(0)}px` + (first ? `, first ${first[0].toFixed(0)}px / opacity ${first[1].toFixed(2)}` : "");
+      });
+      if (jumped) problems.push(`${label} smooth ${name}: the page jumped while closing`);
+      console.log(`${label.padEnd(8)} smooth ${name.padEnd(13)} ${lines.join("; ")}${jumped ? "; the page jumped" : ""}`);
+    }
   } finally {
     await browser.close();
     server.kill();

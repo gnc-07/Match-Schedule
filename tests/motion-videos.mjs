@@ -8,7 +8,7 @@ import { mkdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import puppeteer from "puppeteer-core";
 import { BASE, ROOT, chromePath, startServer } from "./server.mjs";
-import { MATCH, mockNetwork } from "./mock-data.mjs";
+import { F1_WEEKEND, MATCH, mockNetwork } from "./mock-data.mjs";
 
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
 const out = path.join(ROOT, "screenshots", "motion");
@@ -76,7 +76,7 @@ const scenes = [
   }],
   ["05-sources-and-star", 1280, 800, async p => {
     await p.evaluate(() => document.querySelector("#list .srcs").scrollIntoView({ block: "center" }));
-    await click(p, "#list .srcs summary"); await wait(1100); await click(p, "#list .srcs summary"); await wait(600);
+    await click(p, "#list .srcs summary"); await wait(1100); await click(p, "#list .srcs summary"); await wait(1000);
     await click(p, '#list .star[aria-pressed="false"]'); await wait(1000);
     await click(p, '#list .star[aria-pressed="true"]'); await wait(700);
   }],
@@ -100,6 +100,32 @@ const scenes = [
     await click(p, "#themebtn"); await wait(900); await click(p, "#chip-EPL"); await wait(900); await click(p, "#chip-EPL"); await wait(900);
     await click(p, "#setmenu summary"); await wait(500); await click(p, "#mvbox"); await wait(700); await key(p, "Escape"); await wait(500);
   }, true],
+  ["10-filter-sidebar", 1280, 800, async p => {
+    await click(p, "#sidehide"); await wait(1200); await click(p, "#sideshow"); await wait(1100);
+  }],
+  ["11-filter-controls", 1280, 800, async p => {
+    await click(p, '#range [data-r="custom"]'); await wait(900);
+    await click(p, "#q"); await p.keyboard.type("a"); await raise(p); await wait(900); await click(p, "#clearq"); await wait(700);
+    await click(p, "#chip-F1"); await wait(900); await click(p, "#reset"); await wait(1100);
+  }],
+  ["12-table-switches", 1280, 800, async p => {
+    await click(p, "#tablesbtn"); await wait(900); await click(p, '#ltchips [data-code="LIGA"]'); await wait(900);
+    await click(p, '#ltchips [data-code="F1"]'); await wait(900); await click(p, '#ltbody [data-lt="c"]'); await wait(900);
+    await key(p, "Escape"); await wait(700);
+  }],
+  ["13-race-weekend", 1280, 800, async p => {
+    await click(p, `.md-open[data-uid="${F1_WEEKEND}"]`); await wait(1100);
+    await click(p, '#wk-res [data-s="Q"]'); await wait(900); await click(p, '#wk-res .star[aria-pressed="false"]'); await wait(900);
+    await click(p, '#wk-champ [data-tab="c"]'); await wait(900); await key(p, "Escape"); await wait(700);
+  }],
+  ["14-settings-page-fade", 1280, 800, async p => {
+    await click(p, "#setmenu summary"); await wait(700); await click(p, "#hcbox"); await wait(1000);
+    await click(p, '.sizes label:has(input[value="large"])'); await wait(1000); await click(p, '.sizes label:has(input[value="normal"])'); await wait(900);
+    await p.select("#langsel", "pt"); await raise(p); await wait(1000); await click(p, "#hcbox"); await wait(900); await key(p, "Escape"); await wait(600);
+  }],
+  ["15-show-more", 1280, 800, async p => {
+    await click(p, "#more"); await wait(1300);
+  }],
 ];
 
 try {
