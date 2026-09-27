@@ -167,6 +167,33 @@ try {
     await check(`ESPN down: ${code} table`);
     await page.keyboard.press("Escape");
   }
+  espnDown = false;
+
+  // The published page lists a fingerprint of each of its scripts in its security policy (publish_site.py), in place
+  // of 'unsafe-inline': the page's own scripts run (the list above drew), and a script that is not listed must not
+  const policy = await page.evaluate(async () => {
+    const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]').content;
+    const src = (csp.match(/(?:^|;)\s*script-src ([^;]*)/) || [])[1] || "";
+    window.__csp = [];
+    const s = document.createElement("script");
+    s.textContent = "window.__xss = 8";
+    document.body.append(s);
+    await new Promise(r => setTimeout(r, 300)); // the browser reports a refusal a moment later
+    return { src, ran: window.__xss === 8, blocked: window.__csp.some(v => v.startsWith("script-src")) };
+  });
+  shows("published page: script-src lists only script fingerprints (no 'unsafe-inline', no 'self')",
+    /^('sha256-[A-Za-z0-9+/]+=*'\s*)+$/.test(policy.src.trim()));
+  shows("published page: a script that is not in the policy is refused", !policy.ran && policy.blocked);
+  await page.evaluate(() => { window.__csp = []; });
+
+  // index.html as edited (styles.css and the js/ files loaded one by one, as python3 -m http.server shows it) must
+  // work too: this catches a file that uses, while it loads, something only a later file defines
+  await page.goto(`${BASE}source.html?lang=en`, { waitUntil: "networkidle0" });
+  await page.waitForFunction(() => document.querySelectorAll("#list .match").length > 0, { timeout: 15000 }).catch(() => {});
+  shows("page as edited (source.html): the list draws from the separate files",
+    await page.evaluate(() => document.querySelectorAll("#list .match").length > 0
+      && !!document.querySelector('link[rel="stylesheet"][href="styles.css"]') && document.querySelectorAll("script[src]").length > 1));
+  await check("page as edited (source.html)");
 } finally {
   await browser.close();
   server.kill();
