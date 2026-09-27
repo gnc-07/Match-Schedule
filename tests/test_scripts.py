@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import build_schedule as bs
 import cazetv
 import common
+import publish_site
 import research
 
 
@@ -484,6 +485,113 @@ class TrackOutlines(unittest.TestCase):
         self.assertEqual(self.build_race(True, {"f1|2026|20": kept})["length"], 4000)       # f1-circuits first
         self.assertEqual(self.build_race(False, {"f1|2026|20": kept}), kept)               # then the last build's
         self.assertEqual(self.build_race(False, {})["src"], "julesr0y")                    # then f1-circuits-svg
+
+
+class PublishSite(unittest.TestCase):
+    """publish_site.py puts index.html, styles.css and js/ together into the one page visitors get. The workflow runs
+    these checks before every build, so a page that would not work is never published."""
+    ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    def fake_site(self, folder, script="const a = 1;\n", style="body{color:red}\n", scripts=("js/a.js",)):
+        os.makedirs(os.path.join(folder, "js"), exist_ok=True)
+        tags = "".join(f'<script src="{s}"></script>\n' for s in scripts)
+        with open(os.path.join(folder, "index.html"), "w", encoding="utf-8") as f:
+            f.write('<meta http-equiv="Content-Security-Policy" content="default-src \'self\'; script-src \'self\' '
+                    '\'unsafe-inline\'; object-src \'none\'">\n<script>\nwindow.early = 1;\n</script>\n'
+                    '<link rel="stylesheet" href="styles.css">\n<body>\n' + tags + "</body>\n")
+        for name, text in [("styles.css", style)] + [(s, script) for s in scripts]:
+            with open(os.path.join(folder, name), "w", encoding="utf-8") as f:
+                f.write(text)
+
+    def test_real_page_is_one_file(self):
+        page = publish_site.build_page(self.ROOT)
+        self.assertNotIn("<script src", page)
+        self.assertNotIn('rel="stylesheet"', page)
+        with open(os.path.join(self.ROOT, "styles.css"), encoding="utf-8") as f:
+            self.assertIn(f.read().rstrip("\n"), page)
+
+    def test_real_page_policy_lists_every_script_and_nothing_else(self):
+        page = publish_site.build_page(self.ROOT)
+        csp = re.search(r'<meta http-equiv="Content-Security-Policy" content="([^"]*)">', page).group(1)
+        src = re.search(r"script-src ([^;]*)", csp).group(1).split()
+        scripts = re.findall(r"<script>(.*?)</script>", page, re.S)
+        self.assertEqual(src, [publish_site._hash(s) for s in scripts])
+        self.assertNotIn("'unsafe-inline'", src)
+        self.assertNotIn("'self'", src)
+
+    def test_every_script_file_is_in_the_page(self):
+        """A file added to js/ but not listed in index.html would silently never run."""
+        with open(os.path.join(self.ROOT, "index.html"), encoding="utf-8") as f:
+            listed = re.findall(r'<script src="([^"]+)"></script>', f.read())
+        present = sorted("js/" + n for n in os.listdir(os.path.join(self.ROOT, "js")) if n.endswith(".js"))
+        self.assertEqual(sorted(listed), present)
+        self.assertEqual(len(listed), len(set(listed)))
+
+    def test_scripts_joined_in_listed_order(self):
+        with tempfile.TemporaryDirectory() as d:
+            self.fake_site(d, scripts=("js/b.js", "js/a.js"))
+            for name, text in [("js/a.js", "const a = 1;\n"), ("js/b.js", "const b = 2;\n")]:
+                with open(os.path.join(d, name), "w", encoding="utf-8") as f:
+                    f.write(text)
+            page = publish_site.build_page(d)
+        self.assertIn("<script>\nconst b = 2;\n\nconst a = 1;\n</script>", page)
+        self.assertIn("<style>\nbody{color:red}\n</style>", page)
+
+    def test_text_that_would_end_the_block_is_refused(self):
+        for kind, text in [("script", 'const s = "</script><img src=x>";\n'), ("script", "// <!-- x\n"),
+                           ("style", "body{}</style><script>alert(1)</script>\n")]:
+            with tempfile.TemporaryDirectory() as d:
+                self.fake_site(d, **({"script": text} if kind == "script" else {"style": text}))
+                with self.assertRaises(ValueError):
+                    publish_site.build_page(d)
+
+    def test_only_the_sites_own_files_are_included(self):
+        for src in ("../secret.js", "/etc/x.js", "https://evil.example/x.js", "js/a.txt"):
+            with tempfile.TemporaryDirectory() as d:
+                self.fake_site(d)
+                with open(os.path.join(d, "index.html"), encoding="utf-8") as f:
+                    html = f.read().replace("js/a.js", src)
+                with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as f:
+                    f.write(html)
+                with self.assertRaises(ValueError, msg=src):
+                    publish_site.build_page(d)
+
+    def test_a_script_tag_in_another_form_is_refused(self):
+        """It would be published as a separate file that the policy then blocks."""
+        with tempfile.TemporaryDirectory() as d:
+            self.fake_site(d)
+            with open(os.path.join(d, "index.html"), encoding="utf-8") as f:
+                html = f.read().replace('<script src="js/a.js">', '<script defer src="js/a.js">')
+            with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as f:
+                f.write(html)
+            with self.assertRaises(ValueError):
+                publish_site.build_page(d)
+
+    def test_fingerprint_follows_every_file(self):
+        with tempfile.TemporaryDirectory() as d:
+            self.fake_site(d)
+            before = publish_site.fingerprint(d)
+            self.assertEqual(before, publish_site.fingerprint(d))
+            for name, extra in (("js/a.js", "/* x */\n"), ("styles.css", "/* x */\n"), ("index.html", "<p>x</p>\n")):
+                with open(os.path.join(d, name), "a", encoding="utf-8") as f:
+                    f.write(extra)
+                after = publish_site.fingerprint(d)
+                self.assertNotEqual(before, after, name)
+                before = after
+
+    def test_publish_writes_only_the_site(self):
+        with tempfile.TemporaryDirectory() as d:
+            self.fake_site(d)
+            for name in ("fixtures.json", "soccer.ics", "fonts/x.woff2", "build_schedule.py", "tests/t.py"):
+                os.makedirs(os.path.dirname(os.path.join(d, name)), exist_ok=True)
+                with open(os.path.join(d, name), "w", encoding="utf-8") as f:
+                    f.write("x")
+            publish_site.publish(os.path.join(d, "_site"), d)
+            found = sorted(os.path.relpath(os.path.join(p, n), os.path.join(d, "_site"))
+                           for p, _, names in os.walk(os.path.join(d, "_site")) for n in names)
+            self.assertEqual(found, ["fixtures.json", "fonts/x.woff2", "index.html", "soccer.ics"])
+            with self.assertRaises(ValueError):
+                publish_site.publish(d, d)          # never over the source files
 
 
 if __name__ == "__main__":

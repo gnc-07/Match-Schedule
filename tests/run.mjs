@@ -19,11 +19,11 @@ import { ROOT } from "./server.mjs";
 
 const node = file => [process.execPath, [path.join("tests", file)]];
 const GROUPS = [
-  { name: "format", what: "the JavaScript in index.html is laid out the standard way (fix with npm run format)",
+  { name: "format", what: "the JavaScript in js/ and index.html is laid out the standard way (fix with npm run format)",
     steps: [["layout of the code", process.execPath, [path.join("tests", "format.mjs"), "--check"]]] },
-  { name: "python", what: "build_schedule.py, cazetv.py and research.py, including the rule for verified kick-off times",
+  { name: "python", what: "build_schedule.py, cazetv.py, research.py and publish_site.py, including the rule for verified kick-off times",
     steps: [["Python scripts", "python3", ["-m", "unittest", "discover", "-s", "tests"]]] },
-  { name: "security", what: "hostile data from the feeds never runs in the page or becomes a link",
+  { name: "security", what: "hostile data from the feeds never runs in the page or becomes a link; only the page's own scripts may run",
     steps: [["hostile data", ...node("security.mjs")]] },
   { name: "accessibility", what: "axe-core WCAG 2.2 AA in 128 combinations of theme, language, width and open window",
     steps: [["axe-core", ...node("axe.mjs")]] },

@@ -29,7 +29,7 @@ Examples
 import argparse, json, hashlib, math, os, re, sys, urllib.error
 from datetime import datetime, date, timedelta, timezone
 from zoneinfo import ZoneInfo
-import cazetv
+import cazetv, publish_site
 from common import fetch, fetch_json, load_json, save_text
 
 HOME_TZ = ZoneInfo("America/Edmonton")   # all human-readable times are shown in this zone
@@ -829,10 +829,9 @@ def main():
         sys.exit(f"Only {league_count} upcoming league matches found; refusing to publish. Check the data sources.")
     cazetv.add_streams([r for r in recs if r["code"] != "F1"])   # CazéTV links are for football matches
     recs = apply_filters(recs, a.leagues and a.leagues.split(","), a.teams and a.teams.split(","))
-    # "site" fingerprints index.html, so a page left open can tell the site itself was updated and reload
-    with open("index.html", "rb") as f:
-        site = hashlib.sha256(f.read()).hexdigest()[:12]
-    meta = {"generated": datetime.now(timezone.utc).isoformat(timespec="minutes"), "site": site,
+    # "site" fingerprints the published page (index.html with styles.css and js/ inside it), so a page left open can
+    # tell the site itself was updated and reload
+    meta = {"generated": datetime.now(timezone.utc).isoformat(timespec="minutes"), "site": publish_site.fingerprint(),
             "sources": sources, "tables": {c: t for c, t in tables.items() if t}, "matches": recs}
     if f1_stale:
         meta["f1stale"] = True

@@ -51,7 +51,7 @@ Matchday Planner is an independent project and is not affiliated with any league
 
 ## How it works (for the curious)
 
-The site is a single web page (`index.html`) hosted free on GitHub Pages. Several times a day, a GitHub Actions workflow runs `build_schedule.py`, which gathers the fixtures, applies the verification rule above, and saves the result as `fixtures.json` (read by the page) and `soccer.ics` (the calendar feed). Live information such as scores and tables is fetched by each visitor's browser when it is needed, so there is no server to maintain.
+The site is a single web page hosted free on GitHub Pages, put together from `index.html`, `styles.css` and the scripts in `js/` each time it is published. Several times a day, a GitHub Actions workflow runs `build_schedule.py`, which gathers the fixtures, applies the verification rule above, and saves the result as `fixtures.json` (read by the page) and `soccer.ics` (the calendar feed). Live information such as scores and tables is fetched by each visitor's browser when it is needed, so there is no server to maintain.
 
 The owner's setup and maintenance notes are in [MAINTAINING.md](MAINTAINING.md).
 
