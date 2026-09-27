@@ -396,12 +396,12 @@ def _in_seasons(seasons, year):
             return True
     return False
 
-def _svg_outline(circuits, lat, lon, year, name=""):
-    """The outline of the circuit at (lat, lon) from the second source, in the same form as _f1_outline gives
-    (without the lap length, which that source does not have), or None. A circuit within 3 km is taken; one
-    up to 10 km away only when its name shares a word with `name` (that index places some street circuits in the
-    town centre: Las Vegas, 7 km from the Strip). Only the detailed drawings mark the start/finish line, so a
-    layout without one gives None rather than a dot in the wrong place."""
+def _svg_drawing(circuits, lat, lon, year, name=""):
+    """The second source's drawing of the circuit at (lat, lon), as (points, circuit): the points of the lap in
+    drawing units, starting at the start/finish line; or None. A circuit within 3 km is taken; one up to 10 km
+    away only when its name shares a word with `name` (that index places some street circuits in the town
+    centre: Las Vegas, 7 km from the Strip). Only the detailed drawings mark the start/finish line, so a layout
+    without one gives None rather than a start in the wrong place."""
     k = math.cos(math.radians(lat))
     near = lambda c: math.hypot((c["lon"] - lon) * k, c["lat"] - lat) * 111.2   # km
     words = _name_words(name)
@@ -418,17 +418,28 @@ def _svg_outline(circuits, lat, lon, year, name=""):
             return None                        # drawn without the start/finish line only
         raise
     paths = re.findall(r'<path\b[^>]*?\sd="([^"]*)"', svg)
+    if len(paths) < 2:
+        return None
     pts = _svg_points(paths[0])
     if len(pts) < 20:
         return None
     if math.dist(pts[0], pts[-1]) < 1e-6:
         pts.pop()                              # the loop is closed with "Z" instead
     # the detailed drawing's second shape is a short bar across the track: the start/finish line
-    if len(paths) > 1:
-        bar = _svg_points(paths[1], 1)
-        cx, cy = sum(p[0] for p in bar) / len(bar), sum(p[1] for p in bar) / len(bar)
-        at = min(range(len(pts)), key=lambda i: math.hypot(pts[i][0] - cx, pts[i][1] - cy))
-        pts = pts[at:] + pts[:at]
+    bar = _svg_points(paths[1], 1)
+    cx, cy = sum(p[0] for p in bar) / len(bar), sum(p[1] for p in bar) / len(bar)
+    at = min(range(len(pts)), key=lambda i: math.hypot(pts[i][0] - cx, pts[i][1] - cy))
+    return pts[at:] + pts[:at], best
+
+def _svg_outline(circuits, lat, lon, year, name=""):
+    """The outline of the circuit at (lat, lon) from the second source, or None."""
+    got = _svg_drawing(circuits, lat, lon, year, name)
+    return _svg_layout(got) if got else None
+
+def _svg_layout(got):
+    """A drawing from _svg_drawing() in the same form as _f1_outline gives (without the lap length, which that
+    source does not have)."""
+    pts, best = got
     x0, y0 = min(x for x, _ in pts), min(y for _, y in pts)
     scale = 1000 / max(max(x for x, _ in pts) - x0, max(y for _, y in pts) - y0)
     pts = _simplify([(round((x - x0) * scale), round((y - y0) * scale)) for x, y in pts], 2)
@@ -454,9 +465,73 @@ def _simplify(pts, tol):
             keep.add(far); stack += [(a, far), (far, b)]
     return [pts[i] for i in sorted(keep)]
 
-def _f1_outline(layouts, lat, lon):
+def _resample(pts, n):
+    """n points evenly spaced along a closed loop, starting at its first point."""
+    loop = pts + [pts[0]]
+    seg = [math.dist(loop[i], loop[i + 1]) for i in range(len(pts))]
+    total, out, i, done = sum(seg), [], 0, 0.0
+    for k in range(n):
+        d = total * k / n
+        while i < len(seg) - 1 and done + seg[i] < d:
+            done += seg[i]; i += 1
+        t = (d - done) / seg[i] if seg[i] else 0
+        (ax, ay), (bx, by) = loop[i], loop[i + 1]
+        out.append((ax + (bx - ax) * t, ay + (by - ay) * t))
+    return out
+
+def _centred(pts):
+    """The points moved to their centre and scaled to an average distance of 1 from it, and how."""
+    cx, cy = sum(x for x, _ in pts) / len(pts), sum(y for _, y in pts) / len(pts)
+    r = math.sqrt(sum((x - cx) ** 2 + (y - cy) ** 2 for x, y in pts) / len(pts)) or 1
+    return [((x - cx) / r, (y - cy) / r) for x, y in pts], (cx, cy, r)
+
+# How closely a drawing must fit an outline (average gap to the outline, in track radii) to lend it its
+# start/finish line. Measured on the 2026 circuits: Silverstone 0.004, Monaco 0.012, the others that fit well
+# 0.014 or less; Baku's drawing has other proportions (0.043) and would put the line in the wrong place, and
+# the fits from Austin (0.026) up could not be confirmed, so those keep the outline's own first point.
+MATCH_LIMIT = 0.015
+
+def _start_index(track, drawing):
+    """Where on `track` (outline points, y pointing south) the start/finish line is, taken from `drawing` (points
+    starting at the start/finish line, in any size, turn or mirror image): the index of the outline point
+    nearest the drawing's start once the drawing is turned, flipped and scaled to fit the outline best.
+    None when no fit is close enough (for example two different layouts of the same circuit)."""
+    fit, at = _fit(track, drawing)
+    return at if fit <= MATCH_LIMIT else None
+
+def _fit(track, drawing, n=100):
+    """(average gap between the best-fitting drawing and the outline, in track radii; the index for _start_index)."""
+    A, (cx, cy, r) = _centred(_resample(track, n))
+    B, _ = _centred(_resample(drawing, n))
+    segs = [(ax, ay, bx - ax, by - ay, (bx - ax) ** 2 + (by - ay) ** 2 or 1e-12)
+            for (ax, ay), (bx, by) in zip(A, A[1:] + A[:1])]
+    def to_line(u, v):                         # squared distance from (u, v) to the outline, a closed line
+        best = math.inf
+        for ax, ay, dx, dy, dd in segs:
+            t = min(1.0, max(0.0, ((u - ax) * dx + (v - ay) * dy) / dd))
+            best = min(best, (u - ax - t * dx) ** 2 + (v - ay - t * dy) ** 2)
+        return best
+    def gap(turn, flip):
+        c, s = math.cos(math.radians(turn)), math.sin(math.radians(turn))
+        total = 0.0
+        for x, y in B:
+            x = -x if flip else x
+            total += to_line(x * c - y * s, x * s + y * c)
+        return total / n
+    fits = [(gap(t, f), t, f) for f in (False, True) for t in range(0, 360, 10)]
+    _, t0, f0 = min(fits)
+    best = min((gap(t, f0), t, f0) for t in range(t0 - 9, t0 + 10))     # then to the nearest degree
+    x, y = B[0]
+    x = -x if best[2] else x
+    c, s = math.cos(math.radians(best[1])), math.sin(math.radians(best[1]))
+    sx, sy = (x * c - y * s) * r + cx, (x * s + y * c) * r + cy          # the drawing's start, on the outline's scale
+    return math.sqrt(best[0]), min(range(len(track)), key=lambda i: math.hypot(track[i][0] - sx, track[i][1] - sy))
+
+def _f1_outline(layouts, lat, lon, drawing=None):
     """The outline of the circuit at (lat, lon): {"path", "w", "h", "length" (metres), "firstgp"}, or None
-    when no outline lies within 3 km (a new circuit the project has not drawn yet)."""
+    when no outline lies within 3 km (a new circuit the project has not drawn yet). The outline starts where
+    the start/finish line is: f1-circuits does not say where its outlines begin, so the line is taken from
+    `drawing` (from _svg_drawing()) when one is given and fits; otherwise the outline's own first point is used."""
     k = math.cos(math.radians(lat))
     near = lambda f: min(math.hypot((x - lon) * k, y - lat) for x, y in f["points"]) * 111.2   # km
     best = min(layouts, key=near, default=None)
@@ -465,6 +540,9 @@ def _f1_outline(layouts, lat, lon):
     pts = [((x - lon) * k * 111320, (lat - y) * 110574) for x, y in best["points"]]   # metres, y pointing south
     if pts[0] == pts[-1]:
         pts.pop()                            # the loop is closed with "Z" instead
+    at = _start_index(pts, drawing) if drawing else None
+    if at:
+        pts = pts[at:] + pts[:at]
     x0, y0 = min(x for x, _ in pts), min(y for _, y in pts)
     scale = 1000 / max(max(x for x, _ in pts) - x0, max(y for _, y in pts) - y0)
     pts = _simplify([(round((x - x0) * scale), round((y - y0) * scale)) for x, y in pts], 2)
@@ -525,22 +603,27 @@ def from_f1(start, now=None):
                 r["circuit"] = {"name": c["circuitName"], "locality": loc.get("locality"), "country": loc.get("country"),
                                 "lat": float(loc["lat"]), "lon": float(loc["long"])} if loc.get("lat") else {"name": c["circuitName"]}
                 # The diagram is optional: a problem with it never holds up the F1 sessions. Outlines in order:
-                # f1-circuits; else the one this race had at the last build (always north up); else f1-circuits-svg,
-                # downloaded only now (not always north up); else none, and the site shows a map.
-                layout = None
+                # f1-circuits, starting at the start/finish line marked on the f1-circuits-svg drawing when the two
+                # fit; else the one this race had at the last build (always north up); else the f1-circuits-svg
+                # drawing itself (not always north up); else none, and the site shows a map.
+                layout = drawing = None
                 if loc.get("lat"):
                     lat, lon = float(loc["lat"]), float(loc["long"])
                     try:
-                        layout = _f1_outline(layouts, lat, lon) if layouts else None
+                        svg = _svg_circuits() if svg is None else svg
+                        drawing = _svg_drawing(svg, lat, lon, int(season), c["circuitName"]) if svg else None
+                    except Exception as e:
+                        print(f"No f1-circuits-svg drawing for {c['circuitName']} ({e})")
+                    try:
+                        layout = _f1_outline(layouts, lat, lon, drawing and drawing[0]) if layouts else None
                     except (ValueError, ZeroDivisionError) as e:
                         print(f"No f1-circuits outline for {c['circuitName']} ({e})")
                     layout = layout or saved.get(f"f1|{season}|{rnd}")
-                    if not layout:
+                    if not layout and drawing:
                         try:
-                            svg = _svg_circuits() if svg is None else svg
-                            layout = _svg_outline(svg, lat, lon, int(season), c["circuitName"]) if svg else None
+                            layout = _svg_layout(drawing)
                             layout = layout if _valid_layout(layout) else None
-                        except Exception as e:
+                        except (ValueError, ZeroDivisionError) as e:
                             print(f"No f1-circuits-svg outline for {c['circuitName']} ({e}); the site shows a map instead")
                 if layout:
                     r["circuit"]["layout"] = layout

@@ -5,7 +5,7 @@ so they give the same result every time.
 Run from the project folder:
   python3 -m unittest discover -s tests
 """
-import copy, io, json, os, sys, tempfile, unittest, urllib.error, urllib.request
+import copy, io, json, math, os, re, sys, tempfile, unittest, urllib.error, urllib.request
 from contextlib import redirect_stdout
 from datetime import date, datetime, timedelta, timezone
 from unittest import mock
@@ -409,6 +409,43 @@ class TrackOutlines(unittest.TestCase):
                 json.dump({"matches": [race, broken, None, {"sess": "R", "circuit": "x"}]}, f)
             self.assertEqual(bs.previous_layouts(path), {"f1|2026|16": good})
             self.assertEqual(bs.previous_layouts(os.path.join(d, "missing.json")), {})
+
+    def test_start_line_taken_from_a_drawing_that_fits(self):
+        # an L-shaped track (no symmetry, so only one fit is right), and its drawing: turned a quarter,
+        # mirrored, three times the size, and starting at point 50, where its start/finish bar is
+        L = [(0, 0), (400, 0), (400, 100), (100, 100), (100, 300), (0, 300)]
+        track = bs._resample(L, 200)
+        drawing = [(-y * 3, x * 3) for x, y in track[50:] + track[:50]]
+        self.assertLessEqual(abs(bs._start_index(track, drawing) - 50), 1)
+        self.assertLess(bs._fit(track, drawing)[0], 0.01)
+
+    def test_a_drawing_that_does_not_fit_lends_nothing(self):
+        track = bs._resample([(0, 0), (400, 0), (400, 100), (100, 100), (100, 300), (0, 300)], 200)
+        other = bs._resample([(0, 0), (300, 0), (300, 300), (0, 300)], 200)       # a different circuit
+        self.assertIsNone(bs._start_index(track, other))
+
+    def test_outline_starts_at_the_drawings_start_line(self):
+        L = [(9.0, 45.0), (9.004, 45.0), (9.004, 45.001), (9.001, 45.001), (9.001, 45.003), (9.0, 45.003)]
+        geo = [(x, y) for x, y in bs._resample(L, 120)]
+        k = math.cos(math.radians(45.0))
+        # the same shape in drawing units (y pointing down), starting at point 30
+        metres = [((x - 9.0) * k * 111320, (45.0 - y) * 110574) for x, y in geo]
+        drawing = metres[30:] + metres[:30]
+        out = bs._f1_outline([{"points": geo, "props": {}}], 45.0, 9.0, drawing)
+        first = tuple(int(n) for n in re.findall(r"\d+", out["path"])[:2])
+        plain = bs._f1_outline([{"points": geo, "props": {}}], 45.0, 9.0)
+        pts = [tuple(map(int, p)) for p in re.findall(r"(\d+) (\d+)", plain["path"])]
+        self.assertGreater(math.dist(first, pts[0]), 100)                          # no longer the outline's first point
+        def gap(p, a, b):                                                          # distance from p to the side a-b
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            t = max(0, min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / (dx * dx + dy * dy)))
+            return math.dist(p, (a[0] + t * dx, a[1] + t * dy))
+        self.assertLess(min(gap(first, a, b) for a, b in zip(pts, pts[1:] + pts[:1])), 3)   # but on the same line
+        # and exactly where the drawing's start is: point 30, on the page's 1000-unit grid
+        x0, y0 = min(x for x, _ in metres), min(y for _, y in metres)
+        scale = 1000 / max(max(x for x, _ in metres) - x0, max(y for _, y in metres) - y0)
+        want = ((metres[30][0] - x0) * scale, (metres[30][1] - y0) * scale)
+        self.assertLess(math.dist(first, want), 2)
 
     def build_race(self, bacinger_up, saved):
         """from_f1 for one race at the square circuit, with the first outline source up or down."""

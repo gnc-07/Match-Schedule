@@ -144,13 +144,15 @@ try {
   await page.waitForFunction(() => !document.querySelector("#livebox").hidden, { timeout: 15000 }).catch(() => {});
   const live = await page.evaluate(() => ({ list: document.querySelector("#livelist")?.textContent || "",
     note: document.querySelector("#livenote")?.textContent || "" }));
-  shows("ESPN down: the Bundesliga score comes from OpenLigaDB", live.list.includes("1–1") && live.note.includes("OpenLigaDB"));
+  shows("ESPN down: the Bundesliga score comes from OpenLigaDB, marked LIVE (it has no match clock)",
+    live.list.includes("1–1") && live.list.includes("LIVE") && live.note.includes("OpenLigaDB"));
   await check("ESPN down: live scores from OpenLigaDB");
   await page.goto(`${BASE}?lang=en&match=test-backup`, { waitUntil: "networkidle0" });
   await page.waitForFunction(() => document.querySelector("#md-src")?.textContent.includes("OpenLigaDB"), { timeout: 15000 }).catch(() => {});
   const md = await page.evaluate(() => ({ ev: document.querySelector("#md-ev")?.textContent || "",
-    src: document.querySelector("#md-src")?.textContent || "" }));
+    src: document.querySelector("#md-src")?.textContent || "", lineups: !document.querySelector("#md-lu")?.hidden }));
   shows("ESPN down: match details list OpenLigaDB's goals, the hostile scorer as text", md.ev.includes(EVIL) && md.src.includes("OpenLigaDB"));
+  shows("ESPN down: no line-ups box (OpenLigaDB has none)", !md.lineups);
   await check("ESPN down: match details from OpenLigaDB");
   await page.goto(`${BASE}?lang=en`, { waitUntil: "networkidle0" });
   for (const code of ["BUN", "EPL"]) {

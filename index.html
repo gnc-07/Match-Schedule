@@ -3009,7 +3009,7 @@ function renderLive() {
         '</span><span class="t">' +
         esc(x.away) +
         '</span><span class="clk">' +
-        esc(x.clock) +
+        esc(x.clock || T.pLive) + // OpenLigaDB has no match clock
         "</span></div>",
     )
     .join("");
@@ -3300,7 +3300,7 @@ function mdEvents(m) {
 }
 function mdLineups(m) {
   const S = m.S;
-  if (!S) return "";
+  if (!S || S.src === "oldb") return ""; // the backup source has no line-ups at all, so no "they appear later" note
   const marks = new Map(); // player -> goals, cards, substitutions with minutes
   const add = (id, kind, min) => {
     if (!id) return;
