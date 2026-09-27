@@ -5,7 +5,7 @@
 <!-- Content-Security-Policy: the browser refuses anything not listed here (another site's script, a form sending data away,
      a download from an unknown server), so a mistake in the page cannot be turned against visitors. A new outside
      service must be added here: fetch() addresses to connect-src, pictures to img-src. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org; connect-src 'self' https://site.api.espn.com https://www.wikidata.org https://api.jolpi.ca; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org; connect-src 'self' https://site.api.espn.com https://api.openligadb.de https://www.wikidata.org https://api.jolpi.ca; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <script>
 /* start downloading the fixtures straight away, while the rest of the page is still being read */
 window.FX = fetch("fixtures.json", { cache: "no-store" }).then(r => {
@@ -789,7 +789,7 @@ dialog.sheet[open]:not(:modal){animation-name:slide-in}
        list ends instead of sliding over the footer (a sticky box is held inside its parent, not its grid row) -->
   <div class="mid">
   <section class="livebox" id="livebox" hidden aria-labelledby="live-h">
-    <div class="live-head"><h2 id="live-h"><span class="dot-live" aria-hidden="true"></span><span data-t="liveNow">Live now</span></h2><p data-t="liveNote">Updates every 30 seconds · ESPN</p></div>
+    <div class="live-head"><h2 id="live-h"><span class="dot-live" aria-hidden="true"></span><span data-t="liveNow">Live now</span></h2><p id="livenote">Updates every 30 seconds · ESPN</p></div>
     <div id="livelist"></div>
   </section>
 
@@ -859,7 +859,7 @@ dialog.sheet[open]:not(:modal){animation-name:slide-in}
       <h2 id="how-h" data-t="howTitle">How it works</h2>
       <ul>
         <li data-t="how1html">League fixtures come from <a href="https://www.football-data.org/" rel="noopener">football-data.org</a> (or <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> if it is unavailable) and are rebuilt four times a day. When that feed lags, and for friendlies, times come from official league and club sites and the press, with every source listed under the match.</li>
-        <li data-t="how3">Live scores, line-ups, match events and league tables come from ESPN; stadium maps from OpenStreetMap and Wikidata. Live scores appear on this site only, not in the calendar.</li>
+        <li data-t="how3">Live scores, line-ups, match events and league tables come from ESPN. If ESPN is not answering, Bundesliga scores, goals and table come from OpenLigaDB, and the other tables are worked out from the league results. Stadium maps come from OpenStreetMap and Wikidata. Live scores appear on this site only, not in the calendar.</li>
         <li data-t="how5">CazéTV buttons lead to its free YouTube streams, found through its channel and the fan-made agendacazetv.com. Most only play in Brazil.</li>
         <li data-t="howF1html">Formula 1 session times come from <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> and are marked verified when <a href="https://openf1.org/" rel="noopener">OpenF1</a> gives the same time. F1 is not in the calendar.</li>
         <li data-t="how4">Stars and settings are saved in your browser only. Finished matches stay on the list, with the final score, for a day after kick-off.</li>
@@ -913,6 +913,7 @@ const I18N = {
     howOutlook: "Outlook: Add calendar, Subscribe from web. Paste the link.",
     liveNow: "Live now",
     liveNote: "Updates every 30 seconds · ESPN",
+    liveNoteAlt: "Updates every 30 seconds · ESPN is not answering, so Bundesliga scores come from OpenLigaDB",
     nLive: n => n + " live now",
     filters: "Filters",
     showFilters: "Show filters",
@@ -983,7 +984,7 @@ const I18N = {
     howTitle: "How it works",
     how1html:
       'League fixtures come from <a href="https://www.football-data.org/" rel="noopener">football-data.org</a> (or <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> if it is unavailable) and are rebuilt four times a day. When that feed lags, and for friendlies, times come from official league and club sites and the press, with every source listed under the match.',
-    how3: "Live scores, line-ups, match events and league tables come from ESPN; stadium maps from OpenStreetMap and Wikidata. Live scores appear on this site only, not in the calendar.",
+    how3: "Live scores, line-ups, match events and league tables come from ESPN. If ESPN is not answering, Bundesliga scores, goals and table come from OpenLigaDB, and the other tables are worked out from the league results. Stadium maps come from OpenStreetMap and Wikidata. Live scores appear on this site only, not in the calendar.",
     how5: "CazéTV buttons lead to its free YouTube streams, found through its channel and the fan-made agendacazetv.com. Most only play in Brazil.",
     watch: "Watch on CazéTV",
     watchNote: "Free on YouTube. Usually only plays in Brazil.",
@@ -1038,6 +1039,8 @@ const I18N = {
     mdMapWait: "Finding the stadium on the map…",
     mdTable: l => l + " table",
     mdSrc: "Source: ESPN. Updates every 30 seconds during the match.",
+    mdSrcAlt:
+      "Source: OpenLigaDB, because ESPN is not answering just now. It lists goals only. Updates every 30 seconds during the match.",
     addCal: "Add to my calendar",
     addCalNote: "Saves a one-time copy that will not update if the kick-off time changes.",
     share: "Share",
@@ -1061,6 +1064,11 @@ const I18N = {
     ogShort: "o.g.",
     newEvent: (what, min, who) => what + ", " + min + ": " + who,
     ltSource: "Source: ESPN.",
+    ltSourceAlt: "Source: OpenLigaDB, because ESPN is not answering just now.",
+    ltSourceCalc: s =>
+      "ESPN is not answering just now, so this table is worked out from the results in " +
+      s +
+      ", updated four times a day. Teams level on points may be in a different order from the official table.",
     ltLoading: "Loading the table…",
     ltError: "The table could not be loaded. Try again later.",
     ltCols: {
@@ -1150,7 +1158,10 @@ const I18N = {
     f1GridNote: "The race usually starts in qualifying order, but penalties can change it.",
     f1Dates: (a, b) => a + " to " + b,
     f1Src:
-      "Session times: Jolpica-F1, checked against OpenF1. Results and standings: Jolpica-F1, loaded when you open this window. Track diagram: f1-circuits by Tomislav Bacinger (MIT licence), unofficial.",
+      "Session times: Jolpica-F1, checked against OpenF1. Results and standings: Jolpica-F1, loaded when you open this window.",
+    f1Track: "Track diagram: f1-circuits by Tomislav Bacinger (MIT licence), unofficial.",
+    f1TrackAlt:
+      "Track diagram: adapted from f1-circuits-svg by Jules Roy (CC BY 4.0), unofficial. North may not be at the top.",
     howF1html:
       'Formula 1 session times come from <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> and are marked verified when <a href="https://openf1.org/" rel="noopener">OpenF1</a> gives the same time. F1 is not in the calendar.',
     f1Stale: "F1 times could not be refreshed at this update; the ones shown are from an earlier update.",
@@ -1190,6 +1201,8 @@ const I18N = {
     howOutlook: "Outlook: Adicionar calendário, Assinar da Web. Cole o link.",
     liveNow: "Ao vivo",
     liveNote: "Atualiza a cada 30 segundos · ESPN",
+    liveNoteAlt:
+      "Atualiza a cada 30 segundos · A ESPN não está respondendo, então os placares da Bundesliga vêm do OpenLigaDB",
     nLive: n => n + " ao vivo agora",
     filters: "Filtros",
     showFilters: "Mostrar filtros",
@@ -1260,7 +1273,7 @@ const I18N = {
     howTitle: "Como funciona",
     how1html:
       'Os jogos das ligas vêm do <a href="https://www.football-data.org/" rel="noopener">football-data.org</a> (ou do <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a>, se ele estiver indisponível) e são atualizados quatro vezes por dia. Quando essa fonte atrasa, e nos amistosos, os horários vêm dos sites oficiais de ligas e clubes e da imprensa, com todas as fontes listadas no jogo.',
-    how3: "Placares ao vivo, escalações, lances e classificações vêm da ESPN; os mapas dos estádios, do OpenStreetMap e do Wikidata. Os placares ao vivo aparecem só neste site, não na agenda.",
+    how3: "Placares ao vivo, escalações, lances e classificações vêm da ESPN. Se a ESPN não responder, os placares, gols e a classificação da Bundesliga vêm do OpenLigaDB, e as outras classificações são calculadas a partir dos resultados das ligas. Os mapas dos estádios vêm do OpenStreetMap e do Wikidata. Os placares ao vivo aparecem só neste site, não na agenda.",
     how5: "Os botões da CazéTV levam às transmissões grátis no YouTube, encontradas pelo canal dela e pelo site de fã agendacazetv.com. A maioria só funciona no Brasil.",
     watch: "Assistir na CazéTV",
     watchNote: "Grátis no YouTube. Em geral só funciona no Brasil.",
@@ -1372,6 +1385,8 @@ const I18N = {
     mdMapWait: "Procurando o estádio no mapa…",
     mdTable: l => "Classificação: " + l,
     mdSrc: "Fonte: ESPN. Atualiza a cada 30 segundos durante o jogo.",
+    mdSrcAlt:
+      "Fonte: OpenLigaDB, porque a ESPN não está respondendo agora. Mostra só os gols. Atualiza a cada 30 segundos durante o jogo.",
     addCal: "Adicionar à minha agenda",
     addCalNote: "Salva uma cópia única, que não muda se o horário mudar.",
     share: "Compartilhar",
@@ -1395,6 +1410,11 @@ const I18N = {
     ogShort: "contra",
     newEvent: (what, min, who) => what + ", " + min + ": " + who,
     ltSource: "Fonte: ESPN.",
+    ltSourceAlt: "Fonte: OpenLigaDB, porque a ESPN não está respondendo agora.",
+    ltSourceCalc: s =>
+      "A ESPN não está respondendo agora, então esta classificação foi calculada a partir dos resultados em " +
+      s +
+      ", atualizados quatro vezes por dia. Times empatados em pontos podem aparecer em outra ordem que na classificação oficial.",
     ltLoading: "Carregando a classificação…",
     ltError: "Não foi possível carregar a classificação. Tente mais tarde.",
     ltCols: {
@@ -1511,7 +1531,10 @@ const I18N = {
     f1GridNote: "A largada costuma seguir a ordem da classificação, mas punições podem mudá-la.",
     f1Dates: (a, b) => a + " a " + b,
     f1Src:
-      "Horários das sessões: Jolpica-F1, conferidos com o OpenF1. Resultados e classificação: Jolpica-F1, carregados quando você abre esta janela. Desenho do circuito: f1-circuits, de Tomislav Bacinger (licença MIT), não oficial.",
+      "Horários das sessões: Jolpica-F1, conferidos com o OpenF1. Resultados e classificação: Jolpica-F1, carregados quando você abre esta janela.",
+    f1Track: "Desenho do circuito: f1-circuits, de Tomislav Bacinger (licença MIT), não oficial.",
+    f1TrackAlt:
+      "Desenho do circuito: adaptado de f1-circuits-svg, de Jules Roy (CC BY 4.0), não oficial. O norte pode não estar no alto.",
     howF1html:
       'Os horários das sessões de Fórmula 1 vêm do <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> e são marcados como verificados quando o <a href="https://openf1.org/" rel="noopener">OpenF1</a> informa o mesmo horário. A F1 não entra na agenda.',
     f1Stale: "Os horários da F1 não puderam ser atualizados desta vez; os mostrados são de uma atualização anterior.",
@@ -2842,8 +2865,14 @@ function reuse(cache, k, ms, start) {
   return entry.req;
 }
 const BOARDS = new Map(); // "slug|day" -> scoreboard download
+// When ESPN does not answer, a league with a backup source uses that instead (see OpenLigaDB below).
 function board(slug, day) {
-  return reuse(BOARDS, slug + "|" + day, 25e3, () => boardFetch(slug, day));
+  return reuse(BOARDS, slug + "|" + day, 25e3, () =>
+    boardFetch(slug, day).catch(err => {
+      if (!BACKUP_BOARD[slug]) throw err;
+      return BACKUP_BOARD[slug]();
+    }),
+  );
 }
 async function boardFetch(slug, day) {
   const res = await fetch(ESPN_API + slug + "/scoreboard?dates=" + day, { cache: "no-store" });
@@ -2876,6 +2905,127 @@ async function boardFetch(slug, day) {
   }
   return out;
 }
+/* ---------- backup for the Bundesliga: OpenLigaDB (free, no key, allows any website to ask) ---------- */
+// Used only when ESPN does not answer. Its scores are entered by volunteers, it has no match clock,
+// and its match events are goals only. Everything from it goes through the same checks as ESPN's answers.
+const OLDB = "https://api.openligadb.de/";
+const BACKUP_BOARD = { "ger.1": oldbBoard };
+async function oldbGet(path) {
+  const res = await fetch(OLDB + path, { cache: "no-store" });
+  if (!res.ok) throw new Error(res.status);
+  return res.json();
+}
+function oldbBoard() {
+  // the matchday on now (OpenLigaDB groups matches by matchday, not date), shared by every day asked for
+  return reuse(BOARDS, "oldb", 25e3, async () => {
+    const js = await oldbGet("getmatchdata/bl1");
+    return (Array.isArray(js) ? js : []).map(oldbEvent).filter(Boolean);
+  });
+}
+const whole = v => (Number.isInteger(v) && v >= 0 ? v : null); // a count or score from OpenLigaDB, else null
+// the score so far: the final result once finished, else the latest goal, else the result field
+function oldbScore(m) {
+  const scored = (Array.isArray(m.goals) ? m.goals : []).filter(
+    g => g && whole(g.scoreTeam1) !== null && whole(g.scoreTeam2) !== null,
+  );
+  const last = scored.reduce(
+    (a, g) => (!a || g.scoreTeam1 + g.scoreTeam2 >= a.scoreTeam1 + a.scoreTeam2 ? g : a),
+    null,
+  );
+  const end = (Array.isArray(m.matchResults) ? m.matchResults : []).find(
+    x => x && x.resultTypeID === 2 && whole(x.pointsTeam1) !== null && whole(x.pointsTeam2) !== null,
+  );
+  if (end && (m.matchIsFinished === true || !last)) return [end.pointsTeam1, end.pointsTeam2];
+  return last ? [last.scoreTeam1, last.scoreTeam2] : [0, 0];
+}
+function oldbEvent(m) {
+  if (!m || typeof m !== "object") return null;
+  const t1 = m.team1 || {},
+    t2 = m.team2 || {},
+    date = toDate(m.matchDateTimeUTC),
+    id = whole(m.matchID);
+  if (!date || id === null || typeof t1.teamName !== "string" || typeof t2.teamName !== "string") return null;
+  const done = m.matchIsFinished === true,
+    started = Date.now() >= date.getTime();
+  if (!done && started && Date.now() > date.getTime() + 3 * 3600e3) return null; // not marked finished: score unsure
+  const [hs, as] = oldbScore(m);
+  const short = t => (typeof t.shortName === "string" ? t.shortName : "");
+  return {
+    slug: "ger.1",
+    src: "oldb",
+    id: "oldb-" + id,
+    date,
+    state: done ? "post" : started ? "in" : "pre",
+    clock: "",
+    detail: done ? "FT" : "",
+    hn: t1.teamName,
+    an: t2.teamName,
+    hs: String(hs),
+    as: String(as),
+    ht: new Set([...tokens(t1.teamName), ...tokens(short(t1))]),
+    at: new Set([...tokens(t2.teamName), ...tokens(short(t2))]),
+  };
+}
+// one match, in the shape parseSummary() gives for ESPN's: the score and the goals (no line-ups or cards)
+async function oldbSummary(id) {
+  const m = await oldbGet("getmatchdata/" + encodeURIComponent(id));
+  const ev = oldbEvent(m);
+  if (!ev) throw new Error("OpenLigaDB match not usable");
+  let h = 0,
+    a = 0;
+  const events = [];
+  const scored = (Array.isArray(m.goals) ? m.goals : [])
+    .filter(g => g && whole(g.scoreTeam1) !== null && whole(g.scoreTeam2) !== null)
+    .sort((x, y) => x.scoreTeam1 + x.scoreTeam2 - (y.scoreTeam1 + y.scoreTeam2));
+  for (const g of scored) {
+    const side = g.scoreTeam1 > h ? "home" : g.scoreTeam2 > a ? "away" : null;
+    h = g.scoreTeam1;
+    a = g.scoreTeam2;
+    const who = typeof g.goalGetterName === "string" ? g.goalGetterName : "";
+    events.push({
+      id: "oldb" + (whole(g.goalID) ?? h + "-" + a),
+      kind: g.isOwnGoal === true ? "og" : g.isPenalty === true ? "pen" : "goal",
+      min: whole(g.matchMinute) !== null ? g.matchMinute + "'" : "",
+      side,
+      team: side === "home" ? ev.hn : side === "away" ? ev.an : "",
+      who: [who],
+      ids: [who],
+    });
+  }
+  return {
+    src: "oldb",
+    state: ev.state,
+    clock: "",
+    detail: ev.detail,
+    hs: ev.hs,
+    as: ev.as,
+    rosters: {},
+    events,
+    venue: null,
+    attendance: null,
+    referee: "",
+  };
+}
+async function oldbTable() {
+  const now = new Date(),
+    season = now.getUTCMonth() >= 6 ? now.getUTCFullYear() : now.getUTCFullYear() - 1; // 2026 for 2026-27
+  const js = await oldbGet("getbltable/bl1/" + season);
+  const rows = (Array.isArray(js) ? js : [])
+    .filter(x => x && typeof x.teamName === "string")
+    .map((x, i) => ({
+      team: x.teamName,
+      rank: i + 1,
+      p: whole(x.matches),
+      w: whole(x.won),
+      d: whole(x.draw),
+      l: whole(x.lost),
+      gd: Number.isInteger(x.goalDiff) ? x.goalDiff : null,
+      pts: whole(x.points),
+    }));
+  if (!rows.length) throw new Error("OpenLigaDB table empty");
+  return { rows, src: "oldb", partial: true }; // partial: ESPN is asked again the next time the window opens
+}
+
 const etDay = d =>
   new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" })
     .format(d)
@@ -2916,6 +3066,7 @@ async function pollLive() {
     used.add(ev.id);
     const L = {
       id: ev.id,
+      src: ev.src,
       state: ev.state,
       clock: ev.state === "in" ? (ev.detail === "HT" ? "HT" : ev.clock) : ev.clock,
       detail: ev.detail,
@@ -2926,7 +3077,7 @@ async function pollLive() {
     else LIVE.set(k, L);
   }
   LIVE_EXTRA = events
-    .filter(e => e.state === "in" && !used.has(e.id) && e.slug !== "fifa.friendly")
+    .filter(e => e.state === "in" && !used.has(e.id) && e.slug !== "fifa.friendly" && !e.src) // backup: listed matches only
     .filter((e, i, a) => a.findIndex(x => x.id === e.id) === i);
   render();
 }
@@ -2934,9 +3085,11 @@ function renderLive() {
   const box = document.getElementById("livebox"),
     list = document.getElementById("livelist");
   const rows = [];
+  let alt = false; // a score from the backup source is shown, so the note names it
   for (const r of DATA) {
     const L = liveOf(r);
-    if (L && L.state === "in" && on.has(r.code))
+    if (L && L.state === "in" && on.has(r.code)) {
+      if (L.src === "oldb") alt = true;
       rows.push({
         id: L.id || keyOf(r),
         home: teamName(r.home),
@@ -2946,6 +3099,7 @@ function renderLive() {
         clock: L.clock,
         comp: compName(r.comp),
       });
+    }
   }
   const codeOf = { "eng.1": "EPL", "esp.1": "LIGA", "ger.1": "BUN", "bra.1": "BRA" };
   for (const e of LIVE_EXTRA) {
@@ -2985,10 +3139,11 @@ function renderLive() {
         '</span><span class="t">' +
         esc(x.away) +
         '</span><span class="clk">' +
-        esc(x.clock) +
+        esc(x.clock || T.pLive) + // OpenLigaDB has no match clock
         "</span></div>",
     )
     .join("");
+  document.getElementById("livenote").textContent = alt ? T.liveNoteAlt : T.liveNote;
   box.hidden = false;
   goals(list, ".sc", el => "live|" + el.parentNode.dataset.id); // keyed by ESPN's event id, so two live rows never mix
   const stamp = document.getElementById("stamp");
@@ -3018,6 +3173,8 @@ let MD = null; // the match being shown: {r, root, S, status, timer, venueKey, s
 
 const SUMS = new Map(); // ESPN event id -> match summary download
 function summary(ev) {
+  const oldb = /^oldb-(\d+)$/.exec(ev.id); // found through the backup source (ESPN was not answering)
+  if (oldb) return reuse(SUMS, ev.id, 20e3, () => oldbSummary(oldb[1]));
   return reuse(SUMS, ev.id, 20e3, () =>
     fetch(ESPN_API + ev.slug + "/summary?event=" + encodeURIComponent(ev.id), { cache: "no-store" })
       .then(res => {
@@ -3046,7 +3203,7 @@ async function findEvent(r) {
   if (EVID.has(k)) return EVID.get(k);
   const ev = (await board(slug, etDay(r.when || new Date(r.date + "T18:00:00Z")))).find(e => sameMatch(r, e));
   const out = ev ? { slug, id: ev.id } : null;
-  EVID.set(k, out);
+  if (!ev || !ev.src) EVID.set(k, out); // one found through the backup is not kept: ESPN is tried again next time
   return out;
 }
 function kindOf(e) {
@@ -3273,7 +3430,7 @@ function mdEvents(m) {
 }
 function mdLineups(m) {
   const S = m.S;
-  if (!S) return "";
+  if (!S || S.src === "oldb") return ""; // the backup source has no line-ups at all, so no "they appear later" note
   const marks = new Map(); // player -> goals, cards, substitutions with minutes
   const add = (id, kind, min) => {
     if (!id) return;
@@ -3626,9 +3783,13 @@ function paintWeekend() {
     v.hidden = false;
     if (!draw) paintMap(v.querySelector("#wk-map"), c.lat != null ? { lat: c.lat, lon: c.lon } : null, 14); // no outline: a map (found by name without coordinates, or a "find it" link)
   }
-  w.root.querySelector("#wk-src").textContent = T.f1Src;
+  const L = c && c.layout,
+    drawn = L && /^M[\d LZ]+$/.test(L.path || "") && L.w > 0 && L.h > 0; // the credit names whichever project drew the track shown
+  w.root.querySelector("#wk-src").textContent =
+    T.f1Src + (drawn ? " " + (L.src === "julesr0y" ? T.f1TrackAlt : T.f1Track) : "");
 }
-// The track outline, north up, with a dot where the outline starts: on the start/finish line.
+// The track outline (north up from f1-circuits; f1-circuits-svg drawings may be turned), with a dot where the
+// outline starts: on the start/finish line.
 function trackSVG(c) {
   const L = c.layout,
     n = L.path.match(/\d+/g),
@@ -4139,7 +4300,7 @@ function paintMatch() {
   $("md-state").textContent =
     m.status === "loading" ? T.mdLoading : m.status === "none" ? T.mdNoData : m.status === "error" ? T.mdError : "";
   $("md-state").hidden = !$("md-state").textContent;
-  $("md-src").textContent = m.S ? T.mdSrc : "";
+  $("md-src").textContent = m.S ? (m.S.src === "oldb" ? T.mdSrcAlt : T.mdSrc) : "";
 }
 async function loadMatch() {
   const m = MD;
@@ -4534,7 +4695,7 @@ function fetchTable(code) {
   const have = TABLES.get(code);
   if (have && !have.partial && Date.now() - have.at <= 5 * 60e3) return Promise.resolve();
   if (TABLE_REQ.has(code)) return TABLE_REQ.get(code);
-  const req = (code === "F1" ? f1Table() : espnTable(code))
+  const req = (code === "F1" ? f1Table() : espnTable(code).catch(err => backupTable(code, err)))
     .then(t => {
       t.at = Date.now();
       TABLES.set(code, t);
@@ -4566,6 +4727,30 @@ async function espnTable(code) {
   });
   rows.sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99) || b.pts - a.pts || b.gd - a.gd);
   return { rows };
+}
+// ESPN not answering: the Bundesliga asks OpenLigaDB; any league then falls back to the table the site's own
+// rebuild works out from the season's results (the "tables" in fixtures.json, four times a day).
+async function backupTable(code, err) {
+  if (code === "BUN")
+    try {
+      return await oldbTable();
+    } catch {}
+  const saved = META && META.tables && META.tables[code];
+  const n = v => (Number.isInteger(v) ? v : null);
+  const rows = (Array.isArray(saved) ? saved : [])
+    .filter(x => x && typeof x.team === "string")
+    .map((x, i) => ({
+      team: x.team,
+      rank: n(x.rank) ?? i + 1,
+      p: n(x.p),
+      w: n(x.w),
+      d: n(x.d),
+      l: n(x.l),
+      gd: n(x.gd),
+      pts: n(x.pts),
+    }));
+  if (!rows.length) throw err;
+  return { rows, src: "calc", partial: true };
 }
 async function f1Table() {
   // Jolpica-F1, one request after the other (see jol above)
@@ -4672,7 +4857,13 @@ function paintTable() {
     '<p class="lt-key">' +
     esc(T.ltKey) +
     " " +
-    esc(T.ltSource) +
+    esc(
+      t.src === "oldb"
+        ? T.ltSourceAlt
+        : t.src === "calc"
+          ? T.ltSourceCalc(String((META && META.sources && META.sources[ltCode]) || "?"))
+          : T.ltSource,
+    ) +
     "</p>";
 }
 function paintF1Table() {

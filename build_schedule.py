@@ -13,6 +13,8 @@ Data sources, in order of preference
      no key needed). Used when there is no token. Times are LOCAL to each league.
   3. friendlies.json: national-team friendlies entered by hand. No free feed
      covers friendlies, so this file has to be edited when matches are announced.
+  Both league sources also give every result of the season so far, from which a backup league table is
+  worked out (standings() below) for when ESPN's tables cannot be reached.
   4. Formula 1: every session from Jolpica-F1, cross-checked against OpenF1 (both free, no key).
      F1 is left out of soccer.ics. Track outlines for the race weekend panel come from
      bacinger/f1-circuits on GitHub (MIT licence).
@@ -24,11 +26,11 @@ Examples
   python3 build_schedule.py
   python3 build_schedule.py --teams "Arsenal,Real Madrid,Brazil" --leagues EPL,BRA
 """
-import argparse, json, hashlib, math, os, sys, urllib.error
+import argparse, json, hashlib, math, os, re, sys, urllib.error
 from datetime import datetime, date, timedelta, timezone
 from zoneinfo import ZoneInfo
 import cazetv
-from common import fetch_json, load_json, save_text
+from common import fetch, fetch_json, load_json, save_text
 
 HOME_TZ = ZoneInfo("America/Edmonton")   # all human-readable times are shown in this zone
 OPENFOOTBALL = "https://raw.githubusercontent.com/openfootball/football.json/master"
@@ -63,11 +65,15 @@ def record(comp, code, home, away, day, utc=None, rnd="", venue=None, note=None,
 
 # ---------- source 1: football-data.org ----------
 def from_football_data(code, name, fd_code, tz, start, token):
+    """Returns (records, results): the matches to list, and every finished match of the season for standings()."""
     data = get_json(f"{FD_API}/competitions/{fd_code}/matches", {"X-Auth-Token": token})
-    out = []
+    out, results = [], []
     recent = start - timedelta(days=KEEP_DAYS)
     for m in data["matches"]:
         played = m["status"] in ("IN_PLAY", "PAUSED", "FINISHED")
+        ft = (m.get("score") or {}).get("fullTime") or {}
+        if m["status"] == "FINISHED" and ft.get("home") is not None:
+            results.append((m["homeTeam"]["name"], m["awayTeam"]["name"], ft["home"], ft["away"]))
         if m["status"] not in ("SCHEDULED", "TIMED", "POSTPONED") and not played:
             continue                      # skip cancelled, suspended
         kick = datetime.fromisoformat(m["utcDate"].replace("Z", "+00:00"))
@@ -80,27 +86,33 @@ def from_football_data(code, name, fd_code, tz, start, token):
                    kick.isoformat() if confirmed else None,
                    f"Matchday {m['matchday']}" if m.get("matchday") else "",
                    m.get("venue"), note, uid=f"fd-{m['id']}")
-        ft = (m.get("score") or {}).get("fullTime") or {}
         if m["status"] == "FINISHED" and ft.get("home") is not None:
             r["result"] = {"home": ft["home"], "away": ft["away"]}
         elif played:
             r["started"] = True           # on now: the site gets the live score from ESPN
         out.append(r)
-    return out
+    return out, results
 
 # ---------- source 2: openfootball ----------
 def from_openfootball(code, name, filename, style, tz, start):
+    """Returns (records, results), like from_football_data. Results come only from this season's file: when it
+    does not exist yet, the last season's file still gives the matches, but its results are not this season's table."""
     data = None
-    for folder in season_folders(style, start):
+    folders = season_folders(style, start)
+    for folder in folders:
         try:
             data = get_json(f"{OPENFOOTBALL}/{folder}/{filename}"); break
         except urllib.error.HTTPError as e:
             if e.code != 404: raise                     # only "file not there yet" means try the older season
     if data is None:
-        print(f"{code}: no openfootball file found"); return []
-    out, recent = [], start - timedelta(days=KEEP_DAYS)
+        print(f"{code}: no openfootball file found"); return [], []
+    current = folder == folders[0]
+    out, results, recent = [], [], start - timedelta(days=KEEP_DAYS)
     for m in data["matches"]:
-        played = "score" in m
+        ft = _ft(m.get("score"))
+        played = ft is not None
+        if played and current:
+            results.append((m["team1"], m["team2"], ft[0], ft[1]))
         if date.fromisoformat(m["date"]) < (recent if played else start):
             continue
         utc = None
@@ -108,12 +120,42 @@ def from_openfootball(code, name, filename, style, tz, start):
             local = datetime.fromisoformat(f"{m['date']}T{m['time']}").replace(tzinfo=ZoneInfo(tz))
             utc = local.astimezone(timezone.utc).isoformat()
         r = record(name, code, m["team1"], m["team2"], m["date"], utc, m.get("round", ""), m.get("ground"))
-        ft = (m.get("score") or {}).get("ft")
-        if played and ft:
+        if played:
             r["result"] = {"home": ft[0], "away": ft[1]}
         out.append(r)
     mark_provisional([r for r in out if "result" not in r])
-    return out
+    return out, results
+
+# ---------- backup league tables ----------
+def standings(results):
+    """A league table worked out from finished matches, given as (home, away, home goals, away goals):
+    3 points a win and 1 a draw, then goal difference, then goals scored. Leagues break exact ties in
+    their own ways (head-to-head, number of wins) and the feeds do not carry points deductions, so the
+    page uses this only when ESPN's table cannot be reached, and says it is worked out from results."""
+    rows = {}
+    for home, away, hg, ag in results:
+        if not (isinstance(hg, int) and isinstance(ag, int)):
+            continue
+        for team, f, a in ((home, hg, ag), (away, ag, hg)):
+            t = rows.setdefault(team, {"team": team, "p": 0, "w": 0, "d": 0, "l": 0, "gf": 0, "ga": 0})
+            t["p"] += 1; t["gf"] += f; t["ga"] += a
+            t["w" if f > a else "d" if f == a else "l"] += 1
+    for t in rows.values():
+        t["gd"] = t["gf"] - t["ga"]
+        t["pts"] = 3 * t["w"] + t["d"]
+    table = sorted(rows.values(), key=lambda t: (-t["pts"], -t["gd"], -t["gf"], t["team"]))
+    for i, t in enumerate(table, 1):
+        t["rank"] = i
+    return table
+
+def _ft(score):
+    """The full-time score from an openfootball match as [home, away], or None when it has not been played.
+    The feed usually writes {"ft": [2, 1], "ht": [1, 0]}, but some results (often 0-0) as a bare [0, 0],
+    and matches not yet played as null or with no score at all."""
+    ft = score.get("ft") if isinstance(score, dict) else score
+    if isinstance(ft, list) and len(ft) == 2 and all(isinstance(x, int) for x in ft):
+        return ft
+    return None
 
 def mark_provisional(recs):
     """openfootball fills unannounced kick-offs with a placeholder (e.g. every EPL match
@@ -247,6 +289,168 @@ def _f1_layouts():
         print(f"F1 track outlines could not be read ({e}); race weekends show a map instead this run")
         return []
 
+# The second source of track outlines, used for a race the first one has no outline for: julesr0y/f1-circuits-svg
+# (CC BY 4.0, Copyright (c) 2024-2026 ROY Jules; unofficial). Its index gives each circuit's position and which
+# layout was used in which seasons; each layout is an SVG drawing, north up, with the start/finish line marked.
+F1_SVG = "https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/main/"
+SVG_TOKEN = re.compile(r"[MmLlHhVvCcSsQqTtAaZz]|[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
+SVG_ARGS = {"M": 2, "L": 2, "H": 1, "V": 1, "C": 6, "S": 4, "Q": 4, "T": 2, "A": 7, "Z": 0}
+
+def _svg_points(d, steps=8, step=5):
+    """The points along an SVG path's first shape (up to its first Z): curves sampled at `steps` points each,
+    straight lines every `step` units (so a start/finish line on a long straight is found where it is, not at
+    the straight's end). Arcs are followed as straight lines to their end point. Raises ValueError on anything
+    malformed."""
+    toks, i, out = SVG_TOKEN.findall(d), 0, []
+    x = y = 0.0
+    cmd, last_ctrl = None, None
+    if not toks or toks[0] not in "Mm":
+        raise ValueError("path does not start with a move")
+    def line(nx, ny):
+        n = max(1, math.ceil(math.hypot(nx - x, ny - y) / step))
+        out.extend((x + (nx - x) * k / n, y + (ny - y) * k / n) for k in range(1, n + 1))
+    def bez(p0, *ctrl):
+        for k in range(1, steps + 1):
+            t = k / steps
+            if len(ctrl) == 3:    # cubic
+                (x1, y1), (x2, y2), (x3, y3) = ctrl
+                a, b, c, e = (1 - t) ** 3, 3 * (1 - t) ** 2 * t, 3 * (1 - t) * t * t, t ** 3
+                out.append((a * p0[0] + b * x1 + c * x2 + e * x3, a * p0[1] + b * y1 + c * y2 + e * y3))
+            else:                 # quadratic
+                (x1, y1), (x2, y2) = ctrl
+                a, b, c = (1 - t) ** 2, 2 * (1 - t) * t, t * t
+                out.append((a * p0[0] + b * x1 + c * x2, a * p0[1] + b * y1 + c * y2))
+    while i < len(toks):
+        if toks[i].isalpha():
+            cmd = toks[i]; i += 1
+            if cmd in "Zz":
+                if out:
+                    line(*out[0])                  # the closing side, back to where the shape began
+                break                          # one closed shape: the track
+        if cmd is None:
+            raise ValueError("path does not start with a command")
+        n, rel = SVG_ARGS[cmd.upper()], cmd.islower()
+        v = [float(t) for t in toks[i:i + n]]
+        if len(v) < n or not all(math.isfinite(t) for t in v):
+            raise ValueError("path ends early")
+        i += n
+        U, ox, oy = cmd.upper(), (x if rel else 0), (y if rel else 0)
+        ctrl = None
+        if U == "M":
+            if out:
+                break                          # a second shape: stop at the first
+            x, y = v[0] + ox, v[1] + oy; out.append((x, y))
+            cmd = "l" if rel else "L"          # numbers after a move are lines
+        elif U in "LT":
+            line(v[0] + ox, v[1] + oy); x, y = v[0] + ox, v[1] + oy
+        elif U == "H":
+            line(v[0] + ox, y); x = v[0] + ox
+        elif U == "V":
+            line(x, v[0] + oy); y = v[0] + oy
+        elif U == "A":
+            line(v[5] + ox, v[6] + oy); x, y = v[5] + ox, v[6] + oy
+        elif U == "C":
+            c1, c2, e = (v[0] + ox, v[1] + oy), (v[2] + ox, v[3] + oy), (v[4] + ox, v[5] + oy)
+            bez((x, y), c1, c2, e); ctrl, (x, y) = c2, e
+        elif U == "S":
+            c1 = (2 * x - last_ctrl[0], 2 * y - last_ctrl[1]) if last_ctrl else (x, y)
+            c2, e = (v[0] + ox, v[1] + oy), (v[2] + ox, v[3] + oy)
+            bez((x, y), c1, c2, e); ctrl, (x, y) = c2, e
+        elif U == "Q":
+            c1, e = (v[0] + ox, v[1] + oy), (v[2] + ox, v[3] + oy)
+            bez((x, y), c1, e); (x, y) = e
+        last_ctrl = ctrl
+    return out
+
+def _svg_circuits():
+    """The second source's index: [{"lat", "lon", "layouts", "firstgp"}], or [] when it cannot be read."""
+    try:
+        out = []
+        for c in get_json(F1_SVG + "circuits.json"):
+            lat, lon = c.get("latitude"), c.get("longitude")
+            if _point([lon, lat]) is None:
+                continue
+            ls = [l for l in c.get("layouts") or [] if isinstance(l, dict) and re.fullmatch(r"[a-z0-9-]{1,60}", str(l.get("layoutId", "")))
+                  and isinstance(l.get("seasons"), str)]
+            years = [int(y) for l in ls for y in re.findall(r"\d{4}", l["seasons"])]
+            if ls:
+                out.append({"lat": lat, "lon": lon, "layouts": ls, "firstgp": min(years) if years else None,
+                            "words": _name_words(str(c.get("name", "")) + " " + str(c.get("id", "")))})
+        return out
+    except Exception as e:
+        print(f"Second F1 track source could not be read ({e})")
+        return []
+
+NAME_STOP = {"circuit", "circuito", "street", "international", "internacional", "internazionale", "autodromo", "autódromo",
+             "racing", "raceway", "speedway", "motor", "grand", "prix", "course", "park", "city"}
+
+def _name_words(name):
+    """The distinctive words of a circuit's name, for telling apart two circuits in the same city."""
+    return {w for w in re.findall(r"\w+", name.lower().replace("-", " ")) if len(w) > 3 and w not in NAME_STOP}
+
+def _last_year(seasons):
+    return max((int(y) for y in re.findall(r"\d{4}", seasons)), default=0)
+
+def _in_seasons(seasons, year):
+    """True when `year` is in a seasons string such as "2003-2019,2021-2026" or "2021,2023-2026"."""
+    for part in seasons.split(","):
+        a, _, b = part.strip().partition("-")
+        if a.isdigit() and (int(a) == year if not b else b.isdigit() and int(a) <= year <= int(b)):
+            return True
+    return False
+
+def _svg_drawing(circuits, lat, lon, year, name=""):
+    """The second source's drawing of the circuit at (lat, lon), as (points, circuit): the points of the lap in
+    drawing units, starting at the start/finish line; or None. A circuit within 3 km is taken; one up to 10 km
+    away only when its name shares a word with `name` (that index places some street circuits in the town
+    centre: Las Vegas, 7 km from the Strip). Only the detailed drawings mark the start/finish line, so a layout
+    without one gives None rather than a start in the wrong place."""
+    k = math.cos(math.radians(lat))
+    near = lambda c: math.hypot((c["lon"] - lon) * k, c["lat"] - lat) * 111.2   # km
+    words = _name_words(name)
+    fits = [c for c in circuits if near(c) <= 3 or (near(c) <= 10 and c["words"] & words)]
+    best = min(fits, key=lambda c: (not (c["words"] & words), near(c)), default=None)   # a name match first
+    if best is None:
+        return None
+    ls = best["layouts"]
+    layout = next((l for l in ls if _in_seasons(l["seasons"], year)), None) or max(ls, key=lambda l: _last_year(l["seasons"]))
+    try:
+        svg = fetch(F1_SVG + f"circuits/detailed/white/{layout['layoutId']}.svg").decode("utf-8")
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return None                        # drawn without the start/finish line only
+        raise
+    paths = re.findall(r'<path\b[^>]*?\sd="([^"]*)"', svg)
+    if len(paths) < 2:
+        return None
+    pts = _svg_points(paths[0])
+    if len(pts) < 20:
+        return None
+    if math.dist(pts[0], pts[-1]) < 1e-6:
+        pts.pop()                              # the loop is closed with "Z" instead
+    # the detailed drawing's second shape is a short bar across the track: the start/finish line
+    bar = _svg_points(paths[1], 1)
+    cx, cy = sum(p[0] for p in bar) / len(bar), sum(p[1] for p in bar) / len(bar)
+    at = min(range(len(pts)), key=lambda i: math.hypot(pts[i][0] - cx, pts[i][1] - cy))
+    return pts[at:] + pts[:at], best
+
+def _svg_outline(circuits, lat, lon, year, name=""):
+    """The outline of the circuit at (lat, lon) from the second source, or None."""
+    got = _svg_drawing(circuits, lat, lon, year, name)
+    return _svg_layout(got) if got else None
+
+def _svg_layout(got):
+    """A drawing from _svg_drawing() in the same form as _f1_outline gives (without the lap length, which that
+    source does not have)."""
+    pts, best = got
+    x0, y0 = min(x for x, _ in pts), min(y for _, y in pts)
+    scale = 1000 / max(max(x for x, _ in pts) - x0, max(y for _, y in pts) - y0)
+    pts = _simplify([(round((x - x0) * scale), round((y - y0) * scale)) for x, y in pts], 2)
+    pts = [p for i, p in enumerate(pts) if i == 0 or p != pts[i - 1]]
+    return {"path": "M" + "L".join(f"{x} {y}" for x, y in pts) + "Z",
+            "w": max(x for x, _ in pts), "h": max(y for _, y in pts),
+            "length": None, "firstgp": str(best["firstgp"]) if best["firstgp"] else None, "src": "julesr0y"}
+
 def _simplify(pts, tol):
     """Ramer-Douglas-Peucker: keep only the points that bend the line by more than tol, so the path stays small."""
     keep, stack = {0, len(pts) - 1}, [(0, len(pts) - 1)]
@@ -264,9 +468,73 @@ def _simplify(pts, tol):
             keep.add(far); stack += [(a, far), (far, b)]
     return [pts[i] for i in sorted(keep)]
 
-def _f1_outline(layouts, lat, lon):
+def _resample(pts, n):
+    """n points evenly spaced along a closed loop, starting at its first point."""
+    loop = pts + [pts[0]]
+    seg = [math.dist(loop[i], loop[i + 1]) for i in range(len(pts))]
+    total, out, i, done = sum(seg), [], 0, 0.0
+    for k in range(n):
+        d = total * k / n
+        while i < len(seg) - 1 and done + seg[i] < d:
+            done += seg[i]; i += 1
+        t = (d - done) / seg[i] if seg[i] else 0
+        (ax, ay), (bx, by) = loop[i], loop[i + 1]
+        out.append((ax + (bx - ax) * t, ay + (by - ay) * t))
+    return out
+
+def _centred(pts):
+    """The points moved to their centre and scaled to an average distance of 1 from it, and how."""
+    cx, cy = sum(x for x, _ in pts) / len(pts), sum(y for _, y in pts) / len(pts)
+    r = math.sqrt(sum((x - cx) ** 2 + (y - cy) ** 2 for x, y in pts) / len(pts)) or 1
+    return [((x - cx) / r, (y - cy) / r) for x, y in pts], (cx, cy, r)
+
+# How closely a drawing must fit an outline (average gap to the outline, in track radii) to lend it its
+# start/finish line. Measured on the 2026 circuits: Silverstone 0.004, Monaco 0.012, the others that fit well
+# 0.014 or less; Baku's drawing has other proportions (0.043) and would put the line in the wrong place, and
+# the fits from Austin (0.026) up could not be confirmed, so those keep the outline's own first point.
+MATCH_LIMIT = 0.015
+
+def _start_index(track, drawing):
+    """Where on `track` (outline points, y pointing south) the start/finish line is, taken from `drawing` (points
+    starting at the start/finish line, in any size, turn or mirror image): the index of the outline point
+    nearest the drawing's start once the drawing is turned, flipped and scaled to fit the outline best.
+    None when no fit is close enough (for example two different layouts of the same circuit)."""
+    fit, at = _fit(track, drawing)
+    return at if fit <= MATCH_LIMIT else None
+
+def _fit(track, drawing, n=100):
+    """(average gap between the best-fitting drawing and the outline, in track radii; the index for _start_index)."""
+    A, (cx, cy, r) = _centred(_resample(track, n))
+    B, _ = _centred(_resample(drawing, n))
+    segs = [(ax, ay, bx - ax, by - ay, (bx - ax) ** 2 + (by - ay) ** 2 or 1e-12)
+            for (ax, ay), (bx, by) in zip(A, A[1:] + A[:1])]
+    def to_line(u, v):                         # squared distance from (u, v) to the outline, a closed line
+        best = math.inf
+        for ax, ay, dx, dy, dd in segs:
+            t = min(1.0, max(0.0, ((u - ax) * dx + (v - ay) * dy) / dd))
+            best = min(best, (u - ax - t * dx) ** 2 + (v - ay - t * dy) ** 2)
+        return best
+    def gap(turn, flip):
+        c, s = math.cos(math.radians(turn)), math.sin(math.radians(turn))
+        total = 0.0
+        for x, y in B:
+            x = -x if flip else x
+            total += to_line(x * c - y * s, x * s + y * c)
+        return total / n
+    fits = [(gap(t, f), t, f) for f in (False, True) for t in range(0, 360, 10)]
+    _, t0, f0 = min(fits)
+    best = min((gap(t, f0), t, f0) for t in range(t0 - 9, t0 + 10))     # then to the nearest degree
+    x, y = B[0]
+    x = -x if best[2] else x
+    c, s = math.cos(math.radians(best[1])), math.sin(math.radians(best[1]))
+    sx, sy = (x * c - y * s) * r + cx, (x * s + y * c) * r + cy          # the drawing's start, on the outline's scale
+    return math.sqrt(best[0]), min(range(len(track)), key=lambda i: math.hypot(track[i][0] - sx, track[i][1] - sy))
+
+def _f1_outline(layouts, lat, lon, drawing=None):
     """The outline of the circuit at (lat, lon): {"path", "w", "h", "length" (metres), "firstgp"}, or None
-    when no outline lies within 3 km (a new circuit the project has not drawn yet)."""
+    when no outline lies within 3 km (a new circuit the project has not drawn yet). The outline starts where
+    the start/finish line is: f1-circuits does not say where its outlines begin, so the line is taken from
+    `drawing` (from _svg_drawing()) when one is given and fits; otherwise the outline's own first point is used."""
     k = math.cos(math.radians(lat))
     near = lambda f: min(math.hypot((x - lon) * k, y - lat) for x, y in f["points"]) * 111.2   # km
     best = min(layouts, key=near, default=None)
@@ -275,6 +543,9 @@ def _f1_outline(layouts, lat, lon):
     pts = [((x - lon) * k * 111320, (lat - y) * 110574) for x, y in best["points"]]   # metres, y pointing south
     if pts[0] == pts[-1]:
         pts.pop()                            # the loop is closed with "Z" instead
+    at = _start_index(pts, drawing) if drawing else None
+    if at:
+        pts = pts[at:] + pts[:at]
     x0, y0 = min(x for x, _ in pts), min(y for _, y in pts)
     scale = 1000 / max(max(x for x, _ in pts) - x0, max(y for _, y in pts) - y0)
     pts = _simplify([(round((x - x0) * scale), round((y - y0) * scale)) for x, y in pts], 2)
@@ -313,7 +584,7 @@ def from_f1(start, now=None):
             if gap is not None and gap < timedelta(days=4) and (best is None or gap < best[0]):
                 best = (gap, ss)
         return best[1] if best else []
-    layouts = _f1_layouts()
+    layouts, saved, svg = _f1_layouts(), previous_layouts(), None
     out = []
     for race in races:
         season, rnd, c = race["season"], race["round"], race["Circuit"]
@@ -334,11 +605,29 @@ def from_f1(start, now=None):
                 r["sprint"] = "Sprint" in race
                 r["circuit"] = {"name": c["circuitName"], "locality": loc.get("locality"), "country": loc.get("country"),
                                 "lat": float(loc["lat"]), "lon": float(loc["long"])} if loc.get("lat") else {"name": c["circuitName"]}
-                try:                         # the diagram is optional: a problem with it never holds up the F1 sessions
-                    layout = _f1_outline(layouts, float(loc["lat"]), float(loc["long"])) if loc.get("lat") and layouts else None
-                except (ValueError, ZeroDivisionError) as e:
-                    print(f"No track outline for {c['circuitName']} ({e}); the site shows a map instead")
-                    layout = None
+                # The diagram is optional: a problem with it never holds up the F1 sessions. Outlines in order:
+                # f1-circuits, starting at the start/finish line marked on the f1-circuits-svg drawing when the two
+                # fit; else the one this race had at the last build (always north up); else the f1-circuits-svg
+                # drawing itself (not always north up); else none, and the site shows a map.
+                layout = drawing = None
+                if loc.get("lat"):
+                    lat, lon = float(loc["lat"]), float(loc["long"])
+                    try:
+                        svg = _svg_circuits() if svg is None else svg
+                        drawing = _svg_drawing(svg, lat, lon, int(season), c["circuitName"]) if svg else None
+                    except Exception as e:
+                        print(f"No f1-circuits-svg drawing for {c['circuitName']} ({e})")
+                    try:
+                        layout = _f1_outline(layouts, lat, lon, drawing and drawing[0]) if layouts else None
+                    except (ValueError, ZeroDivisionError) as e:
+                        print(f"No f1-circuits outline for {c['circuitName']} ({e})")
+                    layout = layout or saved.get(f"f1|{season}|{rnd}")
+                    if not layout and drawing:
+                        try:
+                            layout = _svg_layout(drawing)
+                            layout = layout if _valid_layout(layout) else None
+                        except (ValueError, ZeroDivisionError) as e:
+                            print(f"No f1-circuits-svg outline for {c['circuitName']} ({e}); the site shows a map instead")
                 if layout:
                     r["circuit"]["layout"] = layout
             if utc:
@@ -377,6 +666,27 @@ def _valid_f1(r):
     except (KeyError, TypeError, ValueError, AttributeError):
         return False
 
+def _valid_layout(L):
+    """True for an outline the page can draw: whole-number points only, a sensible size, and plain extras."""
+    return (isinstance(L, dict) and isinstance(L.get("path"), str) and re.fullmatch(r"M[\d LZ]+", L["path"]) is not None
+            and len(L["path"]) < 20000 and all(isinstance(L.get(k), int) and 0 < L[k] <= 1000 for k in ("w", "h"))
+            and L.get("src") in (None, "julesr0y")
+            and all(L.get(k) is None or isinstance(L[k], (int, str)) and len(str(L[k])) < 20 for k in ("length", "firstgp")))
+
+def previous_layouts(path="fixtures.json"):
+    """Track outlines from the last published fixtures.json, by race weekend ("f1|2026|18"): used when neither
+    outline source can give one this run. Checked like everything else read back from that file."""
+    try:
+        old = load_json(path)["matches"]
+    except Exception:
+        return {}
+    out = {}
+    for r in old:
+        L = ((r or {}).get("circuit") or {}).get("layout") if isinstance(r, dict) and isinstance(r.get("circuit"), dict) else None
+        if r and r.get("sess") == "R" and isinstance(r.get("wk"), str) and _valid_layout(L):
+            out[r["wk"]] = L
+    return out
+
 def previous_f1(start, path="fixtures.json"):
     """The F1 sessions from the last published fixtures.json: used when Jolpica-F1 cannot be reached."""
     try:
@@ -387,19 +697,24 @@ def previous_f1(start, path="fixtures.json"):
     return [r for r in old if isinstance(r, dict) and _valid_f1(r) and r["date"] >= recent]
 
 def load_all(start):
-    """Every match and session from `start` on. Returns (records, sources, f1_stale): which source each
-    league came from (shown on the site), and whether the F1 sessions had to be reused from the last build."""
-    sources, f1_stale = {}, False
+    """Every match and session from `start` on. Returns (records, sources, tables, f1_stale): which source each
+    league came from (shown on the site), each league's backup table (standings()), and whether the F1 sessions
+    had to be reused from the last build."""
+    sources, tables, f1_stale = {}, {}, False
     token = os.environ.get("FOOTBALL_DATA_TOKEN")
     out = []
     for code, (name, fd_code, filename, style, tz) in LEAGUES.items():
         if token:
             try:
-                out += from_football_data(code, name, fd_code, tz, start, token)
+                recs, results = from_football_data(code, name, fd_code, tz, start, token)
+                out += recs
+                tables[code] = standings(results)
                 sources[code] = "football-data.org"; continue
             except Exception as e:           # API down or rate-limited: fall back rather than fail
                 print(f"football-data.org failed for {code} ({e}); using openfootball")
-        out += from_openfootball(code, name, filename, style, tz, start)
+        recs, results = from_openfootball(code, name, filename, style, tz, start)
+        out += recs
+        tables[code] = standings(results)
         sources[code] = "openfootball"
     apply_overrides(out)
     out = [r for r in out if date.fromisoformat(r["date"]) >= start or "result" in r or r.get("started")]
@@ -415,7 +730,7 @@ def load_all(start):
         sources["F1"] = "Jolpica-F1"
     out += f1
     out.sort(key=lambda r: (r["utc"] or r["date"] + "T99"))
-    return out, sources, f1_stale
+    return out, sources, tables, f1_stale
 
 def apply_filters(recs, leagues=None, teams=None):
     if leagues:
@@ -507,7 +822,7 @@ def main():
     ap.add_argument("--teams", help="comma list of team-name fragments")
     ap.add_argument("--out", default="soccer.ics")
     a = ap.parse_args()
-    recs, sources, f1_stale = load_all(date.fromisoformat(a.start))
+    recs, sources, tables, f1_stale = load_all(date.fromisoformat(a.start))
     league_count = sum(1 for r in recs if r["code"] not in ("INTL", "F1") and "result" not in r and not r.get("started"))
     if league_count < MIN_MATCHES:
         # exiting with an error stops the workflow before it publishes, so the last good site stays up
@@ -518,7 +833,7 @@ def main():
     with open("index.html", "rb") as f:
         site = hashlib.sha256(f.read()).hexdigest()[:12]
     meta = {"generated": datetime.now(timezone.utc).isoformat(timespec="minutes"), "site": site,
-            "sources": sources, "matches": recs}
+            "sources": sources, "tables": {c: t for c, t in tables.items() if t}, "matches": recs}
     if f1_stale:
         meta["f1stale"] = True
     write_fixtures(meta)
