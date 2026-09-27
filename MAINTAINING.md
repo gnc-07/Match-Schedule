@@ -135,17 +135,17 @@ One command runs every check and ends with a table of what passed and what faile
 ```bash
 npm test
 ```
-`npm` is Node.js's package tool; `test` runs the script of that name in `package.json`, which is `node tests/run.mjs`. It works through the groups one by one (format, python, security, accessibility, design, browsers, motion, speed) and keeps going when one fails, so one run shows everything that needs attention. It takes several minutes, mostly for the accessibility and Lighthouse groups.
+`npm` is Node.js's package tool; `test` runs the script of that name in `package.json`, which is `node tests/run.mjs`. It runs the groups (format, python, security, accessibility, design, browsers, motion) side by side, then Lighthouse (speed) on its own, because Lighthouse measures how fast the page is and would score lower while sharing the computer. It keeps going when one fails, so one run shows everything that needs attention: a check that passes prints one line, one that fails prints everything it found. It takes about two minutes (it took about seven when the checks ran one after another).
 
 ```bash
 npm run test:quick
 ```
-`run` is needed for any script other than `test`. This one runs only the fast groups (about two minutes); good while working, before the full run at the end.
+`run` is needed for any script other than `test`. This one runs only the fast groups (under a minute); good while working, before the full run at the end.
 
 ```bash
 npm test -- browsers
 ```
-The `--` tells npm that what follows is for the test runner, not for npm. Name one or more groups to run only those; `npm test -- --skip speed` runs all but those named; `npm test -- --list` shows every group and what it checks.
+The `--` tells npm that what follows is for the test runner, not for npm. Name one or more groups to run only those; `npm test -- --skip speed` runs all but those named; `npm test -- --list` shows every group and what it checks; `--verbose` prints every line each check writes; `--serial` runs one check at a time with its output as it happens, which is slower but easier to follow when chasing one problem.
 
 **First time only**, after `npm install`, download the two test browsers Playwright uses for Firefox and Safari:
 

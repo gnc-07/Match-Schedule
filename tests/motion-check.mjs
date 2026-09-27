@@ -6,7 +6,7 @@
 //   - nothing animates an element that is hidden (for example the sun or moon that is about to disappear);
 // and it prints the slowest frame after each click, with animations on and off, with the processor slowed down 4 times
 // the way Lighthouse tests phones (Chromium only; FULLSPEED=1 for normal speed). Those timings vary from run to run,
-// so they are for reading, not a pass or fail.
+// so they are for reading, not a pass or fail; TIMINGS=0 skips them (npm test does, which saves about a minute).
 // It also saves a picture of each animation paused halfway, in screenshots/motion-check/, to compare the browsers.
 // Run: node tests/motion-check.mjs      (FIREFOX_PATH=/path/to/firefox node tests/motion-check.mjs for both)
 import { mkdirSync } from "node:fs";
@@ -78,8 +78,10 @@ async function run(label, launch) {
   }
   try {
     for (const [name, width, act] of cases.filter(c => !ONLY.length || ONLY.includes(c[0]))) {
-      const on = await slowest(browser, label, width, act, "on"), off = await slowest(browser, label, width, act, "off");
-      console.log(`${label.padEnd(8)} ${name.padEnd(12)} slowest frame: ${on} ms with animations, ${off} ms without`);
+      if (process.env.TIMINGS !== "0") {
+        const on = await slowest(browser, label, width, act, "on"), off = await slowest(browser, label, width, act, "off");
+        console.log(`${label.padEnd(8)} ${name.padEnd(12)} slowest frame: ${on} ms with animations, ${off} ms without`);
+      } else console.log(`${label.padEnd(8)} ${name}`);
       // with animations switched off, nothing may move at all
       const still = await open(browser, width, "off");
       await act(still);
@@ -89,6 +91,10 @@ async function run(label, launch) {
       if (moving) problems.push(`${label} ${name}: ${moving} animation(s) ran with animations switched off`);
       const page = await open(browser, width, "on");
       await act(page);
+      // wait for the animation to begin (up to a second) rather than a fixed moment: the theme cross-fade starts a frame
+      // or two after the click, later still on a busy computer, and a fixed 40 ms wait then found nothing moving
+      await page.waitForFunction(() => document.getAnimations().some(a => a.playState === "running" && a.animationName !== "pulse"),
+        { timeout: 1000 }).catch(() => {});
       await wait(40);
       // what is animating: every animation's properties and length (the live dot's pulse was there before)
       const anims = await page.evaluate(() => {
