@@ -1,0 +1,46 @@
+# Runs the whole test suite (npm test) on GitHub's computers whenever a branch other than main is pushed, so a change
+# is checked in Chromium, Firefox and WebKit (Safari's engine) before it reaches the live site. It publishes nothing
+# and saves nothing to the repository; if a check fails, the pictures the tests took are attached to the run.
+name: Tests
+
+on:
+  push:
+    branches-ignore: [main]      # main is published by build-and-deploy.yml; test branches before they are merged
+  workflow_dispatch:             # adds a "Run workflow" button in the Actions tab (once this file is on main)
+
+permissions:
+  contents: read                 # read the code; nothing else
+
+concurrency:                     # a newer push to the same branch replaces a run still going
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false   # the tests never push, so no key is left in the checkout
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install the test tools
+        run: npm ci
+      - name: Install Firefox and WebKit (and the system libraries they need)
+        run: npx playwright install --with-deps firefox webkit
+      # Speed (Lighthouse) is left out: GitHub's shared computers vary in speed from run to run, so its
+      # performance score would pass or fail by chance. Run it on your own computer with npm run test:lighthouse.
+      - name: Run the tests
+        run: npm test -- --skip speed
+        env:
+          CHROME_PATH: /usr/bin/google-chrome   # the Chrome that GitHub's Ubuntu machines come with
+      - name: Keep the pictures if something failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-screenshots
+          path: screenshots/
+          retention-days: 7

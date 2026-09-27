@@ -13,8 +13,9 @@ Notes for the owner: how the project is put together, how to set it up from scra
 | `overrides.json` | League kick-offs the main feed has not caught up with, with sources. |
 | `cazetv.py` | Checks CazéTV's public YouTube feed on every build and adds a **Watch on CazéTV** link to matches it will stream. Matches on CazéTV's schedule whose stream does not exist yet (from the fan-made agendacazetv.com, not run by CazéTV) get a **CazéTV on YouTube** link to the channel instead. Both are remembered in `streams.json`. No key needed. |
 | `common.py` | Small helpers the three scripts share: downloading (HTTPS only, with a size limit) and saving data files in one step, so a build that stops halfway never leaves a half-written file. |
-| `tests/` | Checks that are never published: `test_scripts.py` (the Python scripts, including the rule for when a time counts as verified), `security.mjs` (hostile data must never run in the page), `format.mjs` (lays out the page's JavaScript; run `npm run format` after editing `index.html`), the accessibility checks, `corners.mjs` (a rounded shape sitting close inside another must have parallel corners), `layout.mjs` (on wide screens the filter sidebar and the right-hand column never cover the footer), the Lighthouse checks, and two for the animations: `motion-check.mjs` (`npm run test:motion`: only smooth, cheap properties move, all at the shared speeds; add Firefox with `FIREFOX_PATH`) and `motion-videos.mjs` (records them as videos for a pull request). |
+| `tests/` | Checks that are never published, all run by one command, `npm test` (`run.mjs`, which ends with a summary of every group): `test_scripts.py` (the Python scripts, including the rule for when a time counts as verified), `security.mjs` (hostile data must never run in the page), `format.mjs` (lays out the page's JavaScript; run `npm run format` after editing `index.html`), the accessibility checks, `corners.mjs` (a rounded shape sitting close inside another must have parallel corners), `layout.mjs` (on wide screens the filter sidebar and the right-hand column never cover the footer), `browsers.mjs` (the site loads and works in Chromium, Firefox and WebKit, the engines behind Chrome, Edge, Firefox and Safari), the Lighthouse checks, and two for the animations: `motion-check.mjs` (`npm run test:motion`: only smooth, cheap properties move, all at the shared speeds; add Firefox with `FIREFOX_PATH`) and `motion-videos.mjs` (records them as videos for a pull request). |
 | `research.py` | Once a day, asks Claude (with web search) to find sources for missing kick-off times and new friendlies, and adds them to the two files above. Optional: runs only if you add an Anthropic API key. |
+| `.github/workflows/tests.yml` | Runs the test suite on GitHub's computers, in all three browser engines, whenever you push a branch other than `main`. It only reads the code: it publishes nothing and saves nothing. |
 | `.github/workflows/build-and-deploy.yml` | Instructions for GitHub Actions: four times a day, check the scripts, run them, save any changed data, and publish the site to GitHub Pages; once a day, run the research first. |
 
 This is a *static site*: GitHub Pages only hands out files, it never runs code on request. The fixture list stays current because GitHub Actions rebuilds the files on a timer. Live scores work differently: the visitor's own browser asks ESPN's public scoreboard for the score every 30 seconds while a listed match is on, so no server of ours is involved.
@@ -126,6 +127,34 @@ The workflow commits data on its own, so GitHub usually has commits you do not. 
 git push
 ```
 Uploads your commits to GitHub. Because you changed `friendlies.json`, the push starts the workflow, which rebuilds and republishes the site.
+
+## Running the tests
+
+One command runs every check and ends with a table of what passed and what failed:
+
+```bash
+npm test
+```
+`npm` is Node.js's package tool; `test` runs the script of that name in `package.json`, which is `node tests/run.mjs`. It works through the groups one by one (format, python, security, accessibility, design, browsers, motion, speed) and keeps going when one fails, so one run shows everything that needs attention. It takes several minutes, mostly for the accessibility and Lighthouse groups.
+
+```bash
+npm run test:quick
+```
+`run` is needed for any script other than `test`. This one runs only the fast groups (about two minutes); good while working, before the full run at the end.
+
+```bash
+npm test -- browsers
+```
+The `--` tells npm that what follows is for the test runner, not for npm. Name one or more groups to run only those; `npm test -- --skip speed` runs all but those named; `npm test -- --list` shows every group and what it checks.
+
+**First time only**, after `npm install`, download the two test browsers Playwright uses for Firefox and Safari:
+
+```bash
+npx playwright install firefox webkit
+```
+`npx` runs a tool from the project's `node_modules` folder; `playwright install` downloads its own copies of the browsers (they do not replace the Firefox you browse with). Chromium comes from your system, as for the other tests; on Fedora, `sudo dnf install chromium` if it is missing. WebKit is Safari's engine; Playwright supports it officially on Ubuntu and Debian, so on Fedora it may refuse to start for want of a system library. The browser group then shows **PART**, meaning it passed in the browsers that ran. The test run on GitHub (below) always has all three.
+
+**On GitHub:** every push to a branch other than `main` runs the whole suite except Lighthouse (whose speed score varies on GitHub's shared computers) in all three browsers. Open the **Actions** tab, click **Tests** on the left, and open the newest run: a green tick means everything passed. If a check fails, the run's page has a **test-screenshots** download at the bottom with the pictures the tests took.
 
 ## Test results
 

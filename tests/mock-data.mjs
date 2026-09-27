@@ -1,6 +1,6 @@
 // Sample answers for the outside services the page calls (ESPN, Wikidata, OpenStreetMap), so the tests
 // give the same result every time and work offline. The names and numbers are made up; the shapes follow
-// what those services return. Used by axe.mjs and screenshots.mjs, never by the published site.
+// what those services return. Used by axe.mjs, browsers.mjs, screenshots.mjs and others, never by the published site.
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { ROOT } from "./server.mjs";
@@ -119,31 +119,45 @@ const MATCHES = [...data.matches.filter(m => !SAMPLE_WK.has(m.wk)), ...F1]
 const dupes = MATCHES.map(m => m.uid).filter((u, i, all) => all.indexOf(u) !== i);
 if (dupes.length) throw new Error(`Sample data has more than one match with the same uid: ${[...new Set(dupes)].join(", ")}`);
 
-// Answers each outside request with sample data (only the sample match's league has a match on the scoreboard).
+// The sample answer for one outside request, or null to let it through (the test server's own files).
+// Only the sample match's league has a match on the scoreboard.
+export function answerFor(u) {
+  if (new URL(u).pathname.endsWith("/fixtures.json"))
+    return { status: 200, contentType: "application/json", body: JSON.stringify({ ...data, f1stale: true, matches: MATCHES }) };
+  const json = body => ({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(body) });
+  if (u.includes("api.jolpi.ca")) {
+    if (u.includes("/qualifying/")) return json(f1Quali);
+    if (u.includes("/results/")) return json(f1Race);
+    if (u.includes("/driverstandings/")) return json(f1Drivers);
+    if (u.includes("/constructorstandings/")) return json(f1Teams);
+    return json({ MRData: { RaceTable: { Races: [] } } });
+  }
+  if (u.includes("espn.com")) {
+    if (u.includes("/standings")) return json(standings);
+    if (u.includes("/summary")) return json(summary);
+    if (u.includes("/eng.1/scoreboard")) return json(board);
+    return json({ events: [] });
+  }
+  if (u.includes("wikidata.org")) return json(u.includes("wbsearchentities") ? wdSearch : wdEntities);
+  // map tiles: a plain light-green square stands in for each OpenStreetMap tile
+  if (u.includes("tile.openstreetmap.org")) return { status: 200, contentType: "image/svg+xml",
+    body: '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#dfe8d8" stroke="#c9d6c0"/><path d="M0 128h256M128 0v256" stroke="#fff" stroke-width="6"/></svg>' };
+  return null;
+}
+
+// Answers each outside request with sample data (Puppeteer: axe.mjs, layout.mjs, screenshots.mjs and the others).
 export async function mockNetwork(page) {
   await page.setRequestInterception(true);
   page.on("request", req => {
-    const u = req.url();
-    if (new URL(u).pathname.endsWith("/fixtures.json"))
-      return req.respond({ status: 200, contentType: "application/json", body: JSON.stringify({ ...data, f1stale: true, matches: MATCHES }) });
-    const json = body => req.respond({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(body) });
-    if (u.includes("api.jolpi.ca")) {
-      if (u.includes("/qualifying/")) return json(f1Quali);
-      if (u.includes("/results/")) return json(f1Race);
-      if (u.includes("/driverstandings/")) return json(f1Drivers);
-      if (u.includes("/constructorstandings/")) return json(f1Teams);
-      return json({ MRData: { RaceTable: { Races: [] } } });
-    }
-    if (u.includes("espn.com")) {
-      if (u.includes("/standings")) return json(standings);
-      if (u.includes("/summary")) return json(summary);
-      if (u.includes("/eng.1/scoreboard")) return json(board);
-      return json({ events: [] });
-    }
-    if (u.includes("wikidata.org")) return json(u.includes("wbsearchentities") ? wdSearch : wdEntities);
-    // map tiles: a plain light-green square stands in for each OpenStreetMap tile
-    if (u.includes("tile.openstreetmap.org")) return req.respond({ status: 200, contentType: "image/svg+xml",
-      body: '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#dfe8d8" stroke="#c9d6c0"/><path d="M0 128h256M128 0v256" stroke="#fff" stroke-width="6"/></svg>' });
-    return req.continue();
+    const a = answerFor(req.url());
+    return a ? req.respond(a) : req.continue();
+  });
+}
+
+// The same for Playwright (browsers.mjs), for every page opened in one browser context.
+export async function mockRoutes(context) {
+  await context.route("**/*", route => {
+    const a = answerFor(route.request().url());
+    return a ? route.fulfill(a) : route.continue();
   });
 }
