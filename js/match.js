@@ -376,17 +376,25 @@ async function coords(name) {
     c = store.get(k, null);
   if (c) return c.lat != null ? c : null;
   const W = "https://www.wikidata.org/w/api.php?format=json&origin=*&";
-  const found = await (
-    await fetch(W + "action=wbsearchentities&type=item&limit=5&language=en&search=" + encodeURIComponent(name))
-  ).json();
-  const ids = (found.search || []).map(x => x.id);
+  // An answer that is not a real result (an HTTP error, or Wikidata's own {"error": ...}, which can come with
+  // status 200) throws, so it is never saved as "no location": paintMap shows the link, and the next visit asks again.
+  const ask = async query => {
+    const res = await fetch(W + query);
+    if (!res.ok) throw new Error(res.status);
+    const js = await res.json();
+    if (!js || typeof js !== "object" || js.error) throw new Error("Wikidata did not answer");
+    return js;
+  };
+  const found = await ask("action=wbsearchentities&type=item&limit=5&language=en&search=" + encodeURIComponent(name));
+  if (!Array.isArray(found.search)) throw new Error("Wikidata did not answer");
+  const ids = found.search.map(x => x.id);
   if (!ids.length) {
-    store.set(k, {});
+    store.set(k, {}); // Wikidata answered and knows no such place
     return null;
   }
-  const ents =
-    (await (await fetch(W + "action=wbgetentities&props=claims|descriptions&languages=en&ids=" + ids.join("|"))).json())
-      .entities || {};
+  const got = await ask("action=wbgetentities&props=claims|descriptions&languages=en&ids=" + ids.join("|"));
+  if (!got.entities || typeof got.entities !== "object") throw new Error("Wikidata did not answer");
+  const ents = got.entities;
   const withXY = ids.map(id => ents[id]).filter(e => e && e.claims && e.claims.P625);
   const best =
     withXY.find(e =>

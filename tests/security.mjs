@@ -36,8 +36,12 @@ const kick = new Date(Date.now() - 30 * 60e3).toISOString().replace(/\.\d+Z$/, "
 const bunLive = { comp: "Bundesliga", code: "BUN", round: "Matchday 5", home: "Borussia Dortmund", away: "FC Bayern München",
   date: kick.slice(0, 10), utc: kick, uid: "test-backup" };
 const tables = { EPL: [{ team: "Arsenal" + EVIL, rank: EVIL, p: 3, w: 3, d: 0, l: 0, gd: EVIL, pts: 9 }, { team: 7 }, null, "x"] };
+// two ordinary matches whose stadiums are looked up on Wikidata while it fails, answers, or knows no such place
+const mapMatch = (uid, venue) => ({ comp: "Premier League", code: "EPL", round: "Matchday 7", home: "Mapland FC " + uid,
+  away: "Chelsea", date: soon.slice(0, 10), utc: soon, uid, venue });
 const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, tables,
-  matches: [bad, badWidth, badLat, bunLive, ...malformed, ...data.matches] };
+  matches: [bad, badWidth, badLat, bunLive, ...malformed, mapMatch("test-map", "Mapland Arena, Testville"),
+    mapMatch("test-map-none", "Nowhere Ground, Testville"), ...data.matches] };
 // OpenLigaDB's answers: the match on now (a scorer with markup) and malformed entries that must be skipped quietly
 const oldbMatch = { matchID: 424242, matchDateTimeUTC: kick.replace("+00:00", "Z"), matchIsFinished: false,
   team1: { teamName: "Borussia Dortmund" + EVIL, shortName: EVIL }, team2: { teamName: "FC Bayern München", shortName: "Bayern" },
@@ -47,6 +51,7 @@ const oldbMatch = { matchID: 424242, matchDateTimeUTC: kick.replace("+00:00", "Z
 const oldbBoard = [oldbMatch, { matchID: EVIL, team1: {}, team2: {} }, null, { matchID: 5, matchDateTimeUTC: EVIL, goals: EVIL }];
 const oldbTable = [{ teamName: "Borussia Dortmund" + EVIL, matches: 4, won: 4, draw: 0, lost: 0, goalDiff: EVIL, points: EVIL }, { teamName: 3 }];
 let espnDown = false;
+let wikidata = "hostile";   // how Wikidata answers: "hostile" (markup for coordinates), "http-error", "api-error", "ok", "none"
 
 const server = await startServer();
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true,
@@ -72,6 +77,12 @@ try {
     if (u.includes("espn.com") && u.includes("/standings")) return json({ children: [{ standings: { entries: [
       { team: { displayName: "Arsenal" + EVIL }, stats: [{ name: "rank", value: EVIL }, { name: "points", value: EVIL }] }] } }] });
     if (u.includes("espn.com")) return json({ events: [] });
+    if (u.includes("wikidata.org") && wikidata === "http-error") return req.respond({ status: 503, contentType: "application/json",
+      headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ error: { code: "unavailable" } }) });
+    if (u.includes("wikidata.org") && wikidata === "api-error") return json({ error: { code: "maxlag", info: "Waiting for a database server" } });
+    if (u.includes("wikidata.org") && wikidata === "none") return json({ search: [] });
+    if (u.includes("wikidata.org") && wikidata === "ok") return json(u.includes("wbsearchentities") ? { search: [{ id: "Q7" }] } : { entities: { Q7: {
+      descriptions: { en: { value: "football stadium" } }, claims: { P625: [{ mainsnak: { datavalue: { value: { latitude: 51.555, longitude: -0.108 } } } }] } } } });
     if (u.includes("wikidata.org")) return json(u.includes("wbsearchentities") ? { search: [{ id: "Q1" }] } : { entities: { Q1: {
       claims: { P625: [{ mainsnak: { datavalue: { value: { latitude: EVIL, longitude: 1 } } } }] } } } });
     if (u.startsWith(BASE)) return req.continue();
@@ -194,6 +205,30 @@ try {
     await page.evaluate(() => document.querySelectorAll("#list .match").length > 0
       && !!document.querySelector('link[rel="stylesheet"][href="styles.css"]') && document.querySelectorAll("script[src]").length > 1));
   await check("page as edited (source.html)");
+
+  // Wikidata failing must never be remembered as "this stadium has no location" (issue #36): the map comes back as
+  // soon as Wikidata answers again. A real "no such place" is still remembered, so the page does not ask on every visit.
+  const saved = name => page.evaluate(n => localStorage.getItem("mp.geo." + n), name);
+  const openMap = async uid => {
+    await page.goto(`${BASE}?lang=en&match=${uid}`, { waitUntil: "networkidle0" });
+    await page.waitForFunction(() => {
+      const m = document.querySelector("#md-map");
+      return m && !/Finding|Procurando/.test(m.textContent);
+    }, { timeout: 15000 }).catch(() => {});
+    return page.evaluate(() => !!document.querySelector("#md-map .tiles"));
+  };
+  for (const [mode, what] of [["http-error", "an HTTP error"], ["api-error", "its own error answer, with status 200"]]) {
+    wikidata = mode;
+    const map = await openMap("test-map"), kept = await saved("mapland arena");
+    shows(`Wikidata fails (${what}): no map, and nothing remembered`, !map && kept === null);
+  }
+  wikidata = "ok";
+  shows("Wikidata answers again: the map appears", await openMap("test-map"));
+  wikidata = "none";
+  await openMap("test-map-none");
+  shows("Wikidata knows no such place: that is remembered", (await saved("nowhere ground")) === "{}");
+  wikidata = "hostile";
+  await check("stadium map while Wikidata fails and recovers");
 } finally {
   await browser.close();
   server.kill();
