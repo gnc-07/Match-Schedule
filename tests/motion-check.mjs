@@ -170,7 +170,10 @@ async function run(label, launch) {
       for (const a of anims.list) {
         const inner = /^-ua-|^-moz-|view-transition/.test(a.what);   // the browser's own steps inside a View Transition
         const bad = inner ? [] : a.props.filter(p => !OK_PROPS.has(p) && !/color$/i.test(p));
-        const [s, m] = anims.speeds, okLen = inner || [s, m, 3 * m].some(x => Math.abs(a.ms - x) < 2);
+        // a button's colour change that is undone half way (the pointer leaves it as a panel opens over it) runs back in
+        // the time it had run, as the CSS rules say, so it may be shorter than the shared speed; never longer
+        const [s, m] = anims.speeds, undone = /color$/i.test(a.what) && a.ms > 0 && a.ms < s,
+          okLen = inner || undone || [s, m, 3 * m].some(x => Math.abs(a.ms - x) < 2);
         const line = `           ${a.what.padEnd(34)} ${a.on.slice(0, 40).padEnd(40)} ${String(a.ms).padStart(4)} ms  ${a.props.join(", ")}`;
         if (!seen.has(line)) console.log(line);
         seen.add(line);
@@ -210,10 +213,10 @@ async function run(label, launch) {
       await page.evaluate(sels => {
         window.__tr = [];
         const t0 = performance.now(), pin = [...document.querySelectorAll("#list .match")].find(m => m.getBoundingClientRect().bottom > 0);
-        const tick = () => {
-          window.__tr.push({ t: performance.now(), y: scrollY, at: sels.map(s => { const e = document.querySelector(s), r = (s === "#list" ? pin : e).getBoundingClientRect();
+        const tick = now => {   // now: the frame's own time, the clock the animations move by
+          window.__tr.push({ t: now, y: scrollY, at: sels.map(s => { const e = document.querySelector(s), r = (s === "#list" ? pin : e).getBoundingClientRect();
             return [r.left, r.top, e.checkVisibility() ? +getComputedStyle(e).opacity : 0]; }) });
-          if (performance.now() - t0 < 900) requestAnimationFrame(tick);
+          if (now - t0 < 900) requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
       }, sels);
