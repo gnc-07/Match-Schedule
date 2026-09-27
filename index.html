@@ -316,7 +316,7 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
 .calpanel details summary{font-size:14px;min-height:44px}
 .srcs summary::-webkit-details-marker,.calpanel details summary::-webkit-details-marker{display:none}
 .srcs summary::after,.calpanel details summary::after{content:"";width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translate(0,-2px)}
-.srcs[open] summary::after,.calpanel details[open] summary::after{transform:rotate(-135deg) translate(-1px,-1px)}
+.srcs[open]:not([data-folding]) summary::after,.calpanel details[open]:not([data-folding]) summary::after{transform:rotate(-135deg) translate(-1px,-1px)}
 .srcs .body{margin-top:4px;display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line-2)}
 .srcs .reported{color:var(--warn-ink);font-weight:600}
 .srcs ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
@@ -673,9 +673,12 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
    animates without laying out or redrawing the page. Nothing moves while the page loads; only what a
    visitor opens, stars or switches, and a score that changes. With animations off (the tick box, or
    the device's "reduce motion" until the tick box is used) :root gets data-motion="off" and the last
-   rule stops everything. Script-made animations (theme switch, list) use move() and motionOn() instead.
+   rule stops everything. Script-made animations (theme switch, list, closing, the filter sidebar) use
+   move() and motionOn() instead.
    Two speeds keep everything consistent: --dur-s for things that change in place (colours, arrows,
-   menus unfolding), --dur-m for things that arrive or move (panels, sheets, the list, the theme, a bounce).
+   menus unfolding) and for everything closing or going away (leave(): it moves out, then goes), --dur-m
+   for things that arrive or move (panels, sheets, the list, the theme, a bounce, the page gliding when
+   the filter sidebar or the panel beside the list comes or goes).
    ========================================================================= */
 :root{--dur-s:.18s;--dur-m:.28s;--ease:cubic-bezier(.2,.8,.3,1)}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}}
@@ -691,6 +694,8 @@ dialog.sheet[open]:not(:modal){animation-name:slide-in}
 /* Settings and Calendar drop down from their button; sources and "How to subscribe" unfold; the small arrow turns */
 .calmenu[open]>.calpanel,.srcs[open] .body,.calpanel details[open]>ol{animation:drop var(--dur-s) var(--ease)}
 .srcs summary::after,.calpanel details summary::after{transition:transform var(--dur-s) var(--ease)}
+/* "Link copied" and the other short messages unfold as they appear */
+.toast{animation:drop var(--dur-s) var(--ease)}
 /* a star just switched on: a short bounce */
 .star.pop svg{animation:pop var(--dur-m) var(--ease)}
 /* a score that just changed (a goal): the score bounces and a soft gold light pulses out from behind it, under the
@@ -1706,20 +1711,11 @@ const turnIcon = () =>
       { transform: "none", opacity: 1 },
     ],
   );
-// with animations on, the page cross-fades to the new theme. The buttons' own colour changes are paused meanwhile
-// (data-theming): the cross-fade already covers them, and hundreds of them at once would only cost time.
+// with animations on, the page cross-fades to the new theme (fadePage)
 function switchTheme() {
-  const r = document.documentElement,
-    apply = () => {
-      applyTheme();
-      turnIcon();
-    };
-  if (!motionOn() || !document.startViewTransition) return apply();
-  r.setAttribute("data-theming", "");
-  const t = (fading = document.startViewTransition(apply));
-  t.finished.finally(() => {
-    r.removeAttribute("data-theming");
-    if (fading === t) fading = null;
+  fadePage(() => {
+    applyTheme();
+    turnIcon();
   });
 }
 let fading = null; // the theme cross-fade under way, ended at once if animations are switched off
@@ -1736,7 +1732,7 @@ function applyContrast() {
 hcBox.addEventListener("change", () => {
   contrast = hcBox.checked ? "high" : "normal";
   store.set("contrast", contrast);
-  applyContrast();
+  fadePage(applyContrast);
 });
 
 /* ---------- animations: on, unless the device asks for less motion, until the Animations box is used ---------- */
@@ -1757,6 +1753,79 @@ function move(el, frames, o) {
     () => MOVING.delete(a),
   );
   return a;
+}
+// something closing or going away moves out first, at the shorter speed, and only then goes (done); with animations
+// off it goes at once. Opened again meanwhile (stay), it stops leaving and stays where it is.
+function leave(el, frames, done) {
+  const a = move(el, frames, { duration: DUR("s"), fill: "forwards" });
+  if (!a) return done();
+  el.leaving = a;
+  const end = () => {
+    if (el.leaving !== a) return;
+    el.leaving = null;
+    done();
+    a.cancel();
+  };
+  a.finished.then(end, end);
+}
+function stay(el) {
+  const a = el.leaving;
+  el.leaving = null;
+  if (a) a.cancel();
+}
+const DROP = [
+    { opacity: 0, transform: "translateY(-6px)" },
+    { opacity: 1, transform: "none" },
+  ],
+  LIFT = [...DROP].reverse(), // DROP backwards: fades out upwards
+  SWAP = [
+    { opacity: 0, transform: "translateY(6px)" },
+    { opacity: 1, transform: "none" },
+  ];
+// new content in the same place (another league's table, the teams' championship): a quick fade in
+const swapIn = el => move(el, SWAP, { duration: DUR("s") });
+// the same for what a switch shows: everything in box but the switch's own row (keep), which stays put
+const swapBelow = (box, keep) => box && [...box.children].filter(x => !x.matches(keep)).forEach(swapIn);
+// the days of the list rise into place one after another (only the first few, so it stays short)
+const riseDays = days =>
+  days.slice(0, 6).forEach((d, i) =>
+    move(
+      d,
+      [
+        { opacity: 0, transform: "translateY(10px)" },
+        { opacity: 1, transform: "none" },
+      ],
+      { delay: i * 45, fill: "backwards" },
+    ),
+  );
+// a layout change (the filter sidebar hidden or shown): what moves glides from its old place to the new one, with
+// transform only. Positions are measured on screen, so they are divided by the text-size zoom.
+function glide(els, change) {
+  const z = parseFloat(getComputedStyle(document.documentElement).zoom) || 1,
+    was = els.map(el => el.getBoundingClientRect());
+  change();
+  els.forEach((el, i) => {
+    const a = was[i],
+      b = el.getBoundingClientRect(),
+      dx = (a.left - b.left) / z,
+      dy = (a.top - b.top) / z;
+    if (!a.width && b.width)
+      move(el, [{ opacity: 0 }, { opacity: 1 }]); // just shown: it fades in where it is
+    else if (a.width && b.width && (Math.abs(dx) > 1 || Math.abs(dy) > 1))
+      move(el, [{ transform: "translate(" + dx + "px," + dy + "px)" }, { transform: "none" }]);
+  });
+}
+// the page cross-fades to a new look (theme, contrast, text size, language, time zone). The buttons' own colour
+// changes are paused meanwhile (data-theming): the cross-fade already covers them, and hundreds at once only cost time.
+function fadePage(apply) {
+  const r = document.documentElement;
+  if (!motionOn() || !document.startViewTransition) return apply();
+  r.setAttribute("data-theming", "");
+  const t = (fading = document.startViewTransition(apply));
+  t.finished.finally(() => {
+    r.removeAttribute("data-theming");
+    if (fading === t) fading = null;
+  });
 }
 function applyMotion() {
   if (motionOn()) document.documentElement.removeAttribute("data-motion");
@@ -1786,8 +1855,10 @@ sizeRadios.forEach(r =>
   r.addEventListener("change", () => {
     size = r.value;
     store.set("size", size);
-    applySize();
-    applyWide();
+    fadePage(() => {
+      applySize();
+      applyWide();
+    });
   }),
 );
 
@@ -1867,7 +1938,8 @@ function applyLang() {
   checkDates();
   syncControls();
 }
-langsel.onchange = () => {
+langsel.onchange = () => fadePage(switchLang);
+function switchLang() {
   LANG = langsel.value;
   T = I18N[LANG];
   store.set("lang", LANG);
@@ -1887,8 +1959,9 @@ langsel.onchange = () => {
     paintChips();
     paintTable();
   }
-};
-tzsel.onchange = () => {
+}
+tzsel.onchange = () => fadePage(switchZone);
+function switchZone() {
   TZ = tzsel.value;
   store.set("tz", TZ);
   makeFormatters();
@@ -1898,7 +1971,7 @@ tzsel.onchange = () => {
   }
   render();
   if (MD) paintMatch();
-};
+}
 
 /* ---------- calendar links, built from wherever the site is hosted ---------- */
 const icsURL = new URL("soccer.ics", location.href).href;
@@ -1920,12 +1993,29 @@ document.getElementById("copy").onclick = async () => {
 const calmenu = document.getElementById("calmenu"),
   setmenu = document.getElementById("setmenu"),
   MENUS = [setmenu, calmenu];
-function closeMenu(m, focus) {
-  m.open = false;
-  if (focus) m.querySelector("summary").focus();
-}
 // on phones the menus open as a sheet over a dimmed page: focus moves into the sheet and Tab stays inside it
 const SHEET = matchMedia("(max-width:640px)");
+// a menu closing folds back up into its button (on phones the sheet slides down and the dimmed page fades)
+function foldMenu(m) {
+  const p = m.querySelector(".calpanel");
+  if (!m.open || p.leaving) return;
+  if (SHEET.matches)
+    move(m, [{ opacity: 1 }, { opacity: 0 }], {
+      duration: DUR("s"),
+      fill: "forwards",
+      pseudoElement: "::before",
+      id: "undim",
+    });
+  leave(p, SHEET.matches ? [{ transform: "none" }, { transform: "translateY(100%)" }] : LIFT, () => {
+    undim(m); // first: once closed, the dimmed layer and its animation are gone from the menu
+    m.open = false;
+  });
+}
+const undim = m => m.getAnimations({ subtree: true }).forEach(a => a.id === "undim" && a.cancel());
+function closeMenu(m, focus) {
+  foldMenu(m);
+  if (focus) m.querySelector("summary").focus();
+}
 const tabbable = m =>
   [
     ...m.querySelectorAll(".calpanel a[href],.calpanel button,.calpanel select,.calpanel input,.calpanel summary"),
@@ -1934,15 +2024,28 @@ const tabbable = m =>
       (el.checkVisibility ? el.checkVisibility() : el.getClientRects().length > 0) &&
       !(el.type === "radio" && !el.checked),
   ); // a radio group is one Tab stop
-MENUS.forEach(m =>
+MENUS.forEach(m => {
+  // its own button closes it with the same fold; pressed again while folding, it stays open
+  m.querySelector("summary").addEventListener("click", e => {
+    if (!m.open) return;
+    e.preventDefault();
+    const p = m.querySelector(".calpanel");
+    if (!p.leaving) return foldMenu(m);
+    stay(p);
+    undim(m);
+  });
   m.addEventListener("toggle", () => {
     if (!m.open) return;
     MENUS.forEach(o => {
-      if (o !== m) o.open = false;
+      if (o !== m) {
+        stay(o.querySelector(".calpanel")); // the other menu is replaced at once, not folded
+        undim(o);
+        o.open = false;
+      }
     });
     if (SHEET.matches) m.querySelector(".calpanel").focus();
-  }),
-);
+  });
+});
 document.addEventListener("keydown", e => {
   if (e.key === "Escape")
     MENUS.forEach(m => {
@@ -1969,7 +2072,7 @@ document.addEventListener("click", e => {
   MENUS.forEach(m => {
     if (!m.open) return;
     if (e.target === m) closeMenu(m, true);
-    else if (!m.contains(e.target)) m.open = false;
+    else if (!m.contains(e.target)) foldMenu(m);
   });
 });
 document.getElementById("setdone").onclick = () => closeMenu(setmenu, true);
@@ -2025,7 +2128,7 @@ function setRange(r, focus) {
   range = r;
   store.set("range", r);
   document.querySelectorAll("#range button").forEach(x => x.setAttribute("aria-pressed", x.dataset.r === r));
-  daterange.hidden = r !== "custom";
+  reveal(daterange, r === "custom");
   if (r === "custom") {
     if (!from.value) from.value = dayKey.format(new Date());
     if (focus) from.focus();
@@ -2040,6 +2143,7 @@ function checkDates() {
   from.max = to.value || "";
   const bad = !!(from.value && to.value && to.value < from.value);
   to.setAttribute("aria-invalid", bad);
+  if (bad && !dateErr.textContent && settled) move(dateErr, DROP, { duration: DUR("s") }); // the message unfolds too
   dateErr.textContent = bad ? T.dateErr : "";
   store.set("from", from.value);
   store.set("to", to.value);
@@ -2094,14 +2198,31 @@ resetBtn.onclick = () => {
   setRange("all", false);
   document.querySelector('#range button[data-r="all"]').focus();
 };
+// small controls that come and go with the filters (the Custom dates, Clear filters...) unfold into place and fold
+// away; not while the page loads (settled is set once it has)
+let settled = false;
+const FADE = [{ opacity: 0 }, { opacity: 1 }];
+function reveal(el, show, frames = DROP) {
+  if (show) {
+    stay(el); // back while it was folding away
+    if (!el.hidden) return;
+    el.hidden = false;
+    if (settled) move(el, frames, { duration: DUR("s") });
+  } else if (!el.hidden && !el.leaving) {
+    if (settled) leave(el, [...frames].reverse(), () => (el.hidden = true));
+    else el.hidden = true;
+  }
+}
 function syncControls() {
   // small bits of UI that depend on the current filters
-  clearq.hidden = !q.value;
+  reveal(clearq, !!q.value, FADE); // inside the search box: it only fades
   clearq.setAttribute("aria-label", T.clearSearch);
   document.getElementById("favlabel").textContent = T.favCount(favs.size);
-  resetBtn.hidden =
-    on.size === LEAGUES.length && range === "all" && !q.value && !favonly.checked && tbc.checked && f1prac.checked;
-  document.getElementById("f1praclabel").hidden = !on.has("F1"); // only useful while F1 is shown
+  reveal(
+    resetBtn,
+    !(on.size === LEAGUES.length && range === "all" && !q.value && !favonly.checked && tbc.checked && f1prac.checked),
+  );
+  reveal(document.getElementById("f1praclabel"), on.has("F1")); // only useful while F1 is shown
   const sum = [
     on.size === LEAGUES.length ? T.sumAll : T.sumSome(on.size, LEAGUES.length),
     range === "all" ? T.sumDates : range === "custom" ? T.sumCustom : T[range],
@@ -2252,7 +2373,7 @@ function render() {
   if (!META) return;
   document
     .querySelectorAll("details.srcs")
-    .forEach(d => (d.open ? openSrc.add(d.dataset.k) : openSrc.delete(d.dataset.k)));
+    .forEach(d => (d.open && !d.hasAttribute("data-folding") ? openSrc.add(d.dataset.k) : openSrc.delete(d.dataset.k))); // one folding away counts as closed
   syncControls();
   const rows = filtered(),
     list = document.getElementById("list");
@@ -2383,26 +2504,17 @@ function render() {
   if (html === lastList) return; // the minute-by-minute refresh usually changes nothing: leave the page alone
   lastList = html;
   list.innerHTML = html;
-  // a new choice of filters rises into place, one day after another (only the first few, so it stays short);
-  // automatic updates do not move
-  if (filterAct)
-    [...list.querySelectorAll(".day")].slice(0, 6).forEach((d, i) =>
-      move(
-        d,
-        [
-          { opacity: 0, transform: "translateY(10px)" },
-          { opacity: 1, transform: "none" },
-        ],
-        { delay: i * 45, fill: "backwards" },
-      ),
-    );
+  // a new choice of filters rises into place, one day after another; automatic updates do not move
+  if (filterAct) riseDays([...list.querySelectorAll(".day")]);
   markCurrent();
   goals(list, ".score[data-uid]", el => el.dataset.uid);
   const m = document.getElementById("more");
   if (m)
     m.onclick = () => {
+      const had = list.querySelectorAll(".day").length;
       limit += 80;
       render();
+      riseDays([...list.querySelectorAll(".day")].slice(had)); // the days added rise in turn, as after a filter change
     };
 }
 // the list only moves after a click, change or new date in the filters (the flag is cleared once that event is
@@ -2433,6 +2545,24 @@ function goals(box, sel, key) {
   });
 }
 const listEl = document.getElementById("list");
+// sources and "How to subscribe" fold away as they unfolded (data-folding turns the arrow back at once)
+document.addEventListener("click", e => {
+  const sm = e.target.closest(".srcs>summary,.calpanel details>summary"),
+    d = sm && sm.parentNode;
+  if (!d || !d.open) return;
+  e.preventDefault();
+  const body = d.querySelector(":scope>.body,:scope>ol");
+  if (body.leaving) {
+    stay(body); // clicked again while folding: it stays open
+    d.removeAttribute("data-folding");
+    return;
+  }
+  d.setAttribute("data-folding", "");
+  leave(body, LIFT, () => {
+    d.open = false;
+    d.removeAttribute("data-folding");
+  });
+});
 listEl.addEventListener("click", e => {
   const s = e.target.closest(".star");
   if (!s) return;
@@ -3920,9 +4050,11 @@ function weekendClick(e) {
     w.pick = b.dataset.s;
     paintWkRes();
     refocus('[data-s="' + w.pick + '"]');
+    swapBelow(w.root.querySelector("#wk-res"), ".f1-rh"); // what the switch shows fades in below it
   } else if (b.dataset.tab) {
     w.tab = b.dataset.tab;
     paintWkChamp();
+    swapBelow(w.root.querySelector("#wk-champ"), ".f1-rh");
     refocus('[data-tab="' + w.tab + '"]');
   } else if (b.id === "wk-all") {
     w.all = !w.all;
@@ -3937,6 +4069,11 @@ function weekendClick(e) {
     paintWkRes();
     paintWkChamp();
     refocus((inRes ? "#wk-res" : "#wk-champ") + ' .star[data-drv="' + CSS.escape(id) + '"]'); // keep keyboard focus on the same star
+    // a star just switched on bounces, as a team's star does in the list
+    if (f1favs.has(id)) {
+      const x = w.root.querySelector((inRes ? "#wk-res" : "#wk-champ") + ' .star[data-drv="' + CSS.escape(id) + '"]');
+      if (x) x.classList.add("pop");
+    }
   }
 }
 function shareWeekend() {
@@ -4149,12 +4286,48 @@ function showPanel(uid) {
   mddlg.querySelector("[data-close]").focus();
 }
 function openDialog() {
-  if (!mddlg.open) {
-    if (document.documentElement.dataset.wide === "full") mddlg.show();
-    else mddlg.showModal();
-  }
-  document.documentElement.toggleAttribute("data-pane", mddlg.open && !mddlg.matches(":modal"));
+  stay(mddlg); // opened again while closing
+  undim(mddlg);
+  const beside = document.documentElement.dataset.wide === "full",
+    show = () => {
+      if (!mddlg.open) {
+        if (beside) mddlg.show();
+        else mddlg.showModal();
+      }
+      document.documentElement.toggleAttribute("data-pane", mddlg.open && !mddlg.matches(":modal"));
+    };
+  // beside the list, the page makes room for the panel: the list and the sidebar glide over instead of jumping
+  if (beside && !mddlg.open) glide(pageParts(), show);
+  else show();
   markCurrent();
+}
+// a panel closing sinks and fades over its fading page (beside the list: slides back out to the right, and the page
+// glides back), then closes
+function shut(d) {
+  if (!d.open || d.leaving) return;
+  const modal = d.matches(":modal");
+  if (modal)
+    move(d, [{ opacity: 1 }, { opacity: 0 }], {
+      duration: DUR("s"),
+      fill: "forwards",
+      pseudoElement: "::backdrop",
+      id: "undim",
+    });
+  leave(
+    d,
+    [
+      { opacity: 1, transform: "none" },
+      { opacity: 0, transform: modal ? "translateY(12px)" : "translateX(24px)" },
+    ],
+    () => {
+      undim(d);
+      if (modal) return d.close();
+      glide(pageParts(), () => {
+        d.close();
+        document.documentElement.removeAttribute("data-pane"); // at once: the close event comes a moment later
+      });
+    },
+  );
 }
 // the card whose details are shown beside the list is outlined, and screen readers hear "current" on its button
 function markCurrent() {
@@ -4180,12 +4353,14 @@ listEl.addEventListener("click", e => {
   e.preventDefault();
   trigger = a.dataset.uid;
   // with the details already open beside the list, switching matches replaces the address, so Back still closes the panel
+  const switching = mddlg.open && !mddlg.leaving;
   if (mddlg.open) history.replaceState({ match: a.dataset.uid }, "", a.getAttribute("href"));
   else {
     history.pushState({ match: a.dataset.uid }, "", a.getAttribute("href"));
     pushed = true;
   }
   showPanel(a.dataset.uid);
+  if (switching) swapIn(document.getElementById("mdbody")); // another match beside the list: its details fade in
 });
 mddlg.addEventListener("close", () => {
   if (mddlg.open) return; // reopened straight away because the window changed width (applyWide)
@@ -4212,14 +4387,18 @@ addEventListener("popstate", () => {
     if (DATA.length) showPanel(uid);
   } else if (mddlg.open) {
     pushed = false;
-    mddlg.close();
+    shut(mddlg);
   }
 });
 [mddlg, ltdlg].forEach(d => {
-  d.querySelector("[data-close]").onclick = () => d.close();
+  d.querySelector("[data-close]").onclick = () => shut(d);
   d.addEventListener("click", e => {
-    if (e.target === d && d.matches(":modal")) d.close();
+    if (e.target === d && d.matches(":modal")) shut(d);
   }); // a click on the dimmed background closes it
+  d.addEventListener("cancel", e => {
+    e.preventDefault(); // Escape: close with the same animation
+    shut(d);
+  });
 });
 // Escape closes the details beside the list too (only a panel over the page closes by itself). Checked before the
 // menus' own Escape handler runs, so closing Settings or Calendar leaves the details open.
@@ -4228,7 +4407,7 @@ document.addEventListener(
   e => {
     if (e.key !== "Escape" || !mddlg.open || mddlg.matches(":modal") || ltdlg.open || MENUS.some(m => m.open)) return;
     if (e.target.matches && e.target.matches("input,select") && !mddlg.contains(e.target)) return; // Escape in the search box clears the search
-    mddlg.close();
+    shut(mddlg);
   },
   true,
 );
@@ -4266,11 +4445,40 @@ const fitRail = () =>
     rail.offsetHeight > innerHeight / (parseFloat(getComputedStyle(document.documentElement).zoom) || 1) - 32,
   );
 if (window.ResizeObserver) new ResizeObserver(fitRail).observe(rail);
+// the parts of the page that change place when the filter sidebar or the panel beside the list comes or goes
+const pageParts = () => [filtersEl, sideBar, liveBox, listEl, rail];
+// hiding: the sidebar slides away to the left first; then the list glides over and the bar above it fades in.
+// Showing: the list glides over first; then the sidebar slides in.
 function setSide(s) {
-  side = s;
-  store.set("side", s);
-  applyWide();
-  document.getElementById(s === "open" ? "sidehide" : "sideshow").focus(); // the button pressed disappears: focus goes to its opposite
+  if (s === side || filtersEl.leaving) return;
+  const apply = () => {
+    side = s;
+    store.set("side", s);
+    glide(
+      pageParts().filter(x => x !== filtersEl),
+      applyWide,
+    );
+    // shown: once the list has mostly made room, the sidebar slides in from the left (the way it left)
+    if (s === "open")
+      move(
+        filtersEl,
+        [
+          { opacity: 0, transform: "translateX(-24px)" },
+          { opacity: 1, transform: "none" },
+        ],
+        { duration: DUR("s"), delay: DUR("s"), fill: "backwards" },
+      );
+    document.getElementById(s === "open" ? "sidehide" : "sideshow").focus(); // the button pressed disappears: focus goes to its opposite
+  };
+  if (s === "open") return apply();
+  leave(
+    filtersEl,
+    [
+      { opacity: 1, transform: "none" },
+      { opacity: 0, transform: "translateX(-24px)" },
+    ],
+    apply,
+  );
 }
 document.getElementById("sidehide").onclick = () => setSide("closed");
 document.getElementById("sideshow").onclick = () => setSide("open");
@@ -4303,16 +4511,19 @@ function paintChips() {
 document.getElementById("ltchips").addEventListener("click", e => {
   const b = e.target.closest(".chip");
   if (!b) return;
+  if (b.dataset.code === ltCode) return;
   ltCode = b.dataset.code;
   paintChips();
   document.querySelector('#ltchips [data-code="' + ltCode + '"]').focus();
-  loadTable();
+  loadTable().then(() => swapIn(document.getElementById("ltbody"))); // the new league's table fades in
 });
 // from the header's Tables button, or a match's league-table button (the table opens over the match; Close goes back to it)
 function openTables(code) {
   ltCode = code || ltCode || (ordered().find(l => LT_CODES.includes(l.code) && on.has(l.code)) || { code: "EPL" }).code;
   paintChips();
-  ltdlg.showModal();
+  stay(ltdlg); // opened again while closing
+  undim(ltdlg);
+  if (!ltdlg.open) ltdlg.showModal();
   ltdlg.querySelector("[data-close]").focus();
   loadTable();
   LT_CODES.forEach(c => fetchTable(c).catch(() => {})); // download the other leagues now, so switching is instant
@@ -4553,6 +4764,7 @@ document.getElementById("ltbody").addEventListener("click", e => {
   ltF1 = b.dataset.lt;
   paintF1Table();
   document.querySelector('#ltbody [data-lt="' + ltF1 + '"]').focus();
+  swapBelow(document.getElementById("ltbody"), ".lt-seg"); // the table fades in below the switch
 });
 
 /* ---------- keep a page left open up to date ---------- */
@@ -4644,6 +4856,7 @@ setInterval(() => refresh(false), 60000);
 applyLang();
 applyWide();
 setRange(range, false);
+settled = true; // from here on, what a visitor changes may move
 getData()
   .then(j => {
     useData(j);

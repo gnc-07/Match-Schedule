@@ -13,7 +13,7 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import puppeteer from "puppeteer-core";
 import { BASE, ROOT, chromePath, startServer } from "./server.mjs";
-import { MATCH, mockNetwork } from "./mock-data.mjs";
+import { F1_WEEKEND, MATCH, mockNetwork } from "./mock-data.mjs";
 
 const out = path.join(ROOT, "screenshots", "motion-check");
 mkdirSync(out, { recursive: true });
@@ -29,8 +29,31 @@ const cases = [
   ["sheet-phone", 390, p => p.click("#setmenu summary")],
   ["sources", 1280, async p => { await p.evaluate(() => document.querySelector("#list .srcs").scrollIntoView({ block: "center" })); await p.click("#list .srcs summary"); }],
   ["star", 1280, async p => { await p.evaluate(() => document.querySelector('#list .star[aria-pressed="false"]').scrollIntoView({ block: "center" })); await p.click('#list .star[aria-pressed="false"]'); }],
-  ["theme", 1280, p => p.click("#themebtn")],
+  ["theme", 1280, async p => { await p.click("#themebtn");
+    await p.waitForFunction(() => document.documentElement.classList.contains("is-dark")); }],   // the cross-fade first takes a picture of the page
   ["filters", 1280, p => p.click("#chip-F1")],
+  // closing: each moves out first, then goes
+  ["panel-close", 1280, async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(600); await p.click("#mddlg [data-close]"); }],
+  ["beside-close", 1920, async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(600); await p.keyboard.press("Escape"); }],
+  ["tables-close", 1280, async p => { await p.click("#tablesbtn"); await wait(600); await p.keyboard.press("Escape"); }],
+  ["settings-close", 1280, async p => { await p.click("#setmenu summary"); await wait(400); await p.click("#setmenu summary"); }],
+  ["sheet-close", 390, async p => { await p.click("#setmenu summary"); await wait(600); await p.keyboard.press("Escape"); }],
+  ["sources-close", 1280, async p => { await p.evaluate(() => document.querySelector("#list .srcs").scrollIntoView({ block: "center" }));
+    await p.click("#list .srcs summary"); await wait(400); await p.click("#list .srcs summary"); }],
+  // the filter sidebar (laptops): hidden, then shown again
+  ["sidebar-hide", 1280, p => p.click("#sidehide")],
+  ["sidebar-show", 1280, async p => { await p.click("#sidehide"); await wait(900); await p.click("#sideshow"); }],
+  // small filter controls coming (the Custom dates, Clear filters) and going
+  ["controls", 1280, p => p.click('#range [data-r="custom"]')],
+  ["controls-go", 1280, async p => { await p.click('#range [data-r="custom"]'); await wait(600); await p.click('#range [data-r="all"]'); }],
+  // new content in the same place, and the days added by "Show more"
+  ["table-switch", 1280, async p => { await p.click("#tablesbtn"); await wait(900); await p.click('#ltchips [data-code="LIGA"]'); await wait(20); }],
+  ["weekend-switch", 1280, async p => { await p.click(`.md-open[data-uid="${F1_WEEKEND}"]`); await wait(900); await p.click('#wk-res [data-s="Q"]'); }],
+  ["driver-star", 1280, async p => { await p.click(`.md-open[data-uid="${F1_WEEKEND}"]`); await wait(900); await p.click('#wk-res .star[aria-pressed="false"]'); }],
+  ["show-more", 1280, async p => { await p.evaluate(() => document.getElementById("more").scrollIntoView({ block: "center" })); await p.click("#more"); }],
+  // Settings that change the whole page cross-fade like the theme
+  ["contrast", 1280, async p => { await p.click("#setmenu summary"); await wait(400); await p.click("#hcbox");
+    await p.waitForFunction(() => document.documentElement.dataset.contrast === "high"); }],   // the cross-fade first takes a picture of the page
   ["goal", 1920, async p => {
     await p.evaluate(u => { const r = DATA.find(x => x.uid === u); LIVE.set(keyOf(r), { id: "1", state: "in", clock: "67'", detail: "", hs: "2", as: "1" }); render();
       document.querySelector(`.score[data-uid="${CSS.escape(u)}"]`).scrollIntoView({ block: "center" }); }, uid);
@@ -46,6 +69,7 @@ async function open(browser, width, motion) {
   const page = await browser.newPage();
   await page.setViewport({ width, height: 900 });
   await page.evaluateOnNewDocument(m => { try { localStorage.setItem("mp.theme", '"light"'); localStorage.setItem("mp.favs", "[]");
+    localStorage.setItem("mp.side", '"open"'); localStorage.setItem("mp.contrast", '"normal"'); localStorage.setItem("mp.range", '"all"');
     localStorage.setItem("mp.motion", JSON.stringify(m)); } catch {} }, motion);
   await mockNetwork(page);
   await page.goto(BASE + "?lang=en", { waitUntil: "networkidle0" });
