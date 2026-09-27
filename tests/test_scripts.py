@@ -556,16 +556,22 @@ class PublishSite(unittest.TestCase):
                 with self.assertRaises(ValueError, msg=src):
                     publish_site.build_page(d)
 
-    def test_a_script_tag_in_another_form_is_refused(self):
-        """It would be published as a separate file that the policy then blocks."""
-        with tempfile.TemporaryDirectory() as d:
-            self.fake_site(d)
-            with open(os.path.join(d, "index.html"), encoding="utf-8") as f:
-                html = f.read().replace('<script src="js/a.js">', '<script defer src="js/a.js">')
-            with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as f:
-                f.write(html)
-            with self.assertRaises(ValueError):
-                publish_site.build_page(d)
+    def test_a_script_or_stylesheet_tag_in_another_form_is_refused(self):
+        """It would be published as a separate file that the policy then blocks (or not published at all)."""
+        for old, new in [('<script src="js/a.js">', '<script defer src="js/a.js">'),
+                         ('<script src="js/a.js">', '<script\nsrc="js/a.js">'),
+                         ('<script src="js/a.js">', '<script\tsrc="js/a.js">'),
+                         ('<script src="js/a.js">', '<SCRIPT src="js/a.js">'),
+                         ('<link rel="stylesheet" href="styles.css">', "<link rel='stylesheet' href='styles.css'>"),
+                         ('<link rel="stylesheet" href="styles.css">', '<link href="styles.css" rel=stylesheet>')]:
+            with tempfile.TemporaryDirectory() as d:
+                self.fake_site(d)
+                with open(os.path.join(d, "index.html"), encoding="utf-8") as f:
+                    html = f.read().replace(old, new)
+                with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as f:
+                    f.write(html)
+                with self.assertRaises(ValueError, msg=new):
+                    publish_site.build_page(d)
 
     def test_fingerprint_follows_every_file(self):
         with tempfile.TemporaryDirectory() as d:
@@ -582,11 +588,19 @@ class PublishSite(unittest.TestCase):
     def test_publish_writes_only_the_site(self):
         with tempfile.TemporaryDirectory() as d:
             self.fake_site(d)
-            for name in ("fixtures.json", "soccer.ics", "fonts/x.woff2", "build_schedule.py", "tests/t.py"):
+            for name in ("soccer.ics", "fonts/x.woff2", "build_schedule.py", "tests/t.py"):
                 os.makedirs(os.path.dirname(os.path.join(d, name)), exist_ok=True)
                 with open(os.path.join(d, name), "w", encoding="utf-8") as f:
                     f.write("x")
+            fixtures = '{"generated":"2026-09-27T19:08+00:00",\n"site":"000000000000",\n"matches":[\n]}\n'
+            with open(os.path.join(d, "fixtures.json"), "w", encoding="utf-8") as f:
+                f.write(fixtures)
             publish_site.publish(os.path.join(d, "_site"), d)
+            # the published fixtures.json carries the fingerprint of the page published with it; the source copy is kept
+            with open(os.path.join(d, "_site", "fixtures.json"), encoding="utf-8") as f:
+                self.assertEqual(f.read(), fixtures.replace("000000000000", publish_site.fingerprint(d)))
+            with open(os.path.join(d, "fixtures.json"), encoding="utf-8") as f:
+                self.assertEqual(f.read(), fixtures)
             found = sorted(os.path.relpath(os.path.join(p, n), os.path.join(d, "_site"))
                            for p, _, names in os.walk(os.path.join(d, "_site")) for n in names)
             self.assertEqual(found, ["fixtures.json", "fonts/x.woff2", "index.html", "soccer.ics"])

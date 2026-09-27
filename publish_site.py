@@ -13,10 +13,11 @@ script with a new page.
 
   python3 publish_site.py _site    writes the published site into the folder _site (the workflow does this)
   python3 publish_site.py --page   prints only the published page (the test server uses this)
-build_schedule.py uses fingerprint() for the "site" value in fixtures.json, which tells a page left open that
-the site changed.
+The "site" value in fixtures.json is fingerprint(): it tells a page left open that the site changed.
+build_schedule.py writes it, and publish() writes it again into the published copy of fixtures.json, from the
+page it publishes, so the two always match even if newer files arrived between the build and publishing.
 """
-import base64, hashlib, os, re, shutil, sys
+import base64, hashlib, json, os, re, shutil, sys
 from common import save_text
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -49,7 +50,7 @@ def build_page(root=HERE):
     with open(os.path.join(root, "index.html"), encoding="utf-8") as f:
         page = f.read()
     left = SCRIPT_RUN.sub("", STYLE_LINK.sub("", page))
-    if "<script " in left or 'rel="stylesheet"' in left:
+    if re.search(r"<script(?!>)", left, re.I) or re.search(r"rel\s*=\s*[\"']?stylesheet", left, re.I):
         # anything else would be published as a separate file the policy below blocks, or not published at all
         raise ValueError("index.html has a script or stylesheet tag in another form; write them exactly as "
                          '<script src="js/name.js"></script> and <link rel="stylesheet" href="styles.css">, one per line')
@@ -63,9 +64,12 @@ def build_page(root=HERE):
     policy = re.sub(r"(^|;)(\s*)script-src [^;]*", lambda m: m.group(1) + m.group(2) + "script-src " + hashes, csp.group(2))
     return page[:csp.start(2)] + policy + page[csp.end(2):]
 
+def _fingerprint(page):
+    return hashlib.sha256(page.encode("utf-8")).hexdigest()[:12]
+
 def fingerprint(root=HERE):
     """12 characters that change whenever anything in the published page changes."""
-    return hashlib.sha256(build_page(root).encode("utf-8")).hexdigest()[:12]
+    return _fingerprint(build_page(root))
 
 def publish(folder, root=HERE):
     """Writes the published site into `folder`: the page, the data files and the fonts, nothing else."""
@@ -80,6 +84,14 @@ def publish(folder, root=HERE):
             shutil.copytree(src, dst, dirs_exist_ok=True)
         else:
             shutil.copyfile(src, dst)
+    # the published fixtures.json carries the fingerprint of the page published with it (see the top of this file)
+    path = os.path.join(out, "fixtures.json")
+    with open(path, encoding="utf-8") as f:
+        data = f.read()
+    data, found = re.subn(r'(?m)^"site":"[0-9a-f]*"', '"site":"' + _fingerprint(page) + '"', data, count=1)
+    if found:
+        json.loads(data)                               # still valid JSON, or nothing is published
+        save_text(path, data, newline="")
     save_text(os.path.join(out, "index.html"), page, newline="")
 
 if __name__ == "__main__":
