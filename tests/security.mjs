@@ -51,7 +51,7 @@ const oldbMatch = { matchID: 424242, matchDateTimeUTC: kick.replace("+00:00", "Z
 const oldbBoard = [oldbMatch, { matchID: EVIL, team1: {}, team2: {} }, null, { matchID: 5, matchDateTimeUTC: EVIL, goals: EVIL }];
 const oldbTable = [{ teamName: "Borussia Dortmund" + EVIL, matches: 4, won: 4, draw: 0, lost: 0, goalDiff: EVIL, points: EVIL }, { teamName: 3 }];
 let espnDown = false;
-let wikidata = "hostile";   // how Wikidata answers: "hostile" (markup for coordinates), "http-error", "api-error", "ok", "none"
+let wikidata = "hostile";   // how Wikidata answers: "hostile" (markup for coordinates), "http-error", "api-error", "incomplete", "ok", "none"
 
 const server = await startServer();
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true,
@@ -81,6 +81,7 @@ try {
       headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ error: { code: "unavailable" } }) });
     if (u.includes("wikidata.org") && wikidata === "api-error") return json({ error: { code: "maxlag", info: "Waiting for a database server" } });
     if (u.includes("wikidata.org") && wikidata === "none") return json({ search: [] });
+    if (u.includes("wikidata.org") && wikidata === "incomplete") return json(u.includes("wbsearchentities") ? { search: [{ id: "Q7" }] } : { entities: {} });
     if (u.includes("wikidata.org") && wikidata === "ok") return json(u.includes("wbsearchentities") ? { search: [{ id: "Q7" }] } : { entities: { Q7: {
       descriptions: { en: { value: "football stadium" } }, claims: { P625: [{ mainsnak: { datavalue: { value: { latitude: 51.555, longitude: -0.108 } } } }] } } } });
     if (u.includes("wikidata.org")) return json(u.includes("wbsearchentities") ? { search: [{ id: "Q1" }] } : { entities: { Q1: {
@@ -217,7 +218,8 @@ try {
     }, { timeout: 15000 }).catch(() => {});
     return page.evaluate(() => !!document.querySelector("#md-map .tiles"));
   };
-  for (const [mode, what] of [["http-error", "an HTTP error"], ["api-error", "its own error answer, with status 200"]]) {
+  for (const [mode, what] of [["http-error", "an HTTP error"], ["api-error", "its own error answer, with status 200"],
+    ["incomplete", "an answer that leaves out the place asked about"]]) {
     wikidata = mode;
     const map = await openMap("test-map"), kept = await saved("mapland arena");
     shows(`Wikidata fails (${what}): no map, and nothing remembered`, !map && kept === null);

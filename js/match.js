@@ -387,14 +387,17 @@ async function coords(name) {
   };
   const found = await ask("action=wbsearchentities&type=item&limit=5&language=en&search=" + encodeURIComponent(name));
   if (!Array.isArray(found.search)) throw new Error("Wikidata did not answer");
-  const ids = found.search.map(x => x.id);
+  const ids = found.search.map(x => x && x.id);
+  if (ids.some(id => typeof id !== "string" || !id)) throw new Error("Wikidata did not answer");
   if (!ids.length) {
     store.set(k, {}); // Wikidata answered and knows no such place
     return null;
   }
   const got = await ask("action=wbgetentities&props=claims|descriptions&languages=en&ids=" + ids.join("|"));
-  if (!got.entities || typeof got.entities !== "object") throw new Error("Wikidata did not answer");
   const ents = got.entities;
+  // every place asked about must be in the answer (Wikidata lists one it has deleted as "missing", which is an answer)
+  if (!ents || typeof ents !== "object" || ids.some(id => !ents[id] || typeof ents[id] !== "object"))
+    throw new Error("Wikidata did not answer");
   const withXY = ids.map(id => ents[id]).filter(e => e && e.claims && e.claims.P625);
   const best =
     withXY.find(e =>
