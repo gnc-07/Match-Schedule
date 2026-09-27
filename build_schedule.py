@@ -26,11 +26,11 @@ Examples
   python3 build_schedule.py
   python3 build_schedule.py --teams "Arsenal,Real Madrid,Brazil" --leagues EPL,BRA
 """
-import argparse, json, hashlib, math, os, sys, urllib.error
+import argparse, json, hashlib, math, os, re, sys, urllib.error
 from datetime import datetime, date, timedelta, timezone
 from zoneinfo import ZoneInfo
 import cazetv
-from common import fetch_json, load_json, save_text
+from common import fetch, fetch_json, load_json, save_text
 
 HOME_TZ = ZoneInfo("America/Edmonton")   # all human-readable times are shown in this zone
 OPENFOOTBALL = "https://raw.githubusercontent.com/openfootball/football.json/master"
@@ -286,6 +286,157 @@ def _f1_layouts():
         print(f"F1 track outlines could not be read ({e}); race weekends show a map instead this run")
         return []
 
+# The second source of track outlines, used for a race the first one has no outline for: julesr0y/f1-circuits-svg
+# (CC BY 4.0, Copyright (c) 2024-2026 ROY Jules; unofficial). Its index gives each circuit's position and which
+# layout was used in which seasons; each layout is an SVG drawing, north up, with the start/finish line marked.
+F1_SVG = "https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/main/"
+SVG_TOKEN = re.compile(r"[MmLlHhVvCcSsQqTtAaZz]|[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
+SVG_ARGS = {"M": 2, "L": 2, "H": 1, "V": 1, "C": 6, "S": 4, "Q": 4, "T": 2, "A": 7, "Z": 0}
+
+def _svg_points(d, steps=8, step=5):
+    """The points along an SVG path's first shape (up to its first Z): curves sampled at `steps` points each,
+    straight lines every `step` units (so a start/finish line on a long straight is found where it is, not at
+    the straight's end). Arcs are followed as straight lines to their end point. Raises ValueError on anything
+    malformed."""
+    toks, i, out = SVG_TOKEN.findall(d), 0, []
+    x = y = 0.0
+    cmd, last_ctrl = None, None
+    if not toks or toks[0] not in "Mm":
+        raise ValueError("path does not start with a move")
+    def line(nx, ny):
+        n = max(1, math.ceil(math.hypot(nx - x, ny - y) / step))
+        out.extend((x + (nx - x) * k / n, y + (ny - y) * k / n) for k in range(1, n + 1))
+    def bez(p0, *ctrl):
+        for k in range(1, steps + 1):
+            t = k / steps
+            if len(ctrl) == 3:    # cubic
+                (x1, y1), (x2, y2), (x3, y3) = ctrl
+                a, b, c, e = (1 - t) ** 3, 3 * (1 - t) ** 2 * t, 3 * (1 - t) * t * t, t ** 3
+                out.append((a * p0[0] + b * x1 + c * x2 + e * x3, a * p0[1] + b * y1 + c * y2 + e * y3))
+            else:                 # quadratic
+                (x1, y1), (x2, y2) = ctrl
+                a, b, c = (1 - t) ** 2, 2 * (1 - t) * t, t * t
+                out.append((a * p0[0] + b * x1 + c * x2, a * p0[1] + b * y1 + c * y2))
+    while i < len(toks):
+        if toks[i].isalpha():
+            cmd = toks[i]; i += 1
+            if cmd in "Zz":
+                if out:
+                    line(*out[0])                  # the closing side, back to where the shape began
+                break                          # one closed shape: the track
+        if cmd is None:
+            raise ValueError("path does not start with a command")
+        n, rel = SVG_ARGS[cmd.upper()], cmd.islower()
+        v = [float(t) for t in toks[i:i + n]]
+        if len(v) < n or not all(math.isfinite(t) for t in v):
+            raise ValueError("path ends early")
+        i += n
+        U, ox, oy = cmd.upper(), (x if rel else 0), (y if rel else 0)
+        ctrl = None
+        if U == "M":
+            if out:
+                break                          # a second shape: stop at the first
+            x, y = v[0] + ox, v[1] + oy; out.append((x, y))
+            cmd = "l" if rel else "L"          # numbers after a move are lines
+        elif U in "LT":
+            line(v[0] + ox, v[1] + oy); x, y = v[0] + ox, v[1] + oy
+        elif U == "H":
+            line(v[0] + ox, y); x = v[0] + ox
+        elif U == "V":
+            line(x, v[0] + oy); y = v[0] + oy
+        elif U == "A":
+            line(v[5] + ox, v[6] + oy); x, y = v[5] + ox, v[6] + oy
+        elif U == "C":
+            c1, c2, e = (v[0] + ox, v[1] + oy), (v[2] + ox, v[3] + oy), (v[4] + ox, v[5] + oy)
+            bez((x, y), c1, c2, e); ctrl, (x, y) = c2, e
+        elif U == "S":
+            c1 = (2 * x - last_ctrl[0], 2 * y - last_ctrl[1]) if last_ctrl else (x, y)
+            c2, e = (v[0] + ox, v[1] + oy), (v[2] + ox, v[3] + oy)
+            bez((x, y), c1, c2, e); ctrl, (x, y) = c2, e
+        elif U == "Q":
+            c1, e = (v[0] + ox, v[1] + oy), (v[2] + ox, v[3] + oy)
+            bez((x, y), c1, e); (x, y) = e
+        last_ctrl = ctrl
+    return out
+
+def _svg_circuits():
+    """The second source's index: [{"lat", "lon", "layouts", "firstgp"}], or [] when it cannot be read."""
+    try:
+        out = []
+        for c in get_json(F1_SVG + "circuits.json"):
+            lat, lon = c.get("latitude"), c.get("longitude")
+            if _point([lon, lat]) is None:
+                continue
+            ls = [l for l in c.get("layouts") or [] if isinstance(l, dict) and re.fullmatch(r"[a-z0-9-]{1,60}", str(l.get("layoutId", "")))
+                  and isinstance(l.get("seasons"), str)]
+            years = [int(y) for l in ls for y in re.findall(r"\d{4}", l["seasons"])]
+            if ls:
+                out.append({"lat": lat, "lon": lon, "layouts": ls, "firstgp": min(years) if years else None,
+                            "words": _name_words(str(c.get("name", "")) + " " + str(c.get("id", "")))})
+        return out
+    except Exception as e:
+        print(f"Second F1 track source could not be read ({e})")
+        return []
+
+NAME_STOP = {"circuit", "circuito", "street", "international", "internacional", "internazionale", "autodromo", "autódromo",
+             "racing", "raceway", "speedway", "motor", "grand", "prix", "course", "park", "city"}
+
+def _name_words(name):
+    """The distinctive words of a circuit's name, for telling apart two circuits in the same city."""
+    return {w for w in re.findall(r"\w+", name.lower().replace("-", " ")) if len(w) > 3 and w not in NAME_STOP}
+
+def _last_year(seasons):
+    return max((int(y) for y in re.findall(r"\d{4}", seasons)), default=0)
+
+def _in_seasons(seasons, year):
+    """True when `year` is in a seasons string such as "2003-2019,2021-2026" or "2021,2023-2026"."""
+    for part in seasons.split(","):
+        a, _, b = part.strip().partition("-")
+        if a.isdigit() and (int(a) == year if not b else b.isdigit() and int(a) <= year <= int(b)):
+            return True
+    return False
+
+def _svg_outline(circuits, lat, lon, year, name=""):
+    """The outline of the circuit at (lat, lon) from the second source, in the same form as _f1_outline gives
+    (without the lap length, which that source does not have), or None. A circuit within 3 km is taken; one
+    up to 10 km away only when its name shares a word with `name` (that index places some street circuits in the
+    town centre: Las Vegas, 7 km from the Strip). Only the detailed drawings mark the start/finish line, so a
+    layout without one gives None rather than a dot in the wrong place."""
+    k = math.cos(math.radians(lat))
+    near = lambda c: math.hypot((c["lon"] - lon) * k, c["lat"] - lat) * 111.2   # km
+    words = _name_words(name)
+    fits = [c for c in circuits if near(c) <= 3 or (near(c) <= 10 and c["words"] & words)]
+    best = min(fits, key=lambda c: (not (c["words"] & words), near(c)), default=None)   # a name match first
+    if best is None:
+        return None
+    ls = best["layouts"]
+    layout = next((l for l in ls if _in_seasons(l["seasons"], year)), None) or max(ls, key=lambda l: _last_year(l["seasons"]))
+    try:
+        svg = fetch(F1_SVG + f"circuits/detailed/white/{layout['layoutId']}.svg").decode("utf-8")
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return None                        # drawn without the start/finish line only
+        raise
+    paths = re.findall(r'<path\b[^>]*?\sd="([^"]*)"', svg)
+    pts = _svg_points(paths[0])
+    if len(pts) < 20:
+        return None
+    if math.dist(pts[0], pts[-1]) < 1e-6:
+        pts.pop()                              # the loop is closed with "Z" instead
+    # the detailed drawing's second shape is a short bar across the track: the start/finish line
+    if len(paths) > 1:
+        bar = _svg_points(paths[1], 1)
+        cx, cy = sum(p[0] for p in bar) / len(bar), sum(p[1] for p in bar) / len(bar)
+        at = min(range(len(pts)), key=lambda i: math.hypot(pts[i][0] - cx, pts[i][1] - cy))
+        pts = pts[at:] + pts[:at]
+    x0, y0 = min(x for x, _ in pts), min(y for _, y in pts)
+    scale = 1000 / max(max(x for x, _ in pts) - x0, max(y for _, y in pts) - y0)
+    pts = _simplify([(round((x - x0) * scale), round((y - y0) * scale)) for x, y in pts], 2)
+    pts = [p for i, p in enumerate(pts) if i == 0 or p != pts[i - 1]]
+    return {"path": "M" + "L".join(f"{x} {y}" for x, y in pts) + "Z",
+            "w": max(x for x, _ in pts), "h": max(y for _, y in pts),
+            "length": None, "firstgp": str(best["firstgp"]) if best["firstgp"] else None, "src": "julesr0y"}
+
 def _simplify(pts, tol):
     """Ramer-Douglas-Peucker: keep only the points that bend the line by more than tol, so the path stays small."""
     keep, stack = {0, len(pts) - 1}, [(0, len(pts) - 1)]
@@ -352,7 +503,7 @@ def from_f1(start, now=None):
             if gap is not None and gap < timedelta(days=4) and (best is None or gap < best[0]):
                 best = (gap, ss)
         return best[1] if best else []
-    layouts = _f1_layouts()
+    layouts, saved, svg = _f1_layouts(), previous_layouts(), None
     out = []
     for race in races:
         season, rnd, c = race["season"], race["round"], race["Circuit"]
@@ -373,11 +524,24 @@ def from_f1(start, now=None):
                 r["sprint"] = "Sprint" in race
                 r["circuit"] = {"name": c["circuitName"], "locality": loc.get("locality"), "country": loc.get("country"),
                                 "lat": float(loc["lat"]), "lon": float(loc["long"])} if loc.get("lat") else {"name": c["circuitName"]}
-                try:                         # the diagram is optional: a problem with it never holds up the F1 sessions
-                    layout = _f1_outline(layouts, float(loc["lat"]), float(loc["long"])) if loc.get("lat") and layouts else None
-                except (ValueError, ZeroDivisionError) as e:
-                    print(f"No track outline for {c['circuitName']} ({e}); the site shows a map instead")
-                    layout = None
+                # The diagram is optional: a problem with it never holds up the F1 sessions. Outlines in order:
+                # f1-circuits; else the one this race had at the last build (always north up); else f1-circuits-svg,
+                # downloaded only now (not always north up); else none, and the site shows a map.
+                layout = None
+                if loc.get("lat"):
+                    lat, lon = float(loc["lat"]), float(loc["long"])
+                    try:
+                        layout = _f1_outline(layouts, lat, lon) if layouts else None
+                    except (ValueError, ZeroDivisionError) as e:
+                        print(f"No f1-circuits outline for {c['circuitName']} ({e})")
+                    layout = layout or saved.get(f"f1|{season}|{rnd}")
+                    if not layout:
+                        try:
+                            svg = _svg_circuits() if svg is None else svg
+                            layout = _svg_outline(svg, lat, lon, int(season), c["circuitName"]) if svg else None
+                            layout = layout if _valid_layout(layout) else None
+                        except Exception as e:
+                            print(f"No f1-circuits-svg outline for {c['circuitName']} ({e}); the site shows a map instead")
                 if layout:
                     r["circuit"]["layout"] = layout
             if utc:
@@ -415,6 +579,27 @@ def _valid_f1(r):
                 and isinstance(r.get("gp"), str) and str(r.get("wk", "")).startswith("f1|") and r.get("uid") == f"{r['wk']}|{r['sess']}")
     except (KeyError, TypeError, ValueError, AttributeError):
         return False
+
+def _valid_layout(L):
+    """True for an outline the page can draw: whole-number points only, a sensible size, and plain extras."""
+    return (isinstance(L, dict) and isinstance(L.get("path"), str) and re.fullmatch(r"M[\d LZ]+", L["path"]) is not None
+            and len(L["path"]) < 20000 and all(isinstance(L.get(k), int) and 0 < L[k] <= 1000 for k in ("w", "h"))
+            and L.get("src") in (None, "julesr0y")
+            and all(L.get(k) is None or isinstance(L[k], (int, str)) and len(str(L[k])) < 20 for k in ("length", "firstgp")))
+
+def previous_layouts(path="fixtures.json"):
+    """Track outlines from the last published fixtures.json, by race weekend ("f1|2026|18"): used when neither
+    outline source can give one this run. Checked like everything else read back from that file."""
+    try:
+        old = load_json(path)["matches"]
+    except Exception:
+        return {}
+    out = {}
+    for r in old:
+        L = ((r or {}).get("circuit") or {}).get("layout") if isinstance(r, dict) and isinstance(r.get("circuit"), dict) else None
+        if r and r.get("sess") == "R" and isinstance(r.get("wk"), str) and _valid_layout(L):
+            out[r["wk"]] = L
+    return out
 
 def previous_f1(start, path="fixtures.json"):
     """The F1 sessions from the last published fixtures.json: used when Jolpica-F1 cannot be reached."""

@@ -1153,7 +1153,10 @@ const I18N = {
     f1GridNote: "The race usually starts in qualifying order, but penalties can change it.",
     f1Dates: (a, b) => a + " to " + b,
     f1Src:
-      "Session times: Jolpica-F1, checked against OpenF1. Results and standings: Jolpica-F1, loaded when you open this window. Track diagram: f1-circuits by Tomislav Bacinger (MIT licence), unofficial.",
+      "Session times: Jolpica-F1, checked against OpenF1. Results and standings: Jolpica-F1, loaded when you open this window.",
+    f1Track: "Track diagram: f1-circuits by Tomislav Bacinger (MIT licence), unofficial.",
+    f1TrackAlt:
+      "Track diagram: adapted from f1-circuits-svg by Jules Roy (CC BY 4.0), unofficial. North may not be at the top.",
     howF1html:
       'Formula 1 session times come from <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> and are marked verified when <a href="https://openf1.org/" rel="noopener">OpenF1</a> gives the same time. F1 is not in the calendar.',
     f1Stale: "F1 times could not be refreshed at this update; the ones shown are from an earlier update.",
@@ -1523,7 +1526,10 @@ const I18N = {
     f1GridNote: "A largada costuma seguir a ordem da classificação, mas punições podem mudá-la.",
     f1Dates: (a, b) => a + " a " + b,
     f1Src:
-      "Horários das sessões: Jolpica-F1, conferidos com o OpenF1. Resultados e classificação: Jolpica-F1, carregados quando você abre esta janela. Desenho do circuito: f1-circuits, de Tomislav Bacinger (licença MIT), não oficial.",
+      "Horários das sessões: Jolpica-F1, conferidos com o OpenF1. Resultados e classificação: Jolpica-F1, carregados quando você abre esta janela.",
+    f1Track: "Desenho do circuito: f1-circuits, de Tomislav Bacinger (licença MIT), não oficial.",
+    f1TrackAlt:
+      "Desenho do circuito: adaptado de f1-circuits-svg, de Jules Roy (CC BY 4.0), não oficial. O norte pode não estar no alto.",
     howF1html:
       'Os horários das sessões de Fórmula 1 vêm do <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> e são marcados como verificados quando o <a href="https://openf1.org/" rel="noopener">OpenF1</a> informa o mesmo horário. A F1 não entra na agenda.',
     f1Stale: "Os horários da F1 não puderam ser atualizados desta vez; os mostrados são de uma atualização anterior.",
@@ -3647,9 +3653,13 @@ function paintWeekend() {
     v.hidden = false;
     if (!draw) paintMap(v.querySelector("#wk-map"), c.lat != null ? { lat: c.lat, lon: c.lon } : null, 14); // no outline: a map (found by name without coordinates, or a "find it" link)
   }
-  w.root.querySelector("#wk-src").textContent = T.f1Src;
+  const L = c && c.layout,
+    drawn = L && /^M[\d LZ]+$/.test(L.path || "") && L.w > 0 && L.h > 0; // the credit names whichever project drew the track shown
+  w.root.querySelector("#wk-src").textContent =
+    T.f1Src + (drawn ? " " + (L.src === "julesr0y" ? T.f1TrackAlt : T.f1Track) : "");
 }
-// The track outline, north up, with a dot where the outline starts: on the start/finish line.
+// The track outline (north up from f1-circuits; f1-circuits-svg drawings may be turned), with a dot where the
+// outline starts: on the start/finish line.
 function trackSVG(c) {
   const L = c.layout,
     n = L.path.match(/\d+/g),

@@ -5,9 +5,9 @@ so they give the same result every time.
 Run from the project folder:
   python3 -m unittest discover -s tests
 """
-import copy, io, json, os, sys, tempfile, unittest, urllib.request
+import copy, io, json, os, sys, tempfile, unittest, urllib.error, urllib.request
 from contextlib import redirect_stdout
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -318,6 +318,124 @@ class F1Records(unittest.TestCase):
         self.assertFalse(bs._valid_f1({**good, "sess": "<b>"}))
         self.assertFalse(bs._valid_f1({**good, "utc": "tomorrow"}))
         self.assertFalse(bs._valid_f1({**good, "uid": "f1|2026|16|R"}))
+
+
+
+# a small square track, drawn the way f1-circuits-svg draws them: the lap, then a bar across it at the
+# start/finish line (here halfway along the bottom side), then an arrow
+SQUARE_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500">
+<path d="M100 100h300v300H100z" style="fill:none"/>
+<path d="m245 390 10 0 0 20-10 0z" style="fill:#fff"/>
+<path d="m1 1 2 2" style="fill:none"/></svg>"""
+SVG_INDEX = [
+    {"id": "square", "name": "Square Ring", "latitude": 45.0, "longitude": 9.0,
+     "layouts": [{"layoutId": "square-1", "seasons": "1990-1999"}, {"layoutId": "square-2", "seasons": "2000-2025"}]},
+    {"id": "las-vegas", "name": "Las Vegas Street Circuit", "latitude": 36.175, "longitude": -115.136389,
+     "layouts": [{"layoutId": "las-vegas-1", "seasons": "2023-2026"}]},
+    {"id": "caesars-palace", "name": "Caesars Palace", "latitude": 36.117, "longitude": -115.176,
+     "layouts": [{"layoutId": "caesars-palace-1", "seasons": "1981-1982"}]},
+    {"id": "bad", "name": "Broken", "latitude": "north", "longitude": 1, "layouts": [{"layoutId": "x", "seasons": "2026"}]},
+    {"id": "evil", "name": "Evil", "latitude": 10, "longitude": 10, "layouts": [{"layoutId": "../../x", "seasons": "2026"}]},
+]
+
+
+class TrackOutlines(unittest.TestCase):
+    """The second source of F1 track outlines (f1-circuits-svg) and the outlines kept from the last build."""
+
+    def test_svg_paths_are_followed(self):
+        self.assertEqual(bs._svg_points("M10 10h5v5H10z"), [(10, 10), (15, 10), (15, 15), (10, 15), (10, 10)])
+        self.assertEqual(bs._svg_points("m1 2 3 4 5 6", step=10), [(1, 2), (4, 6), (9, 12)])   # after a move: lines
+        self.assertEqual(bs._svg_points("M0 0H10", step=5), [(0, 0), (5, 0), (10, 0)])   # straights in short steps
+        pts = bs._svg_points("M0 0c0 10 10 10 10 0s10-10 10 0", steps=2)
+        self.assertEqual(pts[0], (0, 0))
+        self.assertEqual(pts[2], (10, 0))
+        self.assertEqual(pts[4], (20, 0))
+        self.assertEqual(pts[3], (15, -7.5))                  # s mirrors the last control point
+        self.assertEqual(bs._svg_points("M0 0L1 1ZM5 5L6 6")[:2], [(0, 0), (1, 1)])   # the first shape only
+        self.assertNotIn((5, 5), bs._svg_points("M0 0L1 1ZM5 5L6 6"))
+        for bad in ("L1 1", "M0 0L1", "M0 0Lnan 1"):
+            with self.assertRaises(ValueError):
+                bs._svg_points(bad)
+
+    def test_seasons(self):
+        self.assertTrue(bs._in_seasons("2003-2019,2021-2026", 2026))
+        self.assertFalse(bs._in_seasons("2003-2019,2021-2026", 2020))
+        self.assertTrue(bs._in_seasons("2021,2023-2026", 2021))
+        self.assertFalse(bs._in_seasons("x-y", 2026))
+
+    def index(self):
+        with mock.patch.object(bs, "get_json", return_value=SVG_INDEX):
+            return bs._svg_circuits()
+
+    def test_index_entries_are_checked(self):
+        self.assertEqual(len(self.index()), 3)                # a text latitude and an odd layout name are left out
+
+    def test_outline_starts_at_the_start_finish_line(self):
+        asked = []
+        def fake(url):
+            asked.append(url)
+            return SQUARE_SVG.encode()
+        with mock.patch.object(bs, "fetch", fake):
+            L = bs._svg_outline(self.index(), 45.001, 9.001, 2026, "Autodromo Square")
+        self.assertTrue(asked[0].endswith("/circuits/detailed/white/square-2.svg"))   # no 2026 layout: the newest
+        self.assertTrue(bs._valid_layout(L))
+        self.assertEqual((L["w"], L["h"], L["firstgp"], L["src"], L["length"]), (1000, 1000, "1990", "julesr0y", None))
+        self.assertTrue(L["path"].startswith("M500 1000L"))   # the point nearest the bar, halfway along the bottom
+
+    def test_street_circuit_placed_in_town_is_found_by_name(self):
+        asked = []
+        with mock.patch.object(bs, "fetch", lambda url: asked.append(url) or SQUARE_SVG.encode()):
+            bs._svg_outline(self.index(), 36.1147, -115.173, 2026, "Las Vegas Strip Street Circuit")
+        self.assertIn("las-vegas-1.svg", asked[0])            # not Caesars Palace, although that one is nearer
+        self.assertIsNone(bs._svg_outline(self.index(), 50.0, 5.0, 2026, "Nowhere Ring"))
+
+    def test_a_layout_without_the_start_line_gives_no_outline(self):
+        def missing(url):
+            raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)
+        with mock.patch.object(bs, "fetch", missing):
+            self.assertIsNone(bs._svg_outline(self.index(), 45.0, 9.0, 2026))
+
+    def test_outlines_read_back_are_checked(self):
+        good = {"path": "M0 0L10 0L10 10Z", "w": 10, "h": 10, "length": 5793, "firstgp": "1950"}
+        self.assertTrue(bs._valid_layout(good))
+        for bad in ({**good, "path": 'M0 0" onload="x'}, {**good, "w": "10"}, {**good, "h": 0},
+                    {**good, "src": "<b>"}, {**good, "firstgp": ["1950"]}, None, "M0 0Z"):
+            self.assertFalse(bs._valid_layout(bad))
+        race = {"sess": "R", "wk": "f1|2026|16", "circuit": {"layout": good}}
+        broken = {"sess": "R", "wk": "f1|2026|17", "circuit": {"layout": {**good, "w": -1}}}
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "fixtures.json")
+            with open(path, "w") as f:
+                json.dump({"matches": [race, broken, None, {"sess": "R", "circuit": "x"}]}, f)
+            self.assertEqual(bs.previous_layouts(path), {"f1|2026|16": good})
+            self.assertEqual(bs.previous_layouts(os.path.join(d, "missing.json")), {})
+
+    def build_race(self, bacinger_up, saved):
+        """from_f1 for one race at the square circuit, with the first outline source up or down."""
+        race = {"season": "2026", "round": "20", "raceName": "Square Grand Prix", "date": "2026-10-25", "time": "19:00:00Z",
+                "Circuit": {"circuitName": "Square Ring", "Location": {"lat": "45.0", "long": "9.0", "locality": "Q", "country": "R"}}}
+        line = {"type": "Feature", "properties": {"length": 4000, "firstgp": 1950},
+                "geometry": {"type": "LineString", "coordinates": [[9.0, 45.0], [9.01, 45.0], [9.01, 45.01], [9.0, 45.01], [9.0, 45.0]]}}
+        def get_json(url, headers=None):
+            if "races" in url:
+                return {"MRData": {"RaceTable": {"Races": [race]}}}
+            if url == bs.F1_LAYOUTS:
+                if bacinger_up:
+                    return {"features": [line]}
+                raise OSError("down")
+            if url.endswith("circuits.json"):
+                return SVG_INDEX
+            return []                                          # OpenF1: nothing to cross-check
+        with mock.patch.object(bs, "get_json", get_json), mock.patch.object(bs, "fetch", lambda u: SQUARE_SVG.encode()), \
+                mock.patch.object(bs, "previous_layouts", lambda: saved), redirect_stdout(io.StringIO()):
+            recs = bs.from_f1(date(2026, 10, 20), now=datetime(2026, 10, 20, tzinfo=timezone.utc))
+        return next(r for r in recs if r["sess"] == "R")["circuit"].get("layout")
+
+    def test_outline_sources_in_order(self):
+        kept = {"path": "M0 0L7 0L7 7Z", "w": 7, "h": 7, "length": None, "firstgp": "1950"}
+        self.assertEqual(self.build_race(True, {"f1|2026|20": kept})["length"], 4000)       # f1-circuits first
+        self.assertEqual(self.build_race(False, {"f1|2026|20": kept}), kept)               # then the last build's
+        self.assertEqual(self.build_race(False, {})["src"], "julesr0y")                    # then f1-circuits-svg
 
 
 if __name__ == "__main__":
