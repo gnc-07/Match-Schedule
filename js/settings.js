@@ -65,8 +65,8 @@ const safeUrl = u => {
     return "";
   }
 };
-// Pictures for the league buttons: flags for the four leagues, a globe for friendlies and the F1 mark (from
-// Simple Icons, https://simpleicons.org). A league missing here keeps its letter badge (abbr).
+// Pictures for the league buttons: flags for the four leagues, a globe for friendlies, a trophy for the Nations League
+// and the F1 mark (from Simple Icons, https://simpleicons.org). A league missing here keeps its letter badge (abbr).
 const band = (v, x, y, w, h) =>
   '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" style="fill:var(--flag-' + v + ')"/>';
 const CREST = {
@@ -81,6 +81,10 @@ const CREST = {
   INTL: [
     "mark",
     '<g style="fill:none;stroke:currentColor;stroke-width:1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-4.5 5-4.5 13 0 18M12 3c4.5 5 4.5 13 0 18"/></g>',
+  ],
+  UNL: [
+    "mark",
+    '<g style="fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4.5v1A3 3 0 0 0 7.4 10M17 6h2.5v1a3 3 0 0 1-2.9 3M12 14v4M8 20h8"/></g>',
   ],
   F1: [
     "mark",

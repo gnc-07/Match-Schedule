@@ -119,6 +119,19 @@ const MATCHES = [...data.matches.filter(m => !SAMPLE_WK.has(m.wk)), ...F1]
 const dupes = MATCHES.map(m => m.uid).filter((u, i, all) => all.indexOf(u) !== i);
 if (dupes.length) throw new Error(`Sample data has more than one match with the same uid: ${[...new Set(dupes)].join(", ")}`);
 
+// Presses "Show more" until the sample match's card is in the list, as a visitor would. The list shows about 40
+// matches at first, and in an international break the Nations League and friendlies can push the first Premier
+// League match past them. Works with Playwright and Puppeteer pages alike.
+export async function showMatch(page, uid = MATCH.uid) {
+  for (let i = 0; i < 5; i++) {
+    const shown = await page.evaluate(u => !!document.querySelector(`.md-open[data-uid="${CSS.escape(u)}"]`), uid);
+    if (shown) return;
+    await page.evaluate(() => document.getElementById("more")?.click());
+    await new Promise(r => setTimeout(r, 700));   // the new days rise into place
+  }
+  throw new Error(`the sample match ${uid} is not in the list, even after "Show more"`);
+}
+
 // The sample answer for one outside request, or null to let it through (the test server's own files).
 // Only the sample match's league has a match on the scoreboard.
 export function answerFor(u) {

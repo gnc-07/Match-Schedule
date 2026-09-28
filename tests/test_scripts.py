@@ -98,6 +98,58 @@ class Calendar(unittest.TestCase):
         self.assertNotIn("\n", out.replace("\r\n", ""))           # every line ends in CRLF
 
 
+class HandKept(unittest.TestCase):
+    """friendlies.json and nations_league.json go through the same loader and the same verification rule."""
+
+    def load(self, code, matches, start=date(2026, 10, 1)):
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "matches.json")
+            common.save_json(path, matches)
+            return bs.from_hand_kept(start, code, path)
+
+    def test_nations_league_matches_get_their_own_code_and_name(self):
+        recs = self.load("UNL", [{"team1": "Belgium", "team2": "France", "venue": "King Baudouin Stadium, Brussels",
+                                  "round": "Group A1, Matchday 3", "reports": [
+                                      report("UEFA", "20:45", tz="Europe/Paris", official=True, day="2026-10-02")]}])
+        self.assertEqual(len(recs), 1)
+        r = recs[0]
+        self.assertEqual((r["code"], r["comp"], r["round"]), ("UNL", "UEFA Nations League", "Group A1, Matchday 3"))
+        self.assertEqual(r["utc"], "2026-10-02T18:45:00+00:00")        # 20:45 Central European summer time
+        self.assertEqual(r["check"]["status"], "confirmed")
+        self.assertTrue(r["uid"].startswith("unl|Belgium|France|"))
+
+    def test_friendlies_keep_their_code_and_an_empty_round(self):
+        r = self.load("INTL", [{"team1": "Canada", "team2": "Peru", "reports": [report("Paper", "19:00")]}])[0]
+        self.assertEqual((r["code"], r["comp"], r["round"]), ("INTL", "International friendly", ""))
+        self.assertIsNone(r["utc"])                                    # one unofficial report is not enough
+        self.assertTrue(r["uid"].startswith("intl|"))
+
+    def test_matches_before_the_start_are_left_out(self):
+        recs = self.load("UNL", [{"team1": "Italy", "team2": "Belgium", "reports": [report("UEFA", day="2026-09-25")]}])
+        self.assertEqual(recs, [])
+
+    def test_hand_kept_matches_never_count_towards_the_safety_check(self):
+        recs = [bs.record("UEFA Nations League", "UNL", "Spain", "England", "2026-11-15"),
+                bs.record("International friendly", "INTL", "Canada", "Peru", "2026-10-10"),
+                bs.record("Formula 1", "F1", "", "", "2026-10-11"),
+                bs.record("Premier League", "EPL", "Arsenal", "Chelsea", "2026-10-03")]
+        self.assertEqual(bs.upcoming_league_matches(recs), 1)
+
+    def test_the_real_nations_league_file_is_verified_by_uefa(self):
+        """Every match in nations_league.json has an official UEFA report with a real time zone."""
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        matches = common.load_json(os.path.join(root, "nations_league.json"))
+        self.assertTrue(matches)
+        for m in matches:
+            official = [r for r in m["reports"] if r.get("official")]
+            self.assertEqual([r["source"] for r in official], ["UEFA"], m)
+            self.assertTrue(official[0]["url"].startswith("https://www.uefa.com/"), m)
+            _, utc, check = bs.resolve(m["reports"])
+            self.assertEqual(check["status"], "confirmed", m)
+            self.assertNotIn("note", check, m)                         # the other reports agree with UEFA
+            self.assertRegex(m["round"], r"^Group A[1-4], Matchday [1-6]$")
+
+
 class BackupTables(unittest.TestCase):
     """The league tables the page falls back to when ESPN does not answer (standings() in build_schedule.py)."""
 
