@@ -123,12 +123,12 @@ if (dupes.length) throw new Error(`Sample data has more than one match with the 
 // matches at first, and in an international break the Nations League and friendlies can push the first Premier
 // League match past them. Works with Playwright and Puppeteer pages alike.
 export async function showMatch(page, uid = MATCH.uid) {
-  for (let i = 0; i < 5; i++) {
-    const shown = await page.evaluate(u => !!document.querySelector(`.md-open[data-uid="${CSS.escape(u)}"]`), uid);
-    if (shown) return;
+  const shown = () => page.evaluate(u => !!document.querySelector(`.md-open[data-uid="${CSS.escape(u)}"]`), uid);
+  for (let i = 0; i < 5 && !(await shown()); i++) {
     await page.evaluate(() => document.getElementById("more")?.click());
     await new Promise(r => setTimeout(r, 700));   // the new days rise into place
   }
+  if (await shown()) return;
   throw new Error(`the sample match ${uid} is not in the list, even after "Show more"`);
 }
 
