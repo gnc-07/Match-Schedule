@@ -27,6 +27,7 @@
   --card-yellow:#F5C518; --card-edge:#7A5C00; --card-red:#D0112B; --sub-on:#0B7A3C; --sub-off:#B3142C; --mine:#FFF6D6;
   --flag-white:#FFFFFF; --flag-black:#000000; --flag-eng:#CE1124; --flag-esp-red:#AA151B; --flag-esp-gold:#F1BF00; --flag-ger-red:#DD0000;
   --flag-ger-gold:#FFCE00; --flag-bra-green:#009C3B; --flag-bra-yellow:#FFDF00; --flag-bra-blue:#002776;
+  --flag-unl-grey:#D0D0D0; --flag-unl-navy:#144391; --flag-unl-sky:#087BC0; --flag-unl-red:#E30918; --flag-unl-green:#009E4C; --flag-unl-yellow:#FDC301;
   --map-pin:#C21A33; --map-bg:#E8EDE4;
 }
 /* High contrast (Settings): stronger text, borders and colours. Light first; its dark version comes after the dark theme. */
@@ -55,6 +56,7 @@
   --card-yellow:#FFD23F; --card-edge:#FFD23F; --card-red:#FF5A6E; --sub-on:#5BD493; --sub-off:#FF8795; --mine:#2A2412;
   --flag-white:#FFFFFF; --flag-black:#000000; --flag-eng:#CE1124; --flag-esp-red:#AA151B; --flag-esp-gold:#F1BF00; --flag-ger-red:#DD0000;
   --flag-ger-gold:#FFCE00; --flag-bra-green:#009C3B; --flag-bra-yellow:#FFDF00; --flag-bra-blue:#002776;
+  --flag-unl-grey:#D0D0D0; --flag-unl-navy:#144391; --flag-unl-sky:#087BC0; --flag-unl-red:#E30918; --flag-unl-green:#009E4C; --flag-unl-yellow:#FDC301;
   --map-pin:#C21A33; --map-bg:#1C2437;
 }}
 :root[data-theme="dark"]{
@@ -74,6 +76,7 @@
   --card-yellow:#FFD23F; --card-edge:#FFD23F; --card-red:#FF5A6E; --sub-on:#5BD493; --sub-off:#FF8795; --mine:#2A2412;
   --flag-white:#FFFFFF; --flag-black:#000000; --flag-eng:#CE1124; --flag-esp-red:#AA151B; --flag-esp-gold:#F1BF00; --flag-ger-red:#DD0000;
   --flag-ger-gold:#FFCE00; --flag-bra-green:#009C3B; --flag-bra-yellow:#FFDF00; --flag-bra-blue:#002776;
+  --flag-unl-grey:#D0D0D0; --flag-unl-navy:#144391; --flag-unl-sky:#087BC0; --flag-unl-red:#E30918; --flag-unl-green:#009E4C; --flag-unl-yellow:#FDC301;
   --map-pin:#C21A33; --map-bg:#1C2437;
 }
 @media (prefers-color-scheme: dark){ :root[data-contrast="high"]:not([data-theme="light"]){

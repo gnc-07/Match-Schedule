@@ -322,7 +322,11 @@ async function pollLive() {
     else LIVE.set(k, L);
   }
   LIVE_EXTRA = events
-    .filter(e => e.state === "in" && !used.has(e.id) && e.slug !== "fifa.friendly" && !e.src) // backup: listed matches only
+    // friendlies and the Nations League (whose feed has Leagues B to D too) show only the matches on the site's list;
+    // backup: listed matches only
+    .filter(
+      e => e.state === "in" && !used.has(e.id) && e.slug !== "fifa.friendly" && e.slug !== "uefa.nations" && !e.src,
+    )
     .filter((e, i, a) => a.findIndex(x => x.id === e.id) === i);
   render();
 }
