@@ -106,6 +106,13 @@ const standings = {
       { name: "ties", value: d }, { name: "losses", value: l }, { name: "pointDifferential", value: gd }, { name: "points", value: w * 3 + d }] };
   }) } }],
 };
+// The Nations League's standings: one table per group, as ESPN sends them (League A, plus a League B group the page
+// must leave out). Made-up points.
+const GROUPS = { A1: ["Belgium", "France", "Italy", "Türkiye"], A2: ["Germany", "Greece", "Netherlands", "Serbia"],
+  A3: ["Croatia", "Czechia", "England", "Spain"], A4: ["Denmark", "Norway", "Portugal", "Wales"], B1: ["Scotland", "Slovenia", "Switzerland", "North Macedonia"] };
+const unlStandings = { children: Object.entries(GROUPS).map(([g, teams]) => ({ name: "Group " + g, standings: { entries: teams.map((t, i) => ({
+  team: { displayName: t }, stats: [{ name: "rank", value: i + 1 }, { name: "gamesPlayed", value: 2 }, { name: "wins", value: 2 - Math.min(i, 2) },
+    { name: "ties", value: 0 }, { name: "losses", value: Math.min(i, 2) }, { name: "pointDifferential", value: 3 - 2 * i }, { name: "points", value: 3 * (2 - Math.min(i, 2)) }] })) } })) };
 
 const wdSearch = { search: [{ id: "Q1" }] };
 const wdEntities = { entities: { Q1: { descriptions: { en: { value: "football stadium in London" } },
@@ -146,6 +153,7 @@ export function answerFor(u) {
     return json({ MRData: { RaceTable: { Races: [] } } });
   }
   if (u.includes("espn.com")) {
+    if (u.includes("/uefa.nations/standings")) return json(unlStandings);
     if (u.includes("/standings")) return json(standings);
     if (u.includes("/summary")) return json(summary);
     if (u.includes("/eng.1/scoreboard")) return json(board);

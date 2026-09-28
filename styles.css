@@ -559,6 +559,7 @@ dialog.sheet::backdrop{background:var(--backdrop)}
 @media (min-width:641px){#ltdlg{height:calc(100dvh - 48px)}}   /* a fixed height, so switching leagues never resizes or moves the window */
 #ltbody[aria-busy="true"] .lt-wrap{opacity:.55}   /* the previous table stays in place, dimmed, until the next one arrives */
 .lt-wrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.lt-wrap + .lt-wrap{margin-top:12px}   /* the Nations League's group tables, one under another */
 table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numeric:tabular-nums;color:var(--ink)}
 .lt caption{text-align:left;padding:16px 16px 8px;font:800 1.2rem/1.1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}
 .lt th,.lt td{padding:10px 8px;text-align:right;border-top:1px solid var(--line-2)}

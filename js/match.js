@@ -1,5 +1,5 @@
 /* ---------- match details: line-ups, goals, cards and substitutions, stadium (a panel over the list) ---------- */
-const TABLE_CODES = ["EPL", "LIGA", "BUN", "BRA"]; // leagues that have a table (not friendlies)
+const TABLE_CODES = ["EPL", "LIGA", "BUN", "BRA", "UNL"]; // competitions that have a table (not friendlies)
 const matchParam = () => new URLSearchParams(location.search).get("match");
 const matchHref = r => "?match=" + encodeURIComponent(r.uid);
 const shareURL = r => {
@@ -227,7 +227,7 @@ function mdActions(r) {
       ? '<button type="button" class="btn" id="md-table">' +
         ICON.table +
         "<span>" +
-        esc(T.mdTable(LEAGUES.find(l => l.code === r.code).name)) +
+        esc(T.mdTable(compName(LEAGUES.find(l => l.code === r.code).name))) +
         "</span></button>"
       : "") +
     "</div>" +

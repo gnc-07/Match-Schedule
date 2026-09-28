@@ -240,6 +240,10 @@ const actChecks = [
     await page.click("#tablesbtn");
     await page.waitForSelector("#ltbody table");
     must(await count(page, "#ltbody tbody tr") >= 10, "the league table has too few rows");
+    await page.click('#ltchips [data-code="UNL"]');
+    await page.waitForSelector("#lt-g-A1");
+    const groups = await page.$$eval("#ltbody caption", c => c.map(x => x.textContent));
+    must(groups.join() === "Group A1,Group A2,Group A3,Group A4", `the Nations League shows the tables ${groups.join(", ")}`);
     await page.click('#ltchips [data-code="F1"]');
     await page.waitForSelector("#ltbody .f1t");
     await page.click("#ltdlg [data-close]");

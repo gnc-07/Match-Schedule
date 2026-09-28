@@ -187,6 +187,7 @@ const I18N = {
       s +
       ", updated four times a day. Teams level on points may be in a different order from the official table.",
     ltLoading: "Loading the table…",
+    ltGroup: g => "Group " + g,
     ltError: "The table could not be loaded. Try again later.",
     ltCols: {
       pos: "Position",
@@ -536,6 +537,7 @@ const I18N = {
       s +
       ", atualizados quatro vezes por dia. Times empatados em pontos podem aparecer em outra ordem que na classificação oficial.",
     ltLoading: "Carregando a classificação…",
+    ltGroup: g => "Grupo " + g,
     ltError: "Não foi possível carregar a classificação. Tente mais tarde.",
     ltCols: {
       pos: "Posição",
