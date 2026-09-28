@@ -21,7 +21,7 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { chromium, firefox, webkit } from "playwright";
 import { BASE, ROOT, chromePath, startServer } from "./server.mjs";
-import { F1_WEEKEND, MATCH, mockRoutes } from "./mock-data.mjs";
+import { F1_WEEKEND, MATCH, mockRoutes, showMatch } from "./mock-data.mjs";
 
 // The Chromium the other tests use (CHROME_PATH or a system copy), else Playwright's own
 function localChromium() {
@@ -198,6 +198,14 @@ const actChecks = [
     must((await page.evaluate(() => localStorage.getItem("mp.favs")) || "").includes(team), "the star was not saved");
     await page.locator(sel).first().click();
   }],
+  ["Nations League button and cards", async page => {
+    const pt = await page.evaluate(() => LANG === "pt");
+    const chip = await page.locator("#chip-UNL").textContent();
+    must(chip.includes(pt ? "Liga das Nações" : "Nations League"), `the Nations League button reads "${chip.trim()}"`);
+    if (!(await page.evaluate(() => DATA.some(r => r.code === "UNL")))) return;   // outside the Nations League's dates
+    const meta = await page.locator("#list .match .m-meta", { hasText: pt ? "Liga das Nações da UEFA" : "UEFA Nations League" }).first().textContent();
+    must(pt ? /Grupo A\d, Rodada \d/.test(meta) : /Group A\d, Matchday \d/.test(meta), `a Nations League card reads "${meta.trim()}"`);
+  }],
   ["sources unfold", async page => {
     const d = page.locator("#list .srcs").first();
     await d.locator("summary").click();
@@ -205,6 +213,7 @@ const actChecks = [
   }],
   ["match details, Escape and Back", async page => {
     const open = () => page.evaluate(() => document.getElementById("mddlg").open);
+    await showMatch(page, uid);
     await page.click(`.md-open[data-uid="${uid}"]`);
     await page.waitForSelector("#md-lu table, #md-lu li, #md-lu p", { state: "attached" });
     must(await open(), "Match details did not open");
@@ -231,6 +240,10 @@ const actChecks = [
     await page.click("#tablesbtn");
     await page.waitForSelector("#ltbody table");
     must(await count(page, "#ltbody tbody tr") >= 10, "the league table has too few rows");
+    await page.click('#ltchips [data-code="UNL"]');
+    await page.waitForSelector("#lt-g-A1");
+    const groups = await page.$$eval("#ltbody caption", c => c.map(x => x.textContent));
+    must(groups.join() === "Group A1,Group A2,Group A3,Group A4", `the Nations League shows the tables ${groups.join(", ")}`);
     await page.click('#ltchips [data-code="F1"]');
     await page.waitForSelector("#ltbody .f1t");
     await page.click("#ltdlg [data-close]");

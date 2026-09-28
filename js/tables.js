@@ -18,7 +18,7 @@ function paintChips() {
         ')">' +
         crestHTML(l) +
         "<span>" +
-        esc(l.name) +
+        esc(leagueName(l)) +
         "</span></button>",
     )
     .join("");
@@ -32,15 +32,16 @@ document.getElementById("ltchips").addEventListener("click", e => {
   document.querySelector('#ltchips [data-code="' + ltCode + '"]').focus();
   loadTable().then(() => swapIn(document.getElementById("ltbody"))); // the new league's table fades in
 });
-// from the header's Tables button, or a match's league-table button (the table opens over the match; Close goes back to it)
-function openTables(code) {
+// from the header's Tables button, or a match's league-table button (the table opens over the match; Close goes back to it).
+// group: a Nations League match's group ("A1"), whose table is brought into view
+function openTables(code, group) {
   ltCode = code || ltCode || (ordered().find(l => LT_CODES.includes(l.code) && on.has(l.code)) || { code: "EPL" }).code;
   paintChips();
   stay(ltdlg); // opened again while closing
   undim(ltdlg);
   if (!ltdlg.open) ltdlg.showModal();
   ltdlg.querySelector("[data-close]").focus();
-  loadTable();
+  loadTable().then(() => group && document.getElementById("lt-g-" + group)?.scrollIntoView({ block: "start" }));
   LT_CODES.forEach(c => fetchTable(c).catch(() => {})); // download the other leagues now, so switching is instant
 }
 document.getElementById("tablesbtn").onclick = () => openTables();
@@ -63,8 +64,19 @@ async function espnTable(code) {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(res.status);
-  const js = await res.json(),
-    g = (js.children || [])[0] || js;
+  const js = await res.json();
+  if (code === "UNL") {
+    // League A's four group tables (ESPN lists every group of every league, A1 to D2)
+    const groups = (js.children || [])
+      .map(c => ({ g: (/^Group (A[1-4])$/.exec(c.name || "") || [])[1], rows: espnRows(c) }))
+      .filter(x => x.g && x.rows.length);
+    if (!groups.length) throw new Error("no League A groups");
+    return { groups };
+  }
+  return { rows: espnRows((js.children || [])[0] || js) };
+}
+// one ESPN standings table, its rows in table order
+function espnRows(g) {
   const rows = ((g.standings || {}).entries || []).map(e => {
     const s = {};
     (e.stats || []).forEach(x => (s[x.name || x.type] = x.value));
@@ -80,7 +92,7 @@ async function espnTable(code) {
     };
   });
   rows.sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99) || b.pts - a.pts || b.gd - a.gd);
-  return { rows };
+  return rows;
 }
 // ESPN not answering: the Bundesliga asks OpenLigaDB; any league then falls back to the table the site's own
 // rebuild works out from the season's results (the "tables" in fixtures.json, four times a day).
@@ -161,38 +173,42 @@ function paintTable() {
     '</span><span class="sr">' +
     esc(C[k]) +
     "</span></th>";
-  const rows = t.rows
-    .map((x, i) => {
-      const fav = mine.some(f => overlap(f, tokens(x.team)));
-      const gd = x.gd > 0 ? "+" + x.gd : String(x.gd ?? "");
-      return (
-        "<tr" +
-        (fav ? ' class="mine"' : "") +
-        '><td class="pos-c">' +
-        esc(x.rank ?? i + 1) +
-        '</td><th scope="row" class="tm-c">' +
-        esc(x.team) +
-        (fav ? ICON.star + '<span class="sr"> (' + esc(T.starred) + ")</span>" : "") +
-        "</th>" +
-        "<td>" +
-        esc(x.p ?? "") +
-        '</td><td class="wdl">' +
-        esc(x.w ?? "") +
-        '</td><td class="wdl">' +
-        esc(x.d ?? "") +
-        '</td><td class="wdl">' +
-        esc(x.l ?? "") +
-        "</td><td>" +
-        esc(gd) +
-        '</td><td class="pts">' +
-        esc(x.pts ?? "") +
-        "</td></tr>"
-      );
-    })
-    .join("");
-  document.getElementById("ltbody").innerHTML =
-    '<div class="lt-wrap"><table class="lt"><caption>' +
-    esc(lg.name) +
+  const body = rows =>
+    rows
+      .map((x, i) => {
+        const fav = mine.some(f => overlap(f, tokens(x.team)));
+        const gd = x.gd > 0 ? "+" + x.gd : String(x.gd ?? "");
+        return (
+          "<tr" +
+          (fav ? ' class="mine"' : "") +
+          '><td class="pos-c">' +
+          esc(x.rank ?? i + 1) +
+          '</td><th scope="row" class="tm-c">' +
+          esc(teamName(x.team)) +
+          (fav ? ICON.star + '<span class="sr"> (' + esc(T.starred) + ")</span>" : "") +
+          "</th>" +
+          "<td>" +
+          esc(x.p ?? "") +
+          '</td><td class="wdl">' +
+          esc(x.w ?? "") +
+          '</td><td class="wdl">' +
+          esc(x.d ?? "") +
+          '</td><td class="wdl">' +
+          esc(x.l ?? "") +
+          "</td><td>" +
+          esc(gd) +
+          '</td><td class="pts">' +
+          esc(x.pts ?? "") +
+          "</td></tr>"
+        );
+      })
+      .join("");
+  // one table; the Nations League has one per group, each with an id so a match's group can be brought into view
+  const table = (caption, rows, id) =>
+    '<div class="lt-wrap"' +
+    (id ? ' id="' + id + '"' : "") +
+    '><table class="lt"><caption>' +
+    esc(caption) +
     "</caption><thead><tr>" +
     '<th scope="col" class="pos-c"><span aria-hidden="true">#</span><span class="sr">' +
     esc(C.pos) +
@@ -206,8 +222,12 @@ function paintTable() {
     col("gd") +
     col("pts") +
     "</tr></thead><tbody>" +
-    rows +
-    "</tbody></table></div>" +
+    body(rows) +
+    "</tbody></table></div>";
+  document.getElementById("ltbody").innerHTML =
+    (t.groups
+      ? t.groups.map(x => table(T.ltGroup(x.g), x.rows, "lt-g-" + x.g)).join("")
+      : table(compName(lg.name), t.rows)) +
     '<p class="lt-key">' +
     esc(T.ltKey) +
     " " +

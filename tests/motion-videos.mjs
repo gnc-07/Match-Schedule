@@ -8,7 +8,7 @@ import { mkdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import puppeteer from "puppeteer-core";
 import { BASE, ROOT, chromePath, startServer } from "./server.mjs";
-import { F1_WEEKEND, MATCH, mockNetwork } from "./mock-data.mjs";
+import { F1_WEEKEND, MATCH, mockNetwork, showMatch } from "./mock-data.mjs";
 
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
 const out = path.join(ROOT, "screenshots", "motion");
@@ -147,6 +147,7 @@ try {
       for (const slow of once ? [false] : [false, true]) {
         // every run starts from the same page
         await page.goto(BASE + "?lang=en", { waitUntil: "networkidle0" });
+        await showMatch(page, uid);
         await overlay(page);
         await cdp.send("Animation.setPlaybackRate", { playbackRate: slow ? 0.25 : 1 });
         await caption(page, slow ? "4 times slower" : "Normal speed");

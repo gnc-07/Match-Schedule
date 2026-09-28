@@ -20,13 +20,14 @@
   --live-bg:#C21A33; --live-ink:#B3142C; --live-soft:#FCEBEE;
   --warn-bg:#FFF1CC; --warn-ink:#6B4700; --tbc-bg:#ECEFF5; --tbc-ink:#4A5468; --early-bg:#ECEBFD; --early-ink:#3D3294;
   --star:#B37F00; --star-off:#8B94A7;
-  --epl:#6A3DBF; --liga:#B23A0E; --bun:#C4102A; --bra:#0B7A3C; --intl:#06708C; --f1:#3D4452; --crest-ink:#FFFFFF;
+  --epl:#6A3DBF; --liga:#B23A0E; --bun:#C4102A; --bra:#0B7A3C; --intl:#06708C; --unl:#9B1F6E; --f1:#3D4452; --crest-ink:#FFFFFF;
   --t-mcl:#FF8000; --t-fer:#DC0000; --t-rbr:#3671C6; --t-mer:#00A19C; --t-amr:#00665E; --t-alp:#0093CC; --t-wil:#1868DB; --t-rb:#6692FF; --t-haa:#9C9FA2; --t-aud:#B4B7BC; --t-cad:#1E1E1E;
   --on-board:#F2F5FB; --board-muted:#B7C3DD; --board-line:#26375F; --board-well:rgba(0,0,0,.3); --on-live:#FFFFFF;
   --shadow:rgba(10,15,28,.45); --backdrop:rgba(10,15,28,.55);
   --card-yellow:#F5C518; --card-edge:#7A5C00; --card-red:#D0112B; --sub-on:#0B7A3C; --sub-off:#B3142C; --mine:#FFF6D6;
   --flag-white:#FFFFFF; --flag-black:#000000; --flag-eng:#CE1124; --flag-esp-red:#AA151B; --flag-esp-gold:#F1BF00; --flag-ger-red:#DD0000;
   --flag-ger-gold:#FFCE00; --flag-bra-green:#009C3B; --flag-bra-yellow:#FFDF00; --flag-bra-blue:#002776;
+  --flag-unl-grey:#D0D0D0; --flag-unl-navy:#144391; --flag-unl-sky:#087BC0; --flag-unl-red:#E30918; --flag-unl-green:#009E4C; --flag-unl-yellow:#FDC301;
   --map-pin:#C21A33; --map-bg:#E8EDE4;
 }
 /* High contrast (Settings): stronger text, borders and colours. Light first; its dark version comes after the dark theme. */
@@ -48,13 +49,14 @@
   --live-bg:#C21A33; --live-ink:#FF8795; --live-soft:#2A1320;
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
-  --epl:#B79CFF; --liga:#FF9A6E; --bun:#FF8193; --bra:#5BD493; --intl:#5ACDE8; --f1:#C3CAD6; --crest-ink:#0A0F1C;
+  --epl:#B79CFF; --liga:#FF9A6E; --bun:#FF8193; --bra:#5BD493; --intl:#5ACDE8; --unl:#F59AD6; --f1:#C3CAD6; --crest-ink:#0A0F1C;
   --t-mcl:#FF8000; --t-fer:#FF3B30; --t-rbr:#5B8EE6; --t-mer:#27F4D2; --t-amr:#229971; --t-alp:#2BB5F0; --t-wil:#64A0FF; --t-rb:#8FAEFF; --t-haa:#B6BABD; --t-aud:#C9CCD1; --t-cad:#E8E8E8;
   --on-board:#F2F5FB; --board-muted:#B7C3DD; --board-line:#26375F; --board-well:rgba(0,0,0,.3); --on-live:#FFFFFF;
   --shadow:rgba(0,0,0,.6); --backdrop:rgba(0,0,0,.65);
   --card-yellow:#FFD23F; --card-edge:#FFD23F; --card-red:#FF5A6E; --sub-on:#5BD493; --sub-off:#FF8795; --mine:#2A2412;
   --flag-white:#FFFFFF; --flag-black:#000000; --flag-eng:#CE1124; --flag-esp-red:#AA151B; --flag-esp-gold:#F1BF00; --flag-ger-red:#DD0000;
   --flag-ger-gold:#FFCE00; --flag-bra-green:#009C3B; --flag-bra-yellow:#FFDF00; --flag-bra-blue:#002776;
+  --flag-unl-grey:#D0D0D0; --flag-unl-navy:#144391; --flag-unl-sky:#087BC0; --flag-unl-red:#E30918; --flag-unl-green:#009E4C; --flag-unl-yellow:#FDC301;
   --map-pin:#C21A33; --map-bg:#1C2437;
 }}
 :root[data-theme="dark"]{
@@ -67,13 +69,14 @@
   --live-bg:#C21A33; --live-ink:#FF8795; --live-soft:#2A1320;
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
-  --epl:#B79CFF; --liga:#FF9A6E; --bun:#FF8193; --bra:#5BD493; --intl:#5ACDE8; --f1:#C3CAD6; --crest-ink:#0A0F1C;
+  --epl:#B79CFF; --liga:#FF9A6E; --bun:#FF8193; --bra:#5BD493; --intl:#5ACDE8; --unl:#F59AD6; --f1:#C3CAD6; --crest-ink:#0A0F1C;
   --t-mcl:#FF8000; --t-fer:#FF3B30; --t-rbr:#5B8EE6; --t-mer:#27F4D2; --t-amr:#229971; --t-alp:#2BB5F0; --t-wil:#64A0FF; --t-rb:#8FAEFF; --t-haa:#B6BABD; --t-aud:#C9CCD1; --t-cad:#E8E8E8;
   --on-board:#F2F5FB; --board-muted:#B7C3DD; --board-line:#26375F; --board-well:rgba(0,0,0,.3); --on-live:#FFFFFF;
   --shadow:rgba(0,0,0,.6); --backdrop:rgba(0,0,0,.65);
   --card-yellow:#FFD23F; --card-edge:#FFD23F; --card-red:#FF5A6E; --sub-on:#5BD493; --sub-off:#FF8795; --mine:#2A2412;
   --flag-white:#FFFFFF; --flag-black:#000000; --flag-eng:#CE1124; --flag-esp-red:#AA151B; --flag-esp-gold:#F1BF00; --flag-ger-red:#DD0000;
   --flag-ger-gold:#FFCE00; --flag-bra-green:#009C3B; --flag-bra-yellow:#FFDF00; --flag-bra-blue:#002776;
+  --flag-unl-grey:#D0D0D0; --flag-unl-navy:#144391; --flag-unl-sky:#087BC0; --flag-unl-red:#E30918; --flag-unl-green:#009E4C; --flag-unl-yellow:#FDC301;
   --map-pin:#C21A33; --map-bg:#1C2437;
 }
 @media (prefers-color-scheme: dark){ :root[data-contrast="high"]:not([data-theme="light"]){
@@ -559,6 +562,7 @@ dialog.sheet::backdrop{background:var(--backdrop)}
 @media (min-width:641px){#ltdlg{height:calc(100dvh - 48px)}}   /* a fixed height, so switching leagues never resizes or moves the window */
 #ltbody[aria-busy="true"] .lt-wrap{opacity:.55}   /* the previous table stays in place, dimmed, until the next one arrives */
 .lt-wrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.lt-wrap + .lt-wrap{margin-top:12px}   /* the Nations League's group tables, one under another */
 table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numeric:tabular-nums;color:var(--ink)}
 .lt caption{text-align:left;padding:16px 16px 8px;font:800 1.2rem/1.1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}
 .lt th,.lt td{padding:10px 8px;text-align:right;border-top:1px solid var(--line-2)}

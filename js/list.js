@@ -5,6 +5,7 @@ const LEAGUES = [
   { code: "BUN", name: "Bundesliga", abbr: "BL", c: "--bun" },
   { code: "BRA", name: "Brasileirão", abbr: "BR", c: "--bra" },
   { code: "INTL", name: "Friendlies", abbr: "INT", c: "--intl" },
+  { code: "UNL", name: "UEFA Nations League", abbr: "UNL", c: "--unl" },
   { code: "F1", name: "Formula 1", abbr: "F1", c: "--f1" },
 ];
 const addDays = (key, n) => {
@@ -12,9 +13,13 @@ const addDays = (key, n) => {
   d.setUTCDate(d.getUTCDate() + n);
   return d.toISOString().slice(0, 10);
 };
-const leagueName = l => (l.code === "INTL" ? T.friendlies : l.code === "F1" ? T.f1 : l.name);
+const leagueName = l =>
+  l.code === "INTL" ? T.friendlies : l.code === "UNL" ? T.nationsLeague : l.code === "F1" ? T.f1 : l.name;
 const colorOf = code => "var(" + (LEAGUES.find(l => l.code === code) || { c: "--line" }).c + ")";
-const ORDER = { en: ["EPL", "LIGA", "BUN", "BRA", "INTL", "F1"], pt: ["BRA", "INTL", "F1", "EPL", "LIGA", "BUN"] };
+const ORDER = {
+  en: ["EPL", "LIGA", "BUN", "BRA", "INTL", "UNL", "F1"],
+  pt: ["BRA", "INTL", "F1", "EPL", "LIGA", "BUN", "UNL"],
+};
 const ordered = () => ORDER[LANG].map(c => LEAGUES.find(l => l.code === c));
 const on = new Set(
   store.get(
@@ -862,7 +867,7 @@ function renderStamp() {
   const src = [
     ...new Set(
       Object.entries(META.sources || {})
-        .filter(([k]) => k !== "INTL")
+        .filter(([k]) => k !== "INTL" && k !== "UNL") // hand-kept files, not a league feed
         .map(([, v]) => v),
     ),
   ].join(", ");

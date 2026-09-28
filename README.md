@@ -4,7 +4,7 @@
 
 Open the site: **https://gnc-07.github.io/Match-Schedule/** (em português: [`?lang=pt`](https://gnc-07.github.io/Match-Schedule/?lang=pt))
 
-Matchday Planner is a free website that lists upcoming matches from the **Premier League, La Liga, Bundesliga, Brasileirão** and **national-team friendlies**, together with every **Formula 1** session. It shows each kick-off in the time zone you choose, follows live scores while matches are on, and offers a calendar feed so the fixtures appear in your own calendar app. There is nothing to install and no account to create.
+Matchday Planner is a free website that lists upcoming matches from the **Premier League, La Liga, Bundesliga, Brasileirão**, the **UEFA Nations League** (League A) and **national-team friendlies**, together with every **Formula 1** session. It shows each kick-off in the time zone you choose, follows live scores while matches are on, and offers a calendar feed so the fixtures appear in your own calendar app. There is nothing to install and no account to create.
 
 ## What you can do with it
 
@@ -13,7 +13,7 @@ Matchday Planner is a free website that lists upcoming matches from the **Premie
 - **Follow live scores.** While a match is on, its score updates every 30 seconds without reloading the page.
 - **Open the match details.** Each match has a **Match details** button with the score, goals, cards and substitutions, the line-ups, the league table and a map of the stadium. You can share a link to one match or add it to your calendar.
 - **Follow a Formula 1 weekend.** Every practice, qualifying, sprint and race session is listed. The **Race weekend** button shows the schedule, results, the championship standings and a drawing of the track.
-- **Check the league tables** with the **Tables** button: all four leagues, plus the F1 drivers' and teams' championships.
+- **Check the league tables** with the **Tables** button: all four leagues, the Nations League's League A groups, plus the F1 drivers' and teams' championships.
 - **Put the fixtures in your calendar.** The **Calendar** button gives you a feed you can subscribe to in Google Calendar, Apple Calendar, Outlook, Proton Calendar and most other apps. Subscribed calendars update by themselves when a time changes. (The feed covers football only.)
 - **Watch on CazéTV.** When the Brazilian YouTube channel CazéTV is streaming a match, the card shows a link to the stream. These streams are usually only available in Brazil.
 
@@ -40,6 +40,7 @@ The site has no accounts, no advertising and no tracking. Your preferences (star
 | --- | --- |
 | League fixtures | [openfootball](https://github.com/openfootball/football.json) (public domain), or [football-data.org](https://www.football-data.org/) when a key is configured |
 | Friendlies and corrected kick-off times | Official announcements and press reports, each one recorded with its link |
+| UEFA Nations League (League A) | UEFA's published fixture list, cross-checked against ESPN |
 | Live scores, match details and league tables | ESPN's public scoreboard (unofficial; it could change without notice) |
 | Backup when ESPN does not answer | Bundesliga scores, goals and table: [OpenLigaDB](https://www.openligadb.de/) (free, community-run). Other leagues' tables: worked out by the site from the league fixtures source's results, four times a day |
 | Formula 1 sessions, results and standings | [Jolpica-F1](https://github.com/jolpica/jolpica-f1), cross-checked with [OpenF1](https://openf1.org/) |

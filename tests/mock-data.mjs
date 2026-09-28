@@ -106,6 +106,13 @@ const standings = {
       { name: "ties", value: d }, { name: "losses", value: l }, { name: "pointDifferential", value: gd }, { name: "points", value: w * 3 + d }] };
   }) } }],
 };
+// The Nations League's standings: one table per group, as ESPN sends them (League A, plus a League B group the page
+// must leave out). Made-up points.
+const GROUPS = { A1: ["Belgium", "France", "Italy", "Türkiye"], A2: ["Germany", "Greece", "Netherlands", "Serbia"],
+  A3: ["Croatia", "Czechia", "England", "Spain"], A4: ["Denmark", "Norway", "Portugal", "Wales"], B1: ["Scotland", "Slovenia", "Switzerland", "North Macedonia"] };
+const unlStandings = { children: Object.entries(GROUPS).map(([g, teams]) => ({ name: "Group " + g, standings: { entries: teams.map((t, i) => ({
+  team: { displayName: t }, stats: [{ name: "rank", value: i + 1 }, { name: "gamesPlayed", value: 2 }, { name: "wins", value: 2 - Math.min(i, 2) },
+    { name: "ties", value: 0 }, { name: "losses", value: Math.min(i, 2) }, { name: "pointDifferential", value: 3 - 2 * i }, { name: "points", value: 3 * (2 - Math.min(i, 2)) }] })) } })) };
 
 const wdSearch = { search: [{ id: "Q1" }] };
 const wdEntities = { entities: { Q1: { descriptions: { en: { value: "football stadium in London" } },
@@ -118,6 +125,19 @@ const MATCHES = [...data.matches.filter(m => !SAMPLE_WK.has(m.wk)), ...F1]
   .sort((a, b) => (a.utc || a.date + "T99") < (b.utc || b.date + "T99") ? -1 : 1);   // in time order, as build_schedule.py writes it
 const dupes = MATCHES.map(m => m.uid).filter((u, i, all) => all.indexOf(u) !== i);
 if (dupes.length) throw new Error(`Sample data has more than one match with the same uid: ${[...new Set(dupes)].join(", ")}`);
+
+// Presses "Show more" until the sample match's card is in the list, as a visitor would. The list shows about 40
+// matches at first, and in an international break the Nations League and friendlies can push the first Premier
+// League match past them. Works with Playwright and Puppeteer pages alike.
+export async function showMatch(page, uid = MATCH.uid) {
+  const shown = () => page.evaluate(u => !!document.querySelector(`.md-open[data-uid="${CSS.escape(u)}"]`), uid);
+  for (let i = 0; i < 5 && !(await shown()); i++) {
+    await page.evaluate(() => document.getElementById("more")?.click());
+    await new Promise(r => setTimeout(r, 700));   // the new days rise into place
+  }
+  if (await shown()) return;
+  throw new Error(`the sample match ${uid} is not in the list, even after "Show more"`);
+}
 
 // The sample answer for one outside request, or null to let it through (the test server's own files).
 // Only the sample match's league has a match on the scoreboard.
@@ -133,6 +153,7 @@ export function answerFor(u) {
     return json({ MRData: { RaceTable: { Races: [] } } });
   }
   if (u.includes("espn.com")) {
+    if (u.includes("/uefa.nations/standings")) return json(unlStandings);
     if (u.includes("/standings")) return json(standings);
     if (u.includes("/summary")) return json(summary);
     if (u.includes("/eng.1/scoreboard")) return json(board);

@@ -1,7 +1,7 @@
 // Runs axe-core (WCAG 2.2 AA plus best practices) over every combination the
 // project rules require: light and dark theme, English and Portuguese,
 // 390px, 1280px (laptop: filters in a sidebar) and 1920px wide (monitor: a right-hand column, and match details beside the list),
-// with the menus closed, the filter sidebar hidden (1280px and 1920px only), Settings open, Calendar open, the League tables window (a league and the F1 championship),
+// with the menus closed, the filter sidebar hidden (1280px and 1920px only), Settings open, Calendar open, the League tables window (a league, the Nations League groups and the F1 championship),
 // the match details panel and the F1 race weekend panel (race results; qualifying in high contrast), plus high contrast (list and match details), using sample data (mock-data.mjs) in place of ESPN, Jolpica-F1, Wikidata and OpenStreetMap.
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
@@ -16,7 +16,7 @@ const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-prac
 const themes = ["light", "dark"];
 const langs = ["en", "pt"];
 const widths = [390, 1280, 1920];
-const states = ["closed", "sidebar-hidden", "setmenu", "calmenu", "tables", "tables-f1", "details", "high", "high-details", "f1", "high-f1"];
+const states = ["closed", "sidebar-hidden", "setmenu", "calmenu", "tables", "tables-unl", "tables-f1", "details", "high", "high-details", "f1", "high-f1"];
 const query = { details: `&match=${encodeURIComponent(MATCH.uid)}`, "high-details": `&match=${encodeURIComponent(MATCH.uid)}`,
   f1: `&match=${encodeURIComponent(F1_WEEKEND)}`, "high-f1": `&match=${encodeURIComponent(F1_WEEKEND)}` };
 
@@ -55,6 +55,7 @@ async function inspect(page, [theme, lang, width, state]) {
   await page.goto(`${BASE}?lang=${lang}${query[state] || ""}`, { waitUntil: "networkidle0" });
   if (state === "setmenu" || state === "calmenu") await page.evaluate(id => { document.getElementById(id).open = true; }, state);
   if (state.startsWith("tables")) { await page.click("#tablesbtn"); await page.waitForSelector("#ltbody table"); }
+  if (state === "tables-unl") { await page.click('#ltchips [data-code="UNL"]'); await page.waitForSelector("#lt-g-A4"); }
   if (state === "tables-f1") { await page.click('#ltchips [data-code="F1"]'); await page.waitForSelector("#ltbody .f1t"); }
   if (state.endsWith("details")) await page.waitForSelector("#md-map .tiles");
   if (state === "f1" || state === "high-f1") await page.waitForSelector("#wk-champ table");

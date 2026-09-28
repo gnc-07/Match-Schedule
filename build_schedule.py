@@ -13,6 +13,7 @@ Data sources, in order of preference
      no key needed). Used when there is no token. Times are LOCAL to each league.
   3. friendlies.json: national-team friendlies entered by hand. No free feed
      covers friendlies, so this file has to be edited when matches are announced.
+     nations_league.json: UEFA Nations League matches, entered by hand the same way.
   Both league sources also give every result of the season so far, from which a backup league table is
   worked out (standings() below) for when ESPN's tables cannot be reached.
   4. Formula 1: every session from Jolpica-F1, cross-checked against OpenF1 (both free, no key).
@@ -212,15 +213,23 @@ def resolve(reports):
         check["note"] = "Some sources report a different time; see the source list."
     return day, utc, check
 
-# ---------- source 3: friendlies (hand-maintained, cross-checked) ----------
-def from_friendlies(start, path="friendlies.json"):
+# ---------- source 3: national-team matches (hand-maintained, cross-checked) ----------
+# code: file, competition name. Each file lists matches as team1, team2, venue, note, round and reports.
+HAND_KEPT = {
+    "INTL": ("friendlies.json", "International friendly"),
+    "UNL":  ("nations_league.json", "UEFA Nations League"),
+}
+
+def from_hand_kept(start, code, path=None):
+    """The matches in one hand-kept file from `start` on, each timed through resolve()."""
+    default, comp = HAND_KEPT[code]
     out = []
-    for f in load_json(path):
+    for f in load_json(path or default):
         day, utc, check = resolve(f["reports"])
         if date.fromisoformat(day) < start:
             continue
-        r = record("International friendly", "INTL", f["team1"], f["team2"], day, utc, venue=f.get("venue"),
-                   note=f.get("note"), uid=f"intl|{f['team1']}|{f['team2']}|{f['reports'][0]['date']}")
+        r = record(comp, code, f["team1"], f["team2"], day, utc, rnd=f.get("round", ""), venue=f.get("venue"),
+                   note=f.get("note"), uid=f"{code.lower()}|{f['team1']}|{f['team2']}|{f['reports'][0]['date']}")
         r["check"] = check
         out.append(r)
     return out
@@ -718,8 +727,9 @@ def load_all(start):
         sources[code] = "openfootball"
     apply_overrides(out)
     out = [r for r in out if date.fromisoformat(r["date"]) >= start or "result" in r or r.get("started")]
-    out += from_friendlies(start)
-    sources["INTL"] = "friendlies.json (hand-maintained, cross-checked)"
+    for code, (path, _) in HAND_KEPT.items():
+        out += from_hand_kept(start, code)
+        sources[code] = f"{path} (hand-maintained, cross-checked)"
     try:
         f1 = from_f1(start)
         sources["F1"] = "Jolpica-F1" + (" and OpenF1" if any(r.get("check") for r in f1) else "")
@@ -815,15 +825,19 @@ def write_fixtures(meta, path="fixtures.json"):
     rows = [one({k: v for k, v in r.items() if not (v is None and k in ("venue", "note"))}) for r in meta["matches"]]
     save_text(path, "{" + ",\n".join(head) + ',\n"matches":[\n' + ",\n".join(rows) + "\n]}\n")
 
+def upcoming_league_matches(recs):
+    """Upcoming matches from the league feeds only: hand-kept matches and F1 must not hide a broken feed."""
+    return sum(1 for r in recs if r["code"] in LEAGUES and "result" not in r and not r.get("started"))
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--start", default=datetime.now(HOME_TZ).date().isoformat())
-    ap.add_argument("--leagues", help="comma list of EPL,LIGA,BUN,BRA,INTL,F1")
+    ap.add_argument("--leagues", help="comma list of EPL,LIGA,BUN,BRA,INTL,UNL,F1")
     ap.add_argument("--teams", help="comma list of team-name fragments")
     ap.add_argument("--out", default="soccer.ics")
     a = ap.parse_args()
     recs, sources, tables, f1_stale = load_all(date.fromisoformat(a.start))
-    league_count = sum(1 for r in recs if r["code"] not in ("INTL", "F1") and "result" not in r and not r.get("started"))
+    league_count = upcoming_league_matches(recs)
     if league_count < MIN_MATCHES:
         # exiting with an error stops the workflow before it publishes, so the last good site stays up
         sys.exit(f"Only {league_count} upcoming league matches found; refusing to publish. Check the data sources.")

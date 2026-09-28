@@ -17,7 +17,7 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import puppeteer from "puppeteer-core";
 import { BASE, ROOT, chromePath, startServer } from "./server.mjs";
-import { F1_WEEKEND, MATCH, mockNetwork } from "./mock-data.mjs";
+import { F1_WEEKEND, MATCH, mockNetwork, showMatch } from "./mock-data.mjs";
 
 const out = path.join(ROOT, "screenshots", "motion-check");
 mkdirSync(out, { recursive: true });
@@ -91,6 +91,7 @@ async function open(browser, width, motion) {
     localStorage.setItem("mp.motion", JSON.stringify(m)); } catch {} }, motion);
   await mockNetwork(page);
   await page.goto(BASE + "?lang=en", { waitUntil: "networkidle0" });
+  await showMatch(page, uid);
   await wait(300);
   return page;
 }

@@ -1,5 +1,5 @@
 /* ---------- live scores (ESPN public scoreboard, fetched by the visitor's browser) ---------- */
-const ESPN = { EPL: "eng.1", LIGA: "esp.1", BUN: "ger.1", BRA: "bra.1", INTL: "fifa.friendly" };
+const ESPN = { EPL: "eng.1", LIGA: "esp.1", BUN: "ger.1", BRA: "bra.1", INTL: "fifa.friendly", UNL: "uefa.nations" };
 const ESPN_API = "https://site.api.espn.com/apis/site/v2/sports/soccer/";
 const LIVE = new Map(); // our match key -> {id, state, clock, detail, hs, as}
 const FINAL = new Map(); // finished matches: kept so the final score stays on the card for a day
@@ -322,7 +322,11 @@ async function pollLive() {
     else LIVE.set(k, L);
   }
   LIVE_EXTRA = events
-    .filter(e => e.state === "in" && !used.has(e.id) && e.slug !== "fifa.friendly" && !e.src) // backup: listed matches only
+    // friendlies and the Nations League (whose feed has Leagues B to D too) show only the matches on the site's list;
+    // backup: listed matches only
+    .filter(
+      e => e.state === "in" && !used.has(e.id) && e.slug !== "fifa.friendly" && e.slug !== "uefa.nations" && !e.src,
+    )
     .filter((e, i, a) => a.findIndex(x => x.id === e.id) === i);
   render();
 }

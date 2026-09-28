@@ -111,8 +111,9 @@ const I18N = {
     how4: "Stars and settings are saved in your browser only. Finished matches stay on the list, with the final score, for a day after kick-off.",
     repo: "Source code and data:",
     teams: {},
-    comp: { "International friendly": "International friendly" },
+    comp: { "International friendly": "International friendly", "UEFA Nations League": "UEFA Nations League" },
     friendlies: "Friendlies",
+    nationsLeague: "Nations League",
     round: r => r,
     notes: {},
     tzNames: {
@@ -186,6 +187,7 @@ const I18N = {
       s +
       ", updated four times a day. Teams level on points may be in a different order from the official table.",
     ltLoading: "Loading the table…",
+    ltGroup: g => "Group " + g,
     ltError: "The table could not be loaded. Try again later.",
     ltCols: {
       pos: "Position",
@@ -443,6 +445,8 @@ const I18N = {
       Austria: "Áustria",
       Czechia: "Tchéquia",
       Turkey: "Turquia",
+      Türkiye: "Turquia",
+      Portugal: "Portugal",
       Greece: "Grécia",
       Ukraine: "Ucrânia",
       Serbia: "Sérvia",
@@ -454,9 +458,10 @@ const I18N = {
       Estonia: "Estônia",
       Andorra: "Andorra",
     },
-    comp: { "International friendly": "Amistoso internacional" },
+    comp: { "International friendly": "Amistoso internacional", "UEFA Nations League": "Liga das Nações da UEFA" },
     friendlies: "Amistosos",
-    round: r => r.replace(/^Matchday (\d+)$/, "Rodada $1"),
+    nationsLeague: "Liga das Nações",
+    round: r => r.replace(/^Group (\w+), /, "Grupo $1, ").replace(/(^|, )Matchday (\d+)$/, "$1Rodada $2"),
     notes: {
       "Messi's farewell match": "Jogo de despedida de Messi",
       "Postponed; new date not set.": "Adiado; nova data não definida.",
@@ -532,6 +537,7 @@ const I18N = {
       s +
       ", atualizados quatro vezes por dia. Times empatados em pontos podem aparecer em outra ordem que na classificação oficial.",
     ltLoading: "Carregando a classificação…",
+    ltGroup: g => "Grupo " + g,
     ltError: "Não foi possível carregar a classificação. Tente mais tarde.",
     ltCols: {
       pos: "Posição",
