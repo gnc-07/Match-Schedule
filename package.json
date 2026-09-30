@@ -18,6 +18,7 @@
     "test:quick": "node tests/run.mjs quick"
   },
   "devDependencies": {
+    "acorn": "^8.18.0",
     "axe-core": "^4.10.0",
     "chrome-launcher": "^1.1.2",
     "lighthouse": "^12.0.0",
