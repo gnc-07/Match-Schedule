@@ -42,7 +42,7 @@ If ESPN does not answer, the page falls back on its own. For the Bundesliga, the
 
 1. **Use your repository `gnc-07/Match-Schedule`.** It must be **Public** for free GitHub Pages: check under **Settings**, **General**, at the bottom (**Danger Zone**, Change visibility).
 
-2. **Upload the files.** On the new repository's page, click **uploading an existing file**. Drag in `index.html`, `styles.css`, `publish_site.py`, `build_schedule.py`, `cazetv.py`, `common.py`, `research.py`, `friendlies.json`, `nations_league.json`, `overrides.json`, `README.md`, `MAINTAINING.md` and the whole `js`, `fonts` and `tests` folders (drag each folder itself; GitHub keeps them as folders; the workflow runs the checks in `tests` before every build), then click **Commit changes**.
+2. **Upload the files.** On the new repository's page, click **uploading an existing file**. Drag in `index.html`, `styles.css`, `publish_site.py`, `build_schedule.py`, `cazetv.py`, `common.py`, `research.py`, `friendlies.json`, `nations_league.json`, `overrides.json`, `sitemap.xml`, `og-image.png`, `README.md`, `MAINTAINING.md` and the whole `js`, `fonts` and `tests` folders (drag each folder itself; GitHub keeps them as folders; the workflow runs the checks in `tests` before every build), then click **Commit changes**.
 
 3. **Add the workflow file.** Folders whose names start with a dot are hidden by most file managers (in Dolphin on Fedora KDE, press Ctrl+H to show them), and they are easy to miss when dragging. The reliable way: click **Add file**, then **Create new file**. In the name box type `.github/workflows/build-and-deploy.yml` (typing each `/` creates a folder). Paste in the contents of that file, then **Commit changes**.
 
