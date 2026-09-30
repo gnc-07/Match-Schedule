@@ -1,7 +1,7 @@
 // Runs axe-core (WCAG 2.2 AA plus best practices) over every combination the
 // project rules require: light and dark theme, English and Portuguese,
 // 390px, 1280px (laptop: filters in a sidebar) and 1920px wide (monitor: a right-hand column, and match details beside the list),
-// with the menus closed, the filters unfolded (390px only), the filter sidebar hidden (1280px and 1920px only), Settings open, Calendar open, the League tables window (a league, the Nations League groups and the F1 championship),
+// with the menus closed (the Follow your teams invitation showing), the filters unfolded (390px only), teams starred (Your teams), the filter sidebar hidden (1280px and 1920px only), Settings open, Calendar open, the League tables window (a league, the Nations League groups and the F1 championship),
 // the match details panel and the F1 race weekend panel (race results; qualifying in high contrast), plus high contrast (list and match details), using sample data (mock-data.mjs) in place of ESPN, Jolpica-F1, Wikidata and OpenStreetMap.
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
@@ -16,7 +16,7 @@ const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-prac
 const themes = ["light", "dark"];
 const langs = ["en", "pt"];
 const widths = [390, 1280, 1920];
-const states = ["closed", "filters-open", "sidebar-hidden", "setmenu", "calmenu", "tables", "tables-unl", "tables-f1", "details", "high", "high-details", "f1", "high-f1"];
+const states = ["closed", "filters-open", "starred", "sidebar-hidden", "setmenu", "calmenu", "tables", "tables-unl", "tables-f1", "details", "high", "high-details", "f1", "high-f1"];
 const query = { details: `&match=${encodeURIComponent(MATCH.uid)}`, "high-details": `&match=${encodeURIComponent(MATCH.uid)}`,
   f1: `&match=${encodeURIComponent(F1_WEEKEND)}`, "high-f1": `&match=${encodeURIComponent(F1_WEEKEND)}` };
 
@@ -49,9 +49,9 @@ async function inspect(page, [theme, lang, width, state]) {
   // so colour contrast is not measured halfway through an animation.
   await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
   // Save the theme the same way the Settings menu does, before the page loads (contrast and the sidebar too).
-  await page.evaluateOnNewDocument((t, high, side) => { try { localStorage.setItem("mp.theme", JSON.stringify(t));
+  await page.evaluateOnNewDocument((t, high, side, favs) => { try { localStorage.setItem("mp.theme", JSON.stringify(t)); localStorage.setItem("mp.favs", JSON.stringify(favs));
     localStorage.setItem("mp.contrast", JSON.stringify(high ? "high" : "normal")); localStorage.setItem("mp.side", JSON.stringify(side)); } catch {} },
-    theme, state.startsWith("high"), state === "sidebar-hidden" ? "closed" : "open");
+    theme, state.startsWith("high"), state === "sidebar-hidden" ? "closed" : "open", state === "starred" ? [MATCH.home, MATCH.away] : []);
   await mockNetwork(page);
   await page.goto(`${BASE}?lang=${lang}${query[state] || ""}`, { waitUntil: "networkidle0" });
   if (state === "filters-open") await page.click("#sideshow");

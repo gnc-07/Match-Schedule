@@ -528,6 +528,81 @@ function srcHTML(r) {
     "</ul></div></details>";
   return h;
 }
+// "Your teams", at the top of the list: the next matches of the starred teams, whatever the filters show. With no
+// team starred yet, an invitation to star one, until "Not now" (remembered as follow: "no").
+const CHEVRON =
+  '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>';
+let followNo = false; // Not now pressed on this visit (also saved, when the browser allows it)
+function mineHTML() {
+  if (!favs.size) {
+    if (followNo || store.get("follow", "") === "no") return "";
+    return (
+      '<section class="myteams" aria-labelledby="myteams-h"><h2 id="myteams-h">' +
+      esc(T.followTitle) +
+      "</h2><p>" +
+      esc(T.followText) +
+      '</p><div class="myteams-act"><button type="button" class="btn primary" id="myteams-find">' +
+      esc(T.followFind) +
+      '</button><button type="button" class="btn" id="myteams-no">' +
+      esc(T.followNo) +
+      "</button></div></section>"
+    );
+  }
+  const today = dayKey.format(new Date()),
+    soon = Date.now() - 3 * 3600e3, // a match that started less than three hours ago may still be on
+    at = r => r.when || new Date(r.day + "T23:59:00Z"), // no time yet: late that day
+    upcoming = DATA.filter(
+      r =>
+        r.kind !== "f1" &&
+        r.uid &&
+        (favs.has(r.home) || favs.has(r.away)) &&
+        (r.when ? r.when > soon : r.day >= today) &&
+        !(liveOf(r) && liveOf(r).state === "post"),
+    ).sort((a, b) => at(a) - at(b)),
+    // each starred team's next match first, so one team's busy week does not hide another; then the soonest others
+    firsts = [...favs].map(t => upcoming.find(r => r.home === t || r.away === t)).filter(Boolean),
+    next = [...new Set([...firsts.slice(0, 3), ...upcoming])].slice(0, 3).sort((a, b) => at(a) - at(b));
+  const when = r => {
+    const L = liveOf(r);
+    if (L && L.state === "in") return T.pLive + " " + L.clock;
+    const d = r.when ? dayKey.format(r.when) : r.day,
+      day =
+        d === today
+          ? T.todayRel
+          : d === addDays(today, 1)
+            ? T.tomorrow
+            : clean(r.when ? fmtDay.format(r.when) : fmtDayU.format(new Date(d + "T12:00:00Z")));
+    return day + " · " + (r.when ? fmtT.format(r.when) + " " + zoneOf(r.when) : T.tbcSmall);
+  };
+  return (
+    '<section class="myteams" aria-labelledby="myteams-h"><h2 id="myteams-h">' +
+    esc(T.mineTitle) +
+    "</h2>" +
+    (next.length
+      ? "<ul>" +
+        next
+          .map(
+            r =>
+              '<li><a class="myteams-row md-open" href="' +
+              esc(matchHref(r)) +
+              '" data-uid="' +
+              esc(r.uid) +
+              '"><span><small>' +
+              esc(when(r)) +
+              "</small><b>" +
+              esc(teamName(r.home)) +
+              esc(T.vs) +
+              esc(teamName(r.away)) +
+              "</b></span>" +
+              CHEVRON +
+              "</a></li>",
+          )
+          .join("") +
+        "</ul>"
+      : "<p>" + esc(T.mineNone) + "</p>") +
+    "</section>"
+  );
+}
 let lastList = "";
 function render() {
   if (!META) return;
@@ -661,6 +736,7 @@ function render() {
       '<p class="empty">' + esc(T.empty) + " " + esc(favonly.checked && !favs.size ? T.emptyFav : T.emptyWide) + "</p>";
   if (rows.length > shown)
     html += '<button type="button" class="more" id="more">' + esc(T.more(rows.length - shown)) + "</button>";
+  html = mineHTML() + html;
   if (html === lastList) return; // the minute-by-minute refresh usually changes nothing: leave the page alone
   lastList = html;
   list.innerHTML = html;
@@ -721,6 +797,25 @@ document.addEventListener("click", e => {
   leave(body, LIFT, () => {
     d.open = false;
     d.removeAttribute("data-folding");
+  });
+});
+// the invitation's buttons: Find my team opens the filters where needed and goes to the team search; Not now folds the
+// invitation away for good, and the days below rise into its place
+listEl.addEventListener("click", e => {
+  const b = e.target.closest("#myteams-find, #myteams-no");
+  if (!b) return;
+  if (b.id === "myteams-find") {
+    if (!filtersEl.checkVisibility()) document.getElementById("sideshow").click();
+    q.focus();
+    return;
+  }
+  followNo = true;
+  store.set("follow", "no");
+  const box = b.closest(".myteams");
+  leave(box, LIFT, () => {
+    render();
+    riseDays([...listEl.querySelectorAll(".day")]);
+    listEl.focus();
   });
 });
 listEl.addEventListener("click", e => {
