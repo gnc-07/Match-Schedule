@@ -1,4 +1,5 @@
 # Matchday Planner
+<img width="1200" height="630" alt="og-image" src="https://github.com/user-attachments/assets/6890b411-fe5d-402d-bd52-d82162902db3" />
 
 **Football and Formula 1 fixtures in your own time zone, with kick-off times you can trust.**
 
