@@ -659,6 +659,28 @@ class PublishSite(unittest.TestCase):
             with self.assertRaises(ValueError):
                 publish_site.publish(d, d)          # never over the source files
 
+    def test_google_verification_file_is_published_only_when_it_is_one(self):
+        name = "google1a2b3c4d5e6f7a8b.html"
+        with tempfile.TemporaryDirectory() as d:
+            self.fake_site(d)
+            for extra in ("soccer.ics", "fonts/x.woff2", "sitemap.xml", "og-image.png"):
+                os.makedirs(os.path.dirname(os.path.join(d, extra)), exist_ok=True)
+                with open(os.path.join(d, extra), "w", encoding="utf-8") as f:
+                    f.write("x")
+            with open(os.path.join(d, "fixtures.json"), "w", encoding="utf-8") as f:
+                f.write('{"matches":[]}\n')
+            for other in ("google.html", "googleXYZ.html", "notgoogle1a2b3c4d5e6f7a8b.html"):   # not Google's names
+                with open(os.path.join(d, other), "w", encoding="utf-8") as f:
+                    f.write("<script>alert(1)</script>")
+            with open(os.path.join(d, name), "w", encoding="utf-8") as f:
+                f.write("google-site-verification: " + name)
+            publish_site.publish(os.path.join(d, "_site"), d)
+            self.assertEqual(sorted(n for n in os.listdir(os.path.join(d, "_site")) if n.endswith(".html")), sorted(["index.html", name]))
+            with open(os.path.join(d, name), "w", encoding="utf-8") as f:
+                f.write("<script>alert(1)</script>")          # the right name, other content: refused, loudly
+            with self.assertRaises(ValueError):
+                publish_site.publish(os.path.join(d, "_site2"), d)
+
 
 class SearchAndSharing(unittest.TestCase):
     """What search engines and link previews read: the addresses in index.html, sitemap.xml and the preview picture
