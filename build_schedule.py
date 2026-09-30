@@ -120,7 +120,11 @@ def from_openfootball(code, name, filename, style, tz, start):
         if m.get("time"):
             local = datetime.fromisoformat(f"{m['date']}T{m['time']}").replace(tzinfo=ZoneInfo(tz))
             utc = local.astimezone(timezone.utc).isoformat()
-        r = record(name, code, m["team1"], m["team2"], m["date"], utc, m.get("round", ""), m.get("ground"))
+        # the feed has no match ids: this key is the one ics() used for these matches before they had a uid, so
+        # calendar entries keep their ids (the page hides a match's "Match details" button when it has no uid)
+        rnd = m.get("round", "")
+        r = record(name, code, m["team1"], m["team2"], m["date"], utc, rnd, m.get("ground"),
+                   uid=f"{code}|{m['team1']}|{m['team2']}|{rnd or m['date']}")
         if played:
             r["result"] = {"home": ft[0], "away": ft[1]}
         out.append(r)

@@ -6,7 +6,7 @@
 // (what python3 -m http.server shows), so a test can check that form works too.
 // It also finds the Chromium browser to test with.
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -24,8 +24,15 @@ const TYPES = {
 const COMPRESS = /^(text\/|application\/json|image\/svg)/;   // what GitHub Pages compresses; fonts and pictures already are
 
 export function chromePath() {
+  // last, the Chromium that Playwright downloaded (its own folder, or PLAYWRIGHT_BROWSERS_PATH as in a cloud container)
+  const pw = process.env.PLAYWRIGHT_BROWSERS_PATH || path.join(process.env.HOME || "", ".cache", "ms-playwright");
+  let fromPlaywright = [];
+  try {
+    fromPlaywright = readdirSync(pw).filter(d => /^chromium-\d+$/.test(d)).sort().reverse()
+      .map(d => path.join(pw, d, "chrome-linux", "chrome"));
+  } catch {}
   const candidates = [process.env.CHROME_PATH, "/usr/bin/chromium-browser", "/usr/bin/chromium",
-    "/usr/bin/google-chrome", "/usr/bin/google-chrome-stable"].filter(Boolean);
+    "/usr/bin/google-chrome", "/usr/bin/google-chrome-stable", ...fromPlaywright].filter(Boolean);
   const found = candidates.find(p => existsSync(p));
   if (!found) throw new Error("No Chromium or Chrome found. Install one, or set CHROME_PATH.");
   return found;

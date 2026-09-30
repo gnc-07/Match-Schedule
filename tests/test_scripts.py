@@ -184,6 +184,19 @@ class BackupTables(unittest.TestCase):
         self.assertEqual(results, [("A", "B", 2, 1), ("B", "A", 0, 0)])   # old results count for the table
         self.assertEqual([(r["home"], r["away"]) for r in recs], [("A", "C")])   # but only the upcoming match is listed
 
+    def test_openfootball_matches_get_a_uid_that_keeps_calendar_ids(self):
+        feed = {"matches": [
+            {"date": "2026-10-03", "time": "15:00", "team1": "A", "team2": "C", "round": "Matchday 7"},
+            {"date": "2026-10-04", "team1": "B", "team2": "D"},
+        ]}
+        with mock.patch.object(bs, "get_json", return_value=feed):
+            recs, _ = bs.from_openfootball("EPL", "Premier League", "en.1.json", "split", "Europe/London", date(2026, 9, 27))
+        self.assertEqual([r["uid"] for r in recs], ["EPL|A|C|Matchday 7", "EPL|B|D|2026-10-04"])
+        # the same calendar UID as before these matches had a uid, so subscribers see no duplicate events
+        old = dict(recs[0], uid=None)
+        uid_line = lambda r: next(l for l in bs.ics([r]).splitlines() if l.startswith("UID:"))
+        self.assertEqual(uid_line(recs[0]), uid_line(old))
+
 
     def test_last_seasons_results_are_not_this_seasons_table(self):
         old = {"matches": [{"date": "2026-05-20", "time": "15:00", "team1": "A", "team2": "B", "score": {"ft": [2, 1]}}]}
