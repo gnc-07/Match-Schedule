@@ -10,7 +10,8 @@
 // large enough, and the page reports no script errors or Content-Security-Policy violations. Then, at phone and laptop
 // width, it uses the site the way a visitor would: theme button, Settings (text size, high contrast, language), league
 // chips, dates, team search, stars, sources, match details (and Escape and Back), the F1 race weekend, the league tables,
-// the Calendar menu and the keyboard. The sample data in mock-data.mjs stands in for ESPN, Jolpica-F1 and Wikidata.
+// the Calendar menu and the keyboard. On a monitor, Match details beside the list must close without the list moving.
+// The sample data in mock-data.mjs stands in for ESPN, Jolpica-F1 and Wikidata.
 // A picture of each view is saved in screenshots/browsers/ to compare the browsers by eye.
 //
 // Run: node tests/browsers.mjs                  (chromium, firefox and webkit; a browser that is not installed is skipped)
@@ -358,6 +359,33 @@ const actChecks = [
   }],
 ];
 
+// On a monitor, where Match details opens beside the list. At 1650px the list is much narrower beside the panel than
+// without it (at 1920px the two barely differ), so the matches above the window change height when it closes: the
+// match whose details were shown must stay where it was on screen, not slide up by all they lost (browsers do not
+// keep it in place themselves here, since the page's own padding changes too).
+const besideChecks = [
+  ["match details beside the list close in place", async page => {
+    await page.setViewportSize({ width: 1650, height: 1000 });
+    await page.waitForFunction(() => document.documentElement.dataset.wide === "full");
+    const pick = await page.evaluate(() => {
+      const a = [...document.querySelectorAll("#list .match .md-open")][14];
+      a.closest(".match").scrollIntoView({ block: "center" });
+      return a.dataset.uid;
+    });
+    const card = `#list .match:has(.md-open[data-uid="${pick}"])`;
+    const top = () => page.locator(card).evaluate(c => Math.round(c.getBoundingClientRect().top));
+    await page.click(`#list .match .md-open[data-uid="${pick}"]`);
+    await page.waitForFunction(() => document.documentElement.hasAttribute("data-pane"));
+    await wait(300);
+    const shown = await top();
+    await page.click("#mddlg [data-close]");
+    await page.waitForFunction(() => !document.getElementById("mddlg").open && !location.search.includes("match="));
+    await wait(300);
+    const after = await top();
+    must(Math.abs(after - shown) <= 2, `the match moved from ${shown}px to ${after}px from the top of the window when Match details closed`);
+  }],
+];
+
 const results = [];   // [browser, what, error or ""]
 const note = (engine, what, err) => {
   results.push([engine, what, err]);
@@ -411,6 +439,14 @@ try {
             }
           }
         }
+        if (lang === "en" && width === 1920)
+          for (const [name, steps] of besideChecks) {
+            try { await steps(page); note(engine, `${view}  ${name}`, ""); }
+            catch (e) {
+              note(engine, `${view}  ${name}`, e.message.split("\n")[0]);
+              await page.screenshot({ path: path.join(out, `${engine}-${width}-FAILED-${name.replace(/\W+/g, "-")}.png`) }).catch(() => {});
+            }
+          }
         const problems = await pageProblems(page, errors);
         note(engine, `${view}  no script errors or blocked requests`, problems.slice(0, 5).join("\n      "));
         await context.close();

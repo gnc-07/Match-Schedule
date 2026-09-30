@@ -858,13 +858,22 @@ function shut(d) {
     // beside the list, the opening played backwards: the page glides back while the panel slides out, the panel
     // keeping its place meanwhile (data-pane-out)
     r.setAttribute("data-pane-out", "");
+    // The list gets wider, so the matches above the window get shorter. Browsers keep what is read in place when the
+    // page above it changes height (scroll anchoring), but not when the page's own padding or width changes too, as
+    // here: the list would slide up by all they lost. So the match shown (or, scrolled away from it, the first match
+    // on screen) is kept where it is by hand, and the list only glides sideways.
+    const c = shownCard(),
+      keep =
+        c && c.getBoundingClientRect().bottom > 0 && c.getBoundingClientRect().top < innerHeight ? c : onScreen(listEl),
+      top = keep.getBoundingClientRect().top;
     glide(
       pageParts(),
       () => {
         r.removeAttribute("data-pane");
         markCurrent();
+        if (keep !== listEl) scrollBy(0, keep.getBoundingClientRect().top - top);
       },
-      shownCard(),
+      keep,
     );
   }
   leave(
