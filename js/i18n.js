@@ -34,6 +34,7 @@ const I18N = {
     filters: "Filters",
     showFilters: "Show filters",
     hideFilters: "Hide filters",
+    filterBar: "Filter summary",
     followTitle: "Follow your teams",
     followText:
       "Tap the star next to a team's name to follow it. Its next matches then appear here, at the top of the list.",
@@ -337,6 +338,7 @@ const I18N = {
     filters: "Filtros",
     showFilters: "Mostrar filtros",
     hideFilters: "Ocultar filtros",
+    filterBar: "Resumo dos filtros",
     followTitle: "Siga seus times",
     followText:
       "Toque na estrela ao lado do nome de um time para segui-lo. Os próximos jogos dele aparecem aqui, no topo da lista.",

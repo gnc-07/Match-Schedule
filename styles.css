@@ -225,6 +225,9 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
 
 /* ---------- fixture list ---------- */
 #list{display:flex;flex-direction:column;gap:18px;outline:none;min-height:60vh}
+/* while it loads, at least a screen tall: with the filters folded on phones the list starts high up, and the footer
+   would show below "Loading fixtures…", then jump down when the matches arrive (a layout shift Lighthouse counts) */
+#list:has(>[data-t="loading"]){min-height:100vh}
 .day{display:grid;grid-template-columns:84px minmax(0,1fr);gap:14px;align-items:start}
 .day-h{margin:0;position:sticky;top:var(--filters-h,150px)}
 .cal-block{display:flex;flex-direction:column;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
@@ -620,6 +623,13 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
   :root[data-size] .tools>#calmenu{grid-column:1/-1}
   .tools>.calmenu>summary.btn,.tools>.btn{width:100%;min-height:52px;font-size:16px}
   .filters{position:static}
+  /* the filters fold away behind "Show filters" (the laptop bar's button), so the list comes first; the summary
+     beside it says what is shown. data-filters="open" unfolds them (foldFilters, js/wide.js) */
+  .side-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px}
+  .side-bar p{flex:1 1 150px}
+  :root:not([data-filters]) .filters{display:none}
+  :root[data-filters] .side-bar p{display:none}
+  :root[data-filters] .filters{margin-top:-18px}   /* straight under its button: no gap of the column between them */
   .day-h{position:static}
   #leagues,.seg{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px;scroll-padding-inline:16px}
   #leagues::-webkit-scrollbar,.seg::-webkit-scrollbar{display:none}

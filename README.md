@@ -15,6 +15,7 @@ Matchday Planner is a free website that lists upcoming matches from the **Premie
 - **Open the match details.** Each match has a **Match details** button with the score, goals, cards and substitutions, the line-ups, the league table and a map of the stadium. You can share a link to one match or add it to your calendar.
 - **Follow a Formula 1 weekend.** Every practice, qualifying, sprint and race session is listed. The **Race weekend** button shows the schedule, results, the championship standings and a drawing of the track.
 - **Check the league tables** with the **Tables** button: all four leagues, the Nations League's League A groups, plus the F1 drivers' and teams' championships.
+- **Keep it on your home screen.** On an Android phone, open the site in Chrome, tap the menu (three dots) and choose **Add to Home screen** (or **Install app**). On an iPhone, open it in Safari, tap **Share** and choose **Add to Home Screen**. The site then opens from its own icon, like an app.
 - **Put the fixtures in your calendar.** The **Calendar** button gives you a feed you can subscribe to in Google Calendar, Apple Calendar, Outlook, Proton Calendar and most other apps. Subscribed calendars update by themselves when a time changes. (The feed covers football only.)
 - **Watch on CazéTV.** When the Brazilian YouTube channel CazéTV is streaming a match, the card shows a link to the stream. These streams are usually only available in Brazil.
 

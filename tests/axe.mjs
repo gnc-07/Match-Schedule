@@ -1,7 +1,7 @@
 // Runs axe-core (WCAG 2.2 AA plus best practices) over every combination the
 // project rules require: light and dark theme, English and Portuguese,
 // 390px, 1280px (laptop: filters in a sidebar) and 1920px wide (monitor: a right-hand column, and match details beside the list),
-// with the menus closed (the Follow your teams invitation showing), teams starred (Your teams), the filter sidebar hidden (1280px and 1920px only), Settings open, Calendar open, the League tables window (a league, the Nations League groups and the F1 championship),
+// with the menus closed (the Follow your teams invitation showing), the filters unfolded (390px only), teams starred (Your teams), the filter sidebar hidden (1280px and 1920px only), Settings open, Calendar open, the League tables window (a league, the Nations League groups and the F1 championship),
 // the match details panel and the F1 race weekend panel (race results; qualifying in high contrast), plus high contrast (list and match details), using sample data (mock-data.mjs) in place of ESPN, Jolpica-F1, Wikidata and OpenStreetMap.
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
@@ -16,7 +16,7 @@ const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-prac
 const themes = ["light", "dark"];
 const langs = ["en", "pt"];
 const widths = [390, 1280, 1920];
-const states = ["closed", "starred", "sidebar-hidden", "setmenu", "calmenu", "tables", "tables-unl", "tables-f1", "details", "high", "high-details", "f1", "high-f1"];
+const states = ["closed", "filters-open", "starred", "sidebar-hidden", "setmenu", "calmenu", "tables", "tables-unl", "tables-f1", "details", "high", "high-details", "f1", "high-f1"];
 const query = { details: `&match=${encodeURIComponent(MATCH.uid)}`, "high-details": `&match=${encodeURIComponent(MATCH.uid)}`,
   f1: `&match=${encodeURIComponent(F1_WEEKEND)}`, "high-f1": `&match=${encodeURIComponent(F1_WEEKEND)}` };
 
@@ -28,7 +28,8 @@ const browser = await puppeteer.launch({ executablePath: chromePath(), headless:
 const WORKERS = Math.max(1, Number(process.env.AXE_WORKERS) || 6);
 const views = [];
 for (const theme of themes) for (const lang of langs) for (const width of widths) for (const state of states)
-  if (!(state === "sidebar-hidden" && width < 1100)) views.push([theme, lang, width, state]);   // phones have no sidebar
+  if (!(state === "sidebar-hidden" && width < 1100) && !(state === "filters-open" && width > 640))   // phones have no sidebar,
+    views.push([theme, lang, width, state]);                                                         // and fold their filters away
 
 // Each view in its own private window: views checked at the same time must not share saved settings (theme, contrast).
 // The window is closed however the check ends, so a view that fails partway does not leave it open.
@@ -53,6 +54,7 @@ async function inspect(page, [theme, lang, width, state]) {
     theme, state.startsWith("high"), state === "sidebar-hidden" ? "closed" : "open", state === "starred" ? [MATCH.home, MATCH.away] : []);
   await mockNetwork(page);
   await page.goto(`${BASE}?lang=${lang}${query[state] || ""}`, { waitUntil: "networkidle0" });
+  if (state === "filters-open") await page.click("#sideshow");
   if (state === "setmenu" || state === "calmenu") await page.evaluate(id => { document.getElementById(id).open = true; }, state);
   if (state.startsWith("tables")) { await page.click("#tablesbtn"); await page.waitForSelector("#ltbody table"); }
   if (state === "tables-unl") { await page.click('#ltchips [data-code="UNL"]'); await page.waitForSelector("#lt-g-A4"); }

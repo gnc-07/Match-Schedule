@@ -21,8 +21,9 @@ const TYPES = {
   ".html": "text/html; charset=utf-8", ".json": "application/json; charset=utf-8", ".ics": "text/calendar; charset=utf-8",
   ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
   ".svg": "image/svg+xml", ".txt": "text/plain; charset=utf-8", ".png": "image/png", ".woff2": "font/woff2",
+  ".webmanifest": "application/manifest+json",
 };
-const COMPRESS = /^(text\/|application\/json|image\/svg)/;   // what GitHub Pages compresses; fonts and pictures already are
+const COMPRESS = /^(text\/|application\/(manifest\+)?json|image\/svg)/;   // what GitHub Pages compresses; fonts and pictures already are
 
 export function chromePath() {
   // last, a Chromium that Playwright downloaded: the one this Playwright version expects, then any other build in its
