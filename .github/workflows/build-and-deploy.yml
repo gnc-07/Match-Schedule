@@ -14,7 +14,7 @@ on:
         default: false
   push:
     branches: [main]
-    paths: ["friendlies.json", "nations_league.json", "overrides.json", "build_schedule.py", "cazetv.py", "research.py", "common.py", "index.html", "styles.css", "js/**", "publish_site.py", "fonts/**", "sitemap.xml", "og-image.png", "manifest.webmanifest", "icons/**", "google*.html", "tests/test_scripts.py", ".github/workflows/**"]
+    paths: ["friendlies.json", "nations_league.json", "overrides.json", "build_schedule.py", "cazetv.py", "research.py", "common.py", "index.html", "styles.css", "js/**", "publish_site.py", "fonts/**", "sitemap.xml", "og-image.png", "manifest.webmanifest", "icons/**", "flags/**", "google*.html", "tests/test_scripts.py", ".github/workflows/**"]
 
 permissions: {}                  # nothing by default; each job below asks only for what it needs
 
@@ -92,7 +92,7 @@ jobs:
 
       - name: Collect the files that make up the website
         # one page (index.html with styles.css and js/ inside it, and a fingerprint of each script in its
-        # security policy), plus fixtures.json, soccer.ics, the fonts, sitemap.xml, og-image.png, the manifest and icons; see publish_site.py
+        # security policy), plus fixtures.json, soccer.ics, the fonts, sitemap.xml, og-image.png, the manifest, icons and flags; see publish_site.py
         run: python publish_site.py _site
 
       - uses: actions/configure-pages@v5

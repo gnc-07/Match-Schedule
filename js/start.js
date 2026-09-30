@@ -40,6 +40,9 @@ const usable = r =>
 function useData(j) {
   META = j;
   DATA = (Array.isArray(j.matches) ? j.matches : []).filter(usable);
+  BADGES = new Map(
+    j.badges && typeof j.badges === "object" && !Array.isArray(j.badges) ? Object.entries(j.badges) : [],
+  );
   DATA.forEach(r => {
     r.when = toDate(r.utc);
     if (!r.when) r.utc = null;

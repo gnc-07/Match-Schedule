@@ -86,9 +86,29 @@ def verification_files(root=HERE):
             raise ValueError(f"{name} is not a Google verification file (it must hold only the line Google gives)")
     return found
 
+FLAG = re.compile(r"[a-z]{2}(-[a-z]{3})?")
+
+def publish_flags(root, out):
+    """The national team flags: flags/flags.json holds them packed (one line per flag, so the repository stays small);
+    each is published as flags/<code>.webp, with flag-icons' licence. Only a proper flag code and a WebP picture
+    under 20 KB is written."""
+    src = os.path.join(root, "flags", "flags.json")
+    if not os.path.exists(src):
+        return
+    with open(src, encoding="utf-8") as f:
+        flags = json.load(f)["flags"]
+    os.makedirs(os.path.join(out, "flags"), exist_ok=True)
+    for code, (_, b64) in flags.items():
+        pic = base64.b64decode(b64, validate=True)
+        if not FLAG.fullmatch(code) or pic[:4] != b"RIFF" or pic[8:12] != b"WEBP" or len(pic) > 20_000:
+            raise ValueError(f"flags/flags.json: {code!r} is not a flag code with a WebP picture under 20 KB")
+        with open(os.path.join(out, "flags", code + ".webp"), "wb") as f:
+            f.write(pic)
+    shutil.copyfile(os.path.join(root, "flags", "LICENSE"), os.path.join(out, "flags", "LICENSE"))
+
 def publish(folder, root=HERE):
     """Writes the published site into `folder`: the page, the data files, the fonts, the sitemap, the link-preview
-    picture and any Google verification file, nothing else."""
+    picture, the home-screen manifest and icons, the flags and any Google verification file, nothing else."""
     out = os.path.abspath(folder)
     if out == os.path.abspath(root) or os.path.abspath(root).startswith(out + os.sep):
         raise ValueError("publish into a folder of its own (such as _site), never over the source files")
@@ -100,6 +120,7 @@ def publish(folder, root=HERE):
             shutil.copytree(src, dst, dirs_exist_ok=True)
         else:
             shutil.copyfile(src, dst)
+    publish_flags(root, out)
     # the published fixtures.json carries the fingerprint of the page published with it (see the top of this file)
     path = os.path.join(out, "fixtures.json")
     with open(path, encoding="utf-8") as f:
