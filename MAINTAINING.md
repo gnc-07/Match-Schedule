@@ -78,7 +78,7 @@ To have the research run immediately instead of waiting for the daily run: Actio
 
 ## Day-to-day maintenance (only if you want to step in)
 
-- **A new friendly is announced, or a time is confirmed:** open `friendlies.json` (or `overrides.json` for league matches, or `nations_league.json` for the Nations League) on GitHub, click the pencil icon, add a report, and **Commit changes**. The workflow rebuilds and republishes within a couple of minutes, except after a change to `nations_league.json` alone: that one waits for the next scheduled rebuild (within about six hours), unless you start a run yourself from the **Actions** tab.
+- **A new friendly is announced, or a time is confirmed:** open `friendlies.json` (or `overrides.json` for league matches, or `nations_league.json` for the Nations League) on GitHub, click the pencil icon, add a report, and **Commit changes**. The workflow rebuilds and republishes within a couple of minutes.
 - **Something looks wrong:** the **Actions** tab shows every run; click one and open a step to read its log.
 - **Live scores missing:** they depend on ESPN's public feed, which is unofficial and could change without notice. The rest of the site keeps working if it does. Bundesliga scores then come from OpenLigaDB (the Live now box says so); the other leagues show their final score after the next rebuild.
 - **Line-ups, match events or tables missing:** they come from the same ESPN feed. When ESPN does not answer, the tables still show (from OpenLigaDB for the Bundesliga, otherwise worked out from results, with a note saying so). Line-ups usually appear about an hour before kick-off, and ESPN does not always list the coach. Friendlies often have little or no detail.
