@@ -141,6 +141,9 @@ const viewChecks = [
   }],
 ];
 
+// on phones the filters are folded away behind "Show filters": the steps that use them unfold them first
+const unfold = async page => { if (!(await page.isVisible("#filters"))) await page.click("#sideshow"); };
+
 // Things a visitor does, run at phone and laptop width in English: [name, steps]
 const uid = MATCH.uid;
 const actChecks = [
@@ -180,7 +183,20 @@ const actChecks = [
     must(await attr(page, "lang") === "en", "choosing English did not switch back");
     await page.click("#setdone");
   }],
+  ["filters fold on phones", async page => {
+    if (page.viewportSize().width > 640) return;   // laptops and monitors have the sidebar instead
+    must(await page.isHidden("#filters"), "the filters are not folded away when the page opens");
+    must(await page.isVisible("#sidesum"), "no summary of what is shown beside Show filters");
+    await page.click("#sideshow");
+    must(await page.isVisible("#chip-F1"), "Show filters did not unfold the filters");
+    must(await page.getAttribute("#sideshow", "aria-expanded") === "true", "Show filters does not say it is expanded");
+    must((await page.textContent("#sideshow")).trim() === "Hide filters", "the button does not read Hide filters once they are shown");
+    await page.click("#sideshow");
+    await page.waitForSelector("#filters", { state: "hidden", timeout: 3000 });
+    must(await page.getAttribute("#sideshow", "aria-expanded") === "false", "Hide filters does not say it is collapsed");
+  }],
   ["league chip", async page => {
+    await unfold(page);
     const f1 = () => count(page, '#list [data-uid^="f1|"]');
     const before = await f1(), pressed = await page.getAttribute("#chip-F1", "aria-pressed");
     await page.click("#chip-F1");
@@ -190,6 +206,7 @@ const actChecks = [
     must(await f1() === before, "switching the F1 chip back did not restore the list");
   }],
   ["date range", async page => {
+    await unfold(page);
     await page.click('#range [data-r="week"]');
     must(await page.getAttribute('#range [data-r="week"]', "aria-pressed") === "true", "Next 7 days was not selected");
     await page.click('#range [data-r="custom"]');
@@ -199,6 +216,7 @@ const actChecks = [
     must(await page.isHidden("#daterange"), "All did not hide the dates");
   }],
   ["team search", async page => {
+    await unfold(page);
     const team = MATCH.home;
     await page.fill("#q", team);
     await wait(400);
