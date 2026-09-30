@@ -709,6 +709,129 @@ def previous_f1(start, path="fixtures.json"):
     recent = (start - timedelta(days=KEEP_DAYS)).isoformat()
     return [r for r in old if isinstance(r, dict) and _valid_f1(r) and r["date"] >= recent]
 
+# ---------- badges beside team names: a flag for national teams, the club's crest for clubs ----------
+# Flags: flag-icons (MIT), in flags/, found by the country's English name (flags/countries.json) or FLAG_ALIAS.
+# Crests: ESPN's, by ESPN's team number, found in ESPN's team list for the club's competition. Only the flag code or
+# the number is saved; the page builds the picture's address itself, so fixtures.json cannot point it elsewhere.
+ESPN_TEAMS = "https://site.api.espn.com/apis/site/v2/sports/soccer/{}/teams"
+ESPN_LEAGUE = {"EPL": "eng.1", "LIGA": "esp.1", "BUN": "ger.1", "BRA": "bra.1"}
+NATIONAL = ("INTL", "UNL")
+FLAG_ALIAS = {   # ESPN's (and FIFA's) names for teams whose flag is filed under another name
+    "Bonaire": "bq", "Bosnia-Herzegovina": "ba", "British Virgin Islands": "vg", "Cape Verde": "cv", "Cabo Verde": "cv",
+    "Congo DR": "cd", "Czechia": "cz", "Ivory Coast": "ci", "Kyrgyz Republic": "kg", "Palestine": "ps",
+    "Republic of Ireland": "ie", "St. Kitts and Nevis": "kn", "St. Lucia": "lc", "St. Martin": "mf",
+    "St. Vincent and the Grenadines": "vc", "US Virgin Islands": "vi", "United States": "us", "USA": "us",
+    "Korea Republic": "kr", "Korea DPR": "kp", "North Korea": "kp", "Chinese Taipei": "tw", "IR Iran": "ir",
+    "Turkey": "tr", "Congo": "cg"}
+# (Tahiti is left out on purpose: its flag is not French Polynesia's, and flag-icons has no Tahiti flag.)
+FLAG_CODE = re.compile(r"[a-z]{2}(-[a-z]{3})?")
+# the words left out when names are compared, as when the page matches ESPN's live scores (STOP and ALIAS in js/live.js),
+# plus "deportivo" (as generic as "club": Deportivo Alavés and Deportivo La Coruña) and "hamburger" (ESPN: Hamburg SV)
+NAME_SKIP = {"fc", "cf", "afc", "sc", "ac", "cd", "rc", "ud", "sd", "ca", "ec", "se", "cr", "fbpa", "club", "clube", "de",
+             "del", "la", "le", "the", "and", "futbol", "football", "sport", "sporting", "esporte", "regatas", "balompie",
+             "calcio", "sad", "national", "team", "deportivo"}
+NAME_ALIAS = {"mineiro": "atleticomg", "paranaense": "athleticopr", "munchen": "munich", "koln": "cologne",
+              "wolverhampton": "wolves", "hamburger": "hamburg"}
+
+def _plain(name):
+    import unicodedata
+    return "".join(c for c in unicodedata.normalize("NFD", name) if not unicodedata.combining(c)).lower()
+
+def team_words(name):
+    """The words that identify a team: no accents, lower case, without "FC", "Clube" and the like; "Atlético-MG"
+    also as "atleticomg"."""
+    s = _plain(name)
+    out = {a + b for a, b in re.findall(r"([a-z]+)-([a-z]+)", s)}
+    for t in re.split(r"[^a-z0-9]+", s):
+        if len(t) > 2 and t not in NAME_SKIP:
+            out.add(t)
+            if t in NAME_ALIAS:
+                out.add(NAME_ALIAS[t])
+    return out
+
+def flag_codes(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "flags", "countries.json")):
+    """{country name, compared without accents, spaces or punctuation: flag code}, from flags/countries.json and
+    FLAG_ALIAS; only codes that have a flag in flags/."""
+    key = lambda n: re.sub(r"[^a-z]", "", _plain(n))
+    folder = os.path.dirname(path)
+    names = {**load_json(path), **FLAG_ALIAS}
+    return {key(n): c for n, c in names.items()
+            if FLAG_CODE.fullmatch(c) and os.path.exists(os.path.join(folder, c + ".svg"))}, key
+
+def _espn_teams(league):
+    """ESPN's clubs in one competition, as (words, ESPN team number). ESPN's API is unofficial: an answer that is
+    missing or odd gives no clubs, never an error, and a team number that is not plain digits is left out."""
+    try:
+        teams = fetch_json(ESPN_TEAMS.format(league))["sports"][0]["leagues"][0]["teams"]
+    except Exception as e:
+        print(f"ESPN teams for {league} failed ({e}); crests from the last build")
+        return []
+    out = []
+    for t in teams if isinstance(teams, list) else []:
+        t = t.get("team") if isinstance(t, dict) else None
+        if not isinstance(t, dict) or not isinstance(t.get("id"), str) or not re.fullmatch(r"\d{1,7}", t["id"]):
+            continue
+        words = set()
+        for k in ("displayName", "shortDisplayName", "name"):
+            if isinstance(t.get(k), str):
+                words |= team_words(t[k])
+        if not words and isinstance(t.get("slug"), str):   # "Deportivo" alone: its address says esp.deportivo_coruna
+            words = team_words(t["slug"].split(".")[-1].replace("_", " "))
+        if words:
+            out.append((words, t["id"]))
+    return out
+
+def best_team(name, teams):
+    """The ESPN team number of the club sharing the most words with `name`. Between two sharing as many, the one
+    whose word comes first in the name ("RCD Espanyol de Barcelona" is Espanyol, not Barcelona). None when no club
+    shares a word, or two still tie: better no crest than another club's."""
+    w = team_words(name)
+    seq = [x for t in name.split() for x in team_words(t)]   # the name's words in order
+    first = lambda words: min((seq.index(x) for x in words & w if x in seq), default=len(seq))
+    scored = [((len(w & words), -first(words)), tid) for words, tid in teams if w & words]
+    if not scored:
+        return None
+    best = max(k for k, _ in scored)
+    found = [tid for k, tid in scored if k == best]
+    return found[0] if len(found) == 1 else None
+
+def valid_badge(b):
+    return isinstance(b, dict) and len(b) == 1 and (
+        (isinstance(b.get("flag"), str) and bool(FLAG_CODE.fullmatch(b["flag"]))) or
+        (isinstance(b.get("crest"), str) and bool(re.fullmatch(r"\d{1,7}", b["crest"]))))
+
+def previous_badges(path="fixtures.json"):
+    """Badges from the last published fixtures.json, checked like everything read back from that file."""
+    try:
+        old = load_json(path).get("badges")
+    except Exception:
+        return {}
+    return {k: v for k, v in (old.items() if isinstance(old, dict) else []) if isinstance(k, str) and valid_badge(v)}
+
+def team_badges(recs, previous=None):
+    """{team name: {"flag": code}} for national teams, {team name: {"crest": ESPN team number}} for clubs, each club
+    looked up among the clubs of its own competition (each list downloaded once). A club ESPN does not give this
+    time keeps its crest from the last build."""
+    flags, key = flag_codes()
+    lists, out = {}, {}
+    for r in recs:
+        for name in (r["home"], r["away"]):
+            if not name or name in out:
+                continue
+            if r["code"] in NATIONAL:
+                if key(name) in flags:
+                    out[name] = {"flag": flags[key(name)]}
+            elif r["code"] in ESPN_LEAGUE:
+                if r["code"] not in lists:
+                    lists[r["code"]] = _espn_teams(ESPN_LEAGUE[r["code"]])
+                tid = best_team(name, lists[r["code"]])
+                if tid:
+                    out[name] = {"crest": tid}
+    for name, b in (previous or {}).items():
+        if "crest" in b:
+            out.setdefault(name, b)
+    return out
+
 def load_all(start):
     """Every match and session from `start` on. Returns (records, sources, tables, f1_stale): which source each
     league came from (shown on the site), each league's backup table (standings()), and whether the F1 sessions
@@ -850,7 +973,8 @@ def main():
     # "site" fingerprints the published page (index.html with styles.css and js/ inside it), so a page left open can
     # tell the site itself was updated and reload
     meta = {"generated": datetime.now(timezone.utc).isoformat(timespec="minutes"), "site": publish_site.fingerprint(),
-            "sources": sources, "tables": {c: t for c, t in tables.items() if t}, "matches": recs}
+            "sources": sources, "tables": {c: t for c, t in tables.items() if t},
+            "badges": team_badges(recs, previous_badges()), "matches": recs}
     if f1_stale:
         meta["f1stale"] = True
     write_fixtures(meta)

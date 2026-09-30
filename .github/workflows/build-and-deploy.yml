@@ -14,7 +14,7 @@ on:
         default: false
   push:
     branches: [main]
-    paths: ["friendlies.json", "nations_league.json", "overrides.json", "build_schedule.py", "cazetv.py", "research.py", "common.py", "index.html", "styles.css", "js/**", "publish_site.py", "fonts/**", "sitemap.xml", "og-image.png", "google*.html", "tests/test_scripts.py", ".github/workflows/**"]
+    paths: ["friendlies.json", "nations_league.json", "overrides.json", "build_schedule.py", "cazetv.py", "research.py", "common.py", "index.html", "styles.css", "js/**", "publish_site.py", "fonts/**", "sitemap.xml", "og-image.png", "flags/**", "google*.html", "tests/test_scripts.py", ".github/workflows/**"]
 
 permissions: {}                  # nothing by default; each job below asks only for what it needs
 

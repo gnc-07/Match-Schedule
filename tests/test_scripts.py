@@ -654,7 +654,7 @@ class PublishSite(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             self.fake_site(d)
             for name in ("soccer.ics", "fonts/x.woff2", "sitemap.xml", "og-image.png", "manifest.webmanifest", "icons/x.png",
-                         "build_schedule.py", "tests/t.py"):
+                         "flags/x.svg", "build_schedule.py", "tests/t.py"):
                 os.makedirs(os.path.dirname(os.path.join(d, name)), exist_ok=True)
                 with open(os.path.join(d, name), "w", encoding="utf-8") as f:
                     f.write("x")
@@ -669,8 +669,8 @@ class PublishSite(unittest.TestCase):
                 self.assertEqual(f.read(), fixtures)
             found = sorted(os.path.relpath(os.path.join(p, n), os.path.join(d, "_site"))
                            for p, _, names in os.walk(os.path.join(d, "_site")) for n in names)
-            self.assertEqual(found, ["fixtures.json", "fonts/x.woff2", "icons/x.png", "index.html", "manifest.webmanifest",
-                                    "og-image.png", "sitemap.xml", "soccer.ics"])
+            self.assertEqual(found, ["fixtures.json", "flags/x.svg", "fonts/x.woff2", "icons/x.png", "index.html",
+                                    "manifest.webmanifest", "og-image.png", "sitemap.xml", "soccer.ics"])
             with self.assertRaises(ValueError):
                 publish_site.publish(d, d)          # never over the source files
 
@@ -678,7 +678,7 @@ class PublishSite(unittest.TestCase):
         name = "google1a2b3c4d5e6f7a8b.html"
         with tempfile.TemporaryDirectory() as d:
             self.fake_site(d)
-            for extra in ("soccer.ics", "fonts/x.woff2", "sitemap.xml", "og-image.png", "manifest.webmanifest", "icons/x.png"):
+            for extra in ("soccer.ics", "fonts/x.woff2", "sitemap.xml", "og-image.png", "manifest.webmanifest", "icons/x.png", "flags/x.svg"):
                 os.makedirs(os.path.dirname(os.path.join(d, extra)), exist_ok=True)
                 with open(os.path.join(d, extra), "w", encoding="utf-8") as f:
                     f.write("x")
@@ -695,6 +695,74 @@ class PublishSite(unittest.TestCase):
                 f.write("<script>alert(1)</script>")          # the right name, other content: refused, loudly
             with self.assertRaises(ValueError):
                 publish_site.publish(os.path.join(d, "_site2"), d)
+
+
+class TeamBadges(unittest.TestCase):
+    """Flags for national teams and ESPN crests for clubs (team_badges()): a team shown with another's flag or crest
+    is worse than none, so names must match closely, ties give nothing, and only a flag code or a team number is kept."""
+    @staticmethod
+    def espn(*teams):
+        return {"sports": [{"leagues": [{"teams": [{"team": t} for t in teams]}]}]}
+
+    def test_national_teams_get_their_flag(self):
+        flags, key = bs.flag_codes()
+        got = lambda n: flags.get(key(n))
+        for name, code in (("Germany", "de"), ("England", "gb-eng"), ("Wales", "gb-wls"), ("Scotland", "gb-sct"),
+                           ("Türkiye", "tr"), ("Turkey", "tr"), ("Czechia", "cz"), ("United States", "us"),
+                           ("Ivory Coast", "ci"), ("Curaçao", "cw"), ("Republic of Ireland", "ie"), ("Bosnia-Herzegovina", "ba")):
+            self.assertEqual(got(name), code, name)
+        self.assertIsNone(got("Tahiti"))      # no Tahiti flag in flag-icons, and French Polynesia's is not Tahiti's
+        self.assertIsNone(got("Atlantis"))
+        for code in set(flags.values()):     # every code found has its picture
+            self.assertTrue(os.path.exists(os.path.join(PublishSite.ROOT, "flags", code + ".svg")), code)
+
+    def test_club_words_and_closest_name(self):
+        self.assertEqual(bs.team_words("Club Atlético de Madrid"), {"atletico", "madrid"})
+        self.assertIn("atleticomg", bs.team_words("CA Mineiro"))
+        self.assertIn("hamburg", bs.team_words("Hamburger SV"))
+        teams = [({"manchester", "united", "man"}, "360"), ({"manchester", "city", "man"}, "382"),
+                 ({"espanyol"}, "88"), ({"barcelona"}, "83")]
+        self.assertEqual(bs.best_team("Manchester United FC", teams), "360")
+        self.assertEqual(bs.best_team("Manchester City FC", teams), "382")
+        self.assertEqual(bs.best_team("RCD Espanyol de Barcelona", teams), "88")   # the word that comes first wins a tie
+        self.assertIsNone(bs.best_team("Manchester FC", teams))                    # City and United tie: no crest
+        self.assertIsNone(bs.best_team("Liverpool FC", teams))
+
+    def test_odd_espn_answers_are_left_out(self):
+        answer = self.espn({"id": "359", "displayName": "Arsenal"}, {"id": "36x", "displayName": "Chelsea"},
+                           {"id": 368, "displayName": "Everton"}, "not a team", {"team": 7},
+                           {"id": "11826", "displayName": "Deportivo", "slug": "esp.deportivo_coruna"})
+        with mock.patch.object(bs, "fetch_json", return_value=answer):
+            got = bs._espn_teams("eng.1")
+        self.assertEqual([(sorted(w), t) for w, t in got], [(["arsenal"], "359"), (["coruna"], "11826")])
+        for bad in (ValueError("down"), {"sports": []}, {"sports": [{"leagues": [{"teams": "x"}]}]}):
+            with mock.patch.object(bs, "fetch_json", side_effect=[bad] if isinstance(bad, Exception) else None, return_value=bad):
+                self.assertEqual(bs._espn_teams("eng.1"), [])
+
+    def test_badges_for_a_build(self):
+        calls = []
+        def fake(url, *a):
+            calls.append(url)
+            return self.espn({"id": "359", "displayName": "Arsenal"}) if "/eng.1/" in url else self.espn()
+        recs = [{"code": "EPL", "home": "Arsenal FC", "away": "Chelsea FC"}, {"code": "EPL", "home": "Chelsea FC", "away": "Arsenal FC"},
+                {"code": "UNL", "home": "Wales", "away": "Tahiti"}, {"code": "F1", "home": "", "away": ""}]
+        with mock.patch.object(bs, "fetch_json", side_effect=fake):
+            got = bs.team_badges(recs, previous={"Chelsea FC": {"crest": "363"}, "Wales": {"flag": "fr"}, "Arsenal FC": {"crest": "1"}})
+        self.assertEqual(len(calls), 1)                                    # the Premier League list, once
+        self.assertEqual(got["Arsenal FC"], {"crest": "359"})             # this build's answer beats the last one's
+        self.assertEqual(got["Chelsea FC"], {"crest": "363"})             # not in this build's list: kept from the last
+        self.assertEqual(got["Wales"], {"flag": "gb-wls"})                # flags come from the name, never the last build
+        self.assertNotIn("Tahiti", got)
+        self.assertTrue(all(bs.valid_badge(b) for b in got.values()))
+
+    def test_previous_badges_are_checked(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "fixtures.json")
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump({"badges": {"A": {"crest": "359"}, "B": {"flag": "de"}, "C": {"crest": "35x"}, "D": {"flag": "../x"},
+                                      "E": "de", "F": {"crest": 359}, "G": {"flag": "de", "crest": "1"}}, "matches": []}, f)
+            self.assertEqual(bs.previous_badges(path), {"A": {"crest": "359"}, "B": {"flag": "de"}})
+            self.assertEqual(bs.previous_badges(os.path.join(d, "missing.json")), {})
 
 
 class SearchAndSharing(unittest.TestCase):

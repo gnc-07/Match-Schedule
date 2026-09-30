@@ -45,7 +45,8 @@ const openSrc = new Set(); // which source lists are open, so a refresh keeps th
 let range = store.get("range", "all"),
   limit = 40,
   DATA = [],
-  META = null;
+  META = null,
+  BADGES = new Map(); // fixtures.json "badges": team name -> {flag: "de"} or {crest: ESPN team number}
 
 /* ---------- apply the language to every static string ---------- */
 function applyLang() {
@@ -464,12 +465,34 @@ function filtered() {
 /* ---------- rendering ---------- */
 const compName = c => T.comp[c] || c;
 const teamName = n => T.teams[n] || n;
+// beside each team name, decorative (the name is always written next to it): a national team's flag (flags/, MIT)
+// or a club's crest (ESPN's picture server, at a small size). Only a flag code or a team number comes from
+// fixtures.json, checked here; the address is built from it, so the data cannot point the picture anywhere else.
+const FLAG_RE = /^[a-z]{2}(-[a-z]{3})?$/,
+  CREST_RE = /^\d{1,7}$/;
+function badgeHTML(name) {
+  const b = BADGES.get(name);
+  if (!b || typeof b !== "object") return "";
+  const img = src =>
+    '<span class="badge" aria-hidden="true"><img src="' +
+    esc(src) +
+    '" alt="" width="18" height="18" loading="lazy"></span>';
+  if (typeof b.flag === "string" && FLAG_RE.test(b.flag)) return img("flags/" + b.flag + ".svg");
+  if (typeof b.crest === "string" && CREST_RE.test(b.crest))
+    return img("https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/" + b.crest + ".png&h=40&w=40").replace(
+      'class="badge"',
+      'class="badge crest"',
+    );
+  return "";
+}
 function teamHTML(name) {
   const f = favs.has(name);
   return (
     '<span class="team' +
     (f ? " fav" : "") +
-    '"><span class="nm">' +
+    '">' +
+    badgeHTML(name) +
+    '<span class="nm">' +
     esc(teamName(name)) +
     '</span><button type="button" class="star" data-team="' +
     esc(name) +

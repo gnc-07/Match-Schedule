@@ -39,7 +39,12 @@ const tables = { EPL: [{ team: "Arsenal" + EVIL, rank: EVIL, p: 3, w: 3, d: 0, l
 // two ordinary matches whose stadiums are looked up on Wikidata while it fails, answers, or knows no such place
 const mapMatch = (uid, venue) => ({ comp: "Premier League", code: "EPL", round: "Matchday 7", home: "Mapland FC " + uid,
   away: "Chelsea", date: soon.slice(0, 10), utc: soon, uid, venue });
-const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, tables,
+// team badges: markup, an address in place of a team number, a path out of flags/, wrong types; and one real crest and
+// one real flag, which must be drawn
+const badges = { [bad.home]: { crest: EVIL }, Chelsea: { crest: "359&img=https://evil.example/x.png" },
+  "Mapland FC test-map": { flag: "../index" }, "Wrongtype FC 1": { crest: 359 }, "Wrongtype FC 2": { flag: "de", crest: "1" },
+  "Borussia Dortmund": "de", "FC Bayern München": { crest: "132" }, Argentina: { flag: "ar" } };
+const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, tables, badges,
   matches: [bad, badWidth, badLat, bunLive, ...malformed, mapMatch("test-map", "Mapland Arena, Testville"),
     mapMatch("test-map-none", "Nowhere Ground, Testville"), ...data.matches] };
 // OpenLigaDB's answers: the match on now (a scorer with markup) and malformed entries that must be skipped quietly
@@ -146,12 +151,23 @@ try {
     if (!ok) problems.push(`league tables: the ${cell} cell does not show the hostile value as text`);
   }
 
-  // ESPN not answering: the backups take over, and their answers get the same treatment
-  espnDown = true;
   const shows = (what, ok) => {
     console.log(`${ok ? "PASS" : "FAIL"}  ${what}`);
     if (!ok) problems.push(what);
   };
+  // team badges: only a flag in flags/ or a crest from ESPN's crest folder, built from a plain team number
+  await page.goto(`${BASE}?lang=en`, { waitUntil: "networkidle0" });
+  const imgs = await page.evaluate(() => [...document.querySelectorAll("#list .badge img")].map(i =>
+    [i.getAttribute("src"), i.closest(".team")?.querySelector(".nm")?.textContent]));
+  shows("team badges: every picture is a flag from flags/ or an ESPN crest built from a team number",
+    imgs.every(([src]) => /^flags\/[a-z]{2}(-[a-z]{3})?\.svg$/.test(src) ||
+      /^https:\/\/a\.espncdn\.com\/combiner\/i\?img=\/i\/teamlogos\/soccer\/500\/\d{1,7}\.png&h=40&w=40$/.test(src)));
+  shows("team badges: hostile or malformed badges draw nothing, and real ones do",
+    imgs.some(([, n]) => /Bayern/.test(n)) && !imgs.some(([, n]) => /Chelsea|Arsenal|Wrongtype|Mapland|Dortmund/.test(n)));
+  await check("team badges");
+
+  // ESPN not answering: the backups take over, and their answers get the same treatment
+  espnDown = true;
   await page.goto(`${BASE}?lang=en`, { waitUntil: "networkidle0" });
   await page.waitForFunction(() => !document.querySelector("#livebox").hidden, { timeout: 15000 }).catch(() => {});
   const live = await page.evaluate(() => ({ list: document.querySelector("#livelist")?.textContent || "",

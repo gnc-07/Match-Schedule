@@ -139,11 +139,19 @@ export async function showMatch(page, uid = MATCH.uid) {
   throw new Error(`the sample match ${uid} is not in the list, even after "Show more"`);
 }
 
+// team badges as build_schedule.py writes them: crests (ESPN team numbers) for the sample match's clubs, and flags for
+// two national teams, on top of whatever the last build saved
+const BADGES = { ...(data.badges || {}), [MATCH.home]: { crest: "359" }, [MATCH.away]: { crest: "360" },
+  Argentina: { flag: "ar" }, Bolivia: { flag: "bo" } };
+
 // The sample answer for one outside request, or null to let it through (the test server's own files).
 // Only the sample match's league has a match on the scoreboard.
 export function answerFor(u) {
   if (new URL(u).pathname.endsWith("/fixtures.json"))
-    return { status: 200, contentType: "application/json", body: JSON.stringify({ ...data, f1stale: true, matches: MATCHES }) };
+    return { status: 200, contentType: "application/json", body: JSON.stringify({ ...data, f1stale: true, matches: MATCHES, badges: BADGES }) };
+  // club crests from ESPN's picture server: a plain grey shield stands in for each (never mistaken for a real crest)
+  if (u.includes("a.espncdn.com/combiner/i?img=/i/teamlogos/")) return { status: 200, contentType: "image/svg+xml",
+    body: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><path d="M20 3 35 8v12c0 9-6 15-15 17C11 35 5 29 5 20V8z" fill="#8a93a6"/></svg>' };
   const json = body => ({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(body) });
   if (u.includes("api.jolpi.ca")) {
     if (u.includes("/qualifying/")) return json(f1Quali);
