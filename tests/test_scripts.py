@@ -1004,6 +1004,19 @@ class CrestBoxes(unittest.TestCase):
                 self.assertGreaterEqual(box[4], 360)
                 self.assertLessEqual(box[4], 420)
 
+    def test_a_see_through_colour_in_grey_or_colour_pictures_is_not_measured_as_solid(self):
+        """Grey and colour PNGs (types 0 and 2) can mark one colour as see-through (tRNS). The reader does not decode
+        that, so it measures nothing and the crest keeps the usual unmeasured look, instead of a box around the whole
+        picture."""
+        colour = png([[(0, 0, 0)] * 4, [(0, 0, 0), (200, 30, 30), (200, 30, 30), (0, 0, 0)]] + [[(0, 0, 0)] * 4] * 2,
+                     ctype=2, trns=[0, 0, 0, 0, 0, 0])
+        grey = png([[0, 0, 0, 0], [0, 90, 90, 0], [0, 0, 0, 0], [0, 0, 0, 0]], ctype=0, trns=[0, 0])
+        self.assertIsNone(bs.png_alpha(colour))
+        self.assertIsNone(bs.png_alpha(grey))
+        self.assertIsNone(bs.crest_box(colour))
+        plain = png([[(9, 9, 9)] * 4] * 4, ctype=2)                  # no see-through colour: the whole picture, as before
+        self.assertEqual(bs.crest_box(plain)[:4], [0, 0, 1000, 1000])
+
     def test_faint_edges_and_palettes(self):
         faint = png([[(0, 0, 0, 10)] * 4, [(0, 0, 0, 10), (9, 9, 9, 255), (0, 0, 0, 10), (0, 0, 0, 10)]] + [[(0, 0, 0, 0)] * 4] * 2)
         self.assertEqual(bs.crest_box(faint)[:4], [250, 250, 250, 250])      # a nearly clear haze is not the crest

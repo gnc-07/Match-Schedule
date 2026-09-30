@@ -1047,6 +1047,8 @@ def png_alpha(data):
     if len(raw) < h * (stride + 1):
         return None
     trns = chunks.get(b"tRNS", b"")
+    if trns and ctype in (0, 2):
+        return None                               # one colour marked see-through: not decoded, so not measured
     rows, prev = [], bytearray(stride)
     for y in range(h):
         f, line = raw[y * (stride + 1)], bytearray(raw[y * (stride + 1) + 1:(y + 1) * (stride + 1)])
