@@ -46,7 +46,7 @@ let range = store.get("range", "all"),
   limit = 40,
   DATA = [],
   META = null,
-  BADGES = new Map(); // fixtures.json "badges": team name -> {flag: "de"} or {crest: ESPN team number}
+  BADGES = new Map(); // fixtures.json "badges": team name -> {flag: "de"} or {crest: ESPN team number, box: where it is drawn}
 
 /* ---------- apply the language to every static string ---------- */
 function applyLang() {
@@ -470,20 +470,59 @@ const teamName = n => T.teams[n] || n;
 // fixtures.json, checked here; the address is built from it, so the data cannot point the picture anywhere else.
 const FLAG_RE = /^[a-z]{2}(-[a-z]{3})?$/,
   CREST_RE = /^\d{1,7}$/;
+// ESPN's crests sit on square pictures, each with its own empty margin, so shrinking every picture alike showed some
+// crests large and others small or off centre. build_schedule.py (crest_box()) measures where each crest is drawn:
+// [left, top, width, height, reach] in thousandths of the picture ("box"; "dark" for ESPN's dark-background version,
+// or false). Here the drawing's longest side becomes CREST_SIDE px and its middle is placed on the middle of the 18px
+// badge.
+const CREST_SIDE = 17;
+function crestFit(box) {
+  if (!Array.isArray(box) || box.length !== 5 || !box.every(v => Number.isInteger(v) && v >= 0 && v <= 1000))
+    return null;
+  const [x, y, w, h, r] = box;
+  if (!w || !h || !r || x + w > 1000 || y + h > 1000) return null;
+  const s = Math.min((CREST_SIDE * 1000) / Math.max(w, h), 40),
+    at = v => (9 - (s * v) / 1000).toFixed(2);
+  return {
+    px: s > 32 ? 100 : s > 16 ? 80 : 40,
+    style:
+      "width:" +
+      s.toFixed(2) +
+      "px;height:" +
+      s.toFixed(2) +
+      "px;left:" +
+      at(x + w / 2) +
+      "px;top:" +
+      at(y + h / 2) +
+      "px",
+  };
+}
 function badgeHTML(name) {
   const b = BADGES.get(name);
   if (!b || typeof b !== "object") return "";
-  const img = src =>
-    '<span class="badge" aria-hidden="true"><img src="' +
+  const img = (src, cls, style) =>
+    '<img src="' +
     esc(src) +
-    '" alt="" width="18" height="18" loading="lazy"></span>';
-  if (typeof b.flag === "string" && FLAG_RE.test(b.flag)) return img("flags/" + b.flag + ".webp");
-  if (typeof b.crest === "string" && CREST_RE.test(b.crest))
-    return img("https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/" + b.crest + ".png&h=40&w=40").replace(
-      'class="badge"',
-      'class="badge crest"',
-    );
-  return "";
+    '" alt="" width="18" height="18" loading="lazy"' +
+    (cls ? ' class="' + cls + '"' : "") +
+    (style ? ' style="' + esc(style) + '"' : "") +
+    ">";
+  if (typeof b.flag === "string" && FLAG_RE.test(b.flag))
+    return '<span class="badge" aria-hidden="true">' + img("flags/" + b.flag + ".webp") + "</span>";
+  if (typeof b.crest !== "string" || !CREST_RE.test(b.crest)) return "";
+  const src = (dir, n) =>
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/" + dir + "/" + b.crest + ".png&h=" + n + "&w=" + n,
+    fit = crestFit(b.box),
+    dark = fit && crestFit(b.dark);
+  if (!fit) return '<span class="badge crest" aria-hidden="true">' + img(src("500", 40)) + "</span>";
+  // in dark theme ESPN's dark-background crest, where it has one (styles.css shows one of the two; a lazy picture
+  // that is not shown is never downloaded)
+  return (
+    '<span class="badge crest fit" aria-hidden="true">' +
+    img(src("500", fit.px), dark ? "lt" : "", fit.style) +
+    (dark ? img(src("500-dark", dark.px), "dk", dark.style) : "") +
+    "</span>"
+  );
 }
 function teamHTML(name) {
   const f = favs.has(name);

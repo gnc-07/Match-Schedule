@@ -43,7 +43,10 @@ const mapMatch = (uid, venue) => ({ comp: "Premier League", code: "EPL", round: 
 // one real flag, which must be drawn
 const badges = { [bad.home]: { crest: EVIL }, Chelsea: { crest: "359&img=https://evil.example/x.png" },
   "Mapland FC test-map": { flag: "../index" }, "Wrongtype FC 1": { crest: 359 }, "Wrongtype FC 2": { flag: "de", crest: "1" },
-  "Borussia Dortmund": "de", "FC Bayern München": { crest: "132" }, Argentina: { flag: "ar" } };
+  "Borussia Dortmund": "de", "FC Bayern München": { crest: "132", box: [40, 50, 940, 930, 475], dark: [40, 50, 940, 930, 475] }, Argentina: { flag: "ar" },
+  // a crest's measured box (crest_box()) with markup, and one reaching outside the picture: the crest is drawn unsized
+  "Mapland FC test-map-none": { crest: "133", box: ['1" onerror="alert(1)', 0, 500, 500, 400] },
+  "Liverpool FC": { crest: "364", box: [900, 0, 500, 500, 400] } };
 const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, tables, badges,
   matches: [bad, badWidth, badLat, bunLive, ...malformed, mapMatch("test-map", "Mapland Arena, Testville"),
     mapMatch("test-map-none", "Nowhere Ground, Testville"), ...data.matches] };
@@ -161,9 +164,15 @@ try {
     [i.getAttribute("src"), i.closest(".team")?.querySelector(".nm")?.textContent]));
   shows("team badges: every picture is a flag from flags/ or an ESPN crest built from a team number",
     imgs.every(([src]) => /^flags\/[a-z]{2}(-[a-z]{3})?\.webp$/.test(src) ||
-      /^https:\/\/a\.espncdn\.com\/combiner\/i\?img=\/i\/teamlogos\/soccer\/500\/\d{1,7}\.png&h=40&w=40$/.test(src)));
+      /^https:\/\/a\.espncdn\.com\/combiner\/i\?img=\/i\/teamlogos\/soccer\/500(-dark)?\/\d{1,7}\.png&h=(40|80|100)&w=\2$/.test(src)));
+  const fits = await page.evaluate(() => [...document.querySelectorAll("#list .badge img")].map(i =>
+    [i.getAttribute("style"), i.closest(".team")?.querySelector(".nm")?.textContent]));
+  shows("team badges: a crest's size and place are plain numbers, and a malformed box leaves the crest unsized",
+    fits.every(([st]) => st === null || /^width:\d+\.\d\dpx;height:\d+\.\d\dpx;left:-?\d+\.\d\dpx;top:-?\d+\.\d\dpx$/.test(st)) &&
+      fits.some(([st, n]) => st && /Bayern/.test(n)) && fits.some(([st, n]) => !st && /Mapland FC test-map-none/.test(n)) &&
+      !fits.some(([st, n]) => st && /Liverpool|Mapland/.test(n)));
   shows("team badges: hostile or malformed badges draw nothing, and real ones do",
-    imgs.some(([, n]) => /Bayern/.test(n)) && !imgs.some(([, n]) => /Chelsea|Arsenal|Wrongtype|Mapland|Dortmund/.test(n)));
+    imgs.some(([, n]) => /Bayern/.test(n)) && !imgs.some(([, n]) => /Chelsea|Arsenal|Wrongtype|Mapland FC test-map$|Dortmund/.test(n)));
   await check("team badges");
 
   // ESPN not answering: the backups take over, and their answers get the same treatment
