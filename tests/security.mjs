@@ -160,7 +160,7 @@ try {
   const imgs = await page.evaluate(() => [...document.querySelectorAll("#list .badge img")].map(i =>
     [i.getAttribute("src"), i.closest(".team")?.querySelector(".nm")?.textContent]));
   shows("team badges: every picture is a flag from flags/ or an ESPN crest built from a team number",
-    imgs.every(([src]) => /^flags\/[a-z]{2}(-[a-z]{3})?\.svg$/.test(src) ||
+    imgs.every(([src]) => /^flags\/[a-z]{2}(-[a-z]{3})?\.webp$/.test(src) ||
       /^https:\/\/a\.espncdn\.com\/combiner\/i\?img=\/i\/teamlogos\/soccer\/500\/\d{1,7}\.png&h=40&w=40$/.test(src)));
   shows("team badges: hostile or malformed badges draw nothing, and real ones do",
     imgs.some(([, n]) => /Bayern/.test(n)) && !imgs.some(([, n]) => /Chelsea|Arsenal|Wrongtype|Mapland|Dortmund/.test(n)));

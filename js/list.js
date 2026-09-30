@@ -477,7 +477,7 @@ function badgeHTML(name) {
     '<span class="badge" aria-hidden="true"><img src="' +
     esc(src) +
     '" alt="" width="18" height="18" loading="lazy"></span>';
-  if (typeof b.flag === "string" && FLAG_RE.test(b.flag)) return img("flags/" + b.flag + ".svg");
+  if (typeof b.flag === "string" && FLAG_RE.test(b.flag)) return img("flags/" + b.flag + ".webp");
   if (typeof b.crest === "string" && CREST_RE.test(b.crest))
     return img("https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/" + b.crest + ".png&h=40&w=40").replace(
       'class="badge"',

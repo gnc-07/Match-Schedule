@@ -710,7 +710,7 @@ def previous_f1(start, path="fixtures.json"):
     return [r for r in old if isinstance(r, dict) and _valid_f1(r) and r["date"] >= recent]
 
 # ---------- badges beside team names: a flag for national teams, the club's crest for clubs ----------
-# Flags: flag-icons (MIT), in flags/, found by the country's English name (flags/countries.json) or FLAG_ALIAS.
+# Flags: flag-icons (MIT), packed in flags/flags.json, found by the country's English name there or FLAG_ALIAS.
 # Crests: ESPN's, by ESPN's team number, found in ESPN's team list for the club's competition. Only the flag code or
 # the number is saved; the page builds the picture's address itself, so fixtures.json cannot point it elsewhere.
 ESPN_TEAMS = "https://site.api.espn.com/apis/site/v2/sports/soccer/{}/teams"
@@ -749,14 +749,13 @@ def team_words(name):
                 out.add(NAME_ALIAS[t])
     return out
 
-def flag_codes(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "flags", "countries.json")):
-    """{country name, compared without accents, spaces or punctuation: flag code}, from flags/countries.json and
-    FLAG_ALIAS; only codes that have a flag in flags/."""
+def flag_codes(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "flags", "flags.json")):
+    """{country name, compared without accents, spaces or punctuation: flag code}, from the names in flags/flags.json
+    and FLAG_ALIAS; only codes that have a flag there."""
     key = lambda n: re.sub(r"[^a-z]", "", _plain(n))
-    folder = os.path.dirname(path)
-    names = {**load_json(path), **FLAG_ALIAS}
-    return {key(n): c for n, c in names.items()
-            if FLAG_CODE.fullmatch(c) and os.path.exists(os.path.join(folder, c + ".svg"))}, key
+    flags = load_json(path)["flags"]
+    names = {**{name: code for code, (name, _) in flags.items()}, **FLAG_ALIAS}
+    return {key(n): c for n, c in names.items() if FLAG_CODE.fullmatch(c) and c in flags}, key
 
 def _espn_teams(league):
     """ESPN's clubs in one competition, as (words, ESPN team number). ESPN's API is unofficial: an answer that is

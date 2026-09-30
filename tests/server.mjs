@@ -21,7 +21,7 @@ const TYPES = {
   ".html": "text/html; charset=utf-8", ".json": "application/json; charset=utf-8", ".ics": "text/calendar; charset=utf-8",
   ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
   ".svg": "image/svg+xml", ".txt": "text/plain; charset=utf-8", ".png": "image/png", ".woff2": "font/woff2",
-  ".webmanifest": "application/manifest+json",
+  ".webmanifest": "application/manifest+json", ".webp": "image/webp",
 };
 const COMPRESS = /^(text\/|application\/(manifest\+)?json|image\/svg)/;   // what GitHub Pages compresses; fonts and pictures already are
 
@@ -66,7 +66,17 @@ export function startServer() {
   } catch (e) {
     throw new Error("publish_site.py could not put the page together:\n" + String(e.stderr || e.message).trim());
   }
+  // the flags, as publish_site.py unpacks them from flags/flags.json into flags/<code>.webp
+  const flags = new Map(Object.entries(JSON.parse(readFileSync(path.join(ROOT, "flags", "flags.json"), "utf8")).flags)
+    .map(([code, [, b64]]) => [code, Buffer.from(b64, "base64")]));
   const server = http.createServer((req, res) => {
+    const flag = /^\/flags\/([a-z]{2}(?:-[a-z]{3})?)\.webp$/.exec(new URL(req.url, BASE).pathname);
+    if (flag && flags.has(flag[1])) {
+      const pic = flags.get(flag[1]);
+      res.writeHead(200, { "content-type": "image/webp", "content-length": pic.length });
+      res.end(req.method === "HEAD" ? undefined : pic);
+      return;
+    }
     const file = fileFor(req.url);
     if (!file) { res.writeHead(404, { "content-type": "text/plain; charset=utf-8" }).end("Not found"); return; }
     const type = TYPES[path.extname(file)] || "application/octet-stream";

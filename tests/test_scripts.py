@@ -5,7 +5,7 @@ so they give the same result every time.
 Run from the project folder:
   python3 -m unittest discover -s tests
 """
-import copy, io, json, math, os, re, sys, tempfile, unittest, urllib.error, urllib.request
+import base64, copy, io, json, math, os, re, sys, tempfile, unittest, urllib.error, urllib.request
 from contextlib import redirect_stdout
 from datetime import date, datetime, timedelta, timezone
 from unittest import mock
@@ -654,10 +654,12 @@ class PublishSite(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             self.fake_site(d)
             for name in ("soccer.ics", "fonts/x.woff2", "sitemap.xml", "og-image.png", "manifest.webmanifest", "icons/x.png",
-                         "flags/x.svg", "build_schedule.py", "tests/t.py"):
+                         "flags/LICENSE", "build_schedule.py", "tests/t.py"):
                 os.makedirs(os.path.dirname(os.path.join(d, name)), exist_ok=True)
                 with open(os.path.join(d, name), "w", encoding="utf-8") as f:
                     f.write("x")
+            with open(os.path.join(d, "flags", "flags.json"), "w", encoding="utf-8") as f:
+                json.dump({"flags": {"de": ["Germany", load_flags()["de"][1]]}}, f)
             fixtures = '{"generated":"2026-09-27T19:08+00:00",\n"site":"000000000000",\n"matches":[\n]}\n'
             with open(os.path.join(d, "fixtures.json"), "w", encoding="utf-8") as f:
                 f.write(fixtures)
@@ -669,16 +671,33 @@ class PublishSite(unittest.TestCase):
                 self.assertEqual(f.read(), fixtures)
             found = sorted(os.path.relpath(os.path.join(p, n), os.path.join(d, "_site"))
                            for p, _, names in os.walk(os.path.join(d, "_site")) for n in names)
-            self.assertEqual(found, ["fixtures.json", "flags/x.svg", "fonts/x.woff2", "icons/x.png", "index.html",
-                                    "manifest.webmanifest", "og-image.png", "sitemap.xml", "soccer.ics"])
+            self.assertEqual(found, ["fixtures.json", "flags/LICENSE", "flags/de.webp", "fonts/x.woff2", "icons/x.png",
+                                    "index.html", "manifest.webmanifest", "og-image.png", "sitemap.xml", "soccer.ics"])
             with self.assertRaises(ValueError):
                 publish_site.publish(d, d)          # never over the source files
+
+    def test_flags_are_unpacked_and_checked(self):
+        # every packed flag is published as flags/<code>.webp; anything else stops publishing, loudly
+        flags = load_flags()
+        self.assertGreater(len(flags), 200)
+        for code, (name, b64) in flags.items():
+            pic = base64.b64decode(b64)
+            self.assertTrue(publish_site.FLAG.fullmatch(code) and pic[8:12] == b"WEBP" and len(pic) < 20_000, code)
+        good = flags["de"][1]
+        for bad in ({"../x": ["X", good]}, {"de": ["Germany", base64.b64encode(b"<svg onload=x>").decode()]},
+                    {"de": ["Germany", "not base64!"]}):
+            with tempfile.TemporaryDirectory() as d:
+                os.makedirs(os.path.join(d, "flags"))
+                with open(os.path.join(d, "flags", "flags.json"), "w", encoding="utf-8") as f:
+                    json.dump({"flags": bad}, f)
+                with self.assertRaises((ValueError, base64.binascii.Error)):
+                    publish_site.publish_flags(d, os.path.join(d, "_site"))
 
     def test_google_verification_file_is_published_only_when_it_is_one(self):
         name = "google1a2b3c4d5e6f7a8b.html"
         with tempfile.TemporaryDirectory() as d:
             self.fake_site(d)
-            for extra in ("soccer.ics", "fonts/x.woff2", "sitemap.xml", "og-image.png", "manifest.webmanifest", "icons/x.png", "flags/x.svg"):
+            for extra in ("soccer.ics", "fonts/x.woff2", "sitemap.xml", "og-image.png", "manifest.webmanifest", "icons/x.png"):
                 os.makedirs(os.path.dirname(os.path.join(d, extra)), exist_ok=True)
                 with open(os.path.join(d, extra), "w", encoding="utf-8") as f:
                     f.write("x")
@@ -697,6 +716,11 @@ class PublishSite(unittest.TestCase):
                 publish_site.publish(os.path.join(d, "_site2"), d)
 
 
+def load_flags():
+    with open(os.path.join(PublishSite.ROOT, "flags", "flags.json"), encoding="utf-8") as f:
+        return json.load(f)["flags"]
+
+
 class TeamBadges(unittest.TestCase):
     """Flags for national teams and ESPN crests for clubs (team_badges()): a team shown with another's flag or crest
     is worse than none, so names must match closely, ties give nothing, and only a flag code or a team number is kept."""
@@ -713,8 +737,9 @@ class TeamBadges(unittest.TestCase):
             self.assertEqual(got(name), code, name)
         self.assertIsNone(got("Tahiti"))      # no Tahiti flag in flag-icons, and French Polynesia's is not Tahiti's
         self.assertIsNone(got("Atlantis"))
+        packed = load_flags()
         for code in set(flags.values()):     # every code found has its picture
-            self.assertTrue(os.path.exists(os.path.join(PublishSite.ROOT, "flags", code + ".svg")), code)
+            self.assertIn(code, packed)
 
     def test_club_words_and_closest_name(self):
         self.assertEqual(bs.team_words("Club Atlético de Madrid"), {"atletico", "madrid"})
