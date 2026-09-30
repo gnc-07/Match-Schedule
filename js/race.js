@@ -633,7 +633,8 @@ function paintActions() {
   m.root.querySelector("#md-ics").onclick = () => downloadICS(m.r);
   m.root.querySelector("#md-share").onclick = () => shareMatch(m.r);
   const tb = m.root.querySelector("#md-table");
-  if (tb) tb.onclick = () => openTables(m.r.code, (/^Group (A[1-4]),/.exec(m.r.round || "") || [])[1]);
+  // a group match brings its group into view: "Group A1, Matchday 3" (Nations League), "Group C" (Libertadores)
+  if (tb) tb.onclick = () => openTables(m.r.code, (/^Group (A[1-4]|[A-H])(?:,|$)/.exec(m.r.round || "") || [])[1]);
 }
 function stopMatch() {
   if (MD) {

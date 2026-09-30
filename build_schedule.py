@@ -16,7 +16,9 @@ Data sources, in order of preference
      nations_league.json: UEFA Nations League matches, entered by hand the same way.
   Both league sources also give every result of the season so far, from which a backup league table is
   worked out (standings() below) for when ESPN's tables cannot be reached.
-  4. Formula 1: every session from Jolpica-F1, cross-checked against OpenF1 (both free, no key).
+  4. CONMEBOL Libertadores: every match from ESPN's public scoreboard, each time cross-checked against the
+     match boxes on English Wikipedia's pages for the season (both free, no key).
+  5. Formula 1: every session from Jolpica-F1, cross-checked against OpenF1 (both free, no key).
      F1 is left out of soccer.ics. Track outlines for the race weekend panel come from
      bacinger/f1-circuits on GitHub (MIT licence).
 
@@ -27,7 +29,7 @@ Examples
   python3 build_schedule.py
   python3 build_schedule.py --teams "Arsenal,Real Madrid,Brazil" --leagues EPL,BRA
 """
-import argparse, json, hashlib, math, os, re, sys, urllib.error
+import argparse, json, hashlib, math, os, re, sys, urllib.error, urllib.parse
 from datetime import datetime, date, timedelta, timezone
 from zoneinfo import ZoneInfo
 import cazetv, publish_site
@@ -251,6 +253,197 @@ def apply_overrides(recs, path="overrides.json"):
         r["check"] = check
         if check["status"] == "confirmed":
             r["date"], r["utc"], r["provisional"] = day, utc, False
+
+# ---------- source 4: CONMEBOL Libertadores, from two independent sources ----------
+# No free league feed covers it (football-data.org's free plan does not; openfootball has no file for the season), so
+# the matches come from ESPN's public scoreboard (one request gives the whole season) and each time is cross-checked
+# against the match boxes on English Wikipedia's pages for the season, which cite CONMEBOL's fixture lists. When both
+# give the same moment, resolve() marks it verified; one alone stays "time TBC", as for any other competition.
+ESPN_API = "https://site.api.espn.com/apis/site/v2/sports/soccer/"
+LIB_ESPN = "conmebol.libertadores"
+WIKI_API = "https://en.wikipedia.org/w/api.php?action=parse&prop=wikitext&format=json&formatversion=2&redirects=1&page="
+WIKI_PAGE = "https://en.wikipedia.org/wiki/"
+# Wikipedia refuses Python's default identification; its policy asks for a name and a way to reach the owner
+WIKI_HEADERS = {"User-Agent": "MatchdayPlanner/1.0 (https://github.com/gnc-07/Match-Schedule)"}
+LIB_COMP = "CONMEBOL Libertadores"
+LIB_ROUNDS = {"first-stage": "First stage", "second-stage": "Second stage", "third-stage": "Third stage",
+              "group-stage": "Group stage", "round-of-16": "Round of 16", "quarterfinals": "Quarter-finals",
+              "semifinals": "Semi-finals", "final": "Final"}
+
+def _wiki_text(value):
+    """Plain text from a line of wikitext: "[[Maracanã Stadium|Estádio do Maracanã]], [[Rio de Janeiro]]" gives
+    "Estádio do Maracanã, Rio de Janeiro"; templates such as {{fbaicon|BRA}} and references are dropped."""
+    s = re.sub(r"<ref[^>]*/>|<ref[^>]*>.*?</ref>|<!--.*?-->", "", value)
+    while True:                                   # innermost templates first, so nested ones go too
+        t = re.sub(r"\{\{[^{}]*\}\}", "", s)
+        if t == s: break
+        s = t
+    s = re.sub(r"\[\[(?:[^|\]]*\|)?([^\]]*)\]\]", r"\1", s)
+    s = re.sub(r"'{2,}|<[^>]+>", "", s)
+    return re.sub(r"\s+", " ", s).strip(" ,")
+
+def _wiki_link(value):
+    """The first link's target, the fuller name ("[[Estudiantes de La Plata|Estudiantes]]" gives
+    "Estudiantes de La Plata"), or the plain text when the line has no link."""
+    m = re.search(r"\[\[([^|\]]+)", value)
+    return re.sub(r"\s*\([^)]*\)$", "", m.group(1)).strip() if m else _wiki_text(value)   # "(football club)" dropped
+
+def wiki_boxes(text, page=""):
+    """Every match box ({{Football box ...}}) on a Wikipedia page, as {"home", "away", "utc" (or None), "date",
+    "venue", "group", "url"}. The kick-off is written as local time plus its offset from UTC ({{UTZ|21:30|-3}});
+    it is turned into UTC here, so it compares directly with ESPN's. A box whose date cannot be read is skipped."""
+    out, group = [], ""
+    for m in re.finditer(r"^(=+)\s*([^=\n]+?)\s*\1\s*$|\{\{\s*Football box", text, re.M):
+        if m.group(1):                            # a section heading: "Group A" names the group of the boxes below
+            g = re.fullmatch(r"Group ([A-L])", m.group(2))
+            group = g.group(1) if g else ("" if len(m.group(1)) <= 3 else group)
+            continue
+        depth, i = 0, m.start()                   # the box runs to the }} that closes its own {{
+        while i < len(text):
+            if text.startswith("{{", i): depth += 1; i += 2
+            elif text.startswith("}}", i):
+                depth -= 1; i += 2
+                if depth == 0: break
+            else: i += 1
+        f = {k.lower(): v.strip() for k, v in re.findall(r"^\|\s*(\w+)\s*=(.*)$", text[m.start():i], re.M)}
+        d = re.search(r"(\d{4})\|(\d{1,2})\|(\d{1,2})", f.get("date", ""))
+        if not d:
+            continue
+        day = date(*map(int, d.groups()))
+        utc = None
+        t = re.search(r"UTZ\|(\d{1,2}):(\d{2})\|([+\-−–]?)(\d{1,2})(?::(\d{2}))?", f.get("time", ""))
+        if t:
+            hh, mm, sign, oh, om = t.groups()
+            off = timedelta(hours=int(oh), minutes=int(om or 0)) * (1 if sign in ("", "+") else -1)
+            utc = (datetime(day.year, day.month, day.day, int(hh), int(mm), tzinfo=timezone(off))).astimezone(timezone.utc)
+        out.append({"home": _wiki_link(f.get("team1", "")), "away": _wiki_link(f.get("team2", "")), "utc": utc,
+                    "date": day, "venue": _wiki_text(f.get("stadium", "")) or None, "group": group,
+                    "url": WIKI_PAGE + page.replace(" ", "_")})
+    return out
+
+def _wiki_pages(start):
+    """The season's pages that can hold matches still to come: the knockout rounds always, the group stage until
+    August and the qualifying rounds until April (fewer requests, as Wikipedia asks)."""
+    y = start.year
+    pages = [f"{y} Copa Libertadores final stages"]
+    if start.month < 8: pages.append(f"{y} Copa Libertadores group stage")
+    if start.month < 4: pages.append(f"{y} Copa Libertadores qualifying stages")
+    return pages
+
+def wiki_libertadores(start):
+    """Match boxes from Wikipedia's pages for the season. A page that is missing or cannot be read gives nothing:
+    the matches still come from ESPN, only without the cross-check this run."""
+    import time
+    out = []
+    for page in _wiki_pages(start):
+        for attempt in (1, 2):
+            try:
+                data = fetch_json(WIKI_API + urllib.parse.quote(page), WIKI_HEADERS)
+                text = (data.get("parse") or {}).get("wikitext")
+                if isinstance(text, str):
+                    out += wiki_boxes(text, page)
+                break
+            except urllib.error.HTTPError as e:     # "too many requests": wait as long as Wikipedia asks, once
+                if e.code == 429 and attempt == 1:
+                    time.sleep(min(int(e.headers.get("Retry-After") or 5), 30)); continue
+                print(f"Wikipedia page {page!r} could not be read ({e}); those Libertadores times are not cross-checked")
+                break
+            except Exception as e:
+                print(f"Wikipedia page {page!r} could not be read ({e}); those Libertadores times are not cross-checked")
+                break
+    return out
+
+def _initials(name):
+    """The first letters of a name's longer words: "Universidad Central de Venezuela F.C." gives "ucv"."""
+    return "".join(t[0] for t in re.split(r"[^a-z0-9]+", _plain(name)) if len(t) > 2)
+
+def _same_team(a, b):
+    """True when two spellings share a word that names the club ("Estudiantes" and "Estudiantes de La Plata"), or
+    one is written as the other's initials (ESPN's "UCV FC", Wikipedia's "Universidad Central de Venezuela")."""
+    wa, wb = team_words(a), team_words(b)
+    return bool(wa & wb) or _initials(a) in wb or _initials(b) in wa
+
+def club_names(recs):
+    """Brasileirão clubs by their words, so a Libertadores club keeps the spelling of the league feed ("CR Flamengo",
+    not ESPN's "Flamengo"): its star and the Your teams box then follow it in both competitions."""
+    return [(team_words(n), n) for n in {x for r in recs if r["code"] == "BRA" for x in (r["home"], r["away"])} if n]
+
+def align_name(name, clubs):
+    """The league feed's spelling of `name` when exactly one Brasileirão club has the same words, or all of its words
+    are among the other's (never across leagues: Argentina's "Racing" must not become another league's club)."""
+    w = team_words(name)
+    found = [n for words, n in clubs if w and words and (words <= w or w <= words)]
+    return found[0] if len(found) == 1 else name
+
+def from_libertadores(start, clubs=(), wiki=None):
+    """The season's matches from yesterday on, from ESPN, each time checked against Wikipedia through resolve().
+    Matches whose teams are not known yet (ESPN's "TBD Home") are left out until they are."""
+    events = fetch_json(f"{ESPN_API}{LIB_ESPN}/scoreboard?dates={start.year}&limit=500")["events"]
+    wiki = wiki_libertadores(start) if wiki is None else wiki
+    recent, out = start - timedelta(days=KEEP_DAYS), []
+    for e in events:
+        try:
+            c = e["competitions"][0]
+            teams = {t["homeAway"]: t for t in c["competitors"]}
+            home, away = teams["home"]["team"]["displayName"], teams["away"]["team"]["displayName"]
+            kick = datetime.fromisoformat(e["date"].replace("Z", "+00:00"))
+            state = e["status"]["type"]["state"]
+        except (KeyError, IndexError, TypeError, ValueError):
+            continue                               # an entry in an unexpected shape is skipped, never trusted
+        if not isinstance(home, str) or not isinstance(away, str) or home.startswith("TBD") or away.startswith("TBD"):
+            continue
+        if kick.date() < (recent if state != "pre" else start):
+            continue
+        timed = c.get("timeValid") is not False
+        leg = (c.get("leg") or {}).get("value") if isinstance(c.get("leg"), dict) else None
+        rnd = LIB_ROUNDS.get((e.get("season") or {}).get("slug"), "")
+        if rnd and leg in (1, 2):
+            rnd += ", 1st leg" if leg == 1 else ", 2nd leg"
+        # its box on Wikipedia: the same two teams, the same way round, within a day
+        box = next((b for b in wiki if abs((b["date"] - kick.date()).days) <= 1
+                    and _same_team(b["home"], home) and _same_team(b["away"], away)), None)
+        if box and box["group"] and rnd.startswith("Group"):
+            rnd = f"Group {box['group']}"
+        link = f"https://www.espn.com/soccer/match/_/gameId/{e.get('id')}" if re.fullmatch(r"\d{1,12}", str(e.get("id"))) else ESPN_API
+        reports = [{"source": "ESPN", "url": link, "date": kick.date().isoformat(),
+                    **({"time": kick.strftime("%H:%M"), "tz": "UTC"} if timed else {})}]
+        if box:
+            u = box["utc"]
+            reports.append({"source": "Wikipedia", "url": box["url"], "date": (u.date() if u else box["date"]).isoformat(),
+                            **({"time": u.strftime("%H:%M"), "tz": "UTC"} if u else {})})
+        day, utc, check = resolve(reports)
+        v = c.get("venue") or {}
+        venue = (box and box["venue"]) or ", ".join(x for x in (v.get("fullName"), (v.get("address") or {}).get("city")) if isinstance(x, str) and x) or None
+        r = record(LIB_COMP, "LIB", align_name(home, clubs), align_name(away, clubs), day, utc, rnd, venue, uid=f"lib|{e.get('id')}")
+        r["check"] = check
+        if state == "post" and e["status"]["type"].get("completed"):
+            try:
+                r["result"] = {"home": int(teams["home"]["score"]), "away": int(teams["away"]["score"])}
+            except (KeyError, TypeError, ValueError):
+                pass
+        elif state == "in":
+            r["started"] = True                    # on now: the page gets the live score from ESPN
+        out.append(r)
+    return out
+
+def _valid_lib(r):
+    """True for a well-formed Libertadores record read back from the last published fixtures.json."""
+    try:
+        date.fromisoformat(r["date"])
+        return (r.get("code") == "LIB" and r.get("comp") == LIB_COMP and str(r.get("uid", "")).startswith("lib|")
+                and all(isinstance(r.get(k), str) and r[k] for k in ("home", "away"))
+                and (r.get("utc") is None or datetime.fromisoformat(r["utc"]) is not None))
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return False
+
+def previous_lib(start, path="fixtures.json"):
+    """The Libertadores matches from the last published fixtures.json: used when ESPN cannot be reached."""
+    try:
+        old = load_json(path)["matches"]
+    except Exception:
+        return []
+    recent = (start - timedelta(days=KEEP_DAYS)).isoformat()
+    return [r for r in old if isinstance(r, dict) and _valid_lib(r) and r["date"] >= recent]
 
 # ---------- Formula 1: every session of every race weekend ----------
 # Jolpica-F1 (volunteer-run successor to the Ergast API; no key) gives each weekend's session times in UTC.
@@ -714,7 +907,7 @@ def previous_f1(start, path="fixtures.json"):
 # Crests: ESPN's, by ESPN's team number, found in ESPN's team list for the club's competition. Only the flag code or
 # the number is saved; the page builds the picture's address itself, so fixtures.json cannot point it elsewhere.
 ESPN_TEAMS = "https://site.api.espn.com/apis/site/v2/sports/soccer/{}/teams"
-ESPN_LEAGUE = {"EPL": "eng.1", "LIGA": "esp.1", "BUN": "ger.1", "BRA": "bra.1"}
+ESPN_LEAGUE = {"EPL": "eng.1", "LIGA": "esp.1", "BUN": "ger.1", "BRA": "bra.1", "LIB": LIB_ESPN}
 NATIONAL = ("INTL", "UNL")
 FLAG_ALIAS = {   # ESPN's (and FIFA's) names for teams whose flag is filed under another name
     "Bonaire": "bq", "Bosnia-Herzegovina": "ba", "British Virgin Islands": "vg", "Cape Verde": "cv", "Cabo Verde": "cv",
@@ -861,6 +1054,14 @@ def load_all(start):
         out += from_hand_kept(start, code)
         sources[code] = f"{path} (hand-maintained, cross-checked)"
     try:
+        lib = from_libertadores(start, club_names(out))
+        sources["LIB"] = "ESPN" + (" and Wikipedia" if any(len(r["check"]["sources"]) > 1 for r in lib) else "")
+    except Exception as e:                   # like F1: the Libertadores must never stop the leagues from publishing
+        print(f"ESPN failed for the Libertadores ({e}); keeping the matches already published")
+        lib = previous_lib(start)
+        sources["LIB"] = "ESPN"
+    out += lib
+    try:
         f1 = from_f1(start)
         sources["F1"] = "Jolpica-F1" + (" and OpenF1" if any(r.get("check") for r in f1) else "")
     except Exception as e:                   # F1 must never stop the football schedule from publishing
@@ -962,7 +1163,7 @@ def upcoming_league_matches(recs):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--start", default=datetime.now(HOME_TZ).date().isoformat())
-    ap.add_argument("--leagues", help="comma list of EPL,LIGA,BUN,BRA,INTL,UNL,F1")
+    ap.add_argument("--leagues", help="comma list of EPL,LIGA,BUN,BRA,LIB,INTL,UNL,F1")
     ap.add_argument("--teams", help="comma list of team-name fragments")
     ap.add_argument("--out", default="soccer.ics")
     a = ap.parse_args()

@@ -4,6 +4,7 @@ const LEAGUES = [
   { code: "LIGA", name: "La Liga", abbr: "LL", c: "--liga" },
   { code: "BUN", name: "Bundesliga", abbr: "BL", c: "--bun" },
   { code: "BRA", name: "Brasileirão", abbr: "BR", c: "--bra" },
+  { code: "LIB", name: "Libertadores", abbr: "LIB", c: "--lib" },
   { code: "INTL", name: "Friendlies", abbr: "INT", c: "--intl" },
   { code: "UNL", name: "UEFA Nations League", abbr: "UNL", c: "--unl" },
   { code: "F1", name: "Formula 1", abbr: "F1", c: "--f1" },
@@ -17,8 +18,8 @@ const leagueName = l =>
   l.code === "INTL" ? T.friendlies : l.code === "UNL" ? T.nationsLeague : l.code === "F1" ? T.f1 : l.name;
 const colorOf = code => "var(" + (LEAGUES.find(l => l.code === code) || { c: "--line" }).c + ")";
 const ORDER = {
-  en: ["EPL", "LIGA", "BUN", "BRA", "INTL", "UNL", "F1"],
-  pt: ["BRA", "INTL", "F1", "EPL", "LIGA", "BUN", "UNL"],
+  en: ["EPL", "LIGA", "BUN", "BRA", "LIB", "INTL", "UNL", "F1"],
+  pt: ["BRA", "LIB", "INTL", "F1", "EPL", "LIGA", "BUN", "UNL"],
 };
 const ordered = () => ORDER[LANG].map(c => LEAGUES.find(l => l.code === c));
 const on = new Set(
@@ -473,16 +474,23 @@ const FLAG_RE = /^[a-z]{2}(-[a-z]{3})?$/,
 function badgeHTML(name) {
   const b = BADGES.get(name);
   if (!b || typeof b !== "object") return "";
-  const img = src =>
+  const img = (src, set) =>
     '<span class="badge" aria-hidden="true"><img src="' +
     esc(src) +
-    '" alt="" width="18" height="18" loading="lazy"></span>';
+    '"' +
+    (set ? ' srcset="' + esc(set) + '"' : "") +
+    ' alt="" width="18" height="18" loading="lazy"></span>';
   if (typeof b.flag === "string" && FLAG_RE.test(b.flag)) return img("flags/" + b.flag + ".webp");
-  if (typeof b.crest === "string" && CREST_RE.test(b.crest))
-    return img("https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/" + b.crest + ".png&h=40&w=40").replace(
+  if (typeof b.crest === "string" && CREST_RE.test(b.crest)) {
+    // the crest is drawn 14px wide: 40px pictures are sharp on ordinary screens, but phones with 2 or 3 screen pixels
+    // to each CSS pixel (more again with Large or Extra large text) need 80 or 120 to stay sharp
+    const at = w =>
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/" + b.crest + ".png&h=" + w + "&w=" + w;
+    return img(at(40), at(40) + " 1x, " + at(80) + " 2x, " + at(120) + " 3x").replace(
       'class="badge"',
       'class="badge crest"',
     );
+  }
   return "";
 }
 function teamHTML(name) {

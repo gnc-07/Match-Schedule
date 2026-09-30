@@ -158,10 +158,16 @@ try {
   // team badges: only a flag in flags/ or a crest from ESPN's crest folder, built from a plain team number
   await page.goto(`${BASE}?lang=en`, { waitUntil: "networkidle0" });
   const imgs = await page.evaluate(() => [...document.querySelectorAll("#list .badge img")].map(i =>
-    [i.getAttribute("src"), i.closest(".team")?.querySelector(".nm")?.textContent]));
+    [i.getAttribute("src"), i.closest(".team")?.querySelector(".nm")?.textContent, i.getAttribute("srcset")]));
+  const crest = (w, id = "\\d{1,7}") => `https:\\/\\/a\\.espncdn\\.com\\/combiner\\/i\\?img=\\/i\\/teamlogos\\/soccer\\/500\\/${id}\\.png&h=${w}&w=${w}`;
   shows("team badges: every picture is a flag from flags/ or an ESPN crest built from a team number",
-    imgs.every(([src]) => /^flags\/[a-z]{2}(-[a-z]{3})?\.webp$/.test(src) ||
-      /^https:\/\/a\.espncdn\.com\/combiner\/i\?img=\/i\/teamlogos\/soccer\/500\/\d{1,7}\.png&h=40&w=40$/.test(src)));
+    imgs.every(([src]) => /^flags\/[a-z]{2}(-[a-z]{3})?\.webp$/.test(src) || new RegExp(`^${crest(40)}$`).test(src)));
+  // a crest's sharper versions for high-resolution screens: the same team number, the same folder, nothing else
+  shows("team badges: a crest's sharper versions (srcset) are the same crest from ESPN's crest folder",
+    imgs.every(([src, , set]) => set === null ? !/espncdn/.test(src) : (() => {
+      const id = /\/(\d{1,7})\.png/.exec(src)[1];
+      return new RegExp(`^${crest(40, id)} 1x, ${crest(80, id)} 2x, ${crest(120, id)} 3x$`).test(set);
+    })()));
   shows("team badges: hostile or malformed badges draw nothing, and real ones do",
     imgs.some(([, n]) => /Bayern/.test(n)) && !imgs.some(([, n]) => /Chelsea|Arsenal|Wrongtype|Mapland|Dortmund/.test(n)));
   await check("team badges");

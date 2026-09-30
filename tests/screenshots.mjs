@@ -24,6 +24,8 @@ const shots = [
   ["details-then-table", 1280, `?match=${uid}`, p => p.click("#md-table"), "light"],
   ["tables-desktop", 1280, "?lang=en", p => p.click("#tablesbtn"), "light"],
   ["tables-phone", 390, "?lang=en", p => p.click("#tablesbtn"), "light"],
+  ["tables-lib-desktop", 1280, "?lang=en", async p => { await p.click("#tablesbtn"); await p.click('#ltchips [data-code="LIB"]'); }, "light"],
+  ["tables-lib-phone-dark-pt", 390, "?lang=pt", async p => { await p.click("#tablesbtn"); await p.click('#ltchips [data-code="LIB"]'); }, "dark"],
   ["tables-f1-desktop", 1280, "?lang=en", async p => { await p.click("#tablesbtn"); await p.click('#ltchips [data-code="F1"]'); }, "light"],
   ["tables-f1-phone", 390, "?lang=en", async p => { await p.click("#tablesbtn"); await p.click('#ltchips [data-code="F1"]'); }, "light"],
   ["tables-f1-teams-dark-pt", 1280, "?lang=pt", async p => { await p.click("#tablesbtn"); await p.click('#ltchips [data-code="F1"]');

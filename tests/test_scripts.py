@@ -150,6 +150,145 @@ class HandKept(unittest.TestCase):
             self.assertRegex(m["round"], r"^Group A[1-4], Matchday [1-6]$")
 
 
+WIKI_PAGE = """
+==Group stage==
+===Group C===
+{{Football box
+|id         = C1
+|date       = {{Start date|2026|4|7|df=y}}
+|time       = {{UTZ|18:00|-4}}
+|team1      = [[Deportivo La Guaira]] {{fbaicon|VEN}}
+|score      = 0–0
+|team2      = {{fbaicon|BRA}} [[Fluminense FC|Fluminense]]
+|stadium    = [[Estadio Olímpico de la UCV]], [[Caracas]]
+}}
+==Semi-finals==
+===Matches===
+{{Football box
+|id         = Match F2.1
+|date       = {{Start date|2026|10|14|df=y}}
+|time       = {{UTZ|21:30|-3}}
+|team1      = [[Fluminense FC|Fluminense]] {{fbaicon|BRA}}
+|score      =
+|team2      = {{fbaicon|BRA}} [[SE Palmeiras|Palmeiras]]<ref>{{cite web|url=https://x.example|title=A {{!}} B}}</ref>
+|goals1     =
+*[[Someone|S. One]] {{goal|12}}
+|stadium    = [[Maracanã Stadium|Estádio do Maracanã]], [[Rio de Janeiro]]
+}}
+{{Football box
+|id         = Match F1.1
+|date       = {{Start date|2026|10|15|df=y}}
+|time       = {{UTZ|21:30|-3}}
+|team1      = [[Universidad Central de Venezuela F.C.|Universidad Central]] {{fbaicon|VEN}}
+|team2      = {{fbaicon|BRA}} [[CR Flamengo|Flamengo]]
+|stadium    = [[Estadio Olímpico de la UCV]], [[Caracas]]
+}}
+==Final==
+{{Football box
+|date       = {{Start date|2026|11|28|df=y}}
+|time       = {{UTZ||-3}}
+|team1      = Higher-seeded finalist {{fbaicon|}}
+|team2      = {{fbaicon|}} Lower-seeded finalist
+|stadium    = [[Estadio Centenario]], [[Montevideo]]
+}}
+"""
+
+
+def espn_event(eid, when, home, away, slug="semifinals", leg=1, state="pre", scores=("0", "0"), time_valid=True):
+    return {"id": eid, "date": when, "season": {"slug": slug},
+            "status": {"type": {"state": state, "completed": state == "post"}},
+            "competitions": [{"timeValid": time_valid, "leg": {"value": leg} if leg else None,
+                              "venue": {"fullName": "Allianz Parque", "address": {"city": "Sao Paulo"}},
+                              "competitors": [{"homeAway": "home", "score": scores[0], "team": {"displayName": home}},
+                                              {"homeAway": "away", "score": scores[1], "team": {"displayName": away}}]}]}
+
+
+class Libertadores(unittest.TestCase):
+    """The Libertadores comes from ESPN, each time cross-checked with Wikipedia's match boxes through resolve()."""
+    CLUBS = [(bs.team_words(n), n) for n in ["CR Flamengo", "SE Palmeiras", "Fluminense FC", "Santos FC"]]
+
+    def build(self, events, wiki=None, start=date(2026, 9, 30)):
+        with mock.patch.object(bs, "fetch_json", return_value={"events": events}):
+            return bs.from_libertadores(start, self.CLUBS, bs.wiki_boxes(WIKI_PAGE, "2026 Copa Libertadores final stages")
+                                        if wiki is None else wiki)
+
+    def test_wikipedia_boxes_are_read_with_their_time_in_utc(self):
+        boxes = bs.wiki_boxes(WIKI_PAGE, "2026 Copa Libertadores final stages")
+        self.assertEqual(len(boxes), 4)
+        g, sf, _, final = boxes
+        self.assertEqual((g["home"], g["away"], g["group"]), ("Deportivo La Guaira", "Fluminense FC", "C"))
+        self.assertEqual(g["utc"], datetime(2026, 4, 7, 22, 0, tzinfo=timezone.utc))      # 18:00 at UTC-4
+        self.assertEqual((sf["home"], sf["away"], sf["group"]), ("Fluminense FC", "SE Palmeiras", ""))
+        self.assertEqual(sf["utc"], datetime(2026, 10, 15, 0, 30, tzinfo=timezone.utc))    # 21:30 at UTC-3: the next day in UTC
+        self.assertEqual(sf["venue"], "Estádio do Maracanã, Rio de Janeiro")               # links and references gone
+        self.assertEqual(sf["url"], "https://en.wikipedia.org/wiki/2026_Copa_Libertadores_final_stages")
+        self.assertIsNone(final["utc"])                                                    # no time announced yet
+
+    def test_two_sources_that_agree_verify_the_time(self):
+        r = self.build([espn_event("401", "2026-10-15T00:30Z", "Fluminense", "Palmeiras")])[0]
+        self.assertEqual((r["code"], r["comp"], r["round"]), ("LIB", "CONMEBOL Libertadores", "Semi-finals, 1st leg"))
+        self.assertEqual(r["utc"], "2026-10-15T00:30:00+00:00")
+        self.assertEqual(r["check"]["status"], "confirmed")
+        self.assertEqual([s["source"] for s in r["check"]["sources"]], ["ESPN", "Wikipedia"])
+        self.assertEqual(r["uid"], "lib|401")
+        self.assertEqual(r["venue"], "Estádio do Maracanã, Rio de Janeiro")                # Wikipedia's name is newer
+
+    def test_the_brasileirao_spelling_is_kept_so_stars_follow_the_club(self):
+        r = self.build([espn_event("401", "2026-10-15T00:30Z", "Fluminense", "Palmeiras")])[0]
+        self.assertEqual((r["home"], r["away"]), ("Fluminense FC", "SE Palmeiras"))
+        self.assertEqual(bs.align_name("Estudiantes de La Plata", self.CLUBS), "Estudiantes de La Plata")
+        self.assertEqual(bs.align_name("Racing", self.CLUBS), "Racing")      # only Brasileirão clubs are ever renamed
+
+    def test_one_source_alone_or_two_that_disagree_stay_unverified(self):
+        alone = self.build([espn_event("401", "2026-10-15T00:30Z", "Fluminense", "Palmeiras")], wiki=[])[0]
+        self.assertIsNone(alone["utc"])
+        self.assertEqual(alone["check"]["status"], "unconfirmed")
+        differ = self.build([espn_event("401", "2026-10-15T01:00Z", "Fluminense", "Palmeiras")])[0]
+        self.assertIsNone(differ["utc"])
+        self.assertEqual(differ["check"]["status"], "conflicting")
+
+    def test_initials_match_the_full_name(self):
+        r = self.build([espn_event("402", "2026-10-16T00:30Z", "UCV FC", "Flamengo")])[0]
+        self.assertEqual(r["check"]["status"], "confirmed")
+        self.assertEqual((r["home"], r["away"]), ("UCV FC", "CR Flamengo"))
+        self.assertFalse(bs._same_team("Libertad", "Universidad Central de Venezuela"))
+
+    def test_group_matches_name_their_group_and_finished_ones_keep_their_score(self):
+        r = self.build([espn_event("403", "2026-04-07T22:00Z", "Deportivo La Guaira", "Fluminense", slug="group-stage",
+                                   leg=None, state="post", scores=("0", "0"))], start=date(2026, 4, 8))[0]
+        self.assertEqual(r["round"], "Group C")
+        self.assertEqual(r["result"], {"home": 0, "away": 0})
+
+    def test_unknown_teams_old_matches_and_odd_entries_are_left_out(self):
+        recs = self.build([espn_event("404", "2026-11-28T20:00Z", "TBD Home", "TBD Away", slug="final", leg=None, time_valid=False),
+                           espn_event("405", "2026-09-10T00:30Z", "Corinthians", "Estudiantes de La Plata", slug="quarterfinals"),
+                           {"id": "406", "date": "not a date"}, "not even an object"])
+        self.assertEqual(recs, [])
+
+    def test_a_time_espn_marks_as_not_valid_is_not_reported(self):
+        r = self.build([espn_event("407", "2026-11-28T20:00Z", "Flamengo", "Palmeiras", slug="final", leg=None, time_valid=False)])[0]
+        self.assertEqual(r["round"], "Final")
+        self.assertNotIn("time", r["check"]["sources"][0])
+        self.assertIsNone(r["utc"])
+
+    def test_the_last_published_matches_are_checked_before_they_are_reused(self):
+        good = bs.record("CONMEBOL Libertadores", "LIB", "Fluminense FC", "SE Palmeiras", "2026-10-15",
+                         "2026-10-15T00:30:00+00:00", uid="lib|401")
+        bad = [{**good, "uid": "evil"}, {**good, "home": 7}, {**good, "code": "EPL"}, {**good, "date": "soon"}, "text"]
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "fixtures.json")
+            common.save_json(path, {"matches": [good, *bad]})
+            self.assertEqual(bs.previous_lib(date(2026, 9, 30), path), [good])
+
+    def test_libertadores_matches_never_count_towards_the_safety_check(self):
+        self.assertEqual(bs.upcoming_league_matches([bs.record("CONMEBOL Libertadores", "LIB", "A", "B", "2026-10-15")]), 0)
+
+    def test_only_the_pages_that_can_hold_matches_to_come_are_asked_for(self):
+        self.assertEqual(bs._wiki_pages(date(2026, 9, 30)), ["2026 Copa Libertadores final stages"])
+        self.assertEqual(len(bs._wiki_pages(date(2026, 5, 1))), 2)
+        self.assertEqual(len(bs._wiki_pages(date(2026, 2, 1))), 3)
+
+
 class BackupTables(unittest.TestCase):
     """The league tables the page falls back to when ESPN does not answer (standings() in build_schedule.py)."""
 
@@ -899,7 +1038,7 @@ class SearchAndSharing(unittest.TestCase):
         self.assertEqual(len(docs), 2)
         self.assertEqual(len(descs), 2)
         for text in docs + descs + [self.meta["og:title"], self.meta["og:description"]]:
-            self.assertNotIn("\u2014", text)                                          # no em dashes (project rule 6)
+            self.assertNotIn("\u2014", text)                                          # no em dashes (project rule 7)
 
 
 if __name__ == "__main__":

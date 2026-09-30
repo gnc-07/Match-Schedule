@@ -282,6 +282,14 @@ const actChecks = [
     const meta = await page.locator("#list .match .m-meta", { hasText: pt ? "Liga das Nações da UEFA" : "UEFA Nations League" }).first().textContent();
     must(pt ? /Grupo A\d, Rodada \d/.test(meta) : /Group A\d, Matchday \d/.test(meta), `a Nations League card reads "${meta.trim()}"`);
   }],
+  ["Libertadores button and cards", async page => {
+    const pt = await page.evaluate(() => LANG === "pt");
+    must((await page.locator("#chip-LIB").textContent()).includes("Libertadores"), "there is no Libertadores button");
+    must(await count(page, "#chip-LIB .crest.flag svg path") >= 2, "the Libertadores button has no emblem");
+    await showMatch(page, "lib|900101");
+    const meta = await page.locator("#list .match .m-meta", { hasText: "CONMEBOL Libertadores" }).last().textContent();
+    must(meta.includes(pt ? "Semifinal, jogo de ida" : "Semi-finals, 1st leg"), `a Libertadores card reads "${meta.trim()}"`);
+  }],
   ["sources unfold", async page => {
     const d = page.locator("#list .srcs").first();
     await d.locator("summary").click();
@@ -327,6 +335,10 @@ const actChecks = [
     await page.waitForSelector("#lt-g-A1");
     const groups = await page.$$eval("#ltbody caption", c => c.map(x => x.textContent));
     must(groups.join() === "Group A1,Group A2,Group A3,Group A4", `the Nations League shows the tables ${groups.join(", ")}`);
+    await page.click('#ltchips [data-code="LIB"]');
+    await page.waitForSelector("#lt-g-H");
+    const lib = await page.$$eval("#ltbody caption", c => c.map(x => x.textContent));
+    must(lib.join() === "Group A,Group B,Group C,Group D,Group E,Group F,Group G,Group H", `the Libertadores shows the tables ${lib.join(", ")}`);
     await page.click('#ltchips [data-code="F1"]');
     await page.waitForSelector("#ltbody .f1t");
     await page.click("#ltdlg [data-close]");

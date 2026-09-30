@@ -23,6 +23,16 @@ export const F1 = [
   f1("19", "Q", 54, { check: { ...agree, status: "conflicting", reported: [hrs(54), hrs(54.5)] } }),
   f1("19", "R", 74, { sprint: true, check: agree }),
 ];
+// Sample Libertadores matches, as build_schedule.py writes them from ESPN and Wikipedia: a semi-final soon (both
+// sources agree, so verified) and a group match yesterday with its result, so the tests see both kinds of round.
+const libAgree = { status: "confirmed", basis: "2 independent sources agree", sources: [{ source: "ESPN", url: "https://www.espn.com/soccer/match/_/gameId/900101" },
+  { source: "Wikipedia", url: "https://en.wikipedia.org/wiki/2026_Copa_Libertadores_final_stages" }] };
+const lib = (id, h, home, away, round, venue, extra = {}) => ({ comp: "CONMEBOL Libertadores", code: "LIB", round, home, away,
+  date: hrs(h).slice(0, 10), utc: hrs(h), venue, uid: `lib|${id}`, check: libAgree, ...extra });
+export const LIB = [
+  lib("900102", -20, "Estudiantes de La Plata", "Independiente del Valle", "Group C", "Estadio Jorge Luis Hirschi, La Plata", { result: { home: 2, away: 1 } }),
+  lib("900101", 30, "Fluminense FC", "SE Palmeiras", "Semi-finals, 1st leg", "Estádio do Maracanã, Rio de Janeiro"),
+];
 // Jolpica-F1 answers for the finished weekend (round 18): made-up drivers, real team ids (for the team colours).
 export const F1_WEEKEND = "f1|2026|18";
 const TEAMS = [["mclaren", "McLaren"], ["ferrari", "Ferrari"], ["red_bull", "Red Bull"], ["mercedes", "Mercedes"], ["aston_martin", "Aston Martin"],
@@ -114,14 +124,26 @@ const unlStandings = { children: Object.entries(GROUPS).map(([g, teams]) => ({ n
   team: { displayName: t }, stats: [{ name: "rank", value: i + 1 }, { name: "gamesPlayed", value: 2 }, { name: "wins", value: 2 - Math.min(i, 2) },
     { name: "ties", value: 0 }, { name: "losses", value: Math.min(i, 2) }, { name: "pointDifferential", value: 3 - 2 * i }, { name: "points", value: 3 * (2 - Math.min(i, 2)) }] })) } })) };
 
+// The Libertadores' eight group tables, plus a qualifying table the page must leave out. Made-up points.
+const LIB_GROUPS = "ABCDEFGH".split("").map((g, k) => [g, ["Fluminense", "Palmeiras", "Estudiantes de La Plata", "Independiente del Valle",
+  "Boca Juniors", "River Plate", "Peñarol", "Nacional", "Olimpia", "Libertad", "Barcelona SC", "Emelec", "Colo-Colo", "Universidad de Chile",
+  "Sporting Cristal", "Alianza Lima", "Bolívar", "The Strongest", "Atlético Nacional", "Millonarios", "Cerro Porteño", "Guaraní",
+  "Liga de Quito", "Aucas", "Racing Club", "Independiente", "Caracas", "Deportivo Táchira", "San Lorenzo", "Talleres", "Always Ready", "Universitario"]
+  .slice(k * 4, k * 4 + 4)]);
+const libStandings = { children: [...LIB_GROUPS, ["Qualifying", ["Team One", "Team Two"]]].map(([g, teams]) => ({ name: g.length === 1 ? "Group " + g : g,
+  standings: { entries: teams.map((t, i) => ({ team: { displayName: t }, stats: [{ name: "rank", value: i + 1 }, { name: "gamesPlayed", value: 6 },
+    { name: "wins", value: 4 - i }, { name: "ties", value: i % 2 }, { name: "losses", value: 2 + i - (i % 2) - 0 }, { name: "pointDifferential", value: 6 - 3 * i },
+    { name: "points", value: 3 * (4 - i) + (i % 2) }] })) } })) };
+
 const wdSearch = { search: [{ id: "Q1" }] };
 const wdEntities = { entities: { Q1: { descriptions: { en: { value: "football stadium in London" } },
   claims: { P625: [{ mainsnak: { datavalue: { value: { latitude: 51.555, longitude: -0.108611 } } } }] } } } };
 
 // The list the test server hands out: the real matches, with the sample F1 weekends in place of any real sessions of
-// the same weekends (fixtures.json gains real rounds over the season; two sessions with one uid would show twice).
+// the same weekends (fixtures.json gains real rounds over the season; two sessions with one uid would show twice), and
+// the sample Libertadores matches in place of the real ones (whose number changes over the season).
 const SAMPLE_WK = new Set(F1.map(m => m.wk));
-const MATCHES = [...data.matches.filter(m => !SAMPLE_WK.has(m.wk)), ...F1]
+const MATCHES = [...data.matches.filter(m => !SAMPLE_WK.has(m.wk) && m.code !== "LIB"), ...F1, ...LIB]
   .sort((a, b) => (a.utc || a.date + "T99") < (b.utc || b.date + "T99") ? -1 : 1);   // in time order, as build_schedule.py writes it
 const dupes = MATCHES.map(m => m.uid).filter((u, i, all) => all.indexOf(u) !== i);
 if (dupes.length) throw new Error(`Sample data has more than one match with the same uid: ${[...new Set(dupes)].map(String).join(", ")}`);
@@ -162,6 +184,7 @@ export function answerFor(u) {
   }
   if (u.includes("espn.com")) {
     if (u.includes("/uefa.nations/standings")) return json(unlStandings);
+    if (u.includes("/conmebol.libertadores/standings")) return json(libStandings);
     if (u.includes("/standings")) return json(standings);
     if (u.includes("/summary")) return json(summary);
     if (u.includes("/eng.1/scoreboard")) return json(board);
