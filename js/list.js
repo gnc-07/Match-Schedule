@@ -532,9 +532,10 @@ function srcHTML(r) {
 // team starred yet, an invitation to star one, until "Not now" (remembered as follow: "no").
 const CHEVRON =
   '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>';
+let followNo = false; // Not now pressed on this visit (also saved, when the browser allows it)
 function mineHTML() {
   if (!favs.size) {
-    if (store.get("follow", "") === "no") return "";
+    if (followNo || store.get("follow", "") === "no") return "";
     return (
       '<section class="myteams" aria-labelledby="myteams-h"><h2 id="myteams-h">' +
       esc(T.followTitle) +
@@ -570,7 +571,7 @@ function mineHTML() {
           ? T.todayRel
           : d === addDays(today, 1)
             ? T.tomorrow
-            : clean(fmtDay.format(r.when || new Date(d + "T12:00:00Z")));
+            : clean(r.when ? fmtDay.format(r.when) : fmtDayU.format(new Date(d + "T12:00:00Z")));
     return day + " · " + (r.when ? fmtT.format(r.when) + " " + zoneOf(r.when) : T.tbcSmall);
   };
   return (
@@ -808,6 +809,7 @@ listEl.addEventListener("click", e => {
     q.focus();
     return;
   }
+  followNo = true;
   store.set("follow", "no");
   const box = b.closest(".myteams");
   leave(box, LIFT, () => {

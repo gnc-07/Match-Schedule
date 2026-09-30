@@ -283,6 +283,13 @@ const actChecks = [
     await page.waitForSelector("#wk-champ table");
     await page.waitForSelector("#wk-res .pod li.p1");
     must(await count(page, "#wk-venue svg") > 0, "the track diagram was not drawn");
+    // a starred driver's rows are highlighted (class "mine", as in the league tables), and nothing else gets that class
+    const drv = await page.getAttribute("#wk-res .star[data-drv]", "data-drv");
+    await page.click(`#wk-res .star[data-drv="${drv}"]`);
+    must(await page.evaluate(d => [...document.querySelectorAll(`#wk-res .star[data-drv="${d}"]`)].every(s => s.closest("tr, li")?.classList.contains("mine")), drv),
+      "starring a driver did not highlight their row");
+    must(!(await count(page, "#mddlg .myteams")), "a race weekend row has the Your teams card's class");
+    await page.click(`#wk-res .star[data-drv="${drv}"]`);   // as it was
     await page.click("#mddlg [data-close]");
     await page.waitForFunction(() => !document.getElementById("mddlg").open);
   }],

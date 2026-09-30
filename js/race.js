@@ -367,7 +367,7 @@ function paintWkRes() {
     return;
   }
   if (have.length === 1) h = h.replace("</h3>", '</h3><span class="f1-one">' + esc(S[w.pick]) + "</span>");
-  const mine = r => (f1favs.has(r.Driver.driverId) ? ' class="myteams"' : "");
+  const mine = r => (f1favs.has(r.Driver.driverId) ? ' class="mine"' : "");
   let t =
     '<div class="lt-scroll"><table class="lt f1t"><caption class="sr">' +
     esc(T.f1Results + ": " + S[w.pick]) +
@@ -528,7 +528,7 @@ function paintWkChamp() {
       }
       h +=
         "<tr" +
-        (fav ? ' class="myteams"' : "") +
+        (fav ? ' class="mine"' : "") +
         '><td class="pos-c">' +
         esc(x.positionText || x.position) +
         "</td>" +

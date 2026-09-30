@@ -269,7 +269,7 @@ function fillZones() {
   if (![...tzsel.options].some(o => o.value === TZ)) TZ = defaultTz();
   tzsel.value = TZ;
 }
-let fmtT, fmtZ, fmtH, fmtStamp, dayKey, fmtMon, fmtWd, fmtDayLong, fmtDay;
+let fmtT, fmtZ, fmtH, fmtStamp, dayKey, fmtMon, fmtWd, fmtDayLong, fmtDay, fmtDayU;
 function makeFormatters() {
   const L = T.locale;
   fmtT = new Intl.DateTimeFormat(L, { hour: "numeric", minute: "2-digit", timeZone: TZ });
@@ -286,6 +286,7 @@ function makeFormatters() {
   fmtMon = new Intl.DateTimeFormat(L, { month: "short", timeZone: "UTC" });
   fmtWd = new Intl.DateTimeFormat(L, { weekday: "short", timeZone: "UTC" });
   fmtDay = new Intl.DateTimeFormat(L, { weekday: "short", day: "numeric", month: "short", timeZone: TZ }); // "Your teams"
+  fmtDayU = new Intl.DateTimeFormat(L, { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }); // a day with no time
   fmtDayLong = new Intl.DateTimeFormat(L, {
     weekday: "long",
     day: "numeric",
