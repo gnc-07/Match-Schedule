@@ -21,7 +21,7 @@ import base64, hashlib, json, os, re, shutil, sys
 from common import save_text
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-COPY = ["fixtures.json", "soccer.ics", "fonts"]   # published as they are, next to the page
+COPY = ["fixtures.json", "soccer.ics", "fonts", "sitemap.xml", "og-image.png"]   # published as they are, next to the page
 
 STYLE_LINK = re.compile(r'<link rel="stylesheet" href="([^"]*)">\n')
 SCRIPT_RUN = re.compile(r'(?:<script src="[^"]*"></script>\n)+')   # script tags one after another
@@ -29,6 +29,10 @@ SCRIPT_SRC = re.compile(r'<script src="([^"]*)"></script>')
 INLINE = re.compile(r"<script>(.*?)</script>", re.S)
 CSP = re.compile(r'(<meta http-equiv="Content-Security-Policy" content=")([^"]*)(">)')
 LOCAL = re.compile(r"[a-z0-9][a-z0-9._/-]*\.(css|js)")   # a file of this site: no "..", no address, no leading /
+# Google Search Console's "HTML file" proof that the site is ours: published only when it is exactly what Google hands
+# out (its name, and one line naming it), because an HTML file beside the page is not covered by the page's security
+# policy, so any other HTML there could run scripts on the site's address
+VERIFY_NAME = re.compile(r"google[0-9a-f]{8,32}\.html")
 
 def _read(root, name, closing):
     """A file the page includes. Only files inside the site folder, and never text that would end the
@@ -71,14 +75,26 @@ def fingerprint(root=HERE):
     """12 characters that change whenever anything in the published page changes."""
     return _fingerprint(build_page(root))
 
+def verification_files(root=HERE):
+    """The Google Search Console verification files at the top of the site folder. A file with such a name but any
+    other content stops publishing, so a mistake is noticed rather than silently leaving the site unverified."""
+    found = sorted(n for n in os.listdir(root) if VERIFY_NAME.fullmatch(n))
+    for name in found:
+        with open(os.path.join(root, name), encoding="utf-8") as f:
+            text = f.read()
+        if text.strip() != "google-site-verification: " + name:
+            raise ValueError(f"{name} is not a Google verification file (it must hold only the line Google gives)")
+    return found
+
 def publish(folder, root=HERE):
-    """Writes the published site into `folder`: the page, the data files and the fonts, nothing else."""
+    """Writes the published site into `folder`: the page, the data files, the fonts, the sitemap, the link-preview
+    picture and any Google verification file, nothing else."""
     out = os.path.abspath(folder)
     if out == os.path.abspath(root) or os.path.abspath(root).startswith(out + os.sep):
         raise ValueError("publish into a folder of its own (such as _site), never over the source files")
     page = build_page(root)
     os.makedirs(out, exist_ok=True)
-    for name in COPY:
+    for name in COPY + verification_files(root):
         src, dst = os.path.join(root, name), os.path.join(out, name)
         if os.path.isdir(src):
             shutil.copytree(src, dst, dirs_exist_ok=True)

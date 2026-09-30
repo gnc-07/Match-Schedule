@@ -653,7 +653,7 @@ class PublishSite(unittest.TestCase):
     def test_publish_writes_only_the_site(self):
         with tempfile.TemporaryDirectory() as d:
             self.fake_site(d)
-            for name in ("soccer.ics", "fonts/x.woff2", "build_schedule.py", "tests/t.py"):
+            for name in ("soccer.ics", "fonts/x.woff2", "sitemap.xml", "og-image.png", "build_schedule.py", "tests/t.py"):
                 os.makedirs(os.path.dirname(os.path.join(d, name)), exist_ok=True)
                 with open(os.path.join(d, name), "w", encoding="utf-8") as f:
                     f.write("x")
@@ -668,9 +668,83 @@ class PublishSite(unittest.TestCase):
                 self.assertEqual(f.read(), fixtures)
             found = sorted(os.path.relpath(os.path.join(p, n), os.path.join(d, "_site"))
                            for p, _, names in os.walk(os.path.join(d, "_site")) for n in names)
-            self.assertEqual(found, ["fixtures.json", "fonts/x.woff2", "index.html", "soccer.ics"])
+            self.assertEqual(found, ["fixtures.json", "fonts/x.woff2", "index.html", "og-image.png", "sitemap.xml", "soccer.ics"])
             with self.assertRaises(ValueError):
                 publish_site.publish(d, d)          # never over the source files
+
+    def test_google_verification_file_is_published_only_when_it_is_one(self):
+        name = "google1a2b3c4d5e6f7a8b.html"
+        with tempfile.TemporaryDirectory() as d:
+            self.fake_site(d)
+            for extra in ("soccer.ics", "fonts/x.woff2", "sitemap.xml", "og-image.png"):
+                os.makedirs(os.path.dirname(os.path.join(d, extra)), exist_ok=True)
+                with open(os.path.join(d, extra), "w", encoding="utf-8") as f:
+                    f.write("x")
+            with open(os.path.join(d, "fixtures.json"), "w", encoding="utf-8") as f:
+                f.write('{"matches":[]}\n')
+            for other in ("google.html", "googleXYZ.html", "notgoogle1a2b3c4d5e6f7a8b.html"):   # not Google's names
+                with open(os.path.join(d, other), "w", encoding="utf-8") as f:
+                    f.write("<script>alert(1)</script>")
+            with open(os.path.join(d, name), "w", encoding="utf-8") as f:
+                f.write("google-site-verification: " + name)
+            publish_site.publish(os.path.join(d, "_site"), d)
+            self.assertEqual(sorted(n for n in os.listdir(os.path.join(d, "_site")) if n.endswith(".html")), sorted(["index.html", name]))
+            with open(os.path.join(d, name), "w", encoding="utf-8") as f:
+                f.write("<script>alert(1)</script>")          # the right name, other content: refused, loudly
+            with self.assertRaises(ValueError):
+                publish_site.publish(os.path.join(d, "_site2"), d)
+
+
+class SearchAndSharing(unittest.TestCase):
+    """What search engines and link previews read: the addresses in index.html, sitemap.xml and the preview picture
+    must agree, since a mistake in any of them fails silently (a preview without a picture, a page left unindexed)."""
+    ROOT = PublishSite.ROOT
+
+    def setUp(self):
+        with open(os.path.join(self.ROOT, "index.html"), encoding="utf-8") as f:
+            self.html = f.read()
+        self.alt = dict(re.findall(r'<link rel="alternate" hreflang="([^"]+)" href="([^"]+)">', self.html))
+        self.meta = dict(re.findall(r'<meta (?:property|name)="([^"]+)" content="([^"]*)">', self.html))
+
+    def test_language_versions(self):
+        self.assertEqual(set(self.alt), {"en", "pt", "x-default"})
+        self.assertEqual(self.alt["x-default"], self.alt["en"])
+        self.assertEqual(self.alt["pt"], self.alt["en"] + "?lang=pt")
+        self.assertTrue(self.alt["en"].startswith("https://") and self.alt["en"].endswith("/"))
+        # the script adds the one canonical link, for the language shown; one in the markup would apply to both
+        self.assertNotIn('rel="canonical"', self.html)
+
+    def test_sitemap_lists_exactly_the_language_versions(self):
+        import xml.etree.ElementTree as ET
+        root = ET.parse(os.path.join(self.ROOT, "sitemap.xml")).getroot()
+        ns = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
+        self.assertEqual(root.tag, ns + "urlset")
+        self.assertEqual([u.findtext(ns + "loc") for u in root], [self.alt["en"], self.alt["pt"]])
+        self.assertIn("sitemap.xml", publish_site.COPY)
+
+    def test_preview_picture_and_address(self):
+        self.assertEqual(self.meta["og:url"], self.alt["en"])
+        self.assertEqual(self.meta["og:image"], self.alt["en"] + "og-image.png")
+        self.assertIn("og-image.png", publish_site.COPY)
+        with open(os.path.join(self.ROOT, "og-image.png"), "rb") as f:
+            head = f.read(24)
+        self.assertEqual(head[:8], b"\x89PNG\r\n\x1a\n")
+        size = (int.from_bytes(head[16:20], "big"), int.from_bytes(head[20:24], "big"))
+        self.assertEqual(size, (int(self.meta["og:image:width"]), int(self.meta["og:image:height"])))
+        self.assertEqual(size, (1200, 630))
+        self.assertLess(os.path.getsize(os.path.join(self.ROOT, "og-image.png")), 300_000)   # chat apps skip large pictures
+
+    def test_title_and_description_match_the_english_text_the_script_sets(self):
+        with open(os.path.join(self.ROOT, "js", "i18n.js"), encoding="utf-8") as f:
+            i18n = f.read()
+        title = re.search(r"<title>([^<]+)</title>", self.html).group(1)
+        docs = re.findall(r'docTitle: "([^"]+)"', i18n)
+        descs = re.findall(r'docDesc:\s*"([^"]+)"', i18n)
+        self.assertEqual((docs[0], descs[0]), (title, self.meta["description"]))   # en comes first in the table
+        self.assertEqual(len(docs), 2)
+        self.assertEqual(len(descs), 2)
+        for text in docs + descs + [self.meta["og:title"], self.meta["og:description"]]:
+            self.assertNotIn("\u2014", text)                                          # no em dashes (project rule 6)
 
 
 if __name__ == "__main__":

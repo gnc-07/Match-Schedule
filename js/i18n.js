@@ -62,7 +62,12 @@ const I18N = {
     loading: "Loading fixtures…",
     loadError: "The fixture list could not be loaded. Reload the page to try again.",
     updated: "Updated",
-    leagueData: "League data",
+    leagueData: "Data sources",
+    srcMore: "(how it works)",
+    // the browser tab and search results: the page's <title> and description in index.html are these English ones
+    docTitle: "Matchday Planner: soccer and F1 schedule with verified kick-off times",
+    docDesc:
+      "Premier League, La Liga, Bundesliga, Brasileirão, UEFA Nations League and international friendly fixtures, plus every Formula 1 session, with cross-checked kick-off times, live scores and a calendar you can subscribe to. In English and Brazilian Portuguese.",
     tomorrow: "Tomorrow",
     todayRel: "Today",
     pVerified: "verified",
@@ -353,7 +358,11 @@ const I18N = {
     loading: "Carregando jogos…",
     loadError: "Não foi possível carregar a lista de jogos. Recarregue a página para tentar novamente.",
     updated: "Atualizado em",
-    leagueData: "Dados das ligas",
+    leagueData: "Fontes dos dados",
+    srcMore: "(como funciona)",
+    docTitle: "Matchday Planner: agenda de futebol e F1 com horários conferidos",
+    docDesc:
+      "Jogos do Brasileirão, Premier League, La Liga, Bundesliga, Liga das Nações da UEFA e amistosos de seleções, e todas as sessões da Fórmula 1, com horários conferidos, placares ao vivo e uma agenda para assinar. Em português e inglês.",
     tomorrow: "Amanhã",
     todayRel: "Hoje",
     pVerified: "verificado",

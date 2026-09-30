@@ -123,6 +123,22 @@ const viewChecks = [
     });
     must(!small.length, `controls shorter than required: ${small.slice(0, 6).join(", ")}${small.length > 6 ? ` and ${small.length - 6} more` : ""}`);
   }],
+  ["search engines and the Data sources link", async (page, { lang }) => {
+    // one canonical address, for the language shown, and a title in that language (search engines read both after the
+    // script has run); the source names joined in the page's language and leading to "How it works"
+    const [title, canon] = await page.evaluate(() => [document.title,
+      [...document.querySelectorAll('link[rel="canonical"]')].map(l => l.href)]);
+    must(canon.length === 1, `${canon.length} canonical links, expected 1`);
+    must(lang === "pt" ? canon[0].endsWith("/?lang=pt") : canon[0].endsWith("/"), `canonical link ${canon[0]} is not the ${lang} page`);
+    must(lang === "pt" ? title.includes("agenda de futebol") : title.includes("soccer and F1 schedule"), `title "${title}" is not in ${lang}`);
+    const src = await page.textContent("#srclink");
+    must(!(lang === "pt" && / and /.test(src)), `English "and" in the Portuguese source names: ${src}`);
+    const before = page.url();
+    await page.click("#srclink");
+    must(page.url() === before, "the source names link changed the address (a Back step for Match details)");
+    must(await page.evaluate(() => document.activeElement?.id) === "how-h", "the source names link did not move focus to How it works");
+    await page.evaluate(() => { document.activeElement.blur(); scrollTo(0, 0); });   // back as it was, for the picture taken next
+  }],
 ];
 
 // Things a visitor does, run at phone and laptop width in English: [name, steps]
@@ -157,6 +173,9 @@ const actChecks = [
     await page.click("#setmenu > summary");
     await page.selectOption("#langsel", "pt");
     must(await attr(page, "lang") === "pt-BR", "choosing Português did not switch the page to Portuguese");
+    must((await page.title()).includes("agenda de futebol"), "choosing Português did not translate the page title");
+    must(await page.evaluate(() => document.querySelector('link[rel="canonical"]').href.endsWith("?lang=pt")),
+      "choosing Português did not point the canonical link at the Portuguese page");
     await page.selectOption("#langsel", "en");
     must(await attr(page, "lang") === "en", "choosing English did not switch back");
     await page.click("#setdone");
