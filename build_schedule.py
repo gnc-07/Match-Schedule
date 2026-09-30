@@ -809,8 +809,9 @@ def valid_badge(b):
         return False
     if set(b) == {"flag"}:
         return isinstance(b["flag"], str) and bool(FLAG_CODE.fullmatch(b["flag"]))
-    return (set(b) in ({"crest"}, {"crest", "box"}) and isinstance(b["crest"], str)
-            and bool(re.fullmatch(r"\d{1,7}", b["crest"])) and ("box" not in b or valid_box(b["box"])))
+    return (set(b) in ({"crest"}, {"crest", "box", "dark"}) and isinstance(b["crest"], str)
+            and bool(re.fullmatch(r"\d{1,7}", b["crest"]))
+            and ("box" not in b or (valid_box(b["box"]) and (b["dark"] is False or valid_box(b["dark"])))))
 
 def png_alpha(data):
     """(width, height, rows of opacity 0-255) of a PNG picture, read with the standard library only; None for anything
@@ -902,23 +903,36 @@ def crest_box(data, solid=32):
     box = [round(x0 * k), round(y0 * k), round((x1 - x0) * k), round((y1 - y0) * k), min(1000, math.ceil(reach * k))]
     return box if valid_box(box) else None
 
-ESPN_CREST = "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/{}.png&h=100&w=100"
+ESPN_CREST = "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/{}/{}.png&h=100&w=100"
+# ESPN also draws most crests again for dark backgrounds (its "500-dark" folder: a white outline, or white in place of
+# navy or black). A few of those are a club's old crest; these clubs keep their usual crest in dark theme.
+OLD_DARK_CREST = {"3458": "Athletico-PR (the round crest used before 2018)", "9169": "Mirassol (an older crest)"}
 
 def measure_crests(badges, previous=None):
-    """Adds "box" (crest_box()) to each crest: kept from the last build when the crest is the same, else measured from
-    ESPN's picture. A crest that cannot be downloaded or read has no box, and the page shows it as before."""
-    old = {b["crest"]: b["box"] for b in (previous or {}).values() if "box" in b}
+    """Adds "box" (crest_box()) to each crest, and "dark": the box of ESPN's dark-background version, or False when
+    there is none, it is the same picture, or it is an old crest (OLD_DARK_CREST). Kept from the last build when the
+    crest is the same, else measured from ESPN's pictures. A crest that cannot be downloaded or read has neither, and
+    the page shows it unmeasured."""
+    old = {b["crest"]: (b["box"], b["dark"]) for b in (previous or {}).values() if "box" in b}
     for b in badges.values():
         if "crest" not in b or "box" in b:
             continue
-        box = old.get(b["crest"])
-        if box is None:
+        got = old.get(b["crest"])
+        if got is None:
             try:
-                box = crest_box(fetch(ESPN_CREST.format(b["crest"])))
+                light = fetch(ESPN_CREST.format("500", b["crest"]))
+                box, dark = crest_box(light), False
+                if box and b["crest"] not in OLD_DARK_CREST:
+                    try:
+                        pic = fetch(ESPN_CREST.format("500-dark", b["crest"]))
+                        dark = pic != light and crest_box(pic) or False
+                    except Exception:
+                        pass                 # no dark version (ESPN answers 404): the usual crest in both themes
+                got = (box, dark) if box else None
             except Exception as e:
                 print(f"crest {b['crest']} could not be measured ({e})")
-        if box:
-            b["box"] = old[b["crest"]] = box
+        if got:
+            b["box"], b["dark"] = old[b["crest"]] = got
     return badges
 
 def previous_badges(path="fixtures.json"):

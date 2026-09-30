@@ -16,7 +16,7 @@
   --ink:#0E1628; --ink-2:#2B3448; --muted:#4F596D; --faint:#5F687C;
   --line:#D5DBE6; --line-2:#E7EBF2;
   --accent:#2446D6; --accent-ink:#FFFFFF; --accent-soft:#E7ECFE;
-  --board:#0F1A33; --gold:#F2B829; --glow:color-mix(in srgb,var(--gold) 60%,transparent);
+  --board:#0F1A33; --gold:#F2B829; --glow:color-mix(in srgb,var(--gold) 60%,transparent); --crest-glow:transparent;
   --live-bg:#C21A33; --live-ink:#B3142C; --live-soft:#FCEBEE;
   --warn-bg:#FFF1CC; --warn-ink:#6B4700; --tbc-bg:#ECEFF5; --tbc-ink:#4A5468; --early-bg:#ECEBFD; --early-ink:#3D3294;
   --star:#B37F00; --star-off:#8B94A7;
@@ -45,7 +45,7 @@
   --ink:#E8ECF4; --ink-2:#CDD4E1; --muted:#A3AEC3; --faint:#97A3B9;
   --line:#28344D; --line-2:#1D273C;
   --accent:#9AACFF; --accent-ink:#0A0F1C; --accent-soft:#1D2849;
-  --board:#0D1630; --gold:#FFC940; --glow:color-mix(in srgb,var(--gold) 42%,transparent);
+  --board:#0D1630; --gold:#FFC940; --glow:color-mix(in srgb,var(--gold) 42%,transparent); --crest-glow:color-mix(in srgb,var(--flag-white) 55%,transparent);
   --live-bg:#C21A33; --live-ink:#FF8795; --live-soft:#2A1320;
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
@@ -65,7 +65,7 @@
   --ink:#E8ECF4; --ink-2:#CDD4E1; --muted:#A3AEC3; --faint:#97A3B9;
   --line:#28344D; --line-2:#1D273C;
   --accent:#9AACFF; --accent-ink:#0A0F1C; --accent-soft:#1D2849;
-  --board:#0D1630; --gold:#FFC940; --glow:color-mix(in srgb,var(--gold) 42%,transparent);
+  --board:#0D1630; --gold:#FFC940; --glow:color-mix(in srgb,var(--gold) 42%,transparent); --crest-glow:color-mix(in srgb,var(--flag-white) 55%,transparent);
   --live-bg:#C21A33; --live-ink:#FF8795; --live-soft:#2A1320;
   --warn-bg:#3A2D0E; --warn-ink:#F6D27A; --tbc-bg:#1C2437; --tbc-ink:#B3BDD0; --early-bg:#231F4A; --early-ink:#C3BBFF;
   --star:#FFC940; --star-off:#7D89A1;
@@ -253,9 +253,12 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
    theme, so dark crests stay visible in the dark theme); the ring keeps a white flag or disc visible on a light card */
 .badge{flex:none;position:relative;width:18px;height:18px;margin-right:4px;border-radius:50%;overflow:hidden}
 .badge img{display:block;width:100%;height:100%;border-radius:50%}
-.badge.crest{background:var(--flag-white)}
-.badge.crest img{width:14px;height:14px;margin:2px;border-radius:0;object-fit:contain}
-.badge.crest.fit img{position:absolute;max-width:none;margin:0}
+.badge.crest{overflow:visible;border-radius:0}
+.badge.crest::after{content:none}
+.badge.crest img{border-radius:0;object-fit:contain;filter:drop-shadow(0 0 1px var(--crest-glow))}
+.badge.crest.fit img{position:absolute;max-width:none}
+.badge .dk,:root.is-dark .badge .lt{display:none}
+:root.is-dark .badge .dk{display:block}
 .badge::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 1px var(--line)}
 .team.fav .nm{box-shadow:inset 0 -2px 0 var(--star)}
 .star{border:0;background:transparent;cursor:pointer;color:var(--star-off);width:32px;height:32px;border-radius:8px;display:grid;place-items:center;margin-block:-4px}

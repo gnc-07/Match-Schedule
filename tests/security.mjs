@@ -43,7 +43,7 @@ const mapMatch = (uid, venue) => ({ comp: "Premier League", code: "EPL", round: 
 // one real flag, which must be drawn
 const badges = { [bad.home]: { crest: EVIL }, Chelsea: { crest: "359&img=https://evil.example/x.png" },
   "Mapland FC test-map": { flag: "../index" }, "Wrongtype FC 1": { crest: 359 }, "Wrongtype FC 2": { flag: "de", crest: "1" },
-  "Borussia Dortmund": "de", "FC Bayern München": { crest: "132", box: [40, 50, 940, 930, 475] }, Argentina: { flag: "ar" },
+  "Borussia Dortmund": "de", "FC Bayern München": { crest: "132", box: [40, 50, 940, 930, 475], dark: [40, 50, 940, 930, 475] }, Argentina: { flag: "ar" },
   // a crest's measured box (crest_box()) with markup, and one reaching outside the picture: the crest is drawn unsized
   "Mapland FC test-map-none": { crest: "133", box: ['1" onerror="alert(1)', 0, 500, 500, 400] },
   "Liverpool FC": { crest: "364", box: [900, 0, 500, 500, 400] } };
@@ -164,7 +164,7 @@ try {
     [i.getAttribute("src"), i.closest(".team")?.querySelector(".nm")?.textContent]));
   shows("team badges: every picture is a flag from flags/ or an ESPN crest built from a team number",
     imgs.every(([src]) => /^flags\/[a-z]{2}(-[a-z]{3})?\.webp$/.test(src) ||
-      /^https:\/\/a\.espncdn\.com\/combiner\/i\?img=\/i\/teamlogos\/soccer\/500\/\d{1,7}\.png&h=(40|80|100)&w=\1$/.test(src)));
+      /^https:\/\/a\.espncdn\.com\/combiner\/i\?img=\/i\/teamlogos\/soccer\/500(-dark)?\/\d{1,7}\.png&h=(40|80|100)&w=\2$/.test(src)));
   const fits = await page.evaluate(() => [...document.querySelectorAll("#list .badge img")].map(i =>
     [i.getAttribute("style"), i.closest(".team")?.querySelector(".nm")?.textContent]));
   shows("team badges: a crest's size and place are plain numbers, and a malformed box leaves the crest unsized",

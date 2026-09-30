@@ -863,25 +863,44 @@ class CrestBoxes(unittest.TestCase):
             self.assertIsNone(bs.crest_box(data))
 
     def test_boxes_are_checked(self):
-        self.assertTrue(bs.valid_badge({"crest": "359", "box": [0, 0, 1000, 1000, 707]}))
+        box = [0, 0, 1000, 1000, 707]
+        self.assertTrue(bs.valid_badge({"crest": "359", "box": box, "dark": False}))
+        self.assertTrue(bs.valid_badge({"crest": "359", "box": box, "dark": [0, 0, 500, 500, 354]}))
         for bad in ([0, 0, 1000, 1000], [0, 0, 0, 10, 5], [600, 0, 500, 10, 5], [0, 0, 10, 10, 0], [0, 0, 10.5, 10, 5],
                     [0, 0, True, 10, 5], "0,0,10,10,5", [-1, 0, 10, 10, 5]):
-            self.assertFalse(bs.valid_badge({"crest": "359", "box": bad}), bad)
-        self.assertFalse(bs.valid_badge({"flag": "de", "box": [0, 0, 10, 10, 5]}))
-        self.assertFalse(bs.valid_badge({"crest": "359", "size": 3}))
+            self.assertFalse(bs.valid_badge({"crest": "359", "box": bad, "dark": False}), bad)
+            self.assertFalse(bs.valid_badge({"crest": "359", "box": box, "dark": bad}), bad)
+        for bad in ({"crest": "359", "box": box}, {"crest": "359", "box": box, "dark": True}, {"crest": "359", "box": box, "dark": 0},
+                    {"flag": "de", "box": box, "dark": False}, {"crest": "359", "size": 3}):
+            self.assertFalse(bs.valid_badge(bad), bad)
 
     def test_measured_once_then_kept(self):
-        pic = self.square(10, 2, 1, 6, 7)
-        with mock.patch.object(bs, "fetch", return_value=pic) as f:
-            got = bs.measure_crests({"A": {"crest": "1"}, "B": {"crest": "1"}, "C": {"crest": "2"}, "D": {"flag": "de"}},
-                                    previous={"Old": {"crest": "2", "box": [0, 0, 500, 500, 354]}})
-        self.assertEqual([c.args[0] for c in f.call_args_list],
-                         ["https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/1.png&h=100&w=100"])
-        self.assertEqual(got["A"]["box"], got["B"]["box"])
-        self.assertEqual(got["C"]["box"], [0, 0, 500, 500, 354])          # the same crest as last time: not downloaded
+        light, dark = self.square(10, 2, 1, 6, 7), self.square(10, 0, 0, 10, 10)
+        pics = {"/500/1.png": light, "/500-dark/1.png": dark, "/500/4.png": light, "/500-dark/4.png": light,
+                "/500/3458.png": light, "/500-dark/3458.png": dark, "/500/5.png": light}
+        def fake(url):
+            for k, v in pics.items():
+                if k + "&" in url:
+                    return v
+            raise OSError("HTTP Error 404: Not Found")
+        with mock.patch.object(bs, "fetch", side_effect=fake) as f:
+            got = bs.measure_crests({"A": {"crest": "1"}, "B": {"crest": "1"}, "C": {"crest": "2"}, "D": {"flag": "de"},
+                                     "E": {"crest": "4"}, "F": {"crest": "3458"}, "G": {"crest": "5"}},
+                                    previous={"Old": {"crest": "2", "box": [0, 0, 500, 500, 354], "dark": False}})
+        urls = [c.args[0] for c in f.call_args_list]
+        self.assertEqual(urls[:2], ["https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/1.png&h=100&w=100",
+                                    "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500-dark/1.png&h=100&w=100"])
+        self.assertEqual(len(urls), 7)                                    # 1, 4 and 5 twice (5's dark one is missing), 3458 once
+        self.assertEqual(got["A"], {"crest": "1", "box": [200, 100, 400, 600, got["A"]["box"][4]], "dark": [0, 0, 1000, 1000, 708]})   # reach rounded up
+        self.assertEqual(got["A"], got["B"])                              # the same crest: measured once
+        self.assertEqual(got["C"], {"crest": "2", "box": [0, 0, 500, 500, 354], "dark": False})   # kept from last time
         self.assertEqual(got["D"], {"flag": "de"})
+        self.assertIs(got["E"]["dark"], False)                            # ESPN's dark version is the same picture
+        self.assertIs(got["F"]["dark"], False)                            # an old crest: not even downloaded
+        self.assertIs(got["G"]["dark"], False)                            # no dark version at all
+        self.assertTrue(all(bs.valid_badge(b) for b in got.values()))
         with mock.patch.object(bs, "fetch", side_effect=OSError("blocked")):
-            self.assertEqual(bs.measure_crests({"A": {"crest": "1"}}), {"A": {"crest": "1"}})   # shown as before
+            self.assertEqual(bs.measure_crests({"A": {"crest": "1"}}), {"A": {"crest": "1"}})   # shown unmeasured
 
 class SearchAndSharing(unittest.TestCase):
     """What search engines and link previews read: the addresses in index.html, sitemap.xml and the preview picture
