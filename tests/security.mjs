@@ -198,6 +198,18 @@ try {
   shows("published page: a script that is not in the policy is refused", !policy.ran && policy.blocked);
   await page.evaluate(() => { window.__csp = []; });
 
+  // "Add to Home Screen": the published page's manifest must load under its security policy (default-src 'self'
+  // covers it), be read without errors, and leave Chromium no reason to refuse installing the site
+  await page.goto(`${BASE}?lang=en`, { waitUntil: "networkidle0" });
+  const cdp = await page.createCDPSession();
+  const manifest = await cdp.send("Page.getAppManifest"), installable = await cdp.send("Page.getInstallabilityErrors");
+  shows("published page: the home-screen manifest loads and is read without errors",
+    /\/manifest\.webmanifest$/.test(manifest.url || "") && !manifest.errors.length);
+  shows(`published page: Chromium can install it${installable.installabilityErrors.length
+    ? " (refused: " + installable.installabilityErrors.map(e => e.errorId).join(", ") + ")" : ""}`, !installable.installabilityErrors.length);
+  await cdp.detach();
+  await check("published page with its manifest");
+
   // index.html as edited (styles.css and the js/ files loaded one by one, as python3 -m http.server shows it) must
   // work too: this catches a file that uses, while it loads, something only a later file defines
   await page.goto(`${BASE}source.html?lang=en`, { waitUntil: "networkidle0" });
