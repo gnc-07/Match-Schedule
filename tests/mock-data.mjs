@@ -121,7 +121,18 @@ const wdEntities = { entities: { Q1: { descriptions: { en: { value: "football st
 // The list the test server hands out: the real matches, with the sample F1 weekends in place of any real sessions of
 // the same weekends (fixtures.json gains real rounds over the season; two sessions with one uid would show twice).
 const SAMPLE_WK = new Set(F1.map(m => m.wk));
-const MATCHES = [...data.matches.filter(m => !SAMPLE_WK.has(m.wk)), ...F1]
+// Two league matches after the sample one, as the league cross-check writes them (build_schedule.py, cross_check()):
+// one whose sources agree (verified) and one whose sources disagree (the feed's time stays, with the warning).
+const LEAGUE_TIMED = data.matches.filter(m => m.code === "EPL" && m.utc && !m.result && m.uid !== MATCH.uid).slice(0, 2);
+export const [LEAGUE_OK, LEAGUE_DIFFER] = LEAGUE_TIMED.map(m => m.uid);
+const leagueChecks = {
+  [LEAGUE_OK]: { status: "confirmed", basis: "3 independent sources agree",
+    sources: [{ source: "football-data.org" }, { source: "openfootball", url: "https://raw.githubusercontent.com/openfootball/football.json/master/2026-27/en.1.json" },
+      { source: "ESPN", url: "https://www.espn.com/soccer/match/_/gameId/900201" }] },
+  [LEAGUE_DIFFER]: { status: "conflicting", sources: [{ source: "football-data.org" }, { source: "ESPN", url: "https://www.espn.com/soccer/match/_/gameId/900202" }],
+    reported: [LEAGUE_TIMED[1]?.utc, LEAGUE_TIMED[1] && new Date(Date.parse(LEAGUE_TIMED[1].utc) + 9e6).toISOString().replace(/\.\d+Z$/, "+00:00")] },
+};
+const MATCHES = [...data.matches.filter(m => !SAMPLE_WK.has(m.wk)).map(m => leagueChecks[m.uid] ? { ...m, check: leagueChecks[m.uid] } : m), ...F1]
   .sort((a, b) => (a.utc || a.date + "T99") < (b.utc || b.date + "T99") ? -1 : 1);   // in time order, as build_schedule.py writes it
 const dupes = MATCHES.map(m => m.uid).filter((u, i, all) => all.indexOf(u) !== i);
 if (dupes.length) throw new Error(`Sample data has more than one match with the same uid: ${[...new Set(dupes)].map(String).join(", ")}`);

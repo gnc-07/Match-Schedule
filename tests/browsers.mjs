@@ -21,7 +21,7 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { chromium, firefox, webkit } from "playwright";
 import { BASE, ROOT, chromePath, startServer } from "./server.mjs";
-import { F1_WEEKEND, MATCH, mockRoutes, showMatch } from "./mock-data.mjs";
+import { F1_WEEKEND, LEAGUE_DIFFER, LEAGUE_OK, MATCH, mockRoutes, showMatch } from "./mock-data.mjs";
 
 // The Chromium the other tests use (CHROME_PATH or a system copy), else Playwright's own
 function localChromium() {
@@ -273,6 +273,15 @@ const actChecks = [
     await page.reload({ waitUntil: "load" });
     await page.waitForSelector("#list .day");
     must(!(await page.isVisible("#myteams-h")), "Not now did not keep the invitation hidden on the next visit");
+  }],
+  ["league times checked against a second source", async page => {
+    const pt = await page.evaluate(() => LANG === "pt");
+    const card = async u => { await showMatch(page, u); return page.locator(`.match:has(.md-open[data-uid="${u}"])`); };
+    const ok = await card(LEAGUE_OK);
+    must((await ok.locator(".pill.ok").textContent()).includes(pt ? "verificado" : "verified"), "a league match whose sources agree is not marked verified");
+    const differ = await card(LEAGUE_DIFFER);
+    must(await differ.locator(".m-time time").count() === 1, "a league match whose sources disagree lost its time");
+    must((await differ.locator(".pill.warn").textContent()).trim().length > 0, "a league match whose sources disagree has no warning");
   }],
   ["Nations League button and cards", async page => {
     const pt = await page.evaluate(() => LANG === "pt");
