@@ -54,6 +54,7 @@ const ALIAS = {
   munchen: "munich",
   koln: "cologne",
   wolverhampton: "wolves",
+  hamburger: "hamburg", // ESPN: "Hamburg SV"
 };
 function tokens(name) {
   const s = name.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();

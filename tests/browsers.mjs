@@ -180,6 +180,14 @@ const actChecks = [
     must(await attr(page, "lang") === "en", "choosing English did not switch back");
     await page.click("#setdone");
   }],
+  ["live scores find their fixtures", async page => {
+    // ESPN's names for teams whose fixture names share no plain word with them: each needs an alias in js/live.js,
+    // or its live scores never reach the list (Hamburg's did not, until "hamburger" was added)
+    const pairs = [["Hamburger SV", "Hamburg SV"], ["1. FC Köln", "FC Cologne"], ["FC Bayern München", "Bayern Munich"],
+      ["CA Mineiro", "Atlético-MG"], ["CA Paranaense", "Athletico-PR"], ["Wolverhampton Wanderers FC", "Wolves"]];
+    const missed = await page.evaluate(ps => ps.filter(([ours, espn]) => !overlap(tokens(ours), tokens(espn))).map(p => p.join(" / ")), pairs);
+    must(!missed.length, `live scores cannot match: ${missed.join(", ")}`);
+  }],
   ["league chip", async page => {
     const f1 = () => count(page, '#list [data-uid^="f1|"]');
     const before = await f1(), pressed = await page.getAttribute("#chip-F1", "aria-pressed");
