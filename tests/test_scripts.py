@@ -1036,7 +1036,7 @@ class CrestBoxes(unittest.TestCase):
             for k, v in pics.items():
                 if k + "&" in url:
                     return v
-            raise OSError("HTTP Error 404: Not Found")
+            raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)
         with mock.patch.object(bs, "fetch", side_effect=fake) as f:
             got = bs.measure_crests({"A": {"crest": "1"}, "B": {"crest": "1"}, "C": {"crest": "2"}, "D": {"flag": "de"},
                                      "E": {"crest": "4"}, "F": {"crest": "3458"}, "G": {"crest": "5"}},
@@ -1055,6 +1055,35 @@ class CrestBoxes(unittest.TestCase):
         self.assertTrue(all(bs.valid_badge(b) for b in got.values()))
         with mock.patch.object(bs, "fetch", side_effect=OSError("blocked")):
             self.assertEqual(bs.measure_crests({"A": {"crest": "1"}}), {"A": {"crest": "1"}})   # shown unmeasured
+        # the dark version failing for another reason (a timeout, ESPN's server erring) is not taken for "none":
+        # nothing is saved, so the next build measures the crest again
+        for err in (TimeoutError("timed out"), urllib.error.HTTPError("u", 503, "Unavailable", {}, None)):
+            answers = iter([light, err])
+            def flaky(url):
+                a = next(answers)
+                if isinstance(a, Exception):
+                    raise a
+                return a
+            with mock.patch.object(bs, "fetch", side_effect=flaky):
+                self.assertEqual(bs.measure_crests({"A": {"crest": "1"}}), {"A": {"crest": "1"}}, err)
+
+    def test_a_picture_claiming_to_be_huge(self):
+        # 10 x 10 pixels, whose data unpacks into 50 MB of zeros: only what 10 x 10 pixels need is ever unpacked
+        import struct, zlib
+        chunk = lambda k, d: struct.pack(">I", len(d)) + k + d + struct.pack(">I", zlib.crc32(k + d))
+        bomb = (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 10, 10, 8, 6, 0, 0, 0))
+                + chunk(b"IDAT", zlib.compress(bytes(50_000_000), 9)) + chunk(b"IEND", b""))
+        self.assertLess(len(bomb), 100_000)
+        import tracemalloc
+        tracemalloc.start()
+        try:
+            w, h, rows = bs.png_alpha(bomb)
+            peak = tracemalloc.get_traced_memory()[1]
+        finally:
+            tracemalloc.stop()
+        self.assertLess(peak, 5_000_000)                                  # not the 50 MB it claims
+        self.assertEqual((w, h, len(rows)), (10, 10, 10))
+        self.assertIsNone(bs.crest_box(bomb))                            # all see-through: no drawing
 
 class SearchAndSharing(unittest.TestCase):
     """What search engines and link previews read: the addresses in index.html, sitemap.xml and the preview picture
