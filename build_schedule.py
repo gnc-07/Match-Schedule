@@ -758,8 +758,9 @@ def flag_codes(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "fl
     return {key(n): c for n, c in names.items() if FLAG_CODE.fullmatch(c) and c in flags}, key
 
 def _espn_teams(league):
-    """ESPN's clubs in one competition, as (words, ESPN team number). ESPN's API is unofficial: an answer that is
-    missing or odd gives no clubs, never an error, and a team number that is not plain digits is left out."""
+    """ESPN's clubs in one competition, as (words of all its names, [words of each name], ESPN team number). ESPN's
+    API is unofficial: an answer that is missing or odd gives no clubs, never an error, and a team number that is not
+    plain digits is left out."""
     try:
         teams = fetch_json(ESPN_TEAMS.format(league))["sports"][0]["leagues"][0]["teams"]
     except Exception as e:
@@ -770,24 +771,27 @@ def _espn_teams(league):
         t = t.get("team") if isinstance(t, dict) else None
         if not isinstance(t, dict) or not isinstance(t.get("id"), str) or not re.fullmatch(r"\d{1,7}", t["id"]):
             continue
-        words = set()
-        for k in ("displayName", "shortDisplayName", "name"):
-            if isinstance(t.get(k), str):
-                words |= team_words(t[k])
-        if not words and isinstance(t.get("slug"), str):   # "Deportivo" alone: its address says esp.deportivo_coruna
-            words = team_words(t["slug"].split(".")[-1].replace("_", " "))
-        if words:
-            out.append((words, t["id"]))
+        names = [w for w in (team_words(t[k]) for k in ("displayName", "shortDisplayName", "name")
+                             if isinstance(t.get(k), str)) if w]
+        if not names and isinstance(t.get("slug"), str):   # "Deportivo" alone: its address says esp.deportivo_coruna
+            names = [team_words(t["slug"].split(".")[-1].replace("_", " "))]
+        names = [w for w in names if w]
+        if names:
+            out.append((set().union(*names), names, t["id"]))
     return out
 
 def best_team(name, teams):
-    """The ESPN team number of the club sharing the most words with `name`. Between two sharing as many, the one
-    whose word comes first in the name ("RCD Espanyol de Barcelona" is Espanyol, not Barcelona). None when no club
-    shares a word, or two still tie: better no crest than another club's."""
+    """The ESPN team number of the club sharing the most words with `name`. Only a close match counts: the words in
+    common must be all of the name's (an alias standing for the word it comes from), or all of one of ESPN's names
+    for the club, so "Manchester City FC" never takes Manchester United's crest when City is missing from ESPN's list.
+    Between two sharing as many, the one whose word comes first in the name ("RCD Espanyol de Barcelona" is
+    Espanyol, not Barcelona). None when no club matches closely, or two still tie: better no crest than another's."""
     w = team_words(name)
     seq = [x for t in name.split() for x in team_words(t)]   # the name's words in order
     first = lambda words: min((seq.index(x) for x in words & w if x in seq), default=len(seq))
-    scored = [((len(w & words), -first(words)), tid) for words, tid in teams if w & words]
+    covered = lambda common: all(x in common or NAME_ALIAS.get(x) in common for x in w)
+    close = lambda words, names: covered(words & w) or any(n <= w for n in names)
+    scored = [((len(w & words), -first(words)), tid) for words, names, tid in teams if w & words and close(words, names)]
     if not scored:
         return None
     best = max(k for k, _ in scored)

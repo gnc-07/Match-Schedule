@@ -745,13 +745,21 @@ class TeamBadges(unittest.TestCase):
         self.assertEqual(bs.team_words("Club Atlético de Madrid"), {"atletico", "madrid"})
         self.assertIn("atleticomg", bs.team_words("CA Mineiro"))
         self.assertIn("hamburg", bs.team_words("Hamburger SV"))
-        teams = [({"manchester", "united", "man"}, "360"), ({"manchester", "city", "man"}, "382"),
-                 ({"espanyol"}, "88"), ({"barcelona"}, "83")]
+        team = lambda tid, *names: (set().union(*map(bs.team_words, names)), [bs.team_words(n) for n in names], tid)
+        teams = [team("360", "Manchester United", "Man United"), team("382", "Manchester City", "Man City"),
+                 team("88", "Espanyol"), team("83", "Barcelona"), team("7632", "Atlético-MG"), team("101", "Rayo Vallecano"),
+                 team("86", "Real Madrid")]
         self.assertEqual(bs.best_team("Manchester United FC", teams), "360")
         self.assertEqual(bs.best_team("Manchester City FC", teams), "382")
         self.assertEqual(bs.best_team("RCD Espanyol de Barcelona", teams), "88")   # the word that comes first wins a tie
         self.assertIsNone(bs.best_team("Manchester FC", teams))                    # City and United tie: no crest
         self.assertIsNone(bs.best_team("Liverpool FC", teams))
+        self.assertEqual(bs.best_team("CA Mineiro", teams), "7632")                  # through an alias
+        self.assertEqual(bs.best_team("Rayo Vallecano de Madrid", teams), "101")     # all of one of ESPN's names
+        # only a shared word is not enough: with City missing from ESPN's list, City gets no crest, not United's
+        only_united = [t for t in teams if t[2] == "360"]
+        self.assertIsNone(bs.best_team("Manchester City FC", only_united))
+        self.assertIsNone(bs.best_team("Getafe CF", [team("86", "Real Madrid")]))
 
     def test_odd_espn_answers_are_left_out(self):
         answer = self.espn({"id": "359", "displayName": "Arsenal"}, {"id": "36x", "displayName": "Chelsea"},
@@ -759,7 +767,7 @@ class TeamBadges(unittest.TestCase):
                            {"id": "11826", "displayName": "Deportivo", "slug": "esp.deportivo_coruna"})
         with mock.patch.object(bs, "fetch_json", return_value=answer):
             got = bs._espn_teams("eng.1")
-        self.assertEqual([(sorted(w), t) for w, t in got], [(["arsenal"], "359"), (["coruna"], "11826")])
+        self.assertEqual([(sorted(w), t) for w, _, t in got], [(["arsenal"], "359"), (["coruna"], "11826")])
         for bad in (ValueError("down"), {"sports": []}, {"sports": [{"leagues": [{"teams": "x"}]}]}):
             with mock.patch.object(bs, "fetch_json", side_effect=[bad] if isinstance(bad, Exception) else None, return_value=bad):
                 self.assertEqual(bs._espn_teams("eng.1"), [])
@@ -779,6 +787,14 @@ class TeamBadges(unittest.TestCase):
         self.assertEqual(got["Wales"], {"flag": "gb-wls"})                # flags come from the name, never the last build
         self.assertNotIn("Tahiti", got)
         self.assertTrue(all(bs.valid_badge(b) for b in got.values()))
+
+    def test_a_club_missing_from_espn_keeps_its_saved_crest(self):
+        # ESPN's list lacks Manchester City: City keeps the crest saved by the last build instead of taking United's
+        answer = self.espn({"id": "360", "displayName": "Manchester United", "shortDisplayName": "Man United"})
+        with mock.patch.object(bs, "fetch_json", return_value=answer):
+            got = bs.team_badges([{"code": "EPL", "home": "Manchester City FC", "away": "Manchester United FC"}],
+                                 previous={"Manchester City FC": {"crest": "382"}})
+        self.assertEqual(got, {"Manchester City FC": {"crest": "382"}, "Manchester United FC": {"crest": "360"}})
 
     def test_previous_badges_are_checked(self):
         with tempfile.TemporaryDirectory() as d:
