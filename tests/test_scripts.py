@@ -918,7 +918,7 @@ class TeamBadges(unittest.TestCase):
             return self.espn({"id": "359", "displayName": "Arsenal"}) if "/eng.1/" in url else self.espn()
         recs = [{"code": "EPL", "home": "Arsenal FC", "away": "Chelsea FC"}, {"code": "EPL", "home": "Chelsea FC", "away": "Arsenal FC"},
                 {"code": "UNL", "home": "Wales", "away": "Tahiti"}, {"code": "F1", "home": "", "away": ""}]
-        with mock.patch.object(bs, "fetch_json", side_effect=fake):
+        with mock.patch.object(bs, "fetch_json", side_effect=fake), mock.patch.object(bs, "fetch", side_effect=OSError):
             got = bs.team_badges(recs, previous={"Chelsea FC": {"crest": "363"}, "Wales": {"flag": "fr"}, "Arsenal FC": {"crest": "1"}})
         self.assertEqual(len(calls), 1)                                    # the Premier League list, once
         self.assertEqual(got["Arsenal FC"], {"crest": "359"})             # this build's answer beats the last one's
@@ -930,7 +930,7 @@ class TeamBadges(unittest.TestCase):
     def test_a_club_missing_from_espn_keeps_its_saved_crest(self):
         # ESPN's list lacks Manchester City: City keeps the crest saved by the last build instead of taking United's
         answer = self.espn({"id": "360", "displayName": "Manchester United", "shortDisplayName": "Man United"})
-        with mock.patch.object(bs, "fetch_json", return_value=answer):
+        with mock.patch.object(bs, "fetch_json", return_value=answer), mock.patch.object(bs, "fetch", side_effect=OSError):
             got = bs.team_badges([{"code": "EPL", "home": "Manchester City FC", "away": "Manchester United FC"}],
                                  previous={"Manchester City FC": {"crest": "382"}})
         self.assertEqual(got, {"Manchester City FC": {"crest": "382"}, "Manchester United FC": {"crest": "360"}})
@@ -944,6 +944,102 @@ class TeamBadges(unittest.TestCase):
             self.assertEqual(bs.previous_badges(path), {"A": {"crest": "359"}, "B": {"flag": "de"}})
             self.assertEqual(bs.previous_badges(os.path.join(d, "missing.json")), {})
 
+
+def png(rows, ctype=6, filters=(0,), trns=None):
+    """A small PNG for the tests: rows of pixels (tuples of 4, 3, 2 or 1 values, or palette numbers), each row saved
+    with the next filter from `filters` (0 none, 1 left, 2 up, 3 average, 4 Paeth), so the reader's unfiltering is tested."""
+    import struct, zlib
+    c = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}[ctype]
+    raw, prev = b"", bytes(len(rows[0]) * c)
+    for y, row in enumerate(rows):
+        line = bytes(v for px in row for v in (px if isinstance(px, tuple) else (px,)))
+        f = filters[y % len(filters)]
+        out = bytearray()
+        for i, v in enumerate(line):
+            a, b, d = (line[i - c] if i >= c else 0), prev[i], (prev[i - c] if i >= c else 0)
+            p = a + b - d
+            pa, pb, pc = abs(p - a), abs(p - b), abs(p - d)
+            pred = [0, a, b, (a + b) // 2, a if pa <= pb and pa <= pc else b if pb <= pc else d][f]
+            out.append((v - pred) & 255)
+        raw += bytes([f]) + out
+        prev = line
+    chunk = lambda k, d: struct.pack(">I", len(d)) + k + d + struct.pack(">I", zlib.crc32(k + d))
+    body = chunk(b"IHDR", struct.pack(">IIBBBBB", len(rows[0]), len(rows), 8, ctype, 0, 0, 0))
+    if trns is not None:
+        body += chunk(b"PLTE", bytes(3 * len(trns))) + chunk(b"tRNS", bytes(trns))
+    return b"\x89PNG\r\n\x1a\n" + body + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b"")
+
+class CrestBoxes(unittest.TestCase):
+    """ESPN's crests sit on square transparent pictures, each with its own margin, so the same circle showed some
+    crests large and others small or off centre. crest_box() measures where each is drawn, and the page sizes by it."""
+
+    @staticmethod
+    def square(size, x0, y0, x1, y1, ctype=6, filters=(0,)):
+        on, off = {6: ((200, 30, 30, 255), (0, 0, 0, 0)), 4: ((90, 255), (90, 0))}[ctype]
+        return png([[on if x0 <= x < x1 and y0 <= y < y1 else off for x in range(size)] for y in range(size)],
+                   ctype, filters)
+
+    def test_the_box_around_the_drawing(self):
+        # a 4 x 6 drawing at (2, 1) in a 10 x 10 picture, saved with every filter, in colour and in grey
+        for ctype in (6, 4):
+            for f in range(5):
+                box = bs.crest_box(self.square(10, 2, 1, 6, 7, ctype, (f, (f + 1) % 5)))
+                self.assertEqual(box[:4], [200, 100, 400, 600], (ctype, f))
+                # the far corner of a corner pixel: 2 across and 3 up from the centre (4, 4), 3.6 pixels
+                self.assertGreaterEqual(box[4], 360)
+                self.assertLessEqual(box[4], 420)
+
+    def test_faint_edges_and_palettes(self):
+        faint = png([[(0, 0, 0, 10)] * 4, [(0, 0, 0, 10), (9, 9, 9, 255), (0, 0, 0, 10), (0, 0, 0, 10)]] + [[(0, 0, 0, 0)] * 4] * 2)
+        self.assertEqual(bs.crest_box(faint)[:4], [250, 250, 250, 250])      # a nearly clear haze is not the crest
+        pal = png([[0, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0], [0, 0, 0, 0]], ctype=3, trns=[0, 255])
+        self.assertEqual(bs.crest_box(pal)[:4], [250, 0, 500, 500])
+        self.assertEqual(bs.crest_box(png([[(1, 2, 3)] * 2] * 2, ctype=2))[:4], [0, 0, 1000, 1000])  # no transparency
+
+    def test_pictures_it_cannot_read(self):
+        for data in (b"", b"GIF89a", b"\x89PNG\r\n\x1a\n", self.square(4, 0, 0, 0, 0),   # empty drawing
+                     self.square(4, 0, 0, 2, 2)[:-30]):                                 # cut off
+            self.assertIsNone(bs.crest_box(data))
+
+    def test_boxes_are_checked(self):
+        box = [0, 0, 1000, 1000, 707]
+        self.assertTrue(bs.valid_badge({"crest": "359", "box": box, "dark": False}))
+        self.assertTrue(bs.valid_badge({"crest": "359", "box": box, "dark": [0, 0, 500, 500, 354]}))
+        for bad in ([0, 0, 1000, 1000], [0, 0, 0, 10, 5], [600, 0, 500, 10, 5], [0, 0, 10, 10, 0], [0, 0, 10.5, 10, 5],
+                    [0, 0, True, 10, 5], "0,0,10,10,5", [-1, 0, 10, 10, 5]):
+            self.assertFalse(bs.valid_badge({"crest": "359", "box": bad, "dark": False}), bad)
+            self.assertFalse(bs.valid_badge({"crest": "359", "box": box, "dark": bad}), bad)
+        for bad in ({"crest": "359", "box": box}, {"crest": "359", "box": box, "dark": True}, {"crest": "359", "box": box, "dark": 0},
+                    {"flag": "de", "box": box, "dark": False}, {"crest": "359", "size": 3}):
+            self.assertFalse(bs.valid_badge(bad), bad)
+
+    def test_measured_once_then_kept(self):
+        light, dark = self.square(10, 2, 1, 6, 7), self.square(10, 0, 0, 10, 10)
+        pics = {"/500/1.png": light, "/500-dark/1.png": dark, "/500/4.png": light, "/500-dark/4.png": light,
+                "/500/3458.png": light, "/500-dark/3458.png": dark, "/500/5.png": light}
+        def fake(url):
+            for k, v in pics.items():
+                if k + "&" in url:
+                    return v
+            raise OSError("HTTP Error 404: Not Found")
+        with mock.patch.object(bs, "fetch", side_effect=fake) as f:
+            got = bs.measure_crests({"A": {"crest": "1"}, "B": {"crest": "1"}, "C": {"crest": "2"}, "D": {"flag": "de"},
+                                     "E": {"crest": "4"}, "F": {"crest": "3458"}, "G": {"crest": "5"}},
+                                    previous={"Old": {"crest": "2", "box": [0, 0, 500, 500, 354], "dark": False}})
+        urls = [c.args[0] for c in f.call_args_list]
+        self.assertEqual(urls[:2], ["https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/1.png&h=100&w=100",
+                                    "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500-dark/1.png&h=100&w=100"])
+        self.assertEqual(len(urls), 7)                                    # 1, 4 and 5 twice (5's dark one is missing), 3458 once
+        self.assertEqual(got["A"], {"crest": "1", "box": [200, 100, 400, 600, got["A"]["box"][4]], "dark": [0, 0, 1000, 1000, 708]})   # reach rounded up
+        self.assertEqual(got["A"], got["B"])                              # the same crest: measured once
+        self.assertEqual(got["C"], {"crest": "2", "box": [0, 0, 500, 500, 354], "dark": False})   # kept from last time
+        self.assertEqual(got["D"], {"flag": "de"})
+        self.assertIs(got["E"]["dark"], False)                            # ESPN's dark version is the same picture
+        self.assertIs(got["F"]["dark"], False)                            # an old crest: not even downloaded
+        self.assertIs(got["G"]["dark"], False)                            # no dark version at all
+        self.assertTrue(all(bs.valid_badge(b) for b in got.values()))
+        with mock.patch.object(bs, "fetch", side_effect=OSError("blocked")):
+            self.assertEqual(bs.measure_crests({"A": {"crest": "1"}}), {"A": {"crest": "1"}})   # shown unmeasured
 
 class SearchAndSharing(unittest.TestCase):
     """What search engines and link previews read: the addresses in index.html, sitemap.xml and the preview picture
