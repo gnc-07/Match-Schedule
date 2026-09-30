@@ -79,7 +79,8 @@ const smooth = [
   ["sheet-close", 390, ["#setmenu .calpanel"], async p => { await p.click("#setmenu summary"); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
   ["menu-close", 1280, ["#setmenu .calpanel"], async p => { await p.click("#setmenu summary"); await wait(900); }, p => p.click("#setmenu summary"), "closing"],
   ["sidebar-hide", 1280, ["#list", "#filters"], async () => {}, p => p.click("#sidehide"), "closing"],
-  ["phone-filters-close", 390, ["#filters"], async p => { await p.click("#sideshow"); await wait(900); }, p => p.click("#sideshow"), "closing"],
+  ["phone-filters-open", 390, ["#list"], async () => {}, p => p.click("#sideshow")],
+  ["phone-filters-close", 390, ["#list", "#filters"], async p => { await p.click("#sideshow"); await wait(900); }, p => p.click("#sideshow"), "closing"],
   ["sidebar-show", 1280, ["#list"], async p => { await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
 ];
 const problems = [];

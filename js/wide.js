@@ -69,7 +69,24 @@ function setSide(s) {
 }
 // phones: the filters fold away behind the same "Show filters" button, so the list comes first. Not remembered: every
 // visit starts with the list, and the summary beside the button says what the filters are showing.
-let filtersFolded = true;
+// Shown, the filters drop in and the list moves down to make room; folded, the filters lift away while the list fades
+// out with them, then the list rises into its place. The list fades in over only the last 48px of the way: the filters
+// are 350px tall or more (Portuguese, larger text), too far to glide in one --dur-m without passing the 50px a frame
+// the motion checks allow.
+let filtersFolded = true,
+  listOut = null; // the list fading out while the filters fold away
+function slideList(change) {
+  const pin = onScreen(listEl), // followed by a match on screen, as in glide()
+    was = pin.getBoundingClientRect().top;
+  change();
+  const dy =
+    (was - pin.getBoundingClientRect().top) / (parseFloat(getComputedStyle(document.documentElement).zoom) || 1);
+  if (Math.abs(dy) > 1)
+    move(listEl, [
+      { opacity: 0, transform: "translateY(" + Math.sign(dy) * Math.min(Math.abs(dy), 48) + "px)" },
+      { opacity: 1, transform: "none" },
+    ]);
+}
 function syncFold() {
   const open = !document.documentElement.dataset.wide && !filtersFolded,
     btn = document.getElementById("sideshow"),
@@ -82,15 +99,22 @@ function foldFilters(fold) {
   const r = document.documentElement;
   if (!fold) {
     stay(filtersEl); // back while it was folding away
+    if (listOut) listOut.cancel();
+    listOut = null;
     if (!filtersFolded) return;
     filtersFolded = false;
-    r.dataset.filters = "open";
     syncFold();
+    slideList(() => (r.dataset.filters = "open"));
     move(filtersEl, DROP, { duration: DUR("s") });
   } else if (!filtersFolded && !filtersEl.leaving) {
     filtersFolded = true;
     syncFold();
-    leave(filtersEl, LIFT, () => delete r.dataset.filters);
+    listOut = move(listEl, FADE.slice().reverse(), { duration: DUR("s"), fill: "forwards", ...SOFT() });
+    leave(filtersEl, LIFT, () => {
+      slideList(() => delete r.dataset.filters);
+      if (listOut) listOut.cancel(); // the list's rise, just started, takes over from here
+      listOut = null;
+    });
   }
 }
 document.getElementById("sidehide").onclick = () => setSide("closed");
