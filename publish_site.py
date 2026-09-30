@@ -21,7 +21,7 @@ import base64, hashlib, json, os, re, shutil, sys
 from common import save_text
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-COPY = ["fixtures.json", "soccer.ics", "fonts", "sitemap.xml", "og-image.png"]   # published as they are, next to the page
+COPY = ["fixtures.json", "soccer.ics", "fonts", "sitemap.xml", "og-image.png", "manifest.webmanifest", "icons"]   # published as they are, next to the page
 
 STYLE_LINK = re.compile(r'<link rel="stylesheet" href="([^"]*)">\n')
 SCRIPT_RUN = re.compile(r'(?:<script src="[^"]*"></script>\n)+')   # script tags one after another
