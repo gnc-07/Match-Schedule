@@ -124,7 +124,7 @@ const SAMPLE_WK = new Set(F1.map(m => m.wk));
 const MATCHES = [...data.matches.filter(m => !SAMPLE_WK.has(m.wk)), ...F1]
   .sort((a, b) => (a.utc || a.date + "T99") < (b.utc || b.date + "T99") ? -1 : 1);   // in time order, as build_schedule.py writes it
 const dupes = MATCHES.map(m => m.uid).filter((u, i, all) => all.indexOf(u) !== i);
-if (dupes.length) throw new Error(`Sample data has more than one match with the same uid: ${[...new Set(dupes)].join(", ")}`);
+if (dupes.length) throw new Error(`Sample data has more than one match with the same uid: ${[...new Set(dupes)].map(String).join(", ")}`);
 
 // Presses "Show more" until the sample match's card is in the list, as a visitor would. The list shows about 40
 // matches at first, and in an international break the Nations League and friendlies can push the first Premier
