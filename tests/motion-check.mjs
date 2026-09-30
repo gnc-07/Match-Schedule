@@ -32,6 +32,7 @@ const cases = [
   ["settings", 1280, p => p.click("#setmenu summary")],
   ["sheet-phone", 390, p => p.click("#setmenu summary")],
   ["phone-filters", 390, p => p.click("#sideshow")],
+  ["follow-not-now", 1280, p => p.click("#myteams-no")],
   ["sources", 1280, async p => { await p.evaluate(() => document.querySelector("#list .srcs").scrollIntoView({ block: "center" })); await p.click("#list .srcs summary"); }],
   ["star", 1280, async p => { await p.evaluate(() => document.querySelector('#list .star[aria-pressed="false"]').scrollIntoView({ block: "center" })); await p.click('#list .star[aria-pressed="false"]'); }],
   ["theme", 1280, async p => { await p.click("#themebtn");
@@ -91,7 +92,7 @@ async function open(browser, width, motion) {
   await page.setViewport({ width, height: 900 });
   await page.evaluateOnNewDocument(m => { try { localStorage.setItem("mp.theme", '"light"'); localStorage.setItem("mp.favs", "[]");
     localStorage.setItem("mp.side", '"open"'); localStorage.setItem("mp.contrast", '"normal"'); localStorage.setItem("mp.range", '"all"');
-    localStorage.setItem("mp.motion", JSON.stringify(m)); } catch {} }, motion);
+    localStorage.setItem("mp.motion", JSON.stringify(m)); localStorage.removeItem("mp.follow"); } catch {} }, motion);
   await mockNetwork(page);
   await page.goto(BASE + "?lang=en", { waitUntil: "networkidle0" });
   await showMatch(page, uid);

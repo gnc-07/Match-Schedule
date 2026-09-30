@@ -10,7 +10,7 @@ Matchday Planner is a free website that lists upcoming matches from the **Premie
 ## What you can do with it
 
 - **See what is on, and when.** Matches are grouped by day. Filter by league, by date (today, this weekend, the next seven days or your own range) or by team name.
-- **Follow your teams.** Tap the star next to a team (or an F1 driver) and choose "Starred teams only" to see just their matches. Stars are remembered on your device.
+- **Follow your teams.** Tap the star next to a team. Its next matches then appear under **Your teams** at the top of the list, and "Starred teams only" shows just its matches. In Formula 1, a star next to a driver highlights that driver in results and standings. Stars are remembered on your device.
 - **Follow live scores.** While a match is on, its score updates every 30 seconds without reloading the page.
 - **Open the match details.** Each match has a **Match details** button with the score, goals, cards and substitutions, the line-ups, the league table and a map of the stadium. You can share a link to one match or add it to your calendar.
 - **Follow a Formula 1 weekend.** Every practice, qualifying, sprint and race session is listed. The **Race weekend** button shows the schedule, results, the championship standings and a drawing of the track.

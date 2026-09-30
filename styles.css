@@ -293,6 +293,19 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
 .srcs .off{font:700 11px/1 "Instrument Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
 .srcs .note{color:var(--muted)}
 .empty,.status{color:var(--muted);padding:32px 4px;text-align:center;margin:0}
+/* "Your teams" at the top of the list (and, with no team starred yet, the invitation to star one) */
+.myteams{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.myteams h2{font:800 1.2rem/1.1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.04em;color:var(--ink);margin:0 0 8px}
+.myteams p{margin:0;color:var(--ink-2)}
+.myteams-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.myteams ul{list-style:none;margin:0 -8px;padding:0}
+.myteams li+li{border-top:1px solid var(--line-2)}
+.myteams-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:6px 8px;border-radius:10px;color:var(--ink);text-decoration:none}
+.myteams-row>span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.myteams-row:hover{background:var(--panel-2)}
+.myteams-row small{color:var(--muted);font-size:13.5px}
+.myteams-row b{font-weight:700}
+.myteams-row svg{width:18px;height:18px;flex:none;color:var(--muted)}
 .more{align-self:center;min-height:44px;font-weight:600;font-size:15px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:0 20px;cursor:pointer}
 
 /* ---------- footer ---------- */
