@@ -13,7 +13,8 @@ Notes for the owner: how the project is put together, how to set it up from scra
 | `publish_site.py` | Puts the page back together for visitors, as one file: fast to load, and an old part can never meet a new one. It also writes a fingerprint of the page's scripts into its security policy, so browsers refuse any other script. The workflow runs it before publishing. |
 | `build_schedule.py` | Downloads league fixtures and the Formula 1 calendar, applies `overrides.json`, `friendlies.json` and `nations_league.json`, and writes `fixtures.json` (for the site) and `soccer.ics` (for calendar apps; football only). |
 | `friendlies.json` | National-team friendlies, with every source report kept. |
-| `nations_league.json` | UEFA Nations League (League A) matches, entered by hand in the same shape as `friendlies.json`, with the group and matchday as `round`. `research.py` does not touch it. Pushing a change to it does not start the workflow on its own (the workflow's list of files does not include it yet); the next scheduled rebuild, within about six hours, picks it up, or start one from the Actions tab. |
+| `nations_league.json` | UEFA Nations League (League A) matches, entered by hand in the same shape as `friendlies.json`, with the group and matchday as `round`. `research.py` does not touch it. Pushing a change to it rebuilds and republishes the site, like the other data files. |
+| `sitemap.xml`, `og-image.png` | For search engines and link previews: the sitemap lists the page's two addresses (English and Portuguese) for Google Search Console, and the picture (1200 x 630 pixels) is what chat apps and social sites show when someone shares a link to the site. See "Being found in search engines" below. |
 | `overrides.json` | League kick-offs the main feed has not caught up with, with sources. |
 | `cazetv.py` | Checks CazéTV's public YouTube feed on every build and adds a **Watch on CazéTV** link to matches it will stream. Matches on CazéTV's schedule whose stream does not exist yet (from the fan-made agendacazetv.com, not run by CazéTV) get a **CazéTV on YouTube** link to the channel instead. Both are remembered in `streams.json`. No key needed. |
 | `common.py` | Small helpers the three scripts share: downloading (HTTPS only, with a size limit) and saving data files in one step, so a build that stops halfway never leaves a half-written file. |
@@ -91,6 +92,24 @@ Add an object to the match's `reports` list:
 `time` is the local kick-off time in the zone `tz` that the source uses (IANA names such as `Europe/Madrid`, `America/Sao_Paulo`). Add `"official": true` only for a federation, league, club or official ticketing source. If a source shows a time without saying which zone, write what it shows in `"comment"` instead of `time`.
 
 A time is shown as **verified** only when an official source gives it or at least two independent sources agree. Otherwise the match stays "time TBC" and the reported times are listed.
+
+## Being found in search engines
+
+The page already tells search engines what they need: a title and description in each language, the English and Portuguese addresses (`hreflang` links in `index.html`, and `sitemap.xml`), and a picture and summary for link previews (the `og:` tags). Search engines still have to be told the site exists. This part only you can do, because it needs your Google account. Do it once:
+
+1. Open [Google Search Console](https://search.google.com/search-console) and sign in.
+2. Click **Add property**, choose **URL prefix** (not Domain: a github.io address cannot be verified as a domain), type `https://gnc-07.github.io/Match-Schedule/` and click **Continue**.
+3. Choose the **HTML tag** method. Google shows a line starting with `<meta name="google-site-verification"`. Copy it.
+4. In `index.html`, paste that line on its own line directly under the `<meta name="description" ...>` line. The simplest way is on GitHub: open `index.html` in the repository, click the pencil icon (**Edit this file**), paste the line, click **Commit changes** twice. Wait for the Actions run to finish (about two minutes), then click **Verify** in Search Console. Leave the line in place afterwards: removing it un-verifies the site.
+5. In Search Console, open **Sitemaps** (left menu), type `sitemap.xml` in the box and click **Submit**.
+6. Open **URL inspection** (top search bar), paste `https://gnc-07.github.io/Match-Schedule/`, press Enter, then click **Request indexing**. Do the same for `https://gnc-07.github.io/Match-Schedule/?lang=pt`.
+7. Optional: in [Bing Webmaster Tools](https://www.bing.com/webmasters), choose **Import from Google Search Console**. This also covers DuckDuckGo, which uses Bing's results.
+
+After a few weeks, **Performance** in Search Console shows which searches found the site and how often it was clicked.
+
+Two limits come from the address, not the page. A `robots.txt` file only works at the root of a host (`gnc-07.github.io/robots.txt`), which this repository cannot publish; the site does not need one. And Google shows a site's own name above its results only for a whole domain, not a folder such as `/Match-Schedule/`; a custom domain (Settings, Pages, Custom domain, after buying one) would allow that, and would move the address, so every `https://gnc-07.github.io/Match-Schedule/` in `index.html` and `sitemap.xml` would change with it.
+
+To see a link preview, paste the site's address into a chat with yourself (WhatsApp, Signal, Messages). Apps remember a preview for a while, so a changed picture can take days to show there.
 
 ## Optional: working from the terminal instead
 

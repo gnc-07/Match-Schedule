@@ -32,19 +32,34 @@ try {
 } catch {}
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Matchday Planner</title>
-<meta name="description" content="Upcoming Premier League, La Liga, Bundesliga, Brasileirão and national-team friendly fixtures, with cross-checked kick-off times, live scores and a calendar you can subscribe to. In English and Brazilian Portuguese.">
-<meta property="og:title" content="Matchday Planner">
-<meta property="og:description" content="Soccer fixtures with cross-checked kick-off times, live scores and a subscribable calendar.">
+<title>Matchday Planner: soccer and F1 schedule with verified kick-off times</title>
+<meta name="description" content="Premier League, La Liga, Bundesliga, Brasileirão, UEFA Nations League and international friendly fixtures, plus every Formula 1 session, with cross-checked kick-off times, live scores and a calendar you can subscribe to. In English and Brazilian Portuguese.">
+<!-- search engines: the English and Portuguese versions of the page (the script adds the one canonical link of the
+     language shown, from these). Link previews in chat apps and social sites: the og: and twitter: tags, which must
+     use full addresses. The picture is og-image.png, 1200 x 630. -->
+<link rel="alternate" hreflang="en" href="https://gnc-07.github.io/Match-Schedule/">
+<link rel="alternate" hreflang="pt" href="https://gnc-07.github.io/Match-Schedule/?lang=pt">
+<link rel="alternate" hreflang="x-default" href="https://gnc-07.github.io/Match-Schedule/">
+<meta property="og:site_name" content="Matchday Planner">
+<meta property="og:title" content="Matchday Planner: soccer and F1 schedule with verified kick-off times">
+<meta property="og:description" content="Premier League, La Liga, Bundesliga, Brasileirão, Nations League, friendlies and every F1 session, with cross-checked kick-off times, live scores and a subscribable calendar.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://gnc-07.github.io/Match-Schedule/">
+<meta property="og:image" content="https://gnc-07.github.io/Match-Schedule/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Matchday Planner: soccer and Formula 1 kick-off times, checked against official sources">
 <meta property="og:locale" content="en_CA">
 <meta property="og:locale:alternate" content="pt_BR">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#F3F5F9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0A0F1C" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230F1A33'/%3E%3Crect x='6' y='9' width='20' height='15' rx='2.5' fill='none' stroke='%23F2B829' stroke-width='2'/%3E%3Cpath d='M6 14h20M12 6v5M20 6v5' stroke='%23F2B829' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preload" href="fonts/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/big-shoulders-display-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
+<!-- without JavaScript: hide the controls that need it and the endless "Loading fixtures…" (the message below replaces them) -->
+<noscript><style>#themebtn,#setmenu,#tablesbtn,#copy,.stamp,.filters,.side-bar,#list>.status{display:none}</style></noscript>
 </head>
 <body>
 <a class="skip" href="#list" data-t="skip">Skip to fixtures</a>
@@ -160,7 +175,10 @@ try {
 
   <div class="rail" id="rail"></div>
 
-  <main id="list" tabindex="-1"><p class="status" data-t="loading">Loading fixtures…</p></main>
+  <main id="list" tabindex="-1"><p class="status" data-t="loading">Loading fixtures…</p>
+    <!-- shown only when JavaScript is off, so it cannot be translated by the script: both languages, as in the Calendar menu -->
+    <noscript><p class="status">This page needs JavaScript to show the fixture list. The Calendar button above still works: subscribe to the feed to get every match in your calendar app.</p>
+      <p class="status" lang="pt-BR">Esta página precisa de JavaScript para mostrar a lista de jogos. O botão Calendar acima continua funcionando: assine a agenda para ver todos os jogos no seu aplicativo de calendário.</p></noscript></main>
   </div>
 
   <footer>
@@ -180,7 +198,7 @@ try {
       </dl>
     </section>
     <section aria-labelledby="how-h">
-      <h2 id="how-h" data-t="howTitle">How it works</h2>
+      <h2 id="how-h" data-t="howTitle" tabindex="-1">How it works</h2>
       <ul>
         <li data-t="how1html">League fixtures come from <a href="https://www.football-data.org/" rel="noopener">football-data.org</a> (or <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> if it is unavailable) and are rebuilt four times a day. When that feed lags, and for friendlies, times come from official league and club sites and the press, with every source listed under the match.</li>
         <li data-t="how3">Live scores, line-ups, match events and league tables come from ESPN. If ESPN is not answering, Bundesliga scores, goals and table come from OpenLigaDB, and the other tables are worked out from the league results. Stadium maps come from OpenStreetMap and Wikidata. Live scores appear on this site only, not in the calendar.</li>

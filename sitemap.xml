@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The addresses search engines should know about: the page in English and in Portuguese. Submit this file in
+     Google Search Console (see MAINTAINING.md). No dates: the page itself rarely changes, only its data. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://gnc-07.github.io/Match-Schedule/</loc></url>
+  <url><loc>https://gnc-07.github.io/Match-Schedule/?lang=pt</loc></url>
+</urlset>

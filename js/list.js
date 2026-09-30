@@ -50,6 +50,18 @@ let range = store.get("range", "all"),
 /* ---------- apply the language to every static string ---------- */
 function applyLang() {
   document.documentElement.lang = LANG === "pt" ? "pt-BR" : "en";
+  // for search engines, which read the page after its script has run: the title, description and the one canonical
+  // address of this language (taken from the hreflang links in <head>, so the site's address is written only there)
+  document.title = T.docTitle;
+  document.querySelector('meta[name="description"]').content = T.docDesc;
+  const alt = document.querySelector('link[rel="alternate"][hreflang="' + (LANG === "pt" ? "pt" : "en") + '"]');
+  let canon = document.querySelector('link[rel="canonical"]');
+  if (alt && !canon) {
+    canon = document.createElement("link");
+    canon.rel = "canonical";
+    document.head.appendChild(canon);
+  }
+  if (alt) canon.href = alt.href;
   document.querySelectorAll("[data-t]").forEach(el => {
     const k = el.dataset.t,
       v = T[k];
@@ -864,16 +876,35 @@ function assignDays() {
 }
 function renderStamp() {
   const stale = META.f1stale ? '<span class="src">' + esc(T.f1Stale) + "</span>" : ""; // Jolpica-F1 was unreachable at the last rebuild
-  const src = [
+  // each name once, joined the way the visitor's language joins a list ("Jolpica-F1 and OpenF1" arrives as one name)
+  const names = [
     ...new Set(
       Object.entries(META.sources || {})
-        .filter(([k]) => k !== "INTL" && k !== "UNL") // hand-kept files, not a league feed
-        .map(([, v]) => v),
+        .filter(([k, v]) => k !== "INTL" && k !== "UNL" && typeof v === "string") // hand-kept files, not a league feed
+        .flatMap(([, v]) => v.split(/ and |, /)),
     ),
-  ].join(", ");
+  ].filter(Boolean);
+  const src = names.length ? new Intl.ListFormat(T.locale || LANG, { type: "conjunction" }).format(names) : "";
   const d = toDate(META.generated);
   document.getElementById("stamp").innerHTML =
     (d ? "<span>" + esc(T.updated) + " <b>" + fmtStamp.format(d) + " " + zoneOf(d) + "</b></span>" : "") +
-    (src ? '<span class="src"><span class="src-l">' + esc(T.leagueData) + ": </span>" + esc(src) + "</span>" : "") +
+    (src
+      ? '<span class="src"><span class="src-l">' +
+        esc(T.leagueData) +
+        ': </span><a href="#how-h" id="srclink">' +
+        esc(src) +
+        ' <span class="sr">' +
+        esc(T.srcMore) +
+        "</span></a></span>"
+      : "") +
     stale;
 }
+// The source names lead to "How it works" in the footer, which says in plain words where everything comes from. Done
+// here, not by the link's own #how-h, which would add a history entry the Match details panel reads as a Back step.
+document.getElementById("stamp").addEventListener("click", e => {
+  if (!e.target.closest("#srclink")) return;
+  e.preventDefault();
+  const h = document.getElementById("how-h");
+  h.scrollIntoView({ block: "start" });
+  h.focus({ preventScroll: true });
+});

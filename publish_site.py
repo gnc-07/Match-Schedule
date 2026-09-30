@@ -21,7 +21,7 @@ import base64, hashlib, json, os, re, shutil, sys
 from common import save_text
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-COPY = ["fixtures.json", "soccer.ics", "fonts"]   # published as they are, next to the page
+COPY = ["fixtures.json", "soccer.ics", "fonts", "sitemap.xml", "og-image.png"]   # published as they are, next to the page
 
 STYLE_LINK = re.compile(r'<link rel="stylesheet" href="([^"]*)">\n')
 SCRIPT_RUN = re.compile(r'(?:<script src="[^"]*"></script>\n)+')   # script tags one after another
@@ -72,7 +72,8 @@ def fingerprint(root=HERE):
     return _fingerprint(build_page(root))
 
 def publish(folder, root=HERE):
-    """Writes the published site into `folder`: the page, the data files and the fonts, nothing else."""
+    """Writes the published site into `folder`: the page, the data files, the fonts, the sitemap and the link-preview
+    picture, nothing else."""
     out = os.path.abspath(folder)
     if out == os.path.abspath(root) or os.path.abspath(root).startswith(out + os.sep):
         raise ValueError("publish into a folder of its own (such as _site), never over the source files")
