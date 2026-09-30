@@ -837,11 +837,13 @@ def png_alpha(data):
     channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}.get(ctype)
     if depth != 8 or interlace or not channels or not 0 < w <= 1000 or not 0 < h <= 1000:
         return None
+    stride = w * channels
     try:
-        raw = zlib.decompress(b"".join(idat))
+        # never more than the picture's own size says (at most 1000 x 1000 pixels, about 4 MB): a small broken or
+        # hostile file could otherwise claim to unpack into gigabytes and stop the build
+        raw = zlib.decompressobj().decompress(b"".join(idat), h * (stride + 1))
     except zlib.error:
         return None
-    stride = w * channels
     if len(raw) < h * (stride + 1):
         return None
     trns = chunks.get(b"tRNS", b"")
@@ -925,9 +927,11 @@ def measure_crests(badges, previous=None):
                 if box and b["crest"] not in OLD_DARK_CREST:
                     try:
                         pic = fetch(ESPN_CREST.format("500-dark", b["crest"]))
-                        dark = pic != light and crest_box(pic) or False
-                    except Exception:
-                        pass                 # no dark version (ESPN answers 404): the usual crest in both themes
+                        dark = (pic != light and crest_box(pic)) or False
+                    except urllib.error.HTTPError as e:
+                        if e.code != 404:
+                            raise            # ESPN failing for a moment: nothing saved, measured again next build
+                        # 404: no dark version, the usual crest in both themes (saved, so not asked again)
                 got = (box, dark) if box else None
             except Exception as e:
                 print(f"crest {b['crest']} could not be measured ({e})")

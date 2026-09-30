@@ -305,6 +305,7 @@ const actChecks = [
     await page.waitForFunction(() => !document.getElementById("mddlg").open);
   }],
   ["F1 race weekend", async page => {
+    await showMatch(page, F1_WEEKEND);   // in view first: days far from the window are not laid out until they come near
     await page.click(`.md-open[data-uid="${F1_WEEKEND}"]`);
     await page.waitForSelector("#wk-champ table");
     await page.waitForSelector("#wk-res .pod li.p1");

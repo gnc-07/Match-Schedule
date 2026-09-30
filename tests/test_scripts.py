@@ -552,6 +552,41 @@ class TrackOutlines(unittest.TestCase):
         self.assertEqual(self.build_race(False, {})["src"], "julesr0y")                    # then f1-circuits-svg
 
 
+class StripComments(unittest.TestCase):
+    """publish_site.py leaves the comments out of the published script and styles (strip_js(), strip_css()); anything
+    that only looks like a comment, inside text, a template string or a regular expression, must stay."""
+
+    def test_script(self):
+        js = ('const a = "http://x.org/*not*/"; // a comment\n'
+              "    /* a\n       longer one */\n"
+              "let r = /\\/\\/[/*]+/g.test(a) ? 1 : 2; /* short */ let d = x / 2 / y;\n"
+              "const t = `line one //\n    line two ${a + `in ${\"}\"} side`} /* kept */`;\n"
+              "function f() {\n  return /re/.source;\n}\n"
+              "let o = { a: 1 }; const s = 'it\\'s // here';\n")
+        self.assertEqual(publish_site.strip_js(js),
+                         'const a = "http://x.org/*not*/";\n'
+                         "let r = /\\/\\/[/*]+/g.test(a) ? 1 : 2; let d = x / 2 / y;\n"
+                         "const t = `line one //\n    line two ${a + `in ${\"}\"} side`} /* kept */`;\n"
+                         "function f() {\nreturn /re/.source;\n}\n"
+                         "let o = { a: 1 }; const s = 'it\\'s // here';")
+
+    def test_script_that_cannot_be_read(self):
+        for bad in ("let a = `never closed", "let a = 1; /* never closed", "let a = 'broken\nstring'"):
+            with self.assertRaises(ValueError, msg=bad):
+                publish_site.strip_js(bad)
+
+    def test_styles(self):
+        css = ('/* heading */\n.a > .b {\n  content: "/* not a comment */  x";\n  margin: 0 auto;\n}\n'
+               "@media (min-width: 600px) { .c { color: var(--ink) } }\n")
+        self.assertEqual(publish_site.strip_css(css),
+                         '.a > .b{content: "/* not a comment */  x";margin: 0 auto;}'
+                         "@media (min-width: 600px){.c{color: var(--ink)}}")
+
+    def test_published_page_is_smaller(self):
+        page = publish_site.build_page()
+        self.assertNotIn("Translations. Every visible string lives here", page)   # a comment at the top of js/i18n.js
+        self.assertIn("const I18N = {", page)
+
 class PublishSite(unittest.TestCase):
     """publish_site.py puts index.html, styles.css and js/ together into the one page visitors get. The workflow runs
     these checks before every build, so a page that would not work is never published."""
@@ -573,7 +608,7 @@ class PublishSite(unittest.TestCase):
         self.assertNotIn("<script src", page)
         self.assertNotIn('rel="stylesheet"', page)
         with open(os.path.join(self.ROOT, "styles.css"), encoding="utf-8") as f:
-            self.assertIn(f.read().rstrip("\n"), page)
+            self.assertIn(publish_site.strip_css(f.read()), page)          # without its comments (strip_css())
 
     def test_real_page_policy_lists_every_script_and_nothing_else(self):
         page = publish_site.build_page(self.ROOT)
@@ -599,7 +634,7 @@ class PublishSite(unittest.TestCase):
                 with open(os.path.join(d, name), "w", encoding="utf-8") as f:
                     f.write(text)
             page = publish_site.build_page(d)
-        self.assertIn("<script>\nconst b = 2;\n\nconst a = 1;\n</script>", page)
+        self.assertIn("<script>\nconst b = 2;\nconst a = 1;\n</script>", page)
         self.assertIn("<style>\nbody{color:red}\n</style>", page)
 
     def test_text_that_would_end_the_block_is_refused(self):
@@ -643,12 +678,18 @@ class PublishSite(unittest.TestCase):
             self.fake_site(d)
             before = publish_site.fingerprint(d)
             self.assertEqual(before, publish_site.fingerprint(d))
-            for name, extra in (("js/a.js", "/* x */\n"), ("styles.css", "/* x */\n"), ("index.html", "<p>x</p>\n")):
+            for name, extra in (("js/a.js", "const z = 3;\n"), ("styles.css", "p{margin:0}\n"), ("index.html", "<p>x</p>\n")):
                 with open(os.path.join(d, name), "a", encoding="utf-8") as f:
                     f.write(extra)
                 after = publish_site.fingerprint(d)
                 self.assertNotEqual(before, after, name)
                 before = after
+            # a comment is left out of the published page, so editing only a comment changes nothing for visitors
+            # (a page left open is not reloaded for it)
+            for name in ("js/a.js", "styles.css"):
+                with open(os.path.join(d, name), "a", encoding="utf-8") as f:
+                    f.write("/* a note */\n")
+                self.assertEqual(before, publish_site.fingerprint(d), name)
 
     def test_publish_writes_only_the_site(self):
         with tempfile.TemporaryDirectory() as d:
@@ -882,7 +923,7 @@ class CrestBoxes(unittest.TestCase):
             for k, v in pics.items():
                 if k + "&" in url:
                     return v
-            raise OSError("HTTP Error 404: Not Found")
+            raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)
         with mock.patch.object(bs, "fetch", side_effect=fake) as f:
             got = bs.measure_crests({"A": {"crest": "1"}, "B": {"crest": "1"}, "C": {"crest": "2"}, "D": {"flag": "de"},
                                      "E": {"crest": "4"}, "F": {"crest": "3458"}, "G": {"crest": "5"}},
@@ -901,6 +942,35 @@ class CrestBoxes(unittest.TestCase):
         self.assertTrue(all(bs.valid_badge(b) for b in got.values()))
         with mock.patch.object(bs, "fetch", side_effect=OSError("blocked")):
             self.assertEqual(bs.measure_crests({"A": {"crest": "1"}}), {"A": {"crest": "1"}})   # shown unmeasured
+        # the dark version failing for another reason (a timeout, ESPN's server erring) is not taken for "none":
+        # nothing is saved, so the next build measures the crest again
+        for err in (TimeoutError("timed out"), urllib.error.HTTPError("u", 503, "Unavailable", {}, None)):
+            answers = iter([light, err])
+            def flaky(url):
+                a = next(answers)
+                if isinstance(a, Exception):
+                    raise a
+                return a
+            with mock.patch.object(bs, "fetch", side_effect=flaky):
+                self.assertEqual(bs.measure_crests({"A": {"crest": "1"}}), {"A": {"crest": "1"}}, err)
+
+    def test_a_picture_claiming_to_be_huge(self):
+        # 10 x 10 pixels, whose data unpacks into 50 MB of zeros: only what 10 x 10 pixels need is ever unpacked
+        import struct, zlib
+        chunk = lambda k, d: struct.pack(">I", len(d)) + k + d + struct.pack(">I", zlib.crc32(k + d))
+        bomb = (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 10, 10, 8, 6, 0, 0, 0))
+                + chunk(b"IDAT", zlib.compress(bytes(50_000_000), 9)) + chunk(b"IEND", b""))
+        self.assertLess(len(bomb), 100_000)
+        import tracemalloc
+        tracemalloc.start()
+        try:
+            w, h, rows = bs.png_alpha(bomb)
+            peak = tracemalloc.get_traced_memory()[1]
+        finally:
+            tracemalloc.stop()
+        self.assertLess(peak, 5_000_000)                                  # not the 50 MB it claims
+        self.assertEqual((w, h, len(rows)), (10, 10, 10))
+        self.assertIsNone(bs.crest_box(bomb))                            # all see-through: no drawing
 
 class SearchAndSharing(unittest.TestCase):
     """What search engines and link previews read: the addresses in index.html, sitemap.xml and the preview picture

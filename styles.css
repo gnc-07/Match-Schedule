@@ -1,8 +1,6 @@
 /* Fonts are served from this site (no third-party requests). Licences: fonts/LICENSE-*.txt (SIL OFL 1.1). */
 @font-face{font-family:"Big Shoulders Display";font-weight:800;font-display:swap;src:url(fonts/big-shoulders-display-latin-800-normal.woff2) format("woff2")}
-@font-face{font-family:"Instrument Sans";font-weight:400;font-display:swap;src:url(fonts/instrument-sans-latin-400-normal.woff2) format("woff2")}
-@font-face{font-family:"Instrument Sans";font-weight:600;font-display:swap;src:url(fonts/instrument-sans-latin-600-normal.woff2) format("woff2")}
-@font-face{font-family:"Instrument Sans";font-weight:700;font-display:swap;src:url(fonts/instrument-sans-latin-700-normal.woff2) format("woff2")}
+@font-face{font-family:"Instrument Sans";font-weight:400 700;font-display:swap;src:url(fonts/instrument-sans-latin-wght-normal.woff2) format("woff2")}   /* one variable file holds every weight (30 KB; three separate weights were 51 KB) */
 @font-face{font-family:"Azeret Mono";font-weight:500;font-display:swap;src:url(fonts/azeret-mono-latin-500-normal.woff2) format("woff2")}
 @font-face{font-family:"Azeret Mono";font-weight:600;font-display:swap;src:url(fonts/azeret-mono-latin-600-normal.woff2) format("woff2")}
 
@@ -229,6 +227,12 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
    would show below "Loading fixtures…", then jump down when the matches arrive (a layout shift Lighthouse counts) */
 #list:has(>[data-t="loading"]){min-height:100vh}
 .day{display:grid;grid-template-columns:84px minmax(0,1fr);gap:14px;align-items:start}
+/* days out of sight are not laid out or painted until they come near the window (a long list stays quick to redraw);
+   until a day has been drawn once its height is guessed from its number of matches (--n), then remembered (auto).
+   The day of the match shown beside the list is always drawn: its outline reaches 1px past the day's edge, which
+   content-visibility would cut off */
+.day{content-visibility:auto;contain-intrinsic-size:auto calc(var(--n,2)*150px + 20px)}
+:root[data-pane] .day:has(.md-open[aria-current="true"]){content-visibility:visible}
 .day-h{margin:0;position:sticky;top:var(--filters-h,150px)}
 .cal-block{display:flex;flex-direction:column;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .cal-block .mon{width:100%;text-align:center;font:700 11px/1 "Instrument Sans",sans-serif;letter-spacing:.14em;text-transform:uppercase;padding:6px 0;background:var(--board);color:var(--gold)}
@@ -417,7 +421,7 @@ footer p{margin:10px 0 0}
 .sess-line b{font-weight:700;color:var(--ink)}
 .sess-res{margin:2px 0 0;font-size:13.5px;color:var(--muted)}
 .m-sess{display:block;font-weight:700}
-.m-gp{display:block;font-weight:500;color:var(--ink-2)}
+.m-gp{display:block;font-weight:400;color:var(--ink-2)}
 .wk-list{margin:0;font-size:14px;color:var(--muted)}
 .mini-pod{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14.5px;color:var(--ink-2)}
 .mini-pod b{font-family:"Azeret Mono",monospace;color:var(--ink)}
