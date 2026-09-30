@@ -21,6 +21,7 @@ function applyWide() {
     mddlg.close();
     openDialog();
   }
+  syncFold();
   setFH();
   fitRail();
 }
@@ -66,6 +67,33 @@ function setSide(s) {
     apply,
   );
 }
+// phones: the filters fold away behind the same "Show filters" button, so the list comes first. Not remembered: every
+// visit starts with the list, and the summary beside the button says what the filters are showing.
+let filtersFolded = true;
+function syncFold() {
+  const open = !document.documentElement.dataset.wide && !filtersFolded,
+    btn = document.getElementById("sideshow"),
+    label = btn.querySelector("[data-t]");
+  btn.setAttribute("aria-expanded", open);
+  label.dataset.t = open ? "hideFilters" : "showFilters"; // applyLang translates it from here
+  label.textContent = T[label.dataset.t];
+}
+function foldFilters(fold) {
+  const r = document.documentElement;
+  if (!fold) {
+    stay(filtersEl); // back while it was folding away
+    if (!filtersFolded) return;
+    filtersFolded = false;
+    r.dataset.filters = "open";
+    syncFold();
+    move(filtersEl, DROP, { duration: DUR("s") });
+  } else if (!filtersFolded && !filtersEl.leaving) {
+    filtersFolded = true;
+    syncFold();
+    leave(filtersEl, LIFT, () => delete r.dataset.filters);
+  }
+}
 document.getElementById("sidehide").onclick = () => setSide("closed");
-document.getElementById("sideshow").onclick = () => setSide("open");
+document.getElementById("sideshow").onclick = () =>
+  document.documentElement.dataset.wide ? setSide("open") : foldFilters(!filtersFolded);
 addEventListener("resize", applyWide);

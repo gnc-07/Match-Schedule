@@ -132,7 +132,8 @@ try {
     <div id="livelist"></div>
   </section>
 
-  <section class="side-bar" id="side-bar" aria-labelledby="filters-h">
+  <!-- its own name, not "Filters": on phones it sits right above the filters, and two regions with one name are ambiguous -->
+  <section class="side-bar" id="side-bar" aria-labelledby="sidebar-h"><h2 class="sr" id="sidebar-h" data-t="filterBar">Filter summary</h2>
     <button type="button" class="btn" id="sideshow" aria-controls="filters" aria-expanded="false"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span data-t="showFilters">Show filters</span></button>
     <p id="sidesum"></p>
   </section>
@@ -170,8 +171,9 @@ try {
       <label class="tog" id="f1praclabel"><input type="checkbox" id="f1prac" checked><span data-t="f1Prac">Include F1 practice sessions</span></label>
       <button type="button" class="reset" id="reset" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span data-t="clearFilters">Clear filters</span></button>
     </div>
-    <p class="sr" id="summary" role="status"></p>
   </section>
+  <!-- outside the filters, so the match count is still announced while they are folded away on phones -->
+  <p class="sr" id="summary" role="status"></p>
 
   <div class="rail" id="rail"></div>
 

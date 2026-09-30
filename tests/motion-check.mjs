@@ -31,6 +31,7 @@ const cases = [
   ["panel-beside", 1920, p => p.click(`.md-open[data-uid="${uid}"]`)],
   ["settings", 1280, p => p.click("#setmenu summary")],
   ["sheet-phone", 390, p => p.click("#setmenu summary")],
+  ["phone-filters", 390, p => p.click("#sideshow")],
   ["sources", 1280, async p => { await p.evaluate(() => document.querySelector("#list .srcs").scrollIntoView({ block: "center" })); await p.click("#list .srcs summary"); }],
   ["star", 1280, async p => { await p.evaluate(() => document.querySelector('#list .star[aria-pressed="false"]').scrollIntoView({ block: "center" })); await p.click('#list .star[aria-pressed="false"]'); }],
   ["theme", 1280, async p => { await p.click("#themebtn");
@@ -78,6 +79,7 @@ const smooth = [
   ["sheet-close", 390, ["#setmenu .calpanel"], async p => { await p.click("#setmenu summary"); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
   ["menu-close", 1280, ["#setmenu .calpanel"], async p => { await p.click("#setmenu summary"); await wait(900); }, p => p.click("#setmenu summary"), "closing"],
   ["sidebar-hide", 1280, ["#list", "#filters"], async () => {}, p => p.click("#sidehide"), "closing"],
+  ["phone-filters-close", 390, ["#filters"], async p => { await p.click("#sideshow"); await wait(900); }, p => p.click("#sideshow"), "closing"],
   ["sidebar-show", 1280, ["#list"], async p => { await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
 ];
 const problems = [];
