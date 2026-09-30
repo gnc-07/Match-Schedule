@@ -11,6 +11,7 @@ import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import zlib from "node:zlib";
+import { chromium as playwright } from "playwright";
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const PORT = Number(process.env.PORT || 8123);
@@ -24,12 +25,17 @@ const TYPES = {
 const COMPRESS = /^(text\/|application\/json|image\/svg)/;   // what GitHub Pages compresses; fonts and pictures already are
 
 export function chromePath() {
-  // last, the Chromium that Playwright downloaded (its own folder, or PLAYWRIGHT_BROWSERS_PATH as in a cloud container)
+  // last, a Chromium that Playwright downloaded: the one this Playwright version expects, then any other build in its
+  // folder (PLAYWRIGHT_BROWSERS_PATH, as in a cloud container), newest first, in either layout ("chrome-linux64" in newer
+  // Playwright builds, "chrome-linux" in older ones)
   const pw = process.env.PLAYWRIGHT_BROWSERS_PATH || path.join(process.env.HOME || "", ".cache", "ms-playwright");
   let fromPlaywright = [];
   try {
-    fromPlaywright = readdirSync(pw).filter(d => /^chromium-\d+$/.test(d)).sort().reverse()
-      .map(d => path.join(pw, d, "chrome-linux", "chrome"));
+    fromPlaywright = [playwright.executablePath()];
+  } catch {}
+  try {
+    const builds = readdirSync(pw).filter(d => /^chromium-\d+$/.test(d)).sort((a, b) => b.split("-")[1] - a.split("-")[1]);
+    for (const d of builds) for (const dir of ["chrome-linux64", "chrome-linux"]) fromPlaywright.push(path.join(pw, d, dir, "chrome"));
   } catch {}
   const candidates = [process.env.CHROME_PATH, "/usr/bin/chromium-browser", "/usr/bin/chromium",
     "/usr/bin/google-chrome", "/usr/bin/google-chrome-stable", ...fromPlaywright].filter(Boolean);
