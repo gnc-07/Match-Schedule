@@ -653,7 +653,8 @@ class PublishSite(unittest.TestCase):
     def test_publish_writes_only_the_site(self):
         with tempfile.TemporaryDirectory() as d:
             self.fake_site(d)
-            for name in ("soccer.ics", "fonts/x.woff2", "sitemap.xml", "og-image.png", "build_schedule.py", "tests/t.py"):
+            for name in ("soccer.ics", "fonts/x.woff2", "sitemap.xml", "og-image.png", "manifest.webmanifest", "icons/x.png",
+                         "build_schedule.py", "tests/t.py"):
                 os.makedirs(os.path.dirname(os.path.join(d, name)), exist_ok=True)
                 with open(os.path.join(d, name), "w", encoding="utf-8") as f:
                     f.write("x")
@@ -668,7 +669,8 @@ class PublishSite(unittest.TestCase):
                 self.assertEqual(f.read(), fixtures)
             found = sorted(os.path.relpath(os.path.join(p, n), os.path.join(d, "_site"))
                            for p, _, names in os.walk(os.path.join(d, "_site")) for n in names)
-            self.assertEqual(found, ["fixtures.json", "fonts/x.woff2", "index.html", "og-image.png", "sitemap.xml", "soccer.ics"])
+            self.assertEqual(found, ["fixtures.json", "fonts/x.woff2", "icons/x.png", "index.html", "manifest.webmanifest",
+                                    "og-image.png", "sitemap.xml", "soccer.ics"])
             with self.assertRaises(ValueError):
                 publish_site.publish(d, d)          # never over the source files
 
@@ -676,7 +678,7 @@ class PublishSite(unittest.TestCase):
         name = "google1a2b3c4d5e6f7a8b.html"
         with tempfile.TemporaryDirectory() as d:
             self.fake_site(d)
-            for extra in ("soccer.ics", "fonts/x.woff2", "sitemap.xml", "og-image.png"):
+            for extra in ("soccer.ics", "fonts/x.woff2", "sitemap.xml", "og-image.png", "manifest.webmanifest", "icons/x.png"):
                 os.makedirs(os.path.dirname(os.path.join(d, extra)), exist_ok=True)
                 with open(os.path.join(d, extra), "w", encoding="utf-8") as f:
                     f.write("x")
@@ -733,6 +735,39 @@ class SearchAndSharing(unittest.TestCase):
         self.assertEqual(size, (int(self.meta["og:image:width"]), int(self.meta["og:image:height"])))
         self.assertEqual(size, (1200, 630))
         self.assertLess(os.path.getsize(os.path.join(self.ROOT, "og-image.png")), 300_000)   # chat apps skip large pictures
+
+    def png_size(self, name):
+        with open(os.path.join(self.ROOT, name), "rb") as f:
+            head = f.read(24)
+        self.assertEqual(head[:8], b"\x89PNG\r\n\x1a\n", name + " is not a PNG picture")
+        return int.from_bytes(head[16:20], "big"), int.from_bytes(head[20:24], "big")
+
+    def test_home_screen_manifest_and_icons(self):
+        # "Add to Home Screen": phones read the manifest and the icons it names; a wrong size or a missing file fails
+        # silently (the phone offers no install, or shows a blank icon)
+        self.assertIn('<link rel="manifest" href="manifest.webmanifest">', self.html)
+        self.assertIn('<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">', self.html)
+        self.assertIn("manifest.webmanifest", publish_site.COPY)
+        self.assertIn("icons", publish_site.COPY)
+        with open(os.path.join(self.ROOT, "manifest.webmanifest"), encoding="utf-8") as f:
+            m = json.load(f)
+        self.assertEqual(m["name"], "Matchday Planner")
+        self.assertLessEqual(len(m["short_name"]), 12)   # longer names are cut short under the icon
+        # relative addresses: the site lives in /Match-Schedule/, not at the top of github.io
+        self.assertEqual((m["start_url"], m["scope"], m["id"]), ("./", "./", "./"))
+        self.assertIn(m["display"], ("standalone", "minimal-ui"))
+        # no description or other text: the manifest has one language, and every visible string must exist in both
+        self.assertEqual(set(m) - {"name", "short_name", "id", "start_url", "scope", "display", "background_color",
+                                   "theme_color", "icons"}, set())
+        sizes = {}
+        for icon in m["icons"]:
+            w, h = self.png_size(icon["src"])
+            self.assertEqual(icon["sizes"], f"{w}x{h}", icon["src"])
+            self.assertEqual(icon["type"], "image/png")
+            sizes.setdefault(icon.get("purpose", "any"), set()).add(w)
+        self.assertLessEqual({192, 512}, sizes["any"])   # the two sizes Chrome asks for before offering to install
+        self.assertIn(512, sizes["maskable"])            # Android crops icons to its own shape
+        self.assertEqual(self.png_size("icons/apple-touch-icon.png"), (180, 180))
 
     def test_title_and_description_match_the_english_text_the_script_sets(self):
         with open(os.path.join(self.ROOT, "js", "i18n.js"), encoding="utf-8") as f:
