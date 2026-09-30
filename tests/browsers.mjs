@@ -217,6 +217,37 @@ const actChecks = [
     must((await page.evaluate(() => localStorage.getItem("mp.favs")) || "").includes(team), "the star was not saved");
     await page.locator(sel).first().click();
   }],
+  ["Your teams", async page => {
+    const open = () => page.evaluate(() => document.getElementById("mddlg").open);
+    must(await page.isVisible("#myteams-h"), "no Follow your teams invitation on a first visit");
+    await page.click("#myteams-find");
+    must(await page.evaluate(() => document.activeElement?.id) === "q", "Find my team did not go to the team search");
+    // starred, the invitation becomes Your teams, with that team's next match
+    const team = MATCH.home, star = () => page.locator(`#list .match .star[data-team="${team.replace(/"/g, '\\"')}"]`).first();
+    await showMatch(page, uid);
+    await star().click();
+    await page.waitForSelector("#list .myteams-row");
+    must(await page.evaluate(t => [...document.querySelectorAll(".myteams-row")].some(a => {
+      const r = DATA.find(x => x.uid === a.dataset.uid);
+      return r && (r.home === t || r.away === t);
+    }), team), `Your teams does not list a match of ${team}`);
+    // a row opens Match details; closed, focus goes back to that row
+    const row = page.locator("#list .myteams-row").first(), rowUid = await row.getAttribute("data-uid");
+    await row.click();
+    await page.waitForFunction(() => document.getElementById("mddlg").open);
+    must(new URL(page.url()).searchParams.get("match") === rowUid, "the Your teams row did not open its match");
+    await page.keyboard.press("Escape");
+    await page.waitForFunction(() => !document.getElementById("mddlg").open);
+    must(await page.evaluate(() => document.activeElement?.classList.contains("myteams-row")), "focus did not return to the Your teams row");
+    await star().click();                                    // as it was: nothing starred
+    await page.waitForSelector("#myteams-no");
+    // Not now hides the invitation, and it stays hidden on the next visit
+    await page.click("#myteams-no");
+    await page.waitForSelector("#myteams-h", { state: "detached" });
+    await page.reload({ waitUntil: "load" });
+    await page.waitForSelector("#list .day");
+    must(!(await page.isVisible("#myteams-h")), "Not now did not keep the invitation hidden on the next visit");
+  }],
   ["Nations League button and cards", async page => {
     const pt = await page.evaluate(() => LANG === "pt");
     const chip = await page.locator("#chip-UNL").textContent();

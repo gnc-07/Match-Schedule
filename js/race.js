@@ -367,7 +367,7 @@ function paintWkRes() {
     return;
   }
   if (have.length === 1) h = h.replace("</h3>", '</h3><span class="f1-one">' + esc(S[w.pick]) + "</span>");
-  const mine = r => (f1favs.has(r.Driver.driverId) ? ' class="mine"' : "");
+  const mine = r => (f1favs.has(r.Driver.driverId) ? ' class="myteams"' : "");
   let t =
     '<div class="lt-scroll"><table class="lt f1t"><caption class="sr">' +
     esc(T.f1Results + ": " + S[w.pick]) +
@@ -528,7 +528,7 @@ function paintWkChamp() {
       }
       h +=
         "<tr" +
-        (fav ? ' class="mine"' : "") +
+        (fav ? ' class="myteams"' : "") +
         '><td class="pos-c">' +
         esc(x.positionText || x.position) +
         "</td>" +
@@ -802,7 +802,8 @@ async function shareLink(url, text) {
 const mddlg = document.getElementById("mddlg"),
   ltdlg = document.getElementById("ltdlg");
 let pushed = false,
-  trigger = null;
+  trigger = null, // the match whose button opened the panel, for focus to return to it
+  triggerSel = ".match .md-open";
 function showPanel(uid) {
   openMatch(uid, document.getElementById("mdbody"));
   // the match shown is brought to the middle of the window (beside the list, it glides there)
@@ -814,7 +815,7 @@ function showPanel(uid) {
 }
 // the card of the match in the address (?match=)
 const shownCard = () => {
-  const a = [...listEl.querySelectorAll(".md-open")].find(x => x.dataset.uid === matchParam());
+  const a = [...listEl.querySelectorAll(".match .md-open")].find(x => x.dataset.uid === matchParam());
   return a && a.closest(".match");
 };
 function openDialog(then) {
@@ -883,7 +884,7 @@ function shut(d) {
 // the card whose details are shown beside the list is outlined, and screen readers hear "current" on its button
 function markCurrent() {
   const u = document.documentElement.hasAttribute("data-pane") ? matchParam() : null;
-  document.querySelectorAll("#list .md-open").forEach(a => {
+  document.querySelectorAll("#list .match .md-open").forEach(a => {
     if (a.dataset.uid === u) a.setAttribute("aria-current", "true");
     else a.removeAttribute("aria-current");
   });
@@ -903,6 +904,7 @@ listEl.addEventListener("click", e => {
   if (!a || e.ctrlKey || e.metaKey || e.shiftKey) return;
   e.preventDefault();
   trigger = a.dataset.uid;
+  triggerSel = a.classList.contains("myteams-row") ? ".myteams-row" : ".match .md-open";
   // with the details already open beside the list, switching matches replaces the address, so Back still closes the panel
   const switching = mddlg.open && !mddlg.leaving;
   if (mddlg.open) history.replaceState({ match: a.dataset.uid }, "", a.getAttribute("href"));
@@ -934,7 +936,8 @@ mddlg.addEventListener("close", () => {
       history.replaceState(null, "", u);
     } // opened from a shared link
   }
-  const b = trigger && [...listEl.querySelectorAll(".md-open")].find(x => x.dataset.uid === trigger);
+  // back to what opened it: the card's button, or the match's row in "Your teams"
+  const b = trigger && [...listEl.querySelectorAll(triggerSel)].find(x => x.dataset.uid === trigger);
   if (b) b.focus();
 });
 addEventListener("popstate", () => {
