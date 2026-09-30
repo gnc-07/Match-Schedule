@@ -345,7 +345,9 @@ def wiki_libertadores(start):
                 break
             except urllib.error.HTTPError as e:     # "too many requests": wait as long as Wikipedia asks, once
                 if e.code == 429 and attempt == 1:
-                    time.sleep(min(int(e.headers.get("Retry-After") or 5), 30)); continue
+                    wait = str((e.headers or {}).get("Retry-After") or "")   # seconds, or a date (then 5 s)
+                    time.sleep(min(int(wait) if wait.isdigit() else 5, 30))
+                    continue
                 print(f"Wikipedia page {page!r} could not be read ({e}); those Libertadores times are not cross-checked")
                 break
             except Exception as e:
@@ -379,7 +381,12 @@ def from_libertadores(start, clubs=(), wiki=None):
     """The season's matches from yesterday on, from ESPN, each time checked against Wikipedia through resolve().
     Matches whose teams are not known yet (ESPN's "TBD Home") are left out until they are."""
     events = fetch_json(f"{ESPN_API}{LIB_ESPN}/scoreboard?dates={start.year}&limit=500")["events"]
-    wiki = wiki_libertadores(start) if wiki is None else wiki
+    if wiki is None:
+        try:
+            wiki = wiki_libertadores(start)
+        except Exception as e:                     # Wikipedia only checks the times: it must never cost the matches
+            print(f"Wikipedia could not be read ({e}); the Libertadores times are not cross-checked this run")
+            wiki = []
     recent, out = start - timedelta(days=KEEP_DAYS), []
     for e in events:
         try:

@@ -283,6 +283,21 @@ class Libertadores(unittest.TestCase):
     def test_libertadores_matches_never_count_towards_the_safety_check(self):
         self.assertEqual(bs.upcoming_league_matches([bs.record("CONMEBOL Libertadores", "LIB", "A", "B", "2026-10-15")]), 0)
 
+    def test_a_busy_wikipedia_never_loses_the_espn_matches(self):
+        """A "too many requests" answer whose Retry-After is a date, not seconds (both are allowed), is waited out
+        once for the default time; a second refusal leaves the matches unverified, never replaced by the last build's."""
+        busy = urllib.error.HTTPError(bs.WIKI_API, 429, "Too Many Requests", {"Retry-After": "Wed, 30 Sep 2026 22:00:00 GMT"}, None)
+        answers = [busy, busy, {"events": [espn_event("401", "2026-10-15T00:30Z", "Fluminense", "Palmeiras")]}]
+        def fake(url, headers=None):
+            a = answers.pop()                     # ESPN first, then Wikipedia twice
+            if isinstance(a, Exception): raise a
+            return a
+        with mock.patch.object(bs, "fetch_json", side_effect=fake), mock.patch("time.sleep") as nap, \
+                redirect_stdout(io.StringIO()):
+            recs = bs.from_libertadores(date(2026, 9, 30), self.CLUBS)
+        nap.assert_called_once_with(5)
+        self.assertEqual([(r["uid"], r["check"]["status"]) for r in recs], [("lib|401", "unconfirmed")])
+
     def test_only_the_pages_that_can_hold_matches_to_come_are_asked_for(self):
         self.assertEqual(bs._wiki_pages(date(2026, 9, 30)), ["2026 Copa Libertadores final stages"])
         self.assertEqual(len(bs._wiki_pages(date(2026, 5, 1))), 2)
