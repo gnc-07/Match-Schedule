@@ -769,6 +769,17 @@ class SearchAndSharing(unittest.TestCase):
         self.assertIn(512, sizes["maskable"])            # Android crops icons to its own shape
         self.assertEqual(self.png_size("icons/apple-touch-icon.png"), (180, 180))
 
+    def test_every_published_file_republishes_the_site_when_it_changes(self):
+        # the workflow rebuilds on a push to main only when a listed file changed: a published file left off that list
+        # would reach visitors only at the next scheduled rebuild
+        with open(os.path.join(self.ROOT, ".github", "workflows", "build-and-deploy.yml"), encoding="utf-8") as f:
+            paths = json.loads(re.search(r"^\s*paths: (\[.*\])$", f.read(), re.M).group(1))
+        for name in publish_site.COPY:
+            if name in ("fixtures.json", "soccer.ics"):   # written by the workflow itself
+                continue
+            folder = os.path.isdir(os.path.join(self.ROOT, name))
+            self.assertIn(name + "/**" if folder else name, paths, f"{name} is published but not in the workflow's paths")
+
     def test_title_and_description_match_the_english_text_the_script_sets(self):
         with open(os.path.join(self.ROOT, "js", "i18n.js"), encoding="utf-8") as f:
             i18n = f.read()
