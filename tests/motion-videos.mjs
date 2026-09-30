@@ -126,6 +126,13 @@ const scenes = [
   ["15-show-more", 1280, 800, async p => {
     await click(p, "#more"); await wait(1300);
   }],
+  // a match further down the list, at a width where the list is much narrower beside the panel: closing keeps it in place
+  ["16-details-beside-close", 1650, 1010, async p => {
+    const u = await p.evaluate(() => { const a = [...document.querySelectorAll("#list .match .md-open")][14];
+      a.closest(".match").scrollIntoView({ block: "center" }); return a.dataset.uid; });
+    await wait(500);
+    await click(p, `#list .match .md-open[data-uid="${u}"]`); await wait(1400); await click(p, "#mddlg [data-close]"); await wait(1200);
+  }],
 ];
 
 try {

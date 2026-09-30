@@ -362,7 +362,8 @@ const actChecks = [
 // On a monitor, where Match details opens beside the list. At 1650px the list is much narrower beside the panel than
 // without it (at 1920px the two barely differ), so the matches above the window change height when it closes: the
 // match whose details were shown must stay where it was on screen, not slide up by all they lost (browsers do not
-// keep it in place themselves here, since the page's own padding changes too).
+// keep it in place themselves here, since the page's own padding changes too). The right-hand column gives way to the
+// panel and comes back.
 const besideChecks = [
   ["match details beside the list close in place", async page => {
     await page.setViewportSize({ width: 1650, height: 1000 });
@@ -377,11 +378,15 @@ const besideChecks = [
     await page.click(`#list .match .md-open[data-uid="${pick}"]`);
     await page.waitForFunction(() => document.documentElement.hasAttribute("data-pane"));
     await wait(300);
+    const rail = () => page.evaluate(() => [document.getElementById("rail").offsetWidth > 0, document.documentElement.hasAttribute("data-rail-out")]);
+    const [railShown, railOut] = await rail();
+    must(!railShown && !railOut, "the right-hand column is still on screen beside Match details");
     const shown = await top();
     await page.click("#mddlg [data-close]");
     await page.waitForFunction(() => !document.getElementById("mddlg").open && !location.search.includes("match="));
     await wait(300);
     const after = await top();
+    must((await rail())[0], "the right-hand column did not come back when Match details closed");
     must(Math.abs(after - shown) <= 2, `the match moved from ${shown}px to ${after}px from the top of the window when Match details closed`);
   }],
 ];
