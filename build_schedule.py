@@ -798,10 +798,128 @@ def best_team(name, teams):
     found = [tid for k, tid in scored if k == best]
     return found[0] if len(found) == 1 else None
 
+def valid_box(box):
+    """A crest's measured drawing (crest_box()): [left, top, width, height, reach] in thousandths of the picture's side,
+    whole numbers, inside the picture."""
+    return (isinstance(box, list) and len(box) == 5 and all(type(v) is int and 0 <= v <= 1000 for v in box)
+            and box[2] > 0 and box[3] > 0 and box[0] + box[2] <= 1000 and box[1] + box[3] <= 1000 and box[4] > 0)
+
 def valid_badge(b):
-    return isinstance(b, dict) and len(b) == 1 and (
-        (isinstance(b.get("flag"), str) and bool(FLAG_CODE.fullmatch(b["flag"]))) or
-        (isinstance(b.get("crest"), str) and bool(re.fullmatch(r"\d{1,7}", b["crest"]))))
+    if not isinstance(b, dict):
+        return False
+    if set(b) == {"flag"}:
+        return isinstance(b["flag"], str) and bool(FLAG_CODE.fullmatch(b["flag"]))
+    return (set(b) in ({"crest"}, {"crest", "box"}) and isinstance(b["crest"], str)
+            and bool(re.fullmatch(r"\d{1,7}", b["crest"])) and ("box" not in b or valid_box(b["box"])))
+
+def png_alpha(data):
+    """(width, height, rows of opacity 0-255) of a PNG picture, read with the standard library only; None for anything
+    this does not read (not a PNG, interlaced, not 8 bits per channel, over 1000 pixels a side, broken data)."""
+    import struct, zlib
+    if data[:8] != b"\x89PNG\r\n\x1a\n":
+        return None
+    pos, chunks, idat = 8, {}, []
+    while pos + 8 <= len(data):
+        n, kind = struct.unpack(">I4s", data[pos:pos + 8])
+        body = data[pos + 8:pos + 8 + n]
+        if kind == b"IDAT":
+            idat.append(body)
+        else:
+            chunks.setdefault(kind, body)
+        pos += 12 + n
+        if kind == b"IEND":
+            break
+    ihdr = chunks.get(b"IHDR")
+    if not ihdr or len(ihdr) != 13:
+        return None
+    w, h, depth, ctype, _, _, interlace = struct.unpack(">IIBBBBB", ihdr)
+    channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}.get(ctype)
+    if depth != 8 or interlace or not channels or not 0 < w <= 1000 or not 0 < h <= 1000:
+        return None
+    try:
+        raw = zlib.decompress(b"".join(idat))
+    except zlib.error:
+        return None
+    stride = w * channels
+    if len(raw) < h * (stride + 1):
+        return None
+    trns = chunks.get(b"tRNS", b"")
+    rows, prev = [], bytearray(stride)
+    for y in range(h):
+        f, line = raw[y * (stride + 1)], bytearray(raw[y * (stride + 1) + 1:(y + 1) * (stride + 1)])
+        c = channels
+        if f == 1:
+            for i in range(c, stride):
+                line[i] = (line[i] + line[i - c]) & 255
+        elif f == 2:
+            for i in range(stride):
+                line[i] = (line[i] + prev[i]) & 255
+        elif f == 3:
+            for i in range(stride):
+                line[i] = (line[i] + ((line[i - c] if i >= c else 0) + prev[i]) // 2) & 255
+        elif f == 4:
+            for i in range(stride):
+                a, b, cc = (line[i - c] if i >= c else 0), prev[i], (prev[i - c] if i >= c else 0)
+                p = a + b - cc
+                pa, pb, pc = abs(p - a), abs(p - b), abs(p - cc)
+                line[i] = (line[i] + (a if pa <= pb and pa <= pc else b if pb <= pc else cc)) & 255
+        elif f != 0:
+            return None
+        prev = line
+        if ctype == 6:
+            rows.append(line[3::4])
+        elif ctype == 4:
+            rows.append(line[1::2])
+        elif ctype == 3:
+            rows.append(bytes(trns[i] if i < len(trns) else 255 for i in line))
+        else:
+            rows.append(bytes([255]) * w)          # no transparency: the whole picture is the drawing
+    return w, h, rows
+
+def crest_box(data, solid=32):
+    """Where a crest is drawn in its picture (ESPN's crests sit on square transparent pictures, each with its own
+    margin), as [left, top, width, height, reach] in thousandths of the picture's side: the box around every pixel at
+    least `solid` opaque, and how far the farthest such pixel's far corner is from the box's centre. The page sizes and centres each crest by
+    it, so every crest fills its circle alike. None when the picture cannot be read or is empty."""
+    img = png_alpha(data)
+    if not img:
+        return None
+    w, h, rows = img
+    side = max(w, h)
+    xs, ys = [], []
+    for y, row in enumerate(rows):
+        hit = [x for x, a in enumerate(row) if a >= solid]
+        if hit:
+            ys.append(y)
+            xs += (hit[0], hit[-1])
+    if not ys:
+        return None
+    x0, x1, y0, y1 = min(xs), max(xs) + 1, ys[0], ys[-1] + 1
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    reach = max(math.hypot(abs(x + .5 - cx) + .5, abs(y + .5 - cy) + .5) for y, row in enumerate(rows)
+                for x, a in enumerate(row) if a >= solid)
+    k = 1000 / side
+    box = [round(x0 * k), round(y0 * k), round((x1 - x0) * k), round((y1 - y0) * k), min(1000, math.ceil(reach * k))]
+    return box if valid_box(box) else None
+
+ESPN_CREST = "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/{}.png&h=100&w=100"
+
+def measure_crests(badges, previous=None):
+    """Adds "box" (crest_box()) to each crest: kept from the last build when the crest is the same, else measured from
+    ESPN's picture. A crest that cannot be downloaded or read has no box, and the page shows it as before."""
+    old = {b["crest"]: b["box"] for b in (previous or {}).values() if "box" in b}
+    for b in badges.values():
+        if "crest" not in b or "box" in b:
+            continue
+        box = old.get(b["crest"])
+        if box is None:
+            try:
+                box = crest_box(fetch(ESPN_CREST.format(b["crest"])))
+            except Exception as e:
+                print(f"crest {b['crest']} could not be measured ({e})")
+        if box:
+            b["box"] = old[b["crest"]] = box
+    return badges
 
 def previous_badges(path="fixtures.json"):
     """Badges from the last published fixtures.json, checked like everything read back from that file."""
@@ -832,8 +950,8 @@ def team_badges(recs, previous=None):
                     out[name] = {"crest": tid}
     for name, b in (previous or {}).items():
         if "crest" in b:
-            out.setdefault(name, b)
-    return out
+            out.setdefault(name, {"crest": b["crest"]})
+    return measure_crests(out, previous)
 
 def load_all(start):
     """Every match and session from `start` on. Returns (records, sources, tables, f1_stale): which source each
