@@ -94,6 +94,14 @@
   "start": "2026-10-10T15:00:00+00:00"
  },
  {
+  "id": "agenda:barcelona-x-getafe:2026-10-10",
+  "source": "agenda",
+  "home": "BARCELONA",
+  "away": "GETAFE",
+  "start": "2026-10-10T15:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=q_ugzqXh5NQ"
+ },
+ {
   "id": "agenda:paris-saint-germain-x-le-mans:2026-10-10",
   "source": "agenda",
   "home": "PARIS SAINT-GERMAIN",
@@ -120,6 +128,28 @@
   "title": "AO VIVO: MÔNACO X TOULOUSE | LIGUE 1 26/27 | 6ª RODADA",
   "published": "2026-09-30T12:00:31+00:00",
   "start": "2026-10-10T18:15:00+00:00"
+ },
+ {
+  "id": "agenda:real-madrid-x-villarreal:2026-10-10",
+  "source": "agenda",
+  "home": "REAL MADRID",
+  "away": "VILLARREAL",
+  "start": "2026-10-10T18:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=XSYhg8U0WEM"
+ },
+ {
+  "id": "agenda:elche-x-celta-de-vigo:2026-10-11",
+  "source": "agenda",
+  "home": "ELCHE",
+  "away": "CELTA DE VIGO",
+  "start": "2026-10-11T11:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=cu707Ey2nss"
+ },
+ {
+  "id": "cu707Ey2nss",
+  "title": "AO VIVO: ELCHE X CELTA DE VIGO | LALIGA 26/27 | 8ª RODADA",
+  "published": "2026-10-01T12:00:04+00:00",
+  "start": "2026-10-11T11:45:00+00:00"
  },
  {
   "id": "agenda:fc-koln-x-borussia-monchengladbach:2026-10-11",
@@ -150,6 +180,20 @@
   "start": "2026-10-11T15:00:00+00:00"
  },
  {
+  "id": "agenda:real-betis-x-osasuna:2026-10-11",
+  "source": "agenda",
+  "home": "REAL BETIS",
+  "away": "OSASUNA",
+  "start": "2026-10-11T15:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=aConm-Qye50"
+ },
+ {
+  "id": "aConm-Qye50",
+  "title": "AO VIVO: REAL BETIS X OSASUNA | LALIGA 26/27 | 8ª RODADA",
+  "published": "2026-10-01T12:00:32+00:00",
+  "start": "2026-10-11T15:30:00+00:00"
+ },
+ {
   "id": "agenda:cagliari-x-juventus:2026-10-11",
   "source": "agenda",
   "home": "CAGLIARI",
@@ -162,6 +206,20 @@
   "title": "AO VIVO: CAGLIARI X JUVENTUS | SÉRIE A ITALIANA 26/27 | 6ª RODADA",
   "published": "2026-10-01T12:00:38+00:00",
   "start": "2026-10-11T18:20:00+00:00"
+ },
+ {
+  "id": "agenda:racing-club-x-valencia:2026-10-11",
+  "source": "agenda",
+  "home": "RACING CLUB",
+  "away": "VALENCIA",
+  "start": "2026-10-11T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=JULAbK5otvA"
+ },
+ {
+  "id": "JULAbK5otvA",
+  "title": "AO VIVO: RACING CLUB X VALENCIA | LaLiga 26/27 | 8ª RODADA",
+  "published": "2026-10-01T12:01:16+00:00",
+  "start": "2026-10-11T18:30:00+00:00"
  },
  {
   "id": "agenda:vasco-x-remo:2026-10-11",
