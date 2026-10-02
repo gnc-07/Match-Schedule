@@ -18,7 +18,7 @@
   "source": "agenda",
   "home": "INTERNACIONAL",
   "away": "CORINTHIANS",
-  "start": "2026-10-07T21:30:00+00:00",
+  "start": "2026-10-07T21:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=7uq9nMdsVFU"
  },
  {
@@ -136,6 +136,14 @@
   "away": "VILLARREAL",
   "start": "2026-10-10T18:20:00+00:00",
   "url": "https://www.youtube.com/watch?v=XSYhg8U0WEM"
+ },
+ {
+  "id": "agenda:vasco-x-remo:2026-10-10",
+  "source": "agenda",
+  "home": "VASCO",
+  "away": "REMO",
+  "start": "2026-10-10T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg"
  },
  {
   "id": "agenda:elche-x-celta-de-vigo:2026-10-11",
