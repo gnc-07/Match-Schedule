@@ -104,6 +104,10 @@ const smooth = [
   ["phone-filters-open", 390, ["#list"], async () => {}, p => p.click("#sideshow")],
   ["phone-filters-close", 390, ["#list", "#filters"], async p => { await p.click("#sideshow"); await wait(900); }, p => p.click("#sideshow"), "closing"],
   ["sidebar-show", 1280, ["#list", "#filters"], async p => { await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
+  // pressed again on the way: it turns back from where it is (ends shown, then hidden)
+  ["sidebar-back-open", 1280, ["#list", "#filters"], async () => {}, async p => { await p.click("#sidehide"); await wait(120); await p.click("#sideshow"); }],
+  ["sidebar-back-closed", 1280, ["#list", "#filters"], async p => { await p.click("#sidehide"); await wait(1200); },
+    async p => { await p.click("#sideshow"); await wait(120); await p.click("#sidehide"); }],
   // monitors: Live now and the key share the right-hand column, so they move as one (see "together" below)
   ["wide-side-hide", 1920, [...COLUMN, "#filters"], live, p => p.click("#sidehide"), "closing"],
   ["wide-side-show", 1920, [...COLUMN, "#filters"], async p => { await live(p); await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
@@ -260,7 +264,11 @@ async function run(label, launch) {
       }, sels);
       await act(page);
       await wait(1000);
-      const tr = await page.evaluate(() => window.__tr);
+      const tr = await page.evaluate(() => window.__tr),
+        end = await page.evaluate(() => [document.documentElement.dataset.side, document.getElementById("filters").checkVisibility()]);
+      const want = /-back-(open|closed)$/.exec(name)?.[1];   // turned back: it ends where the second press asked
+      if (want && (end[0] !== want || end[1] !== (want === "open")))
+        problems.push(`${label} smooth ${name}: ended ${end[0]}, sidebar ${end[1] ? "shown" : "hidden"}`);
       await page.close();
       // the page scrolled and what is read moved with it (closing beside the list, the page scrolls by what the matches
       // above lose as the list gets wider, so the match on screen stays put: that is no jump)
@@ -310,7 +318,7 @@ async function run(label, launch) {
       }
       // the filters hidden or shown: the page keeps its width (the header stays put) and the list keeps its own, so the
       // list only slides (only transform moves: a list that changed width would jump at one edge, or reach over the column)
-      if (/side(bar)?-(hide|show)$/.test(name)) {
+      if (/^(wide-)?side(bar)?-/.test(name)) {
         const moved = Math.max(...tr.map(f => Math.abs(f.head - tr[0].head))), grew = Math.max(...tr.map(f => Math.abs(f.lw - tr[0].lw)));
         if (moved > 0.5) problems.push(`${label} smooth ${name}: the header moved ${moved.toFixed(0)}px`);
         if (grew > 0.5) problems.push(`${label} smooth ${name}: the list changed width by ${grew.toFixed(0)}px`);

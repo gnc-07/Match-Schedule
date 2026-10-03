@@ -39,17 +39,25 @@ const pageParts = () => [filtersEl, sideBar, liveBox, listEl, rail];
 // showing, the same backwards. Hiding, the sidebar is kept where it was meanwhile (data-side-out), as the right-hand
 // column is by railOut(). Positions are measured on screen, so they are divided by the text-size zoom.
 function setSide(s) {
-  if (s === side || filtersEl.leaving) return;
+  if (s === side) return;
   const r = document.documentElement,
     z = parseFloat(getComputedStyle(r).zoom) || 1,
-    was = filtersEl.getBoundingClientRect(),
-    from = listEl.getBoundingClientRect().left;
-  let dx = 0; // how far the list goes
+    cs = getComputedStyle(filtersEl),
+    turn = filtersEl.getAnimations().length > 0 && { opacity: cs.opacity, transform: cs.transform }; // pressed again on its way: it turns back from where it is
+  if (filtersEl.leaving) {
+    stay(filtersEl);
+    r.removeAttribute("data-side-out");
+    filtersEl.style.left = filtersEl.style.top = filtersEl.style.width = "";
+  }
+  filtersEl.getAnimations().forEach(a => a.cancel());
+  const was = filtersEl.getBoundingClientRect();
+  let dx = 0; // how far the list goes from one layout to the other (glide has stopped it first)
   side = s;
   store.set("side", s);
   glide(
     pageParts().filter(x => x !== filtersEl),
     () => {
+      const from = listEl.getBoundingClientRect().left;
       applyWide();
       dx = (listEl.getBoundingClientRect().left - from) / z;
       if (s === "closed") {
@@ -62,15 +70,13 @@ function setSide(s) {
       }
     },
   );
-  const out = [
-    { opacity: 1, transform: "none" },
-    { opacity: 0, transform: "translateX(" + (s === "open" ? -dx : dx) + "px)" },
-  ];
-  if (s === "open") move(filtersEl, out.reverse(), SOFT());
+  const gone = { opacity: 0, transform: "translateX(" + (s === "open" ? -dx : dx) + "px)" },
+    here = { opacity: 1, transform: "none" };
+  if (s === "open") move(filtersEl, [turn || gone, here], SOFT());
   else
     leave(
       filtersEl,
-      out,
+      [turn || here, gone],
       () => {
         r.removeAttribute("data-side-out");
         filtersEl.style.left = filtersEl.style.top = filtersEl.style.width = "";

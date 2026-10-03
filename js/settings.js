@@ -443,6 +443,7 @@ function glide(els, change, pin) {
   const z = parseFloat(getComputedStyle(document.documentElement).zoom) || 1,
     pins = els.map(el => (el === listEl && pin && pin.isConnected ? pin : onScreen(el))),
     was = els.map((el, i) => [el.getBoundingClientRect(), pins[i].getBoundingClientRect()]);
+  els.forEach(el => el.getAnimations().forEach(a => a.cancel())); // still gliding: it turns back from where it is now
   change();
   els.forEach((el, i) => {
     const [a, pa] = was[i],
