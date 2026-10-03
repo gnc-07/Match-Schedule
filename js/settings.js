@@ -448,7 +448,7 @@ function glide(els, change, pin) {
       dx = (pa.left - pb.left) / z,
       dy = (pa.top - pb.top) / z;
     if (!a.width && b.width)
-      move(el, [{ opacity: 0 }, { opacity: 1 }]); // just shown: it fades in where it is
+      move(el, [{ opacity: 0 }, { opacity: 1 }], SOFT()); // just shown: it fades in where it is, on the glide's curve
     else if (a.width && b.width && (Math.abs(dx) > 1 || Math.abs(dy) > 1))
       move(el, [{ transform: "translate(" + dx + "px," + dy + "px)" }, { transform: "none" }], SOFT()); // a long way: gently
   });

@@ -838,8 +838,31 @@ function openDialog(then) {
     };
   // beside the list, the page makes room for the panel and the match shown comes to the middle: the list and the
   // sidebar glide there instead of jumping, following that match
-  if (beside) glide(pageParts(), show, shownCard());
-  else show();
+  if (beside) {
+    const was = !mddlg.open && rail.offsetWidth ? rail.getBoundingClientRect() : null;
+    glide(
+      pageParts(),
+      () => {
+        show();
+        if (was) railOut(was);
+      },
+      shownCard(),
+    );
+  } else show();
+}
+// The right-hand column gives way to the panel beside the list: it fades out where it was while the panel slides in
+// over it, kept in its place meanwhile (data-rail-out, as the panel is by data-pane-out when it leaves), the way it
+// fades back in when the panel closes. Positions are measured on screen, so they are divided by the text-size zoom.
+function railOut(was) {
+  const z = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+  Object.assign(rail.style, { left: was.left / z + "px", top: was.top / z + "px", width: was.width / z + "px" });
+  document.documentElement.setAttribute("data-rail-out", "");
+  leave(rail, [{ opacity: 1 }, { opacity: 0 }], railGone, "m");
+}
+function railGone() {
+  stay(rail); // closed again before it had faded: it stops and goes at once, so it can fade back in
+  document.documentElement.removeAttribute("data-rail-out");
+  rail.style.left = rail.style.top = rail.style.width = "";
 }
 // a panel closing sinks and fades over its fading page (beside the list: slides back out to the right, and the page
 // glides back), then closes
@@ -859,13 +882,23 @@ function shut(d) {
     // beside the list, the opening played backwards: the page glides back while the panel slides out, the panel
     // keeping its place meanwhile (data-pane-out)
     r.setAttribute("data-pane-out", "");
+    if (rail.leaving) railGone();
+    // The list gets wider, so the matches above the window get shorter. Browsers keep what is read in place when the
+    // page above it changes height (scroll anchoring), but not when the page's own padding or width changes too, as
+    // here: the list would slide up by all they lost. So the match shown (or, scrolled away from it, the first match
+    // on screen) is kept where it is by hand, and the list only glides sideways.
+    const c = shownCard(),
+      keep =
+        c && c.getBoundingClientRect().bottom > 0 && c.getBoundingClientRect().top < innerHeight ? c : onScreen(listEl),
+      top = keep.getBoundingClientRect().top;
     glide(
       pageParts(),
       () => {
         r.removeAttribute("data-pane");
         markCurrent();
+        if (keep !== listEl) scrollBy(0, keep.getBoundingClientRect().top - top);
       },
-      shownCard(),
+      keep,
     );
   }
   leave(
