@@ -10,8 +10,9 @@
 //     and the list never glides more than 50px in a sixtieth of a second (a match on screen is followed, as a visitor
 //     sees it; measured per sixtieth, not per frame, so frames a busy computer skips do not count as jumps);
 //   - on monitors, Live now and the key, in one column, move and fade as one (moved by their column and by their own
-//     animation too, one would go twice as far: it jumps ahead, then glides back), and the list, wider from the start
-//     of its glide when the filters hide, never shows over Live now (it slips under the column);
+//     animation too, one would go twice as far: it jumps ahead, then glides back), and the list never reaches into it;
+//   - the filters hidden or shown, the header stays put and the list keeps its width, so it only slides, in step with
+//     the sidebar (the gap between them stays the same);
 //   - the menus, sources and "How to subscribe" play their opening again when opened a second time;
 // and it prints the slowest frame after each click, with animations on and off, with the processor slowed down 4 times
 // the way Lighthouse tests phones (Chromium only; FULLSPEED=1 for normal speed). Those timings vary from run to run,
@@ -102,10 +103,10 @@ const smooth = [
   ["sidebar-hide", 1280, ["#list", "#filters"], async () => {}, p => p.click("#sidehide"), "closing"],
   ["phone-filters-open", 390, ["#list"], async () => {}, p => p.click("#sideshow")],
   ["phone-filters-close", 390, ["#list", "#filters"], async p => { await p.click("#sideshow"); await wait(900); }, p => p.click("#sideshow"), "closing"],
-  ["sidebar-show", 1280, ["#list"], async p => { await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
+  ["sidebar-show", 1280, ["#list", "#filters"], async p => { await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
   // monitors: Live now and the key share the right-hand column, so they move as one (see "together" below)
-  ["wide-side-hide", 1920, COLUMN, live, p => p.click("#sidehide"), "closing"],
-  ["wide-side-show", 1920, COLUMN, async p => { await live(p); await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
+  ["wide-side-hide", 1920, [...COLUMN, "#filters"], live, p => p.click("#sidehide"), "closing"],
+  ["wide-side-show", 1920, [...COLUMN, "#filters"], async p => { await live(p); await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
   ["wide-open", 1920, COLUMN, live, p => p.click(`.md-open[data-uid="${uid}"]`)],
   ["wide-close", 1920, COLUMN, async p => { await live(p); await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
 ];
@@ -251,9 +252,8 @@ async function run(label, launch) {
           window.__tr.push({ t: now, y: scrollY, at: sels.map(s => { const e = document.querySelector(s), r = (s === "#list" ? pin : e).getBoundingClientRect();
             let o = e.checkVisibility() ? 1 : 0;   // how visible it is: its own opacity times every parent's, as a visitor sees it
             for (let x = e; o && x !== document.documentElement; x = x.parentElement) o *= +getComputedStyle(x).opacity;
-            // right: the list's own edge (Your teams included); and whether what shows just inside Live now's left edge is Live now
-            const top = s === "#livebox" && document.elementFromPoint(r.left + 2, r.top + Math.min(r.height / 2, 40));
-            return [r.left, r.top, o, e.getBoundingClientRect().right, !top || e.contains(top)]; }) });
+            return [r.left, r.top, o, e.getBoundingClientRect().right]; }),   // right: the list's own edge, Your teams included
+            head: document.querySelector(".topbar").getBoundingClientRect().left, lw: document.getElementById("list").offsetWidth });
           if (now - t0 < 900) requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
@@ -289,9 +289,10 @@ async function run(label, launch) {
       const lb = sels.indexOf("#livebox"), lg = sels.indexOf("#legend");
       if (lb >= 0 && lg >= 0) {
         let apart = 0, faded = 0;
+        const f0 = tr.find(f => f.at[lb][2] && f.at[lg][2]) || tr[0];   // from the first frame both show (a hidden box has no place)
         for (const f of tr) {
-          const a = f.at[lb], b = f.at[lg], a0 = tr[0].at[lb], b0 = tr[0].at[lg];
-          if (f.y !== tr[0].y || !a[2] || !b[2]) continue;   // scrolled, or gone (a hidden box has no place)
+          const a = f.at[lb], b = f.at[lg], a0 = f0.at[lb], b0 = f0.at[lg];
+          if (f.y !== f0.y || !a[2] || !b[2]) continue;   // scrolled, or gone
           apart = Math.max(apart, Math.hypot(a[0] - a0[0] - (b[0] - b0[0]), a[1] - a0[1] - (b[1] - b0[1])));
           faded = Math.max(faded, Math.abs(a[2] - b[2]));
         }
@@ -299,17 +300,28 @@ async function run(label, launch) {
           problems.push(`${label} smooth ${name}: Live now and the key come apart (${apart.toFixed(0)}px, opacity ${faded.toFixed(2)})`);
         lines.push(`apart ${apart.toFixed(0)}px / opacity ${faded.toFixed(2)}`);
       }
-      // the list never shows over the right-hand column. Only transform moves, so a list that gets wider is at its new
-      // width from the start of its glide and can reach under the column (by "under" px), but Live now stays on top
+      // the list never reaches over (or under) the right-hand column
       const li = sels.indexOf("#list");
       if (li >= 0 && lb >= 0) {
-        let under = 0, covered = 0;
-        for (const f of tr) if (f.at[li][2] && f.at[lb][2] && f.at[li][3] > f.at[lb][0] + 2) {
-          under = Math.max(under, f.at[li][3] - f.at[lb][0]);
-          if (!f.at[lb][4]) covered++;
+        let over = 0;
+        for (const f of tr) if (f.at[li][2] && f.at[lb][2]) over = Math.max(over, f.at[li][3] - f.at[lb][0]);
+        if (over > 0.5) problems.push(`${label} smooth ${name}: the list reaches ${over.toFixed(0)}px into Live now`);
+        lines.push(`list into Live now ${Math.max(0, over).toFixed(0)}px`);
+      }
+      // the filters hidden or shown: the page keeps its width (the header stays put) and the list keeps its own, so the
+      // list only slides (only transform moves: a list that changed width would jump at one edge, or reach over the column)
+      if (/side(bar)?-(hide|show)$/.test(name)) {
+        const moved = Math.max(...tr.map(f => Math.abs(f.head - tr[0].head))), grew = Math.max(...tr.map(f => Math.abs(f.lw - tr[0].lw)));
+        if (moved > 0.5) problems.push(`${label} smooth ${name}: the header moved ${moved.toFixed(0)}px`);
+        if (grew > 0.5) problems.push(`${label} smooth ${name}: the list changed width by ${grew.toFixed(0)}px`);
+        lines.push(`header moved ${moved.toFixed(0)}px, list width changed ${grew.toFixed(0)}px`);
+        // in step: the sidebar and the list move as one, so the gap between them stays the same while the sidebar shows
+        const sb = sels.indexOf("#filters"), seen = tr.filter(f => f.at[sb][2] > 0.02 && f.y === tr[0].y);
+        if (sb >= 0 && seen.length) {
+          const gap = f => f.at[k][0] - f.at[sb][3], g0 = gap(seen[0]), off = Math.max(...seen.map(f => Math.abs(gap(f) - g0)));
+          if (off > 2) problems.push(`${label} smooth ${name}: the sidebar and the list move out of step (${off.toFixed(0)}px)`);
+          lines.push(`sidebar and list out of step ${off.toFixed(0)}px`);
         }
-        if (covered) problems.push(`${label} smooth ${name}: the list shows over Live now in ${covered} frame(s)`);
-        lines.push(`list under Live now ${under.toFixed(0)}px`);
       }
       console.log(`${label.padEnd(8)} smooth ${name.padEnd(13)} ${lines.join("; ")}${jumped ? "; the page jumped" : ""}`);
     }

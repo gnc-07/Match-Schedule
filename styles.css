@@ -362,20 +362,20 @@ footer p{margin:10px 0 0}
 :root[data-wide] .filters .search{flex:none}
 :root[data-wide] .filters .reset{margin-left:0;align-self:flex-start}
 /* filters hidden: a bar above the list says what is shown, with a button to bring them back */
-:root[data-wide][data-side="closed"] .wrap{max-width:1100px}
-:root[data-wide][data-side="closed"] .mid{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"bar" "live" "list"}
+:root[data-wide][data-side="closed"] .mid{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"bar" "live" "list";padding-inline:159px}
+/* the page keeps its width (the header and footer stay put), and the list keeps its own: the sidebar and its gap
+   (290 + 28px) become an equal margin on each side, so the list and the right-hand column only slide (only transform
+   moves: a list that changed width would jump at one edge, or reach under the column) */
 :root[data-wide][data-side="closed"] .filters{display:none}
+:root[data-wide][data-side="closed"][data-side-out] .filters{display:flex;position:fixed;margin:0}   /* sliding away where it was, with the list (setSide) */
 :root[data-wide][data-side="closed"] .side-bar{grid-area:bar;display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;position:sticky;top:0;z-index:10;
   padding:10px 0;background:var(--bg);border-bottom:1px solid var(--line)}
 .side-bar p{margin:0;color:var(--muted);font-size:14.5px}
 /* monitors: the right-hand column */
 :root[data-wide="full"] .wrap{max-width:1680px}
 :root[data-wide="full"] .mid{grid-template-columns:290px minmax(0,1fr) 360px;grid-template-rows:none;grid-template-areas:"side list rail"}
-:root[data-wide="full"][data-side="closed"] .wrap{max-width:1400px}
 :root[data-wide="full"][data-side="closed"] .mid{grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto 1fr;grid-template-areas:"bar rail" "list rail"}
-:root[data-wide="full"] .rail{grid-area:rail;display:flex;flex-direction:column;gap:18px;position:sticky;top:16px;z-index:1}
-/* z-index: above the list, which is wider from the start of its glide when the filters hide (only transform moves),
-   so its edge slips under Live now rather than over it */
+:root[data-wide="full"] .rail{grid-area:rail;display:flex;flex-direction:column;gap:18px;position:sticky;top:16px}
 .rail.tall{position:static}   /* taller than the window (many live matches): it scrolls with the page, so its end stays reachable */
 .rail .livebox{flex:none}
 .rail .lv-row{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;padding:12px}
@@ -387,7 +387,6 @@ footer p{margin:10px 0 0}
 :root[data-pane][data-rail-out] .rail{display:flex;position:fixed;margin:0}   /* fading out where it was, under the arriving panel (railOut) */
 :root[data-pane][data-wide="full"] .wrap{max-width:1320px}
 :root[data-pane][data-wide="full"] .mid{grid-template-columns:290px minmax(0,1fr);grid-template-rows:none;grid-template-areas:"side list"}
-:root[data-pane][data-wide="full"][data-side="closed"] .wrap{max-width:1100px}
 :root[data-pane][data-wide="full"][data-side="closed"] .mid{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"bar" "list"}
 :root:is([data-pane],[data-pane-out]) #mddlg{position:fixed;inset:0 0 0 auto;z-index:20;margin:0;width:var(--pane);max-width:none;height:100%;max-height:none;overflow-y:auto;overscroll-behavior:contain;
   border-width:0 0 0 1px;border-radius:0;box-shadow:-16px 0 40px -24px var(--shadow)}
