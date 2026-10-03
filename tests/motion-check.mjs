@@ -11,6 +11,8 @@
 //     sees it; measured per sixtieth, not per frame, so frames a busy computer skips do not count as jumps);
 //   - on monitors, Live now and the key, in one column, move and fade as one (moved by their column and by their own
 //     animation too, one would go twice as far: it jumps ahead, then glides back), and the list never reaches into it;
+//   - Match details opening or closing beside the list, the header's parts glide aside for it and back, the panel
+//     never covering the buttons, and the "Updated" line under it cross-fades (it wraps anew);
 //   - the filters hidden or shown, the header stays put and the list keeps its width, so it only slides, in step with
 //     the sidebar (the gap between them stays the same);
 //   - the menus, sources and "How to subscribe" play their opening again when opened a second time;
@@ -86,16 +88,20 @@ const cases = [
   }],
 ];
 
-const COLUMN = ["#list", "#livebox", "#legend"],
+const HEADER = [".brand", ".tools", ".stamp"],   // the header's parts and the "Updated" line under it
+  COLUMN = ["#list", "#livebox", "#legend"],
   DURING = Date.parse(MATCH.utc) + 30 * 60e3,   // half an hour into the sample match: Live now shows it
   live = p => p.waitForFunction(() => !document.getElementById("livebox").hidden, { timeout: 15000 });
 // name, width, what to follow, what to do first, what starts the movement (for the frame-by-frame "smooth" check)
 const smooth = [
-  ["beside-open", 1920, ["#list", "#mddlg"], async () => {}, p => p.click(`.md-open[data-uid="${uid}"]`)],
+  ["beside-open", 1920, ["#list", "#mddlg", ...HEADER], async () => {}, p => p.click(`.md-open[data-uid="${uid}"]`)],
+  ["beside-open-1600", 1600, ["#list", "#mddlg", ...HEADER], async () => {}, p => p.click(`.md-open[data-uid="${uid}"]`)],
   ["beside-switch", 1920, ["#list"], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); },
     p => p.evaluate(u => { const all = [...document.querySelectorAll("#list .md-open")], i = all.findIndex(x => x.dataset.uid === u);
       (all.slice(i + 1).find(x => x.getBoundingClientRect().top < innerHeight - 60) || all[i + 1]).click(); }, uid)],
-  ["beside-close", 1920, ["#list", "#mddlg"], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
+  ["beside-reopen", 1920, ["#list", "#mddlg", ...HEADER], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); },
+    async p => { await p.keyboard.press("Escape"); await wait(120); await p.click(`.md-open[data-uid="${uid}"]`); }],
+  ["beside-close", 1920, ["#list", "#mddlg", ...HEADER], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
   ["panel-close", 1280, ["#mddlg"], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); }, p => p.click("#mddlg [data-close]"), "closing"],
   ["tables-close", 1280, ["#ltdlg"], async p => { await p.click("#tablesbtn"); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
   ["sheet-close", 390, ["#setmenu .calpanel"], async p => { await p.click("#setmenu summary"); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
@@ -285,13 +291,33 @@ async function run(label, launch) {
           if (first === null && (d > 0.5 || o > 0.005)) first = [d, o];
           big = Math.max(big, d);
         }
-        if (closing && first && (first[0] > 20 || first[1] > 0.1))
+        // (the "Updated" line cross-fades with a copy of itself as it was, which carries its fade out)
+        if (closing && first && s !== ".stamp" && (first[0] > 20 || first[1] > 0.1))
           problems.push(`${label} smooth ${name}: ${s} starts closing with a jump (${first[0].toFixed(0)}px, opacity ${first[1].toFixed(2)} in the first frame)`);
         // the list is what is being read: it never glides more than 50px in a frame (a sheet leaving the screen may go faster)
         if (s === "#list" && big > 50) problems.push(`${label} smooth ${name}: ${s} moves ${big.toFixed(0)}px in one frame`);
         return `${s} biggest step ${big.toFixed(0)}px` + (first ? `, first ${first[0].toFixed(0)}px / opacity ${first[1].toFixed(2)}` : "");
       });
       if (jumped) problems.push(`${label} smooth ${name}: the page jumped while closing`);
+      // the header's parts glide aside for the panel beside the list, and back (each keeps its width): a glide never
+      // goes half its way in one sixtieth of a second, a jump goes all of it. Across only: the page may scroll meanwhile.
+      for (const sel of HEADER) {
+        const h = sels.indexOf(sel);
+        if (h < 0) continue;
+        const xs = tr.map(f => f.at[h][0]), total = Math.abs(xs.at(-1) - xs[0]);
+        let big = 0;
+        for (let i = 1; i < tr.length; i++) big = Math.max(big, Math.abs(xs[i] - xs[i - 1]) * 1000 / 60 / Math.max(tr[i].t - tr[i - 1].t, 1000 / 60));
+        if (total > 20 && big > total / 2) problems.push(`${label} smooth ${name}: ${sel} jumps ${big.toFixed(0)}px of its ${total.toFixed(0)}px in one frame`);
+        lines.push(`${sel} goes ${total.toFixed(0)}px, at most ${big.toFixed(0)}px a frame`);
+      }
+      // the panel beside the list comes in and goes out in step with the header's buttons: it never covers them
+      const pd = sels.indexOf("#mddlg"), tl = sels.indexOf(".tools");
+      if (pd >= 0 && tl >= 0) {
+        let cover = 0;
+        for (const f of tr) if (f.at[pd][2] > 0.02) cover = Math.max(cover, f.at[tl][3] - f.at[pd][0]);
+        if (cover > 0.5) problems.push(`${label} smooth ${name}: the panel covers the header's buttons by ${cover.toFixed(0)}px`);
+        lines.push(`panel over the buttons ${Math.max(0, cover).toFixed(0)}px`);
+      }
       // together: Live now and the key sit in one column, so every frame they have moved as far as each other and are
       // as visible as each other (one moved or faded twice, by its own animation and its column's, lags or jumps)
       const lb = sels.indexOf("#livebox"), lg = sels.indexOf("#legend");

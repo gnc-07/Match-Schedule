@@ -687,7 +687,6 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
 :root{--dur-s:.18s;--dur-m:.28s;--ease:cubic-bezier(.2,.8,.3,1);--ease-soft:cubic-bezier(.3,0,.2,1)}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}}
 @keyframes drop{from{opacity:0;transform:translateY(-6px)}}
-@keyframes slide-in{from{opacity:0;transform:translateX(24px)}}
 @keyframes sheet-up{from{transform:translateY(100%)}}
 @keyframes fade{from{opacity:0}}
 @keyframes pop{45%{transform:scale(1.4)}}
@@ -696,7 +695,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
    when they leave (on --ease most of it would be over in the first two frames) */
 dialog.sheet[open]{animation:rise var(--dur-m) var(--ease)}
 dialog.sheet[open]::backdrop{animation:fade var(--dur-m) ease-out}
-dialog.sheet[open]:not(:modal){animation-name:slide-in;animation-timing-function:var(--ease-soft)}
+dialog.sheet[open]:not(:modal){animation:none}   /* beside the list it slides in by script, in step with the header's buttons (openDialog) */
 /* Settings and Calendar drop down from their button; sources and "How to subscribe" unfold; the small arrow turns */
 .calmenu[open]>.calpanel,.srcs[open] .body,.calpanel details[open]>ol{animation:drop var(--dur-s) var(--ease)}
 .srcs summary::after,.calpanel details summary::after{transition:transform var(--dur-s) var(--ease)}

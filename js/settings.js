@@ -457,6 +457,32 @@ function glide(els, change, pin) {
       move(el, [{ transform: "translate(" + dx + "px," + dy + "px)" }, { transform: "none" }], SOFT()); // a long way: gently
   });
 }
+// Text that gets wider or narrower with the layout (the "Updated" line under the header) wraps anew, which no transform
+// can smooth: a copy of it as it was fades out where it was, while it fades in where it is now (glide moves it there).
+// Called before the layout changes; what it returns is called once it has changed.
+function crossFade(el) {
+  const r = el.getBoundingClientRect();
+  if (!r.width || !motionOn()) return () => {};
+  const z = parseFloat(getComputedStyle(document.documentElement).zoom) || 1,
+    g = el.cloneNode(true);
+  [g, ...g.querySelectorAll("[id]")].forEach(x => x.removeAttribute("id"));
+  g.removeAttribute("aria-live");
+  g.setAttribute("aria-hidden", "true");
+  g.inert = true;
+  Object.assign(g.style, {
+    position: "fixed",
+    left: r.left / z + "px",
+    top: r.top / z + "px",
+    width: r.width / z + "px",
+    margin: "0",
+  });
+  return () => {
+    if (Math.abs(el.getBoundingClientRect().width - r.width) < 1) return; // the same width: it only glides
+    document.body.append(g);
+    leave(g, [{ opacity: 1 }, { opacity: 0 }], () => g.remove(), "m");
+    move(el, [{ opacity: 0 }, { opacity: 1 }], SOFT());
+  };
+}
 // the page cross-fades to a new look (theme, contrast, text size, language, time zone). The buttons' own colour
 // changes are paused meanwhile (data-theming): the cross-fade already covers them, and hundreds at once only cost time.
 function fadePage(apply) {

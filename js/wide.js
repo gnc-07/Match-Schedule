@@ -32,8 +32,17 @@ const fitRail = () =>
     rail.offsetHeight > innerHeight / (parseFloat(getComputedStyle(document.documentElement).zoom) || 1) - 32,
   );
 if (window.ResizeObserver) new ResizeObserver(fitRail).observe(rail);
-// the parts of the page that change place when the filter sidebar or the panel beside the list comes or goes
-const pageParts = () => [filtersEl, sideBar, liveBox, listEl, rail];
+// the parts of the page that change place when the filter sidebar or the panel beside the list comes or goes: the
+// header's parts (the brand, the theme button, the other buttons) each keep their width, so they only glide
+const pageParts = () => [
+  filtersEl,
+  sideBar,
+  liveBox,
+  listEl,
+  rail,
+  ...document.querySelectorAll(".topbar>*"),
+  document.getElementById("stamp"),
+];
 // The sidebar, the list and the right-hand column move as one: hiding, the sidebar slides out to the left as it fades,
 // and the list and the column slide over by as much, at the same speed (none of them changes width, see styles.css);
 // showing, the same backwards. Hiding, the sidebar is kept where it was meanwhile (data-side-out), as the right-hand
