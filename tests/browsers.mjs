@@ -386,10 +386,23 @@ const actChecks = [
 // match whose details were shown must stay where it was on screen, not slide up by all they lost (browsers do not
 // keep it in place themselves here, since the page's own padding changes too). The right-hand column gives way to the
 // panel and comes back.
+// a wait that, when it runs out, says which step it was and what the page looked like (a bare "Timeout exceeded"
+// does not say which of several waits failed, and WebKit runs only on GitHub, where nothing else can be seen)
+const until = async (page, step, fn) => {
+  try { await page.waitForFunction(fn); }
+  catch (e) {
+    const state = await page.evaluate(() => {
+      const r = document.documentElement, d = document.getElementById("mddlg");
+      return `wide=${r.dataset.wide || ""} pane=${r.hasAttribute("data-pane")} pane-out=${r.hasAttribute("data-pane-out")} ` +
+        `dialog open=${d.open} address=${location.search || "(none)"} scrollY=${Math.round(scrollY)} focus=${document.activeElement?.id || document.activeElement?.className || ""}`;
+    }).catch(() => "page state unreadable");
+    throw new Error(`${step}: ${e.message.split("\n")[0]} (${state})`);
+  }
+};
 const besideChecks = [
   ["match details beside the list close in place", async page => {
     await page.setViewportSize({ width: 1650, height: 1000 });
-    await page.waitForFunction(() => document.documentElement.dataset.wide === "full");
+    await until(page, "waiting for the monitor layout", () => document.documentElement.dataset.wide === "full");
     const pick = await page.evaluate(() => {
       const a = [...document.querySelectorAll("#list .match .md-open")][14];
       a.closest(".match").scrollIntoView({ block: "center" });
@@ -398,14 +411,14 @@ const besideChecks = [
     const card = `#list .match:has(.md-open[data-uid="${pick}"])`;
     const top = () => page.locator(card).evaluate(c => Math.round(c.getBoundingClientRect().top));
     await page.click(`#list .match .md-open[data-uid="${pick}"]`);
-    await page.waitForFunction(() => document.documentElement.hasAttribute("data-pane"));
+    await until(page, "waiting for Match details to open beside the list", () => document.documentElement.hasAttribute("data-pane"));
     await wait(300);
     const rail = () => page.evaluate(() => [document.getElementById("rail").offsetWidth > 0, document.documentElement.hasAttribute("data-rail-out")]);
     const [railShown, railOut] = await rail();
     must(!railShown && !railOut, "the right-hand column is still on screen beside Match details");
     const shown = await top();
     await page.click("#mddlg [data-close]");
-    await page.waitForFunction(() => !document.getElementById("mddlg").open && !location.search.includes("match="));
+    await until(page, "waiting for Match details to close and leave the address", () => !document.getElementById("mddlg").open && !location.search.includes("match="));
     await wait(300);
     const after = await top();
     must((await rail())[0], "the right-hand column did not come back when Match details closed");
