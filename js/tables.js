@@ -59,18 +59,20 @@ function fetchTable(code) {
   TABLE_REQ.set(code, req);
   return req;
 }
+const GROUPS = { UNL: /^Group (A[1-4])$/, LIB: /^Group ([A-H])$/ }; // competitions shown as group tables
 async function espnTable(code) {
   const res = await fetch("https://site.api.espn.com/apis/v2/sports/soccer/" + ESPN[code] + "/standings", {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(res.status);
   const js = await res.json();
-  if (code === "UNL") {
-    // League A's four group tables (ESPN lists every group of every league, A1 to D2)
+  if (GROUPS[code]) {
+    // group tables, one under another: the Nations League's League A (ESPN lists every group of every league, A1 to
+    // D2) and the Libertadores' eight groups, A to H
     const groups = (js.children || [])
-      .map(c => ({ g: (/^Group (A[1-4])$/.exec(c.name || "") || [])[1], rows: espnRows(c) }))
+      .map(c => ({ g: (GROUPS[code].exec(c.name || "") || [])[1], rows: espnRows(c) }))
       .filter(x => x.g && x.rows.length);
-    if (!groups.length) throw new Error("no League A groups");
+    if (!groups.length) throw new Error("no groups");
     return { groups };
   }
   return { rows: espnRows((js.children || [])[0] || js) };
