@@ -1377,5 +1377,37 @@ class SearchAndSharing(unittest.TestCase):
             self.assertNotIn("\u2014", text)                                          # no em dashes (project rule 7)
 
 
+class VisitCounts(unittest.TestCase):
+    """js/count.js sends visit counts to the GoatCounter address in STATS. That address must be a GoatCounter site and
+    be allowed in the security policy (img-src, address/count), or browsers block every count without a word; with no
+    address, the policy must not allow GoatCounter at all."""
+    ROOT = PublishSite.ROOT
+
+    def setUp(self):
+        with open(os.path.join(self.ROOT, "js", "count.js"), encoding="utf-8") as f:
+            self.script = f.read()
+        with open(os.path.join(self.ROOT, "index.html"), encoding="utf-8") as f:
+            self.html = f.read()
+        csp = re.search(r'<meta http-equiv="Content-Security-Policy" content="([^"]+)">', self.html).group(1)
+        self.img = re.search(r"(?:^|;)\s*img-src ([^;]*)", csp).group(1).split()
+
+    def test_address_and_policy_agree(self):
+        found = re.findall(r'^const STATS = "([^"]*)";$', self.script, re.M)
+        self.assertEqual(len(found), 1, "count.js must set STATS once, as one line")
+        stats = found[0]
+        counted = [s for s in self.img if "goatcounter" in s]
+        if stats:
+            self.assertRegex(stats, r"^https://[a-z0-9-]+\.goatcounter\.com$")
+            self.assertEqual(counted, [stats + "/count"])
+        else:
+            self.assertEqual(counted, [])
+
+    def test_how_it_works_says_so(self):
+        # the sentence is in the page (shown only while STATS is set) and in both languages
+        self.assertIn('<li data-t="howCounthtml" id="countnote" hidden>', self.html)
+        with open(os.path.join(self.ROOT, "js", "i18n.js"), encoding="utf-8") as f:
+            self.assertEqual(f.read().count("howCounthtml:"), 2)
+
+
 if __name__ == "__main__":
     unittest.main()

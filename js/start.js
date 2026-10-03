@@ -89,6 +89,7 @@ setInterval(() => refresh(false), 60000);
 /* ---------- start ---------- */
 applyLang();
 applyWide();
+countVisit("/" + LANG); // one visit, and the language the page opened in
 setRange(range, false);
 settled = true; // from here on, what a visitor changes may move
 getData()

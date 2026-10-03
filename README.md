@@ -34,7 +34,7 @@ The fixture list is refreshed automatically at least four times a day.
 
 ## Privacy
 
-The site has no accounts, no advertising and no tracking. Your preferences (stars, language, theme, filters) are stored only in your own browser. To show live scores, match details, tables, club crests and maps, your browser contacts the services listed below directly.
+The site has no accounts, no advertising, no cookies and no tracking. Your preferences (stars, language, theme, filters) are stored only in your own browser. Visits are counted with [GoatCounter](https://www.goatcounter.com/), as totals only: how often the page, match details and race weekends are opened, and in which language. Nothing about your teams, stars or settings is sent, your internet address is not kept, and if your browser asks sites not to track you (Global Privacy Control or Do Not Track), nothing is counted. To show live scores, match details, tables, club crests and maps, your browser contacts the services listed below directly.
 
 ## Where the data comes from
 
