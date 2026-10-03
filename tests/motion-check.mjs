@@ -5,9 +5,17 @@
 //   - with animations switched off, nothing moves, and switching them off stops what is moving;
 //   - nothing animates an element that is hidden (for example the sun or moon that is about to disappear);
 //   - closing and gliding stay gentle, followed frame by frame (see "smooth" below): a closing starts softly (at most
-//     a tenth of its fade, or 20px, in the first sixtieth of a second), the page never jumps while something closes,
+//     a tenth of its fade, or 20px, in the first sixtieth of a second), the page never jumps while something closes
+//     (a scroll that keeps the match on screen in place is no jump),
 //     and the list never glides more than 50px in a sixtieth of a second (a match on screen is followed, as a visitor
 //     sees it; measured per sixtieth, not per frame, so frames a busy computer skips do not count as jumps);
+//   - on monitors, Live now and the key, in one column, move and fade as one (moved by their column and by their own
+//     animation too, one would go twice as far: it jumps ahead, then glides back), and the list never reaches into it;
+//   - Match details opening or closing beside the list, the header's parts glide aside for it and back, the panel
+//     never covering the buttons, and the "Updated" line under it cross-fades (it wraps anew);
+//   - the filters hidden or shown, the header stays put and the list keeps its width, so it only slides, in step with
+//     the sidebar (the gap between them stays the same);
+//   - the menus, sources and "How to subscribe" play their opening again when opened a second time;
 // and it prints the slowest frame after each click, with animations on and off, with the processor slowed down 4 times
 // the way Lighthouse tests phones (Chromium only; FULLSPEED=1 for normal speed). Those timings vary from run to run,
 // so they are for reading, not a pass or fail; TIMINGS=0 skips them (npm test does, which saves about a minute).
@@ -25,7 +33,12 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 const uid = MATCH.uid;
 const OK_PROPS = new Set(["opacity", "transform", "offset", "easing", "composite", "computedOffset"]);
 
-// name, width, what starts the animation
+// opened, closed, then opened again: only the second opening is recorded (Chromium styles nothing inside a closed
+// <details>, so a CSS opening animation there can play the first time only)
+const again = (show, hide) => async p => { await show(p); await wait(500); await hide(p); await wait(900);
+  await p.evaluate(() => window.__seen?.clear()); await show(p); };
+const srcs = async p => { await p.evaluate(() => document.querySelector("#list .srcs").scrollIntoView({ block: "center" })); await p.click("#list .srcs summary"); };
+// name, width, what starts the animation, and (optional) an animation that must be among those that run
 const cases = [
   ["panel", 1280, p => p.click(`.md-open[data-uid="${uid}"]`)],
   ["panel-beside", 1920, p => p.click(`.md-open[data-uid="${uid}"]`)],
@@ -46,6 +59,13 @@ const cases = [
   ["sheet-close", 390, async p => { await p.click("#setmenu summary"); await wait(600); await p.keyboard.press("Escape"); }],
   ["sources-close", 1280, async p => { await p.evaluate(() => document.querySelector("#list .srcs").scrollIntoView({ block: "center" }));
     await p.click("#list .srcs summary"); await wait(400); await p.click("#list .srcs summary"); }],
+  // opened a second time: each plays its opening again
+  ["settings-again", 1280, again(p => p.click("#setmenu summary"), p => p.keyboard.press("Escape")), "drop"],
+  ["calendar-again", 1280, again(p => p.click("#calmenu summary"), p => p.click("#calmenu summary")), "drop"],
+  ["sheet-again", 390, again(p => p.click("#calmenu summary"), p => p.keyboard.press("Escape")), "sheet-up"],
+  ["sources-again", 1280, again(srcs, srcs), "drop"],
+  ["howto-again", 1280, async p => { await p.click("#calmenu summary"); await wait(400);
+    await again(p => p.click("#calmenu .calpanel details summary"), p => p.click("#calmenu .calpanel details summary"))(p); }, "drop"],
   // the filter sidebar (laptops): hidden, then shown again
   ["sidebar-hide", 1280, p => p.click("#sidehide")],
   ["sidebar-show", 1280, async p => { await p.click("#sidehide"); await wait(900); await p.click("#sideshow"); }],
@@ -68,13 +88,20 @@ const cases = [
   }],
 ];
 
+const HEADER = [".brand", ".tools", ".stamp"],   // the header's parts and the "Updated" line under it
+  COLUMN = ["#list", "#livebox", "#legend"],
+  DURING = Date.parse(MATCH.utc) + 30 * 60e3,   // half an hour into the sample match: Live now shows it
+  live = p => p.waitForFunction(() => !document.getElementById("livebox").hidden, { timeout: 15000 });
 // name, width, what to follow, what to do first, what starts the movement (for the frame-by-frame "smooth" check)
 const smooth = [
-  ["beside-open", 1920, ["#list", "#mddlg"], async () => {}, p => p.click(`.md-open[data-uid="${uid}"]`)],
+  ["beside-open", 1920, ["#list", "#mddlg", ...HEADER], async () => {}, p => p.click(`.md-open[data-uid="${uid}"]`)],
+  ["beside-open-1600", 1600, ["#list", "#mddlg", ...HEADER], async () => {}, p => p.click(`.md-open[data-uid="${uid}"]`)],
   ["beside-switch", 1920, ["#list"], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); },
     p => p.evaluate(u => { const all = [...document.querySelectorAll("#list .md-open")], i = all.findIndex(x => x.dataset.uid === u);
       (all.slice(i + 1).find(x => x.getBoundingClientRect().top < innerHeight - 60) || all[i + 1]).click(); }, uid)],
-  ["beside-close", 1920, ["#list", "#mddlg"], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
+  ["beside-reopen", 1920, ["#list", "#mddlg", ...HEADER], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); },
+    async p => { await p.keyboard.press("Escape"); await wait(120); await p.click(`.md-open[data-uid="${uid}"]`); }],
+  ["beside-close", 1920, ["#list", "#mddlg", ...HEADER], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
   ["panel-close", 1280, ["#mddlg"], async p => { await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); }, p => p.click("#mddlg [data-close]"), "closing"],
   ["tables-close", 1280, ["#ltdlg"], async p => { await p.click("#tablesbtn"); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
   ["sheet-close", 390, ["#setmenu .calpanel"], async p => { await p.click("#setmenu summary"); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
@@ -82,14 +109,26 @@ const smooth = [
   ["sidebar-hide", 1280, ["#list", "#filters"], async () => {}, p => p.click("#sidehide"), "closing"],
   ["phone-filters-open", 390, ["#list"], async () => {}, p => p.click("#sideshow")],
   ["phone-filters-close", 390, ["#list", "#filters"], async p => { await p.click("#sideshow"); await wait(900); }, p => p.click("#sideshow"), "closing"],
-  ["sidebar-show", 1280, ["#list"], async p => { await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
+  ["sidebar-show", 1280, ["#list", "#filters"], async p => { await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
+  // pressed again on the way: it turns back from where it is (ends shown, then hidden)
+  ["sidebar-back-open", 1280, ["#list", "#filters"], async () => {}, async p => { await p.click("#sidehide"); await wait(120); await p.click("#sideshow"); }],
+  ["sidebar-back-closed", 1280, ["#list", "#filters"], async p => { await p.click("#sidehide"); await wait(1200); },
+    async p => { await p.click("#sideshow"); await wait(120); await p.click("#sidehide"); }],
+  // monitors: Live now and the key share the right-hand column, so they move as one (see "together" below)
+  ["wide-side-hide", 1920, [...COLUMN, "#filters"], live, p => p.click("#sidehide"), "closing"],
+  ["wide-side-show", 1920, [...COLUMN, "#filters"], async p => { await live(p); await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
+  ["wide-open", 1920, COLUMN, live, p => p.click(`.md-open[data-uid="${uid}"]`)],
+  ["wide-close", 1920, COLUMN, async p => { await live(p); await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
 ];
 const problems = [];
 const ONLY = process.argv.slice(2);   // optional: names of the cases to run, e.g. theme goal
-// Opens the page ready for one case: light theme, nothing starred, animations on or off
-async function open(browser, width, motion) {
+// Opens the page ready for one case: light theme, nothing starred, animations on or off; at: a time for the page's
+// clock (Date only: animations keep to performance.now), such as during the sample match, so Live now shows it
+async function open(browser, width, motion, at) {
   const page = await browser.newPage();
   await page.setViewport({ width, height: 900 });
+  if (at) await page.evaluateOnNewDocument(at => { const D = Date, off = at - D.now();
+    window.Date = class extends D { constructor(...a) { super(...(a.length ? a : [D.now() + off])); } static now() { return D.now() + off; } }; }, at);
   await page.evaluateOnNewDocument(m => { try { localStorage.setItem("mp.theme", '"light"'); localStorage.setItem("mp.favs", "[]");
     localStorage.setItem("mp.side", '"open"'); localStorage.setItem("mp.contrast", '"normal"'); localStorage.setItem("mp.range", '"all"');
     localStorage.setItem("mp.motion", JSON.stringify(m)); localStorage.removeItem("mp.follow"); } catch {} }, motion);
@@ -124,7 +163,7 @@ async function run(label, launch) {
     throw e;
   }
   try {
-    for (const [name, width, act] of cases.filter(c => !ONLY.length || ONLY.includes(c[0]))) {
+    for (const [name, width, act, expect] of cases.filter(c => !ONLY.length || ONLY.includes(c[0]))) {
       if (process.env.TIMINGS !== "0") {
         const on = await slowest(browser, label, width, act, "on"), off = await slowest(browser, label, width, act, "off");
         console.log(`${label.padEnd(8)} ${name.padEnd(12)} slowest frame: ${on} ms with animations, ${off} ms without`);
@@ -171,6 +210,7 @@ async function run(label, launch) {
           list: [...window.__seen.values()] }; });
       await page.close();
       if (!anims.list.length) problems.push(`${label} ${name}: no animation ran`);
+      else if (expect && !anims.list.some(a => a.what === expect)) problems.push(`${label} ${name}: ${expect} did not run`);
       const seen = new Set();
       for (const a of anims.list) {
         const inner = /^-ua-|^-moz-|view-transition/.test(a.what);   // the browser's own steps inside a View Transition
@@ -213,23 +253,33 @@ async function run(label, launch) {
     if (stillFading || !dark) problems.push(`${label}: unticking Animations during the theme cross-fade left ${stillFading} running (dark theme kept: ${dark})`);
     // smooth: each frame, where the things that move are and how visible they are
     for (const [name, width, sels, prep, act, closing] of smooth.filter(c => !ONLY.length || ONLY.includes(c[0]) || ONLY.includes("smooth"))) {
-      const page = await open(browser, width, "on");
+      const page = await open(browser, width, "on", sels.includes("#livebox") && DURING);
       await prep(page);
       await page.evaluate(sels => {
         window.__tr = [];
         const t0 = performance.now(), pin = [...document.querySelectorAll("#list .match")].find(m => m.getBoundingClientRect().bottom > 0);
         const tick = now => {   // now: the frame's own time, the clock the animations move by
           window.__tr.push({ t: now, y: scrollY, at: sels.map(s => { const e = document.querySelector(s), r = (s === "#list" ? pin : e).getBoundingClientRect();
-            return [r.left, r.top, e.checkVisibility() ? +getComputedStyle(e).opacity : 0]; }) });
+            let o = e.checkVisibility() ? 1 : 0;   // how visible it is: its own opacity times every parent's, as a visitor sees it
+            for (let x = e; o && x !== document.documentElement; x = x.parentElement) o *= +getComputedStyle(x).opacity;
+            return [r.left, r.top, o, e.getBoundingClientRect().right]; }),   // right: the list's own edge, Your teams included
+            head: document.querySelector(".topbar").getBoundingClientRect().left, lw: document.getElementById("list").offsetWidth });
           if (now - t0 < 900) requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
       }, sels);
       await act(page);
       await wait(1000);
-      const tr = await page.evaluate(() => window.__tr);
+      const tr = await page.evaluate(() => window.__tr),
+        end = await page.evaluate(() => [document.documentElement.dataset.side, document.getElementById("filters").checkVisibility()]);
+      const want = /-back-(open|closed)$/.exec(name)?.[1];   // turned back: it ends where the second press asked
+      if (want && (end[0] !== want || end[1] !== (want === "open")))
+        problems.push(`${label} smooth ${name}: ended ${end[0]}, sidebar ${end[1] ? "shown" : "hidden"}`);
       await page.close();
-      const jumped = closing && tr.some((f, i) => i && f.y !== tr[i - 1].y);
+      // the page scrolled and what is read moved with it (closing beside the list, the page scrolls by what the matches
+      // above lose as the list gets wider, so the match on screen stays put: that is no jump)
+      const k = sels.indexOf("#list"),
+        jumped = closing && tr.some((f, i) => i && f.y !== tr[i - 1].y && (k < 0 || Math.abs(f.at[k][1] - tr[i - 1].at[k][1]) > 1));
       const lines = sels.map((s, k) => {
         let big = 0, first = null;
         for (let i = 1; i < tr.length; i++) {
@@ -241,13 +291,72 @@ async function run(label, launch) {
           if (first === null && (d > 0.5 || o > 0.005)) first = [d, o];
           big = Math.max(big, d);
         }
-        if (closing && first && (first[0] > 20 || first[1] > 0.1))
+        // (the "Updated" line cross-fades with a copy of itself as it was, which carries its fade out)
+        if (closing && first && s !== ".stamp" && (first[0] > 20 || first[1] > 0.1))
           problems.push(`${label} smooth ${name}: ${s} starts closing with a jump (${first[0].toFixed(0)}px, opacity ${first[1].toFixed(2)} in the first frame)`);
         // the list is what is being read: it never glides more than 50px in a frame (a sheet leaving the screen may go faster)
         if (s === "#list" && big > 50) problems.push(`${label} smooth ${name}: ${s} moves ${big.toFixed(0)}px in one frame`);
         return `${s} biggest step ${big.toFixed(0)}px` + (first ? `, first ${first[0].toFixed(0)}px / opacity ${first[1].toFixed(2)}` : "");
       });
       if (jumped) problems.push(`${label} smooth ${name}: the page jumped while closing`);
+      // the header's parts glide aside for the panel beside the list, and back (each keeps its width): a glide never
+      // goes half its way in one sixtieth of a second, a jump goes all of it. Across only: the page may scroll meanwhile.
+      for (const sel of HEADER) {
+        const h = sels.indexOf(sel);
+        if (h < 0) continue;
+        const xs = tr.map(f => f.at[h][0]), total = Math.abs(xs.at(-1) - xs[0]);
+        let big = 0;
+        for (let i = 1; i < tr.length; i++) big = Math.max(big, Math.abs(xs[i] - xs[i - 1]) * 1000 / 60 / Math.max(tr[i].t - tr[i - 1].t, 1000 / 60));
+        if (total > 20 && big > total / 2) problems.push(`${label} smooth ${name}: ${sel} jumps ${big.toFixed(0)}px of its ${total.toFixed(0)}px in one frame`);
+        lines.push(`${sel} goes ${total.toFixed(0)}px, at most ${big.toFixed(0)}px a frame`);
+      }
+      // the panel beside the list comes in and goes out in step with the header's buttons: it never covers them
+      const pd = sels.indexOf("#mddlg"), tl = sels.indexOf(".tools");
+      if (pd >= 0 && tl >= 0) {
+        let cover = 0;
+        for (const f of tr) if (f.at[pd][2] > 0.02) cover = Math.max(cover, f.at[tl][3] - f.at[pd][0]);
+        if (cover > 0.5) problems.push(`${label} smooth ${name}: the panel covers the header's buttons by ${cover.toFixed(0)}px`);
+        lines.push(`panel over the buttons ${Math.max(0, cover).toFixed(0)}px`);
+      }
+      // together: Live now and the key sit in one column, so every frame they have moved as far as each other and are
+      // as visible as each other (one moved or faded twice, by its own animation and its column's, lags or jumps)
+      const lb = sels.indexOf("#livebox"), lg = sels.indexOf("#legend");
+      if (lb >= 0 && lg >= 0) {
+        let apart = 0, faded = 0;
+        const f0 = tr.find(f => f.at[lb][2] && f.at[lg][2]) || tr[0];   // from the first frame both show (a hidden box has no place)
+        for (const f of tr) {
+          const a = f.at[lb], b = f.at[lg], a0 = f0.at[lb], b0 = f0.at[lg];
+          if (f.y !== f0.y || !a[2] || !b[2]) continue;   // scrolled, or gone
+          apart = Math.max(apart, Math.hypot(a[0] - a0[0] - (b[0] - b0[0]), a[1] - a0[1] - (b[1] - b0[1])));
+          faded = Math.max(faded, Math.abs(a[2] - b[2]));
+        }
+        if (apart > 2 || faded > 0.05)
+          problems.push(`${label} smooth ${name}: Live now and the key come apart (${apart.toFixed(0)}px, opacity ${faded.toFixed(2)})`);
+        lines.push(`apart ${apart.toFixed(0)}px / opacity ${faded.toFixed(2)}`);
+      }
+      // the list never reaches over (or under) the right-hand column
+      const li = sels.indexOf("#list");
+      if (li >= 0 && lb >= 0) {
+        let over = 0;
+        for (const f of tr) if (f.at[li][2] && f.at[lb][2]) over = Math.max(over, f.at[li][3] - f.at[lb][0]);
+        if (over > 0.5) problems.push(`${label} smooth ${name}: the list reaches ${over.toFixed(0)}px into Live now`);
+        lines.push(`list into Live now ${Math.max(0, over).toFixed(0)}px`);
+      }
+      // the filters hidden or shown: the page keeps its width (the header stays put) and the list keeps its own, so the
+      // list only slides (only transform moves: a list that changed width would jump at one edge, or reach over the column)
+      if (/^(wide-)?side(bar)?-/.test(name)) {
+        const moved = Math.max(...tr.map(f => Math.abs(f.head - tr[0].head))), grew = Math.max(...tr.map(f => Math.abs(f.lw - tr[0].lw)));
+        if (moved > 0.5) problems.push(`${label} smooth ${name}: the header moved ${moved.toFixed(0)}px`);
+        if (grew > 0.5) problems.push(`${label} smooth ${name}: the list changed width by ${grew.toFixed(0)}px`);
+        lines.push(`header moved ${moved.toFixed(0)}px, list width changed ${grew.toFixed(0)}px`);
+        // in step: the sidebar and the list move as one, so the gap between them stays the same while the sidebar shows
+        const sb = sels.indexOf("#filters"), seen = tr.filter(f => f.at[sb][2] > 0.02 && f.y === tr[0].y);
+        if (sb >= 0 && seen.length) {
+          const gap = f => f.at[k][0] - f.at[sb][3], g0 = gap(seen[0]), off = Math.max(...seen.map(f => Math.abs(gap(f) - g0)));
+          if (off > 2) problems.push(`${label} smooth ${name}: the sidebar and the list move out of step (${off.toFixed(0)}px)`);
+          lines.push(`sidebar and list out of step ${off.toFixed(0)}px`);
+        }
+      }
       console.log(`${label.padEnd(8)} smooth ${name.padEnd(13)} ${lines.join("; ")}${jumped ? "; the page jumped" : ""}`);
     }
   } finally {
