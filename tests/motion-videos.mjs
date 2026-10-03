@@ -114,7 +114,7 @@ const scenes = [
     await key(p, "Escape"); await wait(700);
   }],
   ["13-race-weekend", 1280, 800, async p => {
-    await click(p, `.md-open[data-uid="${F1_WEEKEND}"]`); await wait(1100);
+    await showMatch(p, F1_WEEKEND); await click(p, `.md-open[data-uid="${F1_WEEKEND}"]`); await wait(1100);
     await click(p, '#wk-res [data-s="Q"]'); await wait(900); await click(p, '#wk-res .star[aria-pressed="false"]'); await wait(900);
     await click(p, '#wk-champ [data-tab="c"]'); await wait(900); await key(p, "Escape"); await wait(700);
   }],

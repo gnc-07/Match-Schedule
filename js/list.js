@@ -689,13 +689,16 @@ function render() {
   }
   const today = dayKey.format(new Date()),
     tomorrow = addDays(today, 1);
-  let html = "";
+  const parts = [mineHTML()]; // each day is one part: a redraw rebuilds only the parts that changed (drawList())
   for (const [day, ms] of groups) {
     const dd = new Date(day + "T12:00:00Z");
     const rel = day === today ? T.todayRel : day === tomorrow ? T.tomorrow : "";
     const long = fmtDayLong.format(dd);
-    html +=
-      '<section class="day"><h2 class="day-h"><span class="sr">' +
+    // --n (its number of matches) lets styles.css guess the height of a day not yet drawn (content-visibility)
+    let html =
+      '<section class="day" style="--n:' +
+      ms.length +
+      '"><h2 class="day-h"><span class="sr">' +
       esc(long.charAt(0).toUpperCase() + long.slice(1)) +
       (rel ? ", " + esc(rel) : "") +
       "</span>" +
@@ -794,17 +797,18 @@ function render() {
         tags.join("") +
         "</div></li>";
     }
-    html += "</ul></section>";
+    parts.push(html + "</ul></section>");
   }
   if (!rows.length)
-    html =
-      '<p class="empty">' + esc(T.empty) + " " + esc(favonly.checked && !favs.size ? T.emptyFav : T.emptyWide) + "</p>";
+    parts.push(
+      '<p class="empty">' + esc(T.empty) + " " + esc(favonly.checked && !favs.size ? T.emptyFav : T.emptyWide) + "</p>",
+    );
   if (rows.length > shown)
-    html += '<button type="button" class="more" id="more">' + esc(T.more(rows.length - shown)) + "</button>";
-  html = mineHTML() + html;
+    parts.push('<button type="button" class="more" id="more">' + esc(T.more(rows.length - shown)) + "</button>");
+  const html = parts.join("");
   if (html === lastList) return; // the minute-by-minute refresh usually changes nothing: leave the page alone
   lastList = html;
-  list.innerHTML = html;
+  drawList(list, parts);
   // a new choice of filters rises into place, one day after another; automatic updates do not move
   if (filterAct) riseDays([...list.querySelectorAll(".day")]);
   markCurrent();
@@ -817,6 +821,35 @@ function render() {
       render();
       riseDays([...list.querySelectorAll(".day")].slice(had)); // the days added rise in turn, as after a filter change
     };
+}
+// Puts the parts (pieces of markup) into the list, keeping in place every element whose markup is the same as last
+// time: starring a team or a new live score then rebuilds only the days it changes, not the whole list, and the browser
+// restyles and lays out only those. Nothing else is kept between redraws, so an element is kept only when the markup
+// it was built from is identical.
+let listParts = new Map(); // markup -> the elements built from it at the last redraw
+const partTpl = document.createElement("template");
+function drawList(list, parts) {
+  const next = new Map(),
+    nodes = [];
+  for (const h of parts) {
+    if (!h) continue;
+    let built = listParts.get(h);
+    if (built && !next.has(h)) listParts.delete(h);
+    else {
+      partTpl.innerHTML = h;
+      built = [...partTpl.content.childNodes];
+    }
+    if (!next.has(h)) next.set(h, built);
+    nodes.push(...built);
+  }
+  listParts = next;
+  const keep = new Set(nodes);
+  [...list.childNodes].forEach(n => keep.has(n) || n.remove());
+  let at = list.firstChild; // what is kept stays where it is; new parts go in between
+  for (const n of nodes) {
+    if (n === at) at = at.nextSibling;
+    else list.insertBefore(n, at);
+  }
 }
 // the list only moves after a click, change or new date in the filters (the flag is cleared once that event is
 // handled). Typing a team name does not move it: the list redraws at each pause, so it would keep jumping while typing.

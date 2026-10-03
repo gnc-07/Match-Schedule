@@ -5,6 +5,7 @@
 // not answering, so the backups are used: OpenLigaDB (Bundesliga) and the tables saved in fixtures.json.
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import * as acorn from "acorn";
 import puppeteer from "puppeteer-core";
 import { BASE, ROOT, chromePath, startServer } from "./server.mjs";
 
@@ -243,6 +244,24 @@ try {
     await page.evaluate(() => document.querySelectorAll("#list .match").length > 0
       && !!document.querySelector('link[rel="stylesheet"][href="styles.css"]') && document.querySelectorAll("script[src]").length > 1));
   await check("page as edited (source.html)");
+
+  // publish_site.py leaves out the comments and the spaces around lines (strip_js(), strip_css()): the program and the
+  // rules must be exactly the ones edited. The script's syntax trees must match (acorn), positions aside; the
+  // browser must read the same style rules from both stylesheets.
+  const edited = readFileSync(path.join(ROOT, "index.html"), "utf8");
+  const files = [...edited.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => readFileSync(path.join(ROOT, m[1]), "utf8"));
+  const published = await (await fetch(BASE)).text();
+  const pubScript = [...published.matchAll(/<script>\n([\s\S]*?)\n<\/script>/g)].map(m => m[1]).find(t => t.includes("const I18N"));
+  const tree = src => JSON.stringify(acorn.parse(src, { ecmaVersion: "latest" }), (k, v) => (k === "start" || k === "end" ? undefined : v));
+  let same = false;
+  try { same = !!pubScript && tree(files.join("\n")) === tree(pubScript); } catch (e) { console.log("      " + e.message); }
+  shows("published script: the edited scripts exactly, without their comments", same);
+  const css = readFileSync(path.join(ROOT, "styles.css"), "utf8"), pubCss = (published.match(/<style>\n([\s\S]*?)\n<\/style>/) || [])[1];
+  shows("published styles: the rules of styles.css exactly, without its comments", !!pubCss && pubCss.length < css.length &&
+    await page.evaluate((a, b) => {
+      const rules = t => { const s = new CSSStyleSheet(); s.replaceSync(t); return [...s.cssRules].map(r => r.cssText).join("\n"); };
+      return rules(a) === rules(b);
+    }, css, pubCss));
 
   // Wikidata failing must never be remembered as "this stadium has no location" (issue #36): the map comes back as
   // soon as Wikidata answers again. A real "no such place" is still remembered, so the page does not ask on every visit.

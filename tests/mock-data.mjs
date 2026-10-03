@@ -146,8 +146,11 @@ export async function showMatch(page, uid = MATCH.uid) {
     await page.evaluate(() => document.getElementById("more")?.click());
     await new Promise(r => setTimeout(r, 700));   // the new days rise into place
   }
-  if (await shown()) return;
-  throw new Error(`the sample match ${uid} is not in the list, even after "Show more"`);
+  if (!(await shown())) throw new Error(`the sample match ${uid} is not in the list, even after "Show more"`);
+  // in view, so it is drawn: the browser skips laying out days far from the window (content-visibility in styles.css),
+  // and a click aimed at a day not yet drawn can land where the match was guessed to be rather than where it is
+  await page.evaluate(u => document.querySelector(`.md-open[data-uid="${CSS.escape(u)}"]`).scrollIntoView({ block: "center" }), uid);
+  await new Promise(r => setTimeout(r, 100));
 }
 
 // team badges as build_schedule.py writes them: crests (ESPN team numbers) for the sample match's clubs, and flags for
