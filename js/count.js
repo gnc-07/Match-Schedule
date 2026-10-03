@@ -1,8 +1,9 @@
 /* ---------- visit counts (GoatCounter, without cookies) ---------- */
 // Only three things are ever counted: that the page was opened (and in which language), that a match's details were
 // opened, and that a race weekend was opened. No team, match, star, setting or search is sent, and nothing is saved
-// in the browser. GoatCounter never keeps the internet address; its own extras (browser, country and so on) are
-// switched off in its settings, as "How it works" promises visitors (MAINTAINING.md, "Visit counts").
+// in the browser. GoatCounter's Sessions setting (on) counts each name once per person every 8 hours, from the internet
+// address and browser details held in its memory only and never saved; its other extras (browser, country and so on)
+// are switched off in its settings, as "How it works" promises visitors (MAINTAINING.md, "Visit counts").
 // The count is a request for a 1x1 picture (img-src in the security policy), so no script of GoatCounter's ever runs
 // on this page.
 // STATS is the GoatCounter address, such as "https://name.goatcounter.com", with no "/" at the end; while it is empty,

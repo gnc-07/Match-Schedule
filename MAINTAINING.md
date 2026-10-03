@@ -118,23 +118,21 @@ To see a link preview, paste the site's address into a chat with yourself (Whats
 
 ## Visit counts
 
-`js/count.js` counts three things through [GoatCounter](https://www.goatcounter.com/) (open source, no cookies): a visit to the page, named `/en` or `/pt` after the language it opened in; `match-details`, each time a match's details are opened; and `race-weekend`, each time an F1 race weekend is opened. Nothing else is sent: no team, match, star, setting or search. Each count is a request for a tiny picture from GoatCounter, so none of GoatCounter's own scripts runs on the page. Nothing is counted on a local preview, in the tests or in a copy of the site published elsewhere (only at the address in the `hreflang` links of `index.html`), nor for a browser that asks sites not to track it (Global Privacy Control or Do Not Track). "How it works" tells visitors this, in both languages, and appears only while counting is switched on.
+`js/count.js` counts three things through [GoatCounter](https://www.goatcounter.com/) (open source, no cookies): a visit to the page, named `/en` or `/pt` after the language it opened in; `match-details`, when a match's details are opened; and `race-weekend`, when an F1 race weekend is opened. With GoatCounter's Sessions setting on (below), each is counted once per person every 8 hours, so the numbers say how many people did something, not how many times. Nothing else is sent: no team, match, star, setting or search. Each count is a request for a tiny picture from GoatCounter, so none of GoatCounter's own scripts runs on the page. Nothing is counted on a local preview, in the tests or in a copy of the site published elsewhere (only at the address in the `hreflang` links of `index.html`), nor for a browser that asks sites not to track it (Global Privacy Control or Do Not Track). "How it works" tells visitors this, in both languages, and appears only while counting is switched on.
 
-### Switching it on (once, about 10 minutes, web browser only)
+### How it is set up
 
-1. Open [goatcounter.com](https://www.goatcounter.com/), click **Sign up**, and choose a **code** (for example `matchday-planner`). Your counts will be at `https://<code>.goatcounter.com`. Fill in your email and a password and finish signing up.
-2. In GoatCounter, open **Settings**, then **Data collection**. Leave only **Sessions** ticked (it counts a person reloading the page as one visit) and untick everything else (Individual pageviews, Referrer, User-Agent, Size, Country, Region, Language). The sentence in "How it works" promises visitors only the counts above; if you tick more here later, change that sentence (`howCounthtml` in `js/i18n.js`, both languages) and the README's Privacy section to say so. Click **Save**.
-3. On the same Settings page, under **Ignore IPs**, click **Add your current IP**, then **Save**, so your own visits from home are not counted (it only covers that connection; your phone on mobile data still counts).
-4. On GitHub, switch the branch menu to the branch holding this work (or `main`, once merged), and make two edits, each with the pencil icon, then **Commit changes**:
-   - `js/count.js`: change `const STATS = "";` to `const STATS = "https://<code>.goatcounter.com";` (your code, no `/` at the end).
-   - `index.html`: in the `Content-Security-Policy` line at the top, after `https://a.espncdn.com` (inside `img-src`), add a space and `https://<code>.goatcounter.com/count`.
+Counting is on, sending to the GoatCounter site `https://gnc.goatcounter.com`. The address is written in two places, which must agree: `STATS` in `js/count.js`, and `https://gnc.goatcounter.com/count` in `img-src` in the `Content-Security-Policy` line at the top of `index.html`. `tests/test_scripts.py` (`VisitCounts`) fails if they do not, and browsers would then silently block every count.
 
-   The two must agree: `tests/test_scripts.py` (`VisitCounts`) fails if they do not, and browsers would then silently block every count.
-5. After the site is republished (Actions tab, about two minutes), open the site on your phone on mobile data, open a match's details, and check GoatCounter's dashboard: `/en` and `match-details` appear within a minute or two. (If nothing appears, your browser may be asking sites not to track it, which some browsers do by default; try another browser.)
+GoatCounter's settings (Settings, then **Data collection**): only **Sessions** is ticked, so a person reloading the page counts once, and everything else is unticked (Individual pageviews, Referrer, User-Agent, Size, Country, Region, Language). The sentence in "How it works" and the README's Privacy section describe exactly this; if you tick more there later, change that sentence (`howCounthtml` in `js/i18n.js`, both languages) and the README to say so. Under **Ignore IPs**, your home connection is listed, so your own visits from home are not counted (your phone on mobile data still counts).
+
+To move to another GoatCounter account, replace `gnc.goatcounter.com` with the new account's address in both places (on GitHub: open each file, click the pencil icon, edit, **Commit changes**).
+
+To check it works: after the site is republished (Actions tab, about two minutes), open the site on your phone on mobile data, open a match's details, and check the dashboard at https://gnc.goatcounter.com: `/en` and `match-details` appear within a minute or two. (If nothing appears, your browser may be asking sites not to track it, which some browsers do by default; try another browser.)
 
 ### Reading the numbers
 
-GoatCounter's dashboard lists `/en` and `/pt` as pages (visits in each language) and `match-details` and `race-weekend` as events. The numbers are a lower bound: ad blockers often block GoatCounter, and browsers that ask not to be tracked are not counted.
+GoatCounter's dashboard lists `/en` and `/pt` as pages (visits in each language) and `match-details` and `race-weekend` as events, each counted once per person every 8 hours. The numbers are a lower bound: ad blockers often block GoatCounter, and browsers that ask not to be tracked are not counted.
 
 ### Switching it off
 
