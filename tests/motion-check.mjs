@@ -54,8 +54,8 @@ const cases = [
   ["controls-go", 1280, async p => { await p.click('#range [data-r="custom"]'); await wait(600); await p.click('#range [data-r="all"]'); }],
   // new content in the same place, and the days added by "Show more"
   ["table-switch", 1280, async p => { await p.click("#tablesbtn"); await wait(900); await p.click('#ltchips [data-code="LIGA"]'); await wait(20); }],
-  ["weekend-switch", 1280, async p => { await p.click(`.md-open[data-uid="${F1_WEEKEND}"]`); await wait(900); await p.click('#wk-res [data-s="Q"]'); }],
-  ["driver-star", 1280, async p => { await p.click(`.md-open[data-uid="${F1_WEEKEND}"]`); await wait(900); await p.click('#wk-res .star[aria-pressed="false"]'); }],
+  ["weekend-switch", 1280, async p => { await showMatch(p, F1_WEEKEND); await p.click(`.md-open[data-uid="${F1_WEEKEND}"]`); await wait(900); await p.click('#wk-res [data-s="Q"]'); }],
+  ["driver-star", 1280, async p => { await showMatch(p, F1_WEEKEND); await p.click(`.md-open[data-uid="${F1_WEEKEND}"]`); await wait(900); await p.click('#wk-res .star[aria-pressed="false"]'); }],
   ["show-more", 1280, async p => { await p.evaluate(() => document.getElementById("more").scrollIntoView({ block: "center" })); await p.click("#more"); }],
   // Settings that change the whole page cross-fade like the theme
   ["contrast", 1280, async p => { await p.click("#setmenu summary"); await wait(400); await p.click("#hcbox");

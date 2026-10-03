@@ -13,7 +13,13 @@ const LIVE = new Map(); // our match key -> {id, state, clock, detail, hs, as}
 const FINAL = new Map(); // finished matches: kept so the final score stays on the card for a day
 const TRIED = new Set(); // matches more than 3 hours old that were already looked up once
 let LIVE_EXTRA = []; // live league events we could not match to a listed fixture
-const keyOf = r => (r.kind ? r.uid : r.code + "|" + r.home + "|" + r.away + "|" + r.date); // F1 sessions have no teams: their own id
+// F1 sessions have no teams: their own id. Worked out once per match (liveOf() asks for it at every redraw)
+const KEYS = new WeakMap();
+const keyOf = r => {
+  let k = KEYS.get(r);
+  if (k === undefined) KEYS.set(r, (k = r.kind ? r.uid : r.code + "|" + r.home + "|" + r.away + "|" + r.date));
+  return k;
+};
 // ESPN first; else the final score from the league feed (build_schedule.py adds "result" for recent matches)
 const liveOf = r =>
   LIVE.get(keyOf(r)) ||

@@ -363,7 +363,13 @@ const CALM = matchMedia("(prefers-reduced-motion: reduce)"),
 let motion = store.get("motion", "auto");
 const motionOn = () => motion === "on" || (motion === "auto" && !CALM.matches);
 // a short animation made by script, at the same speeds as the CSS ones (which data-motion="off" stops instead)
-const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim(),
+// the shared speeds and curves (the Motion block of styles.css) never change while the page is open: read once each, as
+// asking the browser for a style can make it recalculate every style on the page first
+const CSS_VARS = new Map();
+const cssVar = n => {
+    if (!CSS_VARS.has(n)) CSS_VARS.set(n, getComputedStyle(document.documentElement).getPropertyValue(n).trim());
+    return CSS_VARS.get(n);
+  },
   DUR = n => parseFloat(cssVar("--dur-" + n)) * 1000;
 const MOVING = new Set(); // script animations still running, stopped at once if animations are switched off
 function move(el, frames, o) {
