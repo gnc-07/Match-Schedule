@@ -133,6 +133,19 @@ class LeagueCrossCheck(unittest.TestCase):
                                                   ("ESPN", [other("Fulham", "Wolves", "2026-10-03", "2026-10-03T14:00:00+00:00")])])
         self.assertEqual(r["check"]["status"], "confirmed")
         self.assertIn("note", r["check"])
+        # the card says some sources differ: the times are listed, since the source list holds only names and links
+        self.assertEqual(r["check"]["reported"], ["2026-10-03T11:30:00+00:00", "2026-10-03T14:00:00+00:00"])
+
+    def test_two_others_agreeing_against_the_feed_is_a_conflict(self):
+        """The feed's time stays on the card, so it may be called verified only when another source gives that same
+        time: two other sources agreeing on a different one make it "conflicting reports", with every time listed."""
+        r = league("Fulham FC", "Wolverhampton Wanderers FC", "2026-10-03", "2026-10-03T14:00:00+00:00")
+        bs.cross_check([r], "football-data.org", [("openfootball", [other("Fulham FC", "Wolverhampton Wanderers FC", "2026-10-03", "2026-10-03T16:30:00+00:00")]),
+                                                  ("ESPN", [other("Fulham", "Wolverhampton Wanderers", "2026-10-03", "2026-10-03T16:30:00+00:00")])])
+        self.assertEqual(r["check"]["status"], "conflicting")
+        self.assertEqual(r["check"]["reported"], ["2026-10-03T14:00:00+00:00", "2026-10-03T16:30:00+00:00"])
+        self.assertNotIn("basis", r["check"])
+        self.assertEqual(r["utc"], "2026-10-03T14:00:00+00:00")
 
     def test_one_time_only_changes_nothing(self):
         timed = league("Arsenal FC", "Chelsea FC", "2026-10-03", "2026-10-03T16:30:00+00:00")
@@ -176,6 +189,8 @@ class LeagueCrossCheck(unittest.TestCase):
         r = league("Manchester City FC", "Arsenal FC", "2026-10-03")
         city = other("Manchester City", "Arsenal", "2026-10-04")
         self.assertIs(bs.find_match(r, [other("Manchester United", "Everton", "2026-10-03"), city]), city)
+        # a shared word is not the same club: with City's match missing, United's is not taken for it
+        self.assertIsNone(bs.find_match(r, [other("Manchester United", "Arsenal", "2026-10-03")]))
         self.assertIsNone(bs.find_match(r, [other("Arsenal", "Manchester City", "2026-10-03")]))   # the other way round
         self.assertIsNone(bs.find_match(r, [other("Manchester City", "Arsenal", "2026-10-06")]))   # three days later
         # two equally good candidates: better nothing than the wrong one

@@ -293,13 +293,17 @@ def espn_league(slug, years):
     return out
 
 def _overlap(a, b):
-    """Name words two spellings share. A name with no distinctive word left (ESPN's "Deportivo", since "deportivo" is
-    as common as "club") is compared by its plain words instead ("RC Deportivo La Coruña" shares "deportivo")."""
+    """How many name words two spellings share, or 0 unless they name the same club: every distinctive word of one
+    must be in the other ("Real Betis" and "Real Betis Balompié"), or they share an alias word ("Atlético-MG" and "CA
+    Mineiro", both "atleticomg"). One shared word is not enough: "Manchester City" is not "Manchester United". A name
+    with no distinctive word left (ESPN's "Deportivo", since "deportivo" is as common as "club") is compared by its
+    plain words instead ("RC Deportivo La Coruña" has "deportivo")."""
     wa, wb = team_words(a), team_words(b)
     if not wa or not wb:
         plain = lambda n: {t for t in re.split(r"[^a-z0-9]+", _plain(n)) if len(t) > 2}
         wa, wb = plain(a), plain(b)
-    return len(wa & wb)
+    close = wa and wb and (wa <= wb or wb <= wa or wa & wb & set(NAME_ALIAS.values()))
+    return len(wa & wb) if close else 0
 
 def find_match(r, cands):
     """The one entry in `cands` for match `r`: the same two teams the same way round, within a day of its date, with
@@ -343,7 +347,13 @@ def cross_check(recs, main, others):
                     reports.append(_report(name, c["utc"], c.get("url")))
         if len(reports) < 2:
             continue                               # one time only: the card stays as it was
-        check = resolve(reports)[2]
+        _, utc, check = resolve(reports)
+        times = sorted({_utc(x["date"], x["time"], x["tz"]) for x in reports})
+        if check["status"] == "confirmed" and utc != datetime.fromisoformat(r["utc"]).isoformat():
+            # the others agree on another time: the card keeps the feed's, which nothing confirms
+            check = {"sources": check["sources"], "status": "conflicting"}
+        if len(times) > 1:
+            check["reported"] = times              # every time given, also when two agree and one differs
         # the page reads only the names and links of the sources; the times it needs are in "reported"
         check["sources"] = [{k: s[k] for k in ("source", "url") if k in s} for s in check["sources"]]
         r["check"] = check
