@@ -164,17 +164,22 @@ def _ft(score):
         return ft
     return None
 
-def mark_provisional(recs):
-    """openfootball fills unannounced kick-offs with a placeholder (e.g. every EPL match
-    'Sat 15:00'). If every match in a round shares the identical kick-off, flag it."""
+def placeholder_rounds(recs):
+    """The rounds whose kick-offs look like placeholders: every match of the round (5 or more with a time) at the
+    identical clock time, as feeds fill unannounced kick-offs (e.g. every EPL match 'Sat 15:00')."""
     rounds = {}
     for r in recs:
         if r["utc"]:
             rounds.setdefault(r["round"], []).append(r)
-    for group in rounds.values():
-        if len(group) >= 5 and len({r["utc"][11:16] for r in group}) == 1:
-            for r in group:
-                r["provisional"] = True
+    return {k for k, group in rounds.items() if len(group) >= 5 and len({r["utc"][11:16] for r in group}) == 1}
+
+def mark_provisional(recs):
+    """openfootball fills unannounced kick-offs with a placeholder. If every match in a round shares the identical
+    kick-off, flag it."""
+    held = placeholder_rounds(recs)
+    for r in recs:
+        if r["utc"] and r["round"] in held:
+            r["provisional"] = True
 
 # ---------- cross-checking: reports from several sources ----------
 # friendlies.json and overrides.json store every report found, with its source.
@@ -253,6 +258,134 @@ def apply_overrides(recs, path="overrides.json"):
         r["check"] = check
         if check["status"] == "confirmed":
             r["date"], r["utc"], r["provisional"] = day, utc, False
+
+# ---------- leagues: each kick-off checked against the other league sources ----------
+# The main feed (football-data.org, else openfootball) lists the matches. Every rebuild also reads the other sources
+# it can reach, openfootball (when it is not already the main feed) and ESPN's public scoreboard, and passes the times
+# through resolve(). The owner chose to keep the main feed's time on the card whatever happens, with labels:
+#   two or more agree     -> "verified"
+#   they disagree         -> the main feed's time stays, marked "conflicting reports", every reported time listed
+#   only one gives a time -> no label and no source list, as before
+# Only a time the main feed gives is checked, and the other sources never add one: weeks ahead, openfootball and ESPN
+# both show provisional times (in England, Saturday 15:00) until television picks are announced, and two placeholders
+# agreeing is not a confirmation. football-data.org gives a time only once it is final ("TIMED"); openfootball has no
+# such flag, so when it is the main feed (football-data.org down) there is no cross-check that run.
+ESPN_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/soccer/{}/scoreboard?dates={}&limit=1000"
+
+def espn_league(slug, years):
+    """ESPN's matches of one league in the given calendar years (one request each; a split season needs two), as
+    {"home", "away", "utc" (None when ESPN marks the time as not final), "date", "url"}. ESPN's API is unofficial: an
+    entry in an unexpected shape is skipped."""
+    out, seen = [], set()
+    for y in years:
+        for e in fetch_json(ESPN_SCOREBOARD.format(slug, y)).get("events", []):
+            try:
+                c = e["competitions"][0]
+                t = {x["homeAway"]: x["team"]["displayName"] for x in c["competitors"]}
+                kick = datetime.fromisoformat(e["date"].replace("Z", "+00:00")).astimezone(timezone.utc)
+                eid = str(e["id"])
+            except (KeyError, IndexError, TypeError, ValueError, AttributeError):
+                continue
+            if eid in seen or not re.fullmatch(r"\d{1,12}", eid) or not all(isinstance(t.get(k), str) for k in ("home", "away")):
+                continue
+            seen.add(eid)
+            out.append({"home": t["home"], "away": t["away"], "date": kick.date(),
+                        "utc": kick if c.get("timeValid") is not False else None,
+                        "url": f"https://www.espn.com/soccer/match/_/gameId/{eid}"})
+    return out
+
+def _overlap(a, b):
+    """How many name words two spellings share, or 0 unless they name the same club: every distinctive word of one
+    must be in the other ("Real Betis" and "Real Betis Balompié"), or they share an alias word ("Atlético-MG" and "CA
+    Mineiro", both "atleticomg"). One shared word is not enough: "Manchester City" is not "Manchester United". A name
+    with no distinctive word left (ESPN's "Deportivo", since "deportivo" is as common as "club") is compared by its
+    plain words instead ("RC Deportivo La Coruña" has "deportivo")."""
+    wa, wb = team_words(a), team_words(b)
+    if not wa or not wb:
+        plain = lambda n: {t for t in re.split(r"[^a-z0-9]+", _plain(n)) if len(t) > 2}
+        wa, wb = plain(a), plain(b)
+    close = wa and wb and (wa <= wb or wb <= wa or wa & wb & set(NAME_ALIAS.values()))
+    return len(wa & wb) if close else 0
+
+def find_match(r, cands):
+    """The one entry in `cands` for match `r`: the same two teams the same way round, within a day of its date, with
+    the most name words in common ("Manchester City" never stands for "Manchester United": the other team must match
+    too, and a team plays at most once a day). None when nothing matches or two match equally well."""
+    day = date.fromisoformat(r["date"])
+    scored = []
+    for c in cands:
+        if abs((c["date"] - day).days) > 1:
+            continue
+        h, a = _overlap(r["home"], c["home"]), _overlap(r["away"], c["away"])
+        if h and a:
+            scored.append((h + a, c))
+    if not scored:
+        return None
+    best = max(s for s, _ in scored)
+    found = [c for s, c in scored if s == best]
+    return found[0] if len(found) == 1 else None
+
+def _report(source, utc, url=None):
+    return {"source": source, "date": utc.date().isoformat(), "time": utc.strftime("%H:%M"), "tz": "UTC",
+            **({"url": url} if url else {})}
+
+def cross_check(recs, main, others):
+    """Checks each upcoming league match in `recs` that has a time (from the source named `main`; not in a round of
+    placeholders, placeholder_rounds()) against `others`, a
+    list of (source name, entries as espn_league() gives them). Sets r["check"] when another source also gives a time;
+    the match's own time is never changed. Returns how many matches were found in each other
+    source (printed by the build, so a source that stops matching shows in the log)."""
+    found = {name: 0 for name, _ in others}
+    held = placeholder_rounds([r for r in recs if "result" not in r and not r.get("started")])
+    for r in recs:
+        if "result" in r or r.get("started") or not r.get("utc") or r["round"] in held:
+            continue                               # no time, or a placeholder the feed marks as final: nothing to check
+        reports = [_report(main, datetime.fromisoformat(r["utc"]))]
+        for name, cands in others:
+            c = find_match(r, cands)
+            if c:
+                found[name] += 1
+                if c["utc"]:
+                    reports.append(_report(name, c["utc"], c.get("url")))
+        if len(reports) < 2:
+            continue                               # one time only: the card stays as it was
+        _, utc, check = resolve(reports)
+        times = sorted({_utc(x["date"], x["time"], x["tz"]) for x in reports})
+        if check["status"] == "confirmed" and utc != datetime.fromisoformat(r["utc"]).isoformat():
+            # the others agree on another time: the card keeps the feed's, which nothing confirms
+            check = {"sources": check["sources"], "status": "conflicting"}
+        if len(times) > 1:
+            check["reported"] = times              # every time given, also when two agree and one differs
+        # the page reads only the names and links of the sources; the times it needs are in "reported"
+        check["sources"] = [{k: s[k] for k in ("source", "url") if k in s} for s in check["sources"]]
+        r["check"] = check
+    return found
+
+def cross_check_league(code, recs, main, start):
+    """The other sources for one league, then cross_check(). A source that cannot be read is left out this run; the
+    matches still show, as before, just without its check. Returns the sources that matched at least one match."""
+    name, _, filename, style, tz = LEAGUES[code]
+    if main == "openfootball":
+        print(f"{code}: openfootball is the main feed this run; its times are provisional, so not cross-checked")
+        return []
+    others = []
+    try:
+        of, _ = from_openfootball(code, name, filename, style, tz, start)
+        others.append(("openfootball", [{"home": x["home"], "away": x["away"], "date": date.fromisoformat(x["date"]),
+                                         # a placeholder is not a report of a time: it can neither confirm nor contradict
+                                         "utc": datetime.fromisoformat(x["utc"]) if x["utc"] and not x.get("provisional") else None,
+                                         "url": f"{OPENFOOTBALL}/{season_folders(style, start)[0]}/{filename}"} for x in of]))
+    except Exception as e:
+        print(f"openfootball could not be read for {code} ({e}); not cross-checked with it this run")
+    years = [start.year, start.year + 1] if style == "split" and start.month >= 7 else [start.year]
+    try:
+        others.append(("ESPN", espn_league(ESPN_LEAGUE[code], years)))
+    except Exception as e:
+        print(f"ESPN could not be read for {code} ({e}); not cross-checked with it this run")
+    found = cross_check(recs, main, others)
+    upcoming = sum(1 for r in recs if "result" not in r and not r.get("started"))
+    print(f"{code}: {upcoming} upcoming matches; found in " + ", ".join(f"{n} {k}" for n, k in found.items()))
+    return [n for n, _ in others if found[n]]          # only the sources that checked something are named on the site
 
 # ---------- source 4: CONMEBOL Libertadores, from two independent sources ----------
 # No free league feed covers it (football-data.org's free plan does not; openfootball has no file for the season), so
@@ -1182,18 +1315,20 @@ def load_all(start):
     token = os.environ.get("FOOTBALL_DATA_TOKEN")
     out = []
     for code, (name, fd_code, filename, style, tz) in LEAGUES.items():
+        recs = None
         if token:
             try:
                 recs, results = from_football_data(code, name, fd_code, tz, start, token)
-                out += recs
-                tables[code] = standings(results)
-                sources[code] = "football-data.org"; continue
+                main = "football-data.org"
             except Exception as e:           # API down or rate-limited: fall back rather than fail
                 print(f"football-data.org failed for {code} ({e}); using openfootball")
-        recs, results = from_openfootball(code, name, filename, style, tz, start)
-        out += recs
+        if recs is None:
+            recs, results = from_openfootball(code, name, filename, style, tz, start)
+            main = "openfootball"
         tables[code] = standings(results)
-        sources[code] = "openfootball"
+        checked = cross_check_league(code, recs, main, start)      # two sources or more for every time (CLAUDE.md)
+        sources[code] = ", ".join([main] + checked[:-1]) + (" and " + checked[-1] if checked else "")
+        out += recs
     apply_overrides(out)
     out = [r for r in out if date.fromisoformat(r["date"]) >= start or "result" in r or r.get("started")]
     for code, (path, _) in HAND_KEPT.items():

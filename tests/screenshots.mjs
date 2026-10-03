@@ -4,7 +4,7 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import puppeteer from "puppeteer-core";
 import { BASE, ROOT, chromePath, startServer } from "./server.mjs";
-import { F1_WEEKEND, MATCH, mockNetwork } from "./mock-data.mjs";
+import { F1_WEEKEND, LEAGUE_OK, MATCH, mockNetwork, showMatch } from "./mock-data.mjs";
 
 const out = path.join(ROOT, "screenshots");
 mkdirSync(out, { recursive: true });
@@ -18,6 +18,10 @@ const uid = encodeURIComponent(MATCH.uid), wk = encodeURIComponent(F1_WEEKEND);
 const shots = [
   ["list-desktop", 1280, "?lang=en", null, "light"],
   ["list-phone", 390, "?lang=en", null, "light"],
+  // league times checked against a second source: a verified card and, below it, one whose sources disagree
+  ...[["league-checks-desktop", 1280, "light", "en"], ["league-checks-phone", 390, "light", "en"], ["league-checks-phone-dark-pt", 390, "dark", "pt"]]
+    .map(([n, w, t, l]) => [n, w, "?lang=" + l, async p => { await showMatch(p, LEAGUE_OK);
+      await p.evaluate(u => { document.querySelector(`.md-open[data-uid="${CSS.escape(u)}"]`).closest(".match").scrollIntoView({ block: "start" }); window.scrollBy(0, -16); }, LEAGUE_OK); }, t]),
   ["details-desktop", 1280, `?match=${uid}`, null, "light"],
   ["details-phone", 390, `?match=${uid}`, null, "light"],
   ["details-desktop-dark-pt", 1280, `?lang=pt&match=${uid}`, null, "dark"],

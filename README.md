@@ -40,7 +40,7 @@ The site has no accounts, no advertising and no tracking. Your preferences (star
 
 | What | Source |
 | --- | --- |
-| League fixtures | [openfootball](https://github.com/openfootball/football.json) (public domain), or [football-data.org](https://www.football-data.org/) when a key is configured |
+| League fixtures | [football-data.org](https://www.football-data.org/) (or [openfootball](https://github.com/openfootball/football.json), public domain, when it is unavailable). Each final kick-off time is checked against openfootball and ESPN's public scoreboard: verified when they agree, marked "conflicting reports" when they do not |
 | Friendlies and corrected kick-off times | Official announcements and press reports, each one recorded with its link |
 | CONMEBOL Libertadores | ESPN's public scoreboard, each kick-off time cross-checked against the match listings on English [Wikipedia](https://en.wikipedia.org/), which cite CONMEBOL's fixture lists |
 | UEFA Nations League (League A) | UEFA's published fixture list, cross-checked against ESPN |

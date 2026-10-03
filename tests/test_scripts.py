@@ -98,6 +98,136 @@ class Calendar(unittest.TestCase):
         self.assertNotIn("\n", out.replace("\r\n", ""))           # every line ends in CRLF
 
 
+def league(home, away, day, utc=None, rnd="Matchday 7", **extra):
+    return {**bs.record("Premier League", "EPL", home, away, day, utc, rnd), **extra}
+
+
+def other(home, away, day, utc=None):
+    """An entry from another league source, as espn_league() gives it."""
+    return {"home": home, "away": away, "date": date.fromisoformat(day),
+            "utc": datetime.fromisoformat(utc) if utc else None, "url": "https://other.example/m"}
+
+
+class LeagueCrossCheck(unittest.TestCase):
+    """Each league time from the main feed is checked against the other league sources (CLAUDE.md: at least two
+    sources for every competition). The feed's time always stays; the check only adds a label."""
+
+    def test_two_sources_that_agree_verify_the_time(self):
+        r = league("Arsenal FC", "Chelsea FC", "2026-10-03", "2026-10-03T16:30:00+00:00")
+        found = bs.cross_check([r], "football-data.org", [("ESPN", [other("Arsenal", "Chelsea", "2026-10-03", "2026-10-03T16:30:00+00:00")])])
+        self.assertEqual(found, {"ESPN": 1})
+        self.assertEqual(r["check"]["status"], "confirmed")
+        self.assertEqual(r["check"]["sources"], [{"source": "football-data.org"}, {"source": "ESPN", "url": "https://other.example/m"}])
+        self.assertEqual(r["utc"], "2026-10-03T16:30:00+00:00")
+
+    def test_sources_that_disagree_keep_the_feeds_time_with_a_warning(self):
+        r = league("Everton FC", "Leeds United FC", "2026-10-03", "2026-10-03T14:00:00+00:00")
+        bs.cross_check([r], "football-data.org", [("ESPN", [other("Everton", "Leeds United", "2026-10-03", "2026-10-03T16:30:00+00:00")])])
+        self.assertEqual(r["check"]["status"], "conflicting")
+        self.assertEqual(r["check"]["reported"], ["2026-10-03T14:00:00+00:00", "2026-10-03T16:30:00+00:00"])
+        self.assertEqual(r["utc"], "2026-10-03T14:00:00+00:00")                     # the feed's time stays
+
+    def test_two_of_three_agreeing_verify_with_a_note(self):
+        r = league("Fulham FC", "Wolverhampton Wanderers FC", "2026-10-03", "2026-10-03T14:00:00+00:00")
+        bs.cross_check([r], "football-data.org", [("openfootball", [other("Fulham FC", "Wolverhampton Wanderers FC", "2026-10-03", "2026-10-03T11:30:00+00:00")]),
+                                                  ("ESPN", [other("Fulham", "Wolves", "2026-10-03", "2026-10-03T14:00:00+00:00")])])
+        self.assertEqual(r["check"]["status"], "confirmed")
+        self.assertIn("note", r["check"])
+        # the card says some sources differ: the times are listed, since the source list holds only names and links
+        self.assertEqual(r["check"]["reported"], ["2026-10-03T11:30:00+00:00", "2026-10-03T14:00:00+00:00"])
+
+    def test_two_others_agreeing_against_the_feed_is_a_conflict(self):
+        """The feed's time stays on the card, so it may be called verified only when another source gives that same
+        time: two other sources agreeing on a different one make it "conflicting reports", with every time listed."""
+        r = league("Fulham FC", "Wolverhampton Wanderers FC", "2026-10-03", "2026-10-03T14:00:00+00:00")
+        bs.cross_check([r], "football-data.org", [("openfootball", [other("Fulham FC", "Wolverhampton Wanderers FC", "2026-10-03", "2026-10-03T16:30:00+00:00")]),
+                                                  ("ESPN", [other("Fulham", "Wolverhampton Wanderers", "2026-10-03", "2026-10-03T16:30:00+00:00")])])
+        self.assertEqual(r["check"]["status"], "conflicting")
+        self.assertEqual(r["check"]["reported"], ["2026-10-03T14:00:00+00:00", "2026-10-03T16:30:00+00:00"])
+        self.assertNotIn("basis", r["check"])
+        self.assertEqual(r["utc"], "2026-10-03T14:00:00+00:00")
+
+    def test_one_time_only_changes_nothing(self):
+        timed = league("Arsenal FC", "Chelsea FC", "2026-10-03", "2026-10-03T16:30:00+00:00")
+        untimed = league("Everton FC", "Leeds United FC", "2026-10-04")
+        others = [("ESPN", [other("Arsenal", "Chelsea", "2026-10-03"),                        # ESPN has no final time
+                            other("Everton", "Leeds", "2026-10-04", "2026-10-04T13:00:00+00:00")]),
+                  ("openfootball", [other("Everton FC", "Leeds United FC", "2026-10-04", "2026-10-04T13:00:00+00:00")])]
+        bs.cross_check([timed, untimed], "football-data.org", others)
+        self.assertNotIn("check", timed)
+        # the other sources never add a time of their own, even when they agree: weeks ahead they agree on placeholders
+        self.assertNotIn("check", untimed)
+        self.assertIsNone(untimed["utc"])
+
+    def test_placeholder_rounds_are_not_checked(self):
+        """A round whose every match sits at one clock time is a placeholder (EPL 'Sat 15:00'), even when the feed calls
+        it final; the other sources show the same placeholder, and agreeing on it confirms nothing."""
+        teams = [("Arsenal FC", "Chelsea FC"), ("Everton FC", "Fulham FC"), ("Brentford FC", "Burnley FC"),
+                 ("Leeds United FC", "Liverpool FC"), ("Sunderland AFC", "Wolverhampton Wanderers FC")]
+        recs = [league(h, a, "2026-12-05", "2026-12-05T15:00:00+00:00", "Matchday 14") for h, a in teams]
+        others = [("ESPN", [other(h, a, "2026-12-05", "2026-12-05T15:00:00+00:00") for h, a in teams])]
+        bs.cross_check(recs, "football-data.org", others)
+        self.assertFalse(any("check" in r for r in recs))
+
+    def test_an_openfootball_placeholder_is_not_a_report(self):
+        with mock.patch.object(bs, "from_openfootball", return_value=([
+                    {"home": "Arsenal FC", "away": "Chelsea FC", "date": "2026-10-03", "utc": "2026-10-03T14:00:00+00:00", "provisional": True}], [])), \
+                mock.patch.object(bs, "espn_league", return_value=[]), redirect_stdout(io.StringIO()):
+            r = league("Arsenal FC", "Chelsea FC", "2026-10-03", "2026-10-03T16:30:00+00:00")
+            bs.cross_check_league("EPL", [r], "football-data.org", date(2026, 10, 1))
+        self.assertNotIn("check", r)                                                     # not "conflicting"
+
+    def test_a_source_that_matched_nothing_is_not_named_on_the_site(self):
+        with mock.patch.object(bs, "from_openfootball", return_value=([
+                    {"home": "Arsenal FC", "away": "Chelsea FC", "date": "2026-10-03", "utc": "2026-10-03T16:30:00+00:00"}], [])), \
+                mock.patch.object(bs, "espn_league", return_value=[other("Fulham", "Burnley", "2026-10-03")]), \
+                redirect_stdout(io.StringIO()):
+            r = league("Arsenal FC", "Chelsea FC", "2026-10-03", "2026-10-03T16:30:00+00:00")
+            named = bs.cross_check_league("EPL", [r], "football-data.org", date(2026, 10, 1))
+        self.assertEqual(named, ["openfootball"])                                       # ESPN read, but checked nothing
+
+    def test_finished_and_started_matches_are_left_alone(self):
+        done = league("Arsenal FC", "Chelsea FC", "2026-10-03", "2026-10-03T16:30:00+00:00", result={"home": 1, "away": 0})
+        on = league("Everton FC", "Leeds United FC", "2026-10-03", "2026-10-03T14:00:00+00:00", started=True)
+        bs.cross_check([done, on], "football-data.org", [("ESPN", [other("Arsenal", "Chelsea", "2026-10-03", "2026-10-03T19:00:00+00:00"),
+                                                                   other("Everton", "Leeds", "2026-10-03", "2026-10-03T19:00:00+00:00")])])
+        self.assertNotIn("check", done)
+        self.assertNotIn("check", on)
+
+    def test_matching_needs_both_teams_the_same_way_round_within_a_day(self):
+        r = league("Manchester City FC", "Arsenal FC", "2026-10-03")
+        city = other("Manchester City", "Arsenal", "2026-10-04")
+        self.assertIs(bs.find_match(r, [other("Manchester United", "Everton", "2026-10-03"), city]), city)
+        # a shared word is not the same club: with City's match missing, United's is not taken for it
+        self.assertIsNone(bs.find_match(r, [other("Manchester United", "Arsenal", "2026-10-03")]))
+        self.assertIsNone(bs.find_match(r, [other("Arsenal", "Manchester City", "2026-10-03")]))   # the other way round
+        self.assertIsNone(bs.find_match(r, [other("Manchester City", "Arsenal", "2026-10-06")]))   # three days later
+        # two equally good candidates: better nothing than the wrong one
+        self.assertIsNone(bs.find_match(r, [other("Manchester City", "Arsenal", "2026-10-02"), other("Manchester City", "Arsenal", "2026-10-04")]))
+
+    def test_a_name_with_no_distinctive_word_still_matches(self):
+        """ESPN calls Deportivo La Coruña just "Deportivo", a word the matcher otherwise ignores (as in Deportivo Alavés)."""
+        r = {**league("RC Deportivo La Coruña", "Levante UD", "2026-10-16"), "code": "LIGA"}
+        c = other("Deportivo", "Levante", "2026-10-16")
+        self.assertIs(bs.find_match(r, [c]), c)
+
+    def test_espn_entries_in_an_odd_shape_are_skipped(self):
+        good = {"id": "401", "date": "2026-10-03T16:30Z", "competitions": [{"timeValid": True, "competitors": [
+            {"homeAway": "home", "team": {"displayName": "Arsenal"}}, {"homeAway": "away", "team": {"displayName": "Chelsea"}}]}]}
+        unsure = {**good, "id": "402", "competitions": [{**good["competitions"][0], "timeValid": False}]}
+        bad = [{**good, "id": "x/../y"}, {**good, "id": "403", "date": "soon"}, {"id": "404"}, "text", {**good}]   # the last repeats 401
+        with mock.patch.object(bs, "fetch_json", return_value={"events": [good, unsure, *bad]}):
+            got = bs.espn_league("eng.1", [2026])
+        self.assertEqual([(g["home"], g["utc"] is not None, g["url"][-3:]) for g in got], [("Arsenal", True, "401"), ("Arsenal", False, "402")])
+
+    def test_openfootball_as_the_main_feed_is_not_cross_checked(self):
+        r = league("Arsenal FC", "Chelsea FC", "2026-10-03", "2026-10-03T14:00:00+00:00")
+        with mock.patch.object(bs, "espn_league") as espn, redirect_stdout(io.StringIO()):
+            self.assertEqual(bs.cross_check_league("EPL", [r], "openfootball", date(2026, 10, 1)), [])
+        espn.assert_not_called()
+        self.assertNotIn("check", r)
+
+
 class HandKept(unittest.TestCase):
     """friendlies.json and nations_league.json go through the same loader and the same verification rule."""
 

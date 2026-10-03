@@ -742,6 +742,9 @@ function render() {
         } else if (r.provisional) tags.push('<span class="pill warn">' + esc(T.pProvisional) + "</span>");
         else if (c && c.status === "confirmed")
           tags.push('<span class="pill ok">' + ICON.check + esc(T.pVerified) + "</span>");
+        // a league match whose sources disagree keeps its feed's time, with the warning (the times are under Sources)
+        else if (c && c.status === "conflicting")
+          tags.push('<span class="pill warn">' + esc(T.pConflicting) + "</span>");
         if (r.when && +fmtH.format(r.when) < 7)
           tags.push('<span class="pill early">' + ICON.moon + esc(T.pEarly) + "</span>");
       }
