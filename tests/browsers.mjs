@@ -413,17 +413,19 @@ const besideChecks = [
     // the days near the window are laid out only once they are near it (content-visibility in styles.css), so the
     // matches above can change height just after the scroll: wait until the card stays put for a few frames, or the
     // press and release of the click can land on different places and no click happens (see showMatch())
-    await page.locator(card).evaluate(c => new Promise(done => {
+    const settled = await page.locator(card).evaluate(c => new Promise(done => {
       let last = null, same = 0, frames = 0;
       const look = () => {
         const top = Math.round(c.getBoundingClientRect().top);
         same = top === last ? same + 1 : 0;
         last = top;
-        if (same >= 5 || ++frames > 120) done();
+        if (same >= 5) done(true);
+        else if (++frames > 120) done(false);
         else requestAnimationFrame(look);
       };
       requestAnimationFrame(look);
     }));
+    must(settled, "waiting for the match card to stay put after the scroll: it was still moving after 120 frames");
     // what happened, for the message if a wait below runs out: a click reaching the page, the panel closing
     await page.evaluate(() => {
       window.__trace = [];
