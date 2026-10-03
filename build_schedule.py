@@ -450,7 +450,8 @@ def previous_lib(start, path="fixtures.json"):
     except Exception:
         return []
     recent = (start - timedelta(days=KEEP_DAYS)).isoformat()
-    return [r for r in old if isinstance(r, dict) and _valid_lib(r) and r["date"] >= recent]
+    # write_fixtures() leaves out an empty venue and note; ics() and the rest expect both keys
+    return [{"venue": None, "note": None, **r} for r in old if isinstance(r, dict) and _valid_lib(r) and r["date"] >= recent]
 
 # ---------- Formula 1: every session of every race weekend ----------
 # Jolpica-F1 (volunteer-run successor to the Ergast API; no key) gives each weekend's session times in UTC.

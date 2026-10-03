@@ -280,6 +280,18 @@ class Libertadores(unittest.TestCase):
             common.save_json(path, {"matches": [good, *bad]})
             self.assertEqual(bs.previous_lib(date(2026, 9, 30), path), [good])
 
+    def test_reused_matches_still_make_a_calendar(self):
+        """fixtures.json leaves out an empty venue and note; matches reused from it (ESPN down) get them back, so the
+        calendar can be written."""
+        r = bs.record("CONMEBOL Libertadores", "LIB", "Fluminense FC", "SE Palmeiras", "2026-10-15",
+                      "2026-10-15T00:30:00+00:00", uid="lib|401")
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "fixtures.json")
+            bs.write_fixtures({"generated": "2026-10-01T00:00+00:00", "sources": {}, "matches": [r]}, path)
+            again = bs.previous_lib(date(2026, 9, 30), path)
+        self.assertEqual([(x["venue"], x["note"]) for x in again], [(None, None)])
+        self.assertIn("Fluminense FC", bs.ics(again))
+
     def test_libertadores_matches_never_count_towards_the_safety_check(self):
         self.assertEqual(bs.upcoming_league_matches([bs.record("CONMEBOL Libertadores", "LIB", "A", "B", "2026-10-15")]), 0)
 
