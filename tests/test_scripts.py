@@ -177,6 +177,15 @@ class LeagueCrossCheck(unittest.TestCase):
             bs.cross_check_league("EPL", [r], "football-data.org", date(2026, 10, 1))
         self.assertNotIn("check", r)                                                     # not "conflicting"
 
+    def test_a_source_that_matched_nothing_is_not_named_on_the_site(self):
+        with mock.patch.object(bs, "from_openfootball", return_value=([
+                    {"home": "Arsenal FC", "away": "Chelsea FC", "date": "2026-10-03", "utc": "2026-10-03T16:30:00+00:00"}], [])), \
+                mock.patch.object(bs, "espn_league", return_value=[other("Fulham", "Burnley", "2026-10-03")]), \
+                redirect_stdout(io.StringIO()):
+            r = league("Arsenal FC", "Chelsea FC", "2026-10-03", "2026-10-03T16:30:00+00:00")
+            named = bs.cross_check_league("EPL", [r], "football-data.org", date(2026, 10, 1))
+        self.assertEqual(named, ["openfootball"])                                       # ESPN read, but checked nothing
+
     def test_finished_and_started_matches_are_left_alone(self):
         done = league("Arsenal FC", "Chelsea FC", "2026-10-03", "2026-10-03T16:30:00+00:00", result={"home": 1, "away": 0})
         on = league("Everton FC", "Leeds United FC", "2026-10-03", "2026-10-03T14:00:00+00:00", started=True)

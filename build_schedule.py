@@ -363,7 +363,7 @@ def cross_check(recs, main, others):
 
 def cross_check_league(code, recs, main, start):
     """The other sources for one league, then cross_check(). A source that cannot be read is left out this run; the
-    matches still show, as before, just without its check."""
+    matches still show, as before, just without its check. Returns the sources that matched at least one match."""
     name, _, filename, style, tz = LEAGUES[code]
     if main == "openfootball":
         print(f"{code}: openfootball is the main feed this run; its times are provisional, so not cross-checked")
@@ -385,7 +385,7 @@ def cross_check_league(code, recs, main, start):
     found = cross_check(recs, main, others)
     upcoming = sum(1 for r in recs if "result" not in r and not r.get("started"))
     print(f"{code}: {upcoming} upcoming matches; found in " + ", ".join(f"{n} {k}" for n, k in found.items()))
-    return [n for n, _ in others]
+    return [n for n, _ in others if found[n]]          # only the sources that checked something are named on the site
 
 # ---------- source 4: CONMEBOL Libertadores, from two independent sources ----------
 # No free league feed covers it (football-data.org's free plan does not; openfootball has no file for the season), so
