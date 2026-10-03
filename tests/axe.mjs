@@ -16,7 +16,7 @@ const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-prac
 const themes = ["light", "dark"];
 const langs = ["en", "pt"];
 const widths = [390, 1280, 1920];
-const states = ["closed", "filters-open", "starred", "sidebar-hidden", "setmenu", "calmenu", "tables", "tables-unl", "tables-f1", "details", "high", "high-details", "f1", "high-f1"];
+const states = ["closed", "filters-open", "starred", "sidebar-hidden", "setmenu", "calmenu", "tables", "tables-unl", "tables-lib", "tables-f1", "details", "high", "high-details", "f1", "high-f1"];
 const query = { details: `&match=${encodeURIComponent(MATCH.uid)}`, "high-details": `&match=${encodeURIComponent(MATCH.uid)}`,
   f1: `&match=${encodeURIComponent(F1_WEEKEND)}`, "high-f1": `&match=${encodeURIComponent(F1_WEEKEND)}` };
 
@@ -58,6 +58,7 @@ async function inspect(page, [theme, lang, width, state]) {
   if (state === "setmenu" || state === "calmenu") await page.evaluate(id => { document.getElementById(id).open = true; }, state);
   if (state.startsWith("tables")) { await page.click("#tablesbtn"); await page.waitForSelector("#ltbody table"); }
   if (state === "tables-unl") { await page.click('#ltchips [data-code="UNL"]'); await page.waitForSelector("#lt-g-A4"); }
+  if (state === "tables-lib") { await page.click('#ltchips [data-code="LIB"]'); await page.waitForSelector("#lt-g-H"); }
   if (state === "tables-f1") { await page.click('#ltchips [data-code="F1"]'); await page.waitForSelector("#ltbody .f1t"); }
   if (state.endsWith("details")) await page.waitForSelector("#md-map .tiles");
   if (state === "f1" || state === "high-f1") await page.waitForSelector("#wk-champ table");

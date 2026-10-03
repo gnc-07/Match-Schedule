@@ -10,7 +10,8 @@
 // large enough, and the page reports no script errors or Content-Security-Policy violations. Then, at phone and laptop
 // width, it uses the site the way a visitor would: theme button, Settings (text size, high contrast, language), league
 // chips, dates, team search, stars, sources, match details (and Escape and Back), the F1 race weekend, the league tables,
-// the Calendar menu and the keyboard. The sample data in mock-data.mjs stands in for ESPN, Jolpica-F1 and Wikidata.
+// the Calendar menu and the keyboard. On a monitor, Match details beside the list must close without the list moving.
+// The sample data in mock-data.mjs stands in for ESPN, Jolpica-F1 and Wikidata.
 // A picture of each view is saved in screenshots/browsers/ to compare the browsers by eye.
 //
 // Run: node tests/browsers.mjs                  (chromium, firefox and webkit; a browser that is not installed is skipped)
@@ -291,6 +292,14 @@ const actChecks = [
     const meta = await page.locator("#list .match .m-meta", { hasText: pt ? "Liga das Nações da UEFA" : "UEFA Nations League" }).first().textContent();
     must(pt ? /Grupo A\d, Rodada \d/.test(meta) : /Group A\d, Matchday \d/.test(meta), `a Nations League card reads "${meta.trim()}"`);
   }],
+  ["Libertadores button and cards", async page => {
+    const pt = await page.evaluate(() => LANG === "pt");
+    must((await page.locator("#chip-LIB").textContent()).includes("Libertadores"), "there is no Libertadores button");
+    must(await count(page, "#chip-LIB .crest.flag svg path") >= 2, "the Libertadores button has no emblem");
+    await showMatch(page, "lib|900101");
+    const meta = await page.locator("#list .match .m-meta", { hasText: "CONMEBOL Libertadores" }).last().textContent();
+    must(meta.includes(pt ? "Semifinal, jogo de ida" : "Semi-finals, 1st leg"), `a Libertadores card reads "${meta.trim()}"`);
+  }],
   ["sources unfold", async page => {
     const d = page.locator("#list .srcs").first();
     await d.locator("summary").click();
@@ -337,6 +346,10 @@ const actChecks = [
     await page.waitForSelector("#lt-g-A1");
     const groups = await page.$$eval("#ltbody caption", c => c.map(x => x.textContent));
     must(groups.join() === "Group A1,Group A2,Group A3,Group A4", `the Nations League shows the tables ${groups.join(", ")}`);
+    await page.click('#ltchips [data-code="LIB"]');
+    await page.waitForSelector("#lt-g-H");
+    const lib = await page.$$eval("#ltbody caption", c => c.map(x => x.textContent));
+    must(lib.join() === "Group A,Group B,Group C,Group D,Group E,Group F,Group G,Group H", `the Libertadores shows the tables ${lib.join(", ")}`);
     await page.click('#ltchips [data-code="F1"]');
     await page.waitForSelector("#ltbody .f1t");
     await page.click("#ltdlg [data-close]");
@@ -365,6 +378,38 @@ const actChecks = [
     const before = await page.evaluate(() => document.documentElement.classList.contains("is-dark"));
     await page.keyboard.press("Enter");
     must(await page.evaluate(() => document.documentElement.classList.contains("is-dark")) !== before, "Enter did not press the theme button");
+  }],
+];
+
+// On a monitor, where Match details opens beside the list. At 1650px the list is much narrower beside the panel than
+// without it (at 1920px the two barely differ), so the matches above the window change height when it closes: the
+// match whose details were shown must stay where it was on screen, not slide up by all they lost (browsers do not
+// keep it in place themselves here, since the page's own padding changes too). The right-hand column gives way to the
+// panel and comes back.
+const besideChecks = [
+  ["match details beside the list close in place", async page => {
+    await page.setViewportSize({ width: 1650, height: 1000 });
+    await page.waitForFunction(() => document.documentElement.dataset.wide === "full");
+    const pick = await page.evaluate(() => {
+      const a = [...document.querySelectorAll("#list .match .md-open")][14];
+      a.closest(".match").scrollIntoView({ block: "center" });
+      return a.dataset.uid;
+    });
+    const card = `#list .match:has(.md-open[data-uid="${pick}"])`;
+    const top = () => page.locator(card).evaluate(c => Math.round(c.getBoundingClientRect().top));
+    await page.click(`#list .match .md-open[data-uid="${pick}"]`);
+    await page.waitForFunction(() => document.documentElement.hasAttribute("data-pane"));
+    await wait(300);
+    const rail = () => page.evaluate(() => [document.getElementById("rail").offsetWidth > 0, document.documentElement.hasAttribute("data-rail-out")]);
+    const [railShown, railOut] = await rail();
+    must(!railShown && !railOut, "the right-hand column is still on screen beside Match details");
+    const shown = await top();
+    await page.click("#mddlg [data-close]");
+    await page.waitForFunction(() => !document.getElementById("mddlg").open && !location.search.includes("match="));
+    await wait(300);
+    const after = await top();
+    must((await rail())[0], "the right-hand column did not come back when Match details closed");
+    must(Math.abs(after - shown) <= 2, `the match moved from ${shown}px to ${after}px from the top of the window when Match details closed`);
   }],
 ];
 
@@ -421,6 +466,14 @@ try {
             }
           }
         }
+        if (lang === "en" && width === 1920)
+          for (const [name, steps] of besideChecks) {
+            try { await steps(page); note(engine, `${view}  ${name}`, ""); }
+            catch (e) {
+              note(engine, `${view}  ${name}`, e.message.split("\n")[0]);
+              await page.screenshot({ path: path.join(out, `${engine}-${width}-FAILED-${name.replace(/\W+/g, "-")}.png`) }).catch(() => {});
+            }
+          }
         const problems = await pageProblems(page, errors);
         note(engine, `${view}  no script errors or blocked requests`, problems.slice(0, 5).join("\n      "));
         await context.close();

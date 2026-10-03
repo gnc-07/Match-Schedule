@@ -112,7 +112,7 @@ const I18N = {
     dEarly: "Kicks off before 7:00 a.m. in the time zone you chose.",
     howTitle: "How it works",
     how1html:
-      'League fixtures come from <a href="https://www.football-data.org/" rel="noopener">football-data.org</a> (or <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> if it is unavailable) and are rebuilt four times a day. Each league kick-off time is also checked against openfootball and ESPN, and marked verified when they agree. When that feed lags, and for friendlies, times come from official league and club sites and the press, with every source listed under the match.',
+      'League fixtures come from <a href="https://www.football-data.org/" rel="noopener">football-data.org</a> (or <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a> if it is unavailable) and are rebuilt four times a day. Each league kick-off time is also checked against openfootball and ESPN, and marked verified when they agree. When that feed lags, and for friendlies, times come from official league and club sites and the press, with every source listed under the match. Copa Libertadores matches come from ESPN, with each time checked against the match listings on Wikipedia.',
     how3: "Live scores, line-ups, match events and league tables come from ESPN. If ESPN is not answering, Bundesliga scores, goals and table come from OpenLigaDB, and the other tables are worked out from the league results. Stadium maps come from OpenStreetMap and Wikidata. Live scores appear on this site only, not in the calendar.",
     how5: "CazéTV buttons lead to its free YouTube streams, found through its channel and the fan-made agendacazetv.com. Most only play in Brazil.",
     watch: "Watch on CazéTV",
@@ -124,7 +124,11 @@ const I18N = {
     how4: "Stars and settings are saved in your browser only. Finished matches stay on the list, with the final score, for a day after kick-off.",
     repo: "Source code and data:",
     teams: {},
-    comp: { "International friendly": "International friendly", "UEFA Nations League": "UEFA Nations League" },
+    comp: {
+      "International friendly": "International friendly",
+      "UEFA Nations League": "UEFA Nations League",
+      "CONMEBOL Libertadores": "CONMEBOL Libertadores",
+    },
     friendlies: "Friendlies",
     nationsLeague: "Nations League",
     round: r => r,
@@ -415,7 +419,7 @@ const I18N = {
     dEarly: "Começa antes das 7h no fuso horário escolhido.",
     howTitle: "Como funciona",
     how1html:
-      'Os jogos das ligas vêm do <a href="https://www.football-data.org/" rel="noopener">football-data.org</a> (ou do <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a>, se ele estiver indisponível) e são atualizados quatro vezes por dia. Cada horário das ligas também é conferido no openfootball e na ESPN, e marcado como verificado quando eles concordam. Quando essa fonte atrasa, e nos amistosos, os horários vêm dos sites oficiais de ligas e clubes e da imprensa, com todas as fontes listadas no jogo.',
+      'Os jogos das ligas vêm do <a href="https://www.football-data.org/" rel="noopener">football-data.org</a> (ou do <a href="https://github.com/openfootball/football.json" rel="noopener">openfootball</a>, se ele estiver indisponível) e são atualizados quatro vezes por dia. Cada horário das ligas também é conferido no openfootball e na ESPN, e marcado como verificado quando eles concordam. Quando essa fonte atrasa, e nos amistosos, os horários vêm dos sites oficiais de ligas e clubes e da imprensa, com todas as fontes listadas no jogo. Os jogos da Libertadores vêm da ESPN, com cada horário conferido nas listas de jogos da Wikipédia.',
     how3: "Placares ao vivo, escalações, lances e classificações vêm da ESPN. Se a ESPN não responder, os placares, gols e a classificação da Bundesliga vêm do OpenLigaDB, e as outras classificações são calculadas a partir dos resultados das ligas. Os mapas dos estádios vêm do OpenStreetMap e do Wikidata. Os placares ao vivo aparecem só neste site, não na agenda.",
     how5: "Os botões da CazéTV levam às transmissões grátis no YouTube, encontradas pelo canal dela e pelo site de fã agendacazetv.com. A maioria só funciona no Brasil.",
     watch: "Assistir na CazéTV",
@@ -483,10 +487,33 @@ const I18N = {
       Estonia: "Estônia",
       Andorra: "Andorra",
     },
-    comp: { "International friendly": "Amistoso internacional", "UEFA Nations League": "Liga das Nações da UEFA" },
+    comp: {
+      "International friendly": "Amistoso internacional",
+      "UEFA Nations League": "Liga das Nações da UEFA",
+      "CONMEBOL Libertadores": "CONMEBOL Libertadores",
+    },
     friendlies: "Amistosos",
     nationsLeague: "Liga das Nações",
-    round: r => r.replace(/^Group (\w+), /, "Grupo $1, ").replace(/(^|, )Matchday (\d+)$/, "$1Rodada $2"),
+    // rounds: "Group A1, Matchday 3" (Nations League), "Matchday 5" (leagues), "Semi-finals, 1st leg" (Libertadores)
+    round: r =>
+      r
+        .replace(
+          /^(First stage|Second stage|Third stage|Group stage|Round of 16|Quarter-finals|Semi-finals)(?=,|$)/,
+          m =>
+            ({
+              "First stage": "Primeira fase",
+              "Second stage": "Segunda fase",
+              "Third stage": "Terceira fase",
+              "Group stage": "Fase de grupos",
+              "Round of 16": "Oitavas de final",
+              "Quarter-finals": "Quartas de final",
+              "Semi-finals": "Semifinal",
+            })[m],
+        )
+        .replace(/, 1st leg$/, ", jogo de ida")
+        .replace(/, 2nd leg$/, ", jogo de volta")
+        .replace(/^Group (\w+)(?=,|$)/, "Grupo $1")
+        .replace(/(^|, )Matchday (\d+)$/, "$1Rodada $2"),
     notes: {
       "Messi's farewell match": "Jogo de despedida de Messi",
       "Postponed; new date not set.": "Adiado; nova data não definida.",

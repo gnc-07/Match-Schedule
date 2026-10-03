@@ -65,8 +65,8 @@ const safeUrl = u => {
     return "";
   }
 };
-// Pictures for the league buttons: flags for the four leagues, a globe for friendlies, the flag from the Nations League's logo
-// and the F1 mark (from Simple Icons, https://simpleicons.org). A league missing here keeps its letter badge (abbr).
+// Pictures for the league buttons: flags for the four leagues, the Libertadores emblem, a globe for friendlies, the flag from
+// the Nations League's logo and the F1 mark (from Simple Icons, https://simpleicons.org). A league missing here keeps its letter badge (abbr).
 const band = (v, x, y, w, h) =>
   '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" style="fill:var(--flag-' + v + ')"/>';
 const CREST = {
@@ -221,6 +221,14 @@ const CREST = {
       ]
         .map(([c, d]) => '<path d="' + d + '" style="fill:var(--flag-' + c + ')"/>')
         .join(""),
+  ],
+  // CONMEBOL Libertadores: the emblem of its official logo (CONMEBOL's trademark), five gold bars on black, traced from
+  // the logo ESPN serves (a.espncdn.com/i/leaguelogos/soccer/500/58.png), the lettering and sponsor's name left out.
+  // Like the Nations League's, used on a free, non-commercial site.
+  LIB: [
+    "flag",
+    band("black", 0, 0, 24, 24) +
+      '<path d="M7.38 5.25 7 5.79 7.93 7.73 8.55 10.29 8.55 14.02 8.16 15.96 7.31 18.21 6.22 19.84 5.06 20.92 6.76 20.92 7.46 19.91 8.31 18.05 8.94 15.88 9.25 13.78 9.25 10.91 8.94 8.82 8.47 7.11 7.69 5.25zM9.09 3.85 8.47 4.24 8.24 4.55 9.01 6.65 9.56 9.28 9.71 10.84 9.71 13.71 9.25 16.97 8.47 19.53 7.85 20.84 7.93 20.92 9.48 20.92 10.18 18.36 10.49 16.42 10.72 12.23 10.41 8.35 9.87 5.64 9.32 3.85zM11.26 3.16 11.11 3.23 11.03 15.96 10.8 18.91 10.41 20.77 10.49 20.92 13.59 20.92 13.67 20.84 13.36 19.6 13.12 17.51 12.97 14.64 12.89 11.07 12.97 3.23 12.74 3.16zM14.75 3.85 14.13 5.87 13.75 7.73 13.36 11.61 13.36 13.78 13.59 16.58 14.13 19.53 14.6 20.92 16.15 20.92 16.23 20.84 15.53 19.37 14.83 17.04 14.37 14.02 14.37 10.53 14.6 8.66 15.14 6.34 15.84 4.55 15.69 4.32 14.99 3.85zM16.38 5.25 15.84 6.41 15.14 8.74 14.83 10.76 14.75 12.78 14.99 15.18 15.53 17.43 16.38 19.53 17.24 20.92 19.02 20.92 17.7 19.68 17 18.67 16.07 16.58 15.53 14.17 15.53 10.14 16.07 7.89 16.69 6.41 17.08 5.79 16.69 5.25z" style="fill:var(--flag-lib-gold)"/><path d="M11.96 17.2 11.96 17.59 11.73 17.66 11.42 18.05 11.11 18.21 11.88 18.91 11.81 19.84 11.57 20.15 11.19 20.38 11.11 20.77 10.88 20.92 13.12 20.92 12.97 20.77 12.89 20.38 12.5 20.15 12.19 19.68 12.12 18.91 12.97 18.28 12.43 17.74 12.12 17.59 12.04 17.43 12.12 17.2z" style="fill:var(--flag-black)"/>',
   ],
   F1: [
     "mark",
@@ -440,7 +448,7 @@ function glide(els, change, pin) {
       dx = (pa.left - pb.left) / z,
       dy = (pa.top - pb.top) / z;
     if (!a.width && b.width)
-      move(el, [{ opacity: 0 }, { opacity: 1 }]); // just shown: it fades in where it is
+      move(el, [{ opacity: 0 }, { opacity: 1 }], SOFT()); // just shown: it fades in where it is, on the glide's curve
     else if (a.width && b.width && (Math.abs(dx) > 1 || Math.abs(dy) > 1))
       move(el, [{ transform: "translate(" + dx + "px," + dy + "px)" }, { transform: "none" }], SOFT()); // a long way: gently
   });

@@ -4,6 +4,7 @@ const LEAGUES = [
   { code: "LIGA", name: "La Liga", abbr: "LL", c: "--liga" },
   { code: "BUN", name: "Bundesliga", abbr: "BL", c: "--bun" },
   { code: "BRA", name: "Brasileirão", abbr: "BR", c: "--bra" },
+  { code: "LIB", name: "Libertadores", abbr: "LIB", c: "--lib" },
   { code: "INTL", name: "Friendlies", abbr: "INT", c: "--intl" },
   { code: "UNL", name: "UEFA Nations League", abbr: "UNL", c: "--unl" },
   { code: "F1", name: "Formula 1", abbr: "F1", c: "--f1" },
@@ -17,8 +18,8 @@ const leagueName = l =>
   l.code === "INTL" ? T.friendlies : l.code === "UNL" ? T.nationsLeague : l.code === "F1" ? T.f1 : l.name;
 const colorOf = code => "var(" + (LEAGUES.find(l => l.code === code) || { c: "--line" }).c + ")";
 const ORDER = {
-  en: ["EPL", "LIGA", "BUN", "BRA", "INTL", "UNL", "F1"],
-  pt: ["BRA", "INTL", "F1", "EPL", "LIGA", "BUN", "UNL"],
+  en: ["EPL", "LIGA", "BUN", "BRA", "LIB", "INTL", "UNL", "F1"],
+  pt: ["BRA", "LIB", "INTL", "F1", "EPL", "LIGA", "BUN", "UNL"],
 };
 const ordered = () => ORDER[LANG].map(c => LEAGUES.find(l => l.code === c));
 const on = new Set(
