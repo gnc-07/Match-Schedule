@@ -32,40 +32,67 @@ const fitRail = () =>
     rail.offsetHeight > innerHeight / (parseFloat(getComputedStyle(document.documentElement).zoom) || 1) - 32,
   );
 if (window.ResizeObserver) new ResizeObserver(fitRail).observe(rail);
-// the parts of the page that change place when the filter sidebar or the panel beside the list comes or goes
-const pageParts = () => [filtersEl, sideBar, liveBox, listEl, rail];
-// hiding: the sidebar slides away to the left first; then the list glides over and the bar above it fades in.
-// Showing: the list glides over first; then the sidebar slides in.
+// the parts of the page that change place when the filter sidebar or the panel beside the list comes or goes: the
+// header's parts (the brand, the theme button, the other buttons) each keep their width, so they only glide
+const pageParts = () => [
+  filtersEl,
+  sideBar,
+  liveBox,
+  listEl,
+  rail,
+  ...document.querySelectorAll(".topbar>*"),
+  document.getElementById("stamp"),
+];
+// The sidebar, the list and the right-hand column move as one: hiding, the sidebar slides out to the left as it fades,
+// and the list and the column slide over by as much, at the same speed (none of them changes width, see styles.css);
+// showing, the same backwards. Hiding, the sidebar is kept where it was meanwhile (data-side-out), as the right-hand
+// column is by railOut(). Positions are measured on screen, so they are divided by the text-size zoom.
 function setSide(s) {
-  if (s === side || filtersEl.leaving) return;
-  const apply = () => {
-    side = s;
-    store.set("side", s);
-    glide(
-      pageParts().filter(x => x !== filtersEl),
-      applyWide,
-    );
-    // shown: once the list has mostly made room, the sidebar slides in from the left (the way it left)
-    if (s === "open")
-      move(
-        filtersEl,
-        [
-          { opacity: 0, transform: "translateX(-24px)" },
-          { opacity: 1, transform: "none" },
-        ],
-        { duration: DUR("s"), delay: DUR("s"), fill: "backwards" },
-      );
-    document.getElementById(s === "open" ? "sidehide" : "sideshow").focus(); // the button pressed disappears: focus goes to its opposite
-  };
-  if (s === "open") return apply();
-  leave(
-    filtersEl,
-    [
-      { opacity: 1, transform: "none" },
-      { opacity: 0, transform: "translateX(-24px)" },
-    ],
-    apply,
+  if (s === side) return;
+  const r = document.documentElement,
+    z = parseFloat(getComputedStyle(r).zoom) || 1,
+    cs = getComputedStyle(filtersEl),
+    turn = filtersEl.getAnimations().length > 0 && { opacity: cs.opacity, transform: cs.transform }; // pressed again on its way: it turns back from where it is
+  if (filtersEl.leaving) {
+    stay(filtersEl);
+    r.removeAttribute("data-side-out");
+    filtersEl.style.left = filtersEl.style.top = filtersEl.style.width = "";
+  }
+  filtersEl.getAnimations().forEach(a => a.cancel());
+  const was = filtersEl.getBoundingClientRect();
+  let dx = 0; // how far the list goes from one layout to the other (glide has stopped it first)
+  side = s;
+  store.set("side", s);
+  glide(
+    pageParts().filter(x => x !== filtersEl),
+    () => {
+      const from = listEl.getBoundingClientRect().left;
+      applyWide();
+      dx = (listEl.getBoundingClientRect().left - from) / z;
+      if (s === "closed") {
+        Object.assign(filtersEl.style, {
+          left: was.left / z + "px",
+          top: was.top / z + "px",
+          width: was.width / z + "px",
+        });
+        r.setAttribute("data-side-out", "");
+      }
+    },
   );
+  const gone = { opacity: 0, transform: "translateX(" + (s === "open" ? -dx : dx) + "px)" },
+    here = { opacity: 1, transform: "none" };
+  if (s === "open") move(filtersEl, [turn || gone, here], SOFT());
+  else
+    leave(
+      filtersEl,
+      [turn || here, gone],
+      () => {
+        r.removeAttribute("data-side-out");
+        filtersEl.style.left = filtersEl.style.top = filtersEl.style.width = "";
+      },
+      "m",
+    );
+  document.getElementById(s === "open" ? "sidehide" : "sideshow").focus(); // the button pressed disappears: focus goes to its opposite
 }
 // phones: the filters fold away behind the same "Show filters" button, so the list comes first. Not remembered: every
 // visit starts with the list, and the summary beside the button says what the filters are showing.

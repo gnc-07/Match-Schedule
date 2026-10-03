@@ -837,19 +837,45 @@ function openDialog(then) {
       markCurrent();
       if (then) then();
     };
-  // beside the list, the page makes room for the panel and the match shown comes to the middle: the list and the
-  // sidebar glide there instead of jumping, following that match
+  // beside the list, the page makes room for the panel and the match shown comes to the middle: the list, the sidebar
+  // and the header's parts glide there instead of jumping, following that match, and the panel slides in from the right
+  // as far as the header's buttons go, in step with them, so it pushes them aside rather than covering them
   if (beside) {
-    const was = !mddlg.open && rail.offsetWidth ? rail.getBoundingClientRect() : null;
-    glide(
-      pageParts(),
-      () => {
+    const fresh = !mddlg.open,
+      was = fresh && rail.offsetWidth ? rail.getBoundingClientRect() : null,
+      stamp = crossFade(document.getElementById("stamp")), // narrower beside the panel: it wraps anew
+      push = makeRoom(() => {
         show();
         if (was) railOut(was);
-      },
-      shownCard(),
-    );
+        stamp();
+      });
+    if (push > 0 || fresh)
+      move(
+        mddlg,
+        [
+          { opacity: 0, transform: "translateX(" + (push > 0 ? push : 24) + "px)" },
+          { opacity: 1, transform: "none" },
+        ],
+        SOFT(),
+      );
   } else show();
+}
+// glides the page into its new layout (change) and returns how far the header's buttons went to the left, the way the
+// panel beside the list comes in or goes out (on screen, so divided by the text-size zoom). Pressed again on the way, the
+// buttons are measured where they are, which is where the panel is too, as it moves in step with them.
+function makeRoom(change, pin) {
+  const tools = document.querySelector(".topbar .tools"),
+    from = tools.getBoundingClientRect().left;
+  let go = 0;
+  glide(
+    pageParts(),
+    () => {
+      change();
+      go = from - tools.getBoundingClientRect().left;
+    },
+    pin === undefined ? shownCard() : pin,
+  );
+  return go / (parseFloat(getComputedStyle(document.documentElement).zoom) || 1);
 }
 // The right-hand column gives way to the panel beside the list: it fades out where it was while the panel slides in
 // over it, kept in its place meanwhile (data-rail-out, as the panel is by data-pane-out when it leaves), the way it
@@ -871,6 +897,7 @@ function shut(d) {
   if (!d.open || d.leaving) return;
   const r = document.documentElement,
     modal = d.matches(":modal");
+  let back = 0; // beside the list: how far the header's buttons go back to the right, and the panel out with them
   if (modal)
     move(d, [{ opacity: 1 }, { opacity: 0 }], {
       duration: DUR("m"),
@@ -891,22 +918,20 @@ function shut(d) {
     const c = shownCard(),
       keep =
         c && c.getBoundingClientRect().bottom > 0 && c.getBoundingClientRect().top < innerHeight ? c : onScreen(listEl),
-      top = keep.getBoundingClientRect().top;
-    glide(
-      pageParts(),
-      () => {
-        r.removeAttribute("data-pane");
-        markCurrent();
-        if (keep !== listEl) scrollBy(0, keep.getBoundingClientRect().top - top);
-      },
-      keep,
-    );
+      top = keep.getBoundingClientRect().top,
+      stamp = crossFade(document.getElementById("stamp"));
+    back = -makeRoom(() => {
+      r.removeAttribute("data-pane");
+      markCurrent();
+      if (keep !== listEl) scrollBy(0, keep.getBoundingClientRect().top - top);
+      stamp();
+    }, keep);
   }
   leave(
     d,
     [
       { opacity: 1, transform: "none" },
-      { opacity: 0, transform: modal ? "translateY(12px)" : "translateX(24px)" },
+      { opacity: 0, transform: modal ? "translateY(12px)" : "translateX(" + (back > 0 ? back : 24) + "px)" },
     ],
     () => {
       undim(d);
