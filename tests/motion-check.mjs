@@ -5,11 +5,13 @@
 //   - with animations switched off, nothing moves, and switching them off stops what is moving;
 //   - nothing animates an element that is hidden (for example the sun or moon that is about to disappear);
 //   - closing and gliding stay gentle, followed frame by frame (see "smooth" below): a closing starts softly (at most
-//     a tenth of its fade, or 20px, in the first sixtieth of a second), the page never jumps while something closes,
+//     a tenth of its fade, or 20px, in the first sixtieth of a second), the page never jumps while something closes
+//     (a scroll that keeps the match on screen in place is no jump),
 //     and the list never glides more than 50px in a sixtieth of a second (a match on screen is followed, as a visitor
 //     sees it; measured per sixtieth, not per frame, so frames a busy computer skips do not count as jumps);
 //   - on monitors, Live now and the key, in one column, move and fade as one (moved by their column and by their own
-//     animation too, one would go twice as far: it jumps ahead, then glides back);
+//     animation too, one would go twice as far: it jumps ahead, then glides back), and the list, wider from the start
+//     of its glide when the filters hide, never shows over Live now (it slips under the column);
 //   - the menus, sources and "How to subscribe" play their opening again when opened a second time;
 // and it prints the slowest frame after each click, with animations on and off, with the processor slowed down 4 times
 // the way Lighthouse tests phones (Chromium only; FULLSPEED=1 for normal speed). Those timings vary from run to run,
@@ -249,7 +251,9 @@ async function run(label, launch) {
           window.__tr.push({ t: now, y: scrollY, at: sels.map(s => { const e = document.querySelector(s), r = (s === "#list" ? pin : e).getBoundingClientRect();
             let o = e.checkVisibility() ? 1 : 0;   // how visible it is: its own opacity times every parent's, as a visitor sees it
             for (let x = e; o && x !== document.documentElement; x = x.parentElement) o *= +getComputedStyle(x).opacity;
-            return [r.left, r.top, o]; }) });
+            // right: the list's own edge (Your teams included); and whether what shows just inside Live now's left edge is Live now
+            const top = s === "#livebox" && document.elementFromPoint(r.left + 2, r.top + Math.min(r.height / 2, 40));
+            return [r.left, r.top, o, e.getBoundingClientRect().right, !top || e.contains(top)]; }) });
           if (now - t0 < 900) requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
@@ -258,7 +262,10 @@ async function run(label, launch) {
       await wait(1000);
       const tr = await page.evaluate(() => window.__tr);
       await page.close();
-      const jumped = closing && tr.some((f, i) => i && f.y !== tr[i - 1].y);
+      // the page scrolled and what is read moved with it (closing beside the list, the page scrolls by what the matches
+      // above lose as the list gets wider, so the match on screen stays put: that is no jump)
+      const k = sels.indexOf("#list"),
+        jumped = closing && tr.some((f, i) => i && f.y !== tr[i - 1].y && (k < 0 || Math.abs(f.at[k][1] - tr[i - 1].at[k][1]) > 1));
       const lines = sels.map((s, k) => {
         let big = 0, first = null;
         for (let i = 1; i < tr.length; i++) {
@@ -291,6 +298,18 @@ async function run(label, launch) {
         if (apart > 2 || faded > 0.05)
           problems.push(`${label} smooth ${name}: Live now and the key come apart (${apart.toFixed(0)}px, opacity ${faded.toFixed(2)})`);
         lines.push(`apart ${apart.toFixed(0)}px / opacity ${faded.toFixed(2)}`);
+      }
+      // the list never shows over the right-hand column. Only transform moves, so a list that gets wider is at its new
+      // width from the start of its glide and can reach under the column (by "under" px), but Live now stays on top
+      const li = sels.indexOf("#list");
+      if (li >= 0 && lb >= 0) {
+        let under = 0, covered = 0;
+        for (const f of tr) if (f.at[li][2] && f.at[lb][2] && f.at[li][3] > f.at[lb][0] + 2) {
+          under = Math.max(under, f.at[li][3] - f.at[lb][0]);
+          if (!f.at[lb][4]) covered++;
+        }
+        if (covered) problems.push(`${label} smooth ${name}: the list shows over Live now in ${covered} frame(s)`);
+        lines.push(`list under Live now ${under.toFixed(0)}px`);
       }
       console.log(`${label.padEnd(8)} smooth ${name.padEnd(13)} ${lines.join("; ")}${jumped ? "; the page jumped" : ""}`);
     }

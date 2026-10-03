@@ -373,7 +373,9 @@ footer p{margin:10px 0 0}
 :root[data-wide="full"] .mid{grid-template-columns:290px minmax(0,1fr) 360px;grid-template-rows:none;grid-template-areas:"side list rail"}
 :root[data-wide="full"][data-side="closed"] .wrap{max-width:1400px}
 :root[data-wide="full"][data-side="closed"] .mid{grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto 1fr;grid-template-areas:"bar rail" "list rail"}
-:root[data-wide="full"] .rail{grid-area:rail;display:flex;flex-direction:column;gap:18px;position:sticky;top:16px}
+:root[data-wide="full"] .rail{grid-area:rail;display:flex;flex-direction:column;gap:18px;position:sticky;top:16px;z-index:1}
+/* z-index: above the list, which is wider from the start of its glide when the filters hide (only transform moves),
+   so its edge slips under Live now rather than over it */
 .rail.tall{position:static}   /* taller than the window (many live matches): it scrolls with the page, so its end stays reachable */
 .rail .livebox{flex:none}
 .rail .lv-row{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;padding:12px}
