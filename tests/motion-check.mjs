@@ -8,6 +8,9 @@
 //     a tenth of its fade, or 20px, in the first sixtieth of a second), the page never jumps while something closes,
 //     and the list never glides more than 50px in a sixtieth of a second (a match on screen is followed, as a visitor
 //     sees it; measured per sixtieth, not per frame, so frames a busy computer skips do not count as jumps);
+//   - on monitors, Live now and the key, in one column, move and fade as one (moved by their column and by their own
+//     animation too, one would go twice as far: it jumps ahead, then glides back);
+//   - the menus, sources and "How to subscribe" play their opening again when opened a second time;
 // and it prints the slowest frame after each click, with animations on and off, with the processor slowed down 4 times
 // the way Lighthouse tests phones (Chromium only; FULLSPEED=1 for normal speed). Those timings vary from run to run,
 // so they are for reading, not a pass or fail; TIMINGS=0 skips them (npm test does, which saves about a minute).
@@ -25,7 +28,12 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 const uid = MATCH.uid;
 const OK_PROPS = new Set(["opacity", "transform", "offset", "easing", "composite", "computedOffset"]);
 
-// name, width, what starts the animation
+// opened, closed, then opened again: only the second opening is recorded (Chromium styles nothing inside a closed
+// <details>, so a CSS opening animation there can play the first time only)
+const again = (show, hide) => async p => { await show(p); await wait(500); await hide(p); await wait(900);
+  await p.evaluate(() => window.__seen?.clear()); await show(p); };
+const srcs = async p => { await p.evaluate(() => document.querySelector("#list .srcs").scrollIntoView({ block: "center" })); await p.click("#list .srcs summary"); };
+// name, width, what starts the animation, and (optional) an animation that must be among those that run
 const cases = [
   ["panel", 1280, p => p.click(`.md-open[data-uid="${uid}"]`)],
   ["panel-beside", 1920, p => p.click(`.md-open[data-uid="${uid}"]`)],
@@ -46,6 +54,13 @@ const cases = [
   ["sheet-close", 390, async p => { await p.click("#setmenu summary"); await wait(600); await p.keyboard.press("Escape"); }],
   ["sources-close", 1280, async p => { await p.evaluate(() => document.querySelector("#list .srcs").scrollIntoView({ block: "center" }));
     await p.click("#list .srcs summary"); await wait(400); await p.click("#list .srcs summary"); }],
+  // opened a second time: each plays its opening again
+  ["settings-again", 1280, again(p => p.click("#setmenu summary"), p => p.keyboard.press("Escape")), "drop"],
+  ["calendar-again", 1280, again(p => p.click("#calmenu summary"), p => p.click("#calmenu summary")), "drop"],
+  ["sheet-again", 390, again(p => p.click("#calmenu summary"), p => p.keyboard.press("Escape")), "sheet-up"],
+  ["sources-again", 1280, again(srcs, srcs), "drop"],
+  ["howto-again", 1280, async p => { await p.click("#calmenu summary"); await wait(400);
+    await again(p => p.click("#calmenu .calpanel details summary"), p => p.click("#calmenu .calpanel details summary"))(p); }, "drop"],
   // the filter sidebar (laptops): hidden, then shown again
   ["sidebar-hide", 1280, p => p.click("#sidehide")],
   ["sidebar-show", 1280, async p => { await p.click("#sidehide"); await wait(900); await p.click("#sideshow"); }],
@@ -68,6 +83,9 @@ const cases = [
   }],
 ];
 
+const COLUMN = ["#list", "#livebox", "#legend"],
+  DURING = Date.parse(MATCH.utc) + 30 * 60e3,   // half an hour into the sample match: Live now shows it
+  live = p => p.waitForFunction(() => !document.getElementById("livebox").hidden, { timeout: 15000 });
 // name, width, what to follow, what to do first, what starts the movement (for the frame-by-frame "smooth" check)
 const smooth = [
   ["beside-open", 1920, ["#list", "#mddlg"], async () => {}, p => p.click(`.md-open[data-uid="${uid}"]`)],
@@ -83,13 +101,21 @@ const smooth = [
   ["phone-filters-open", 390, ["#list"], async () => {}, p => p.click("#sideshow")],
   ["phone-filters-close", 390, ["#list", "#filters"], async p => { await p.click("#sideshow"); await wait(900); }, p => p.click("#sideshow"), "closing"],
   ["sidebar-show", 1280, ["#list"], async p => { await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
+  // monitors: Live now and the key share the right-hand column, so they move as one (see "together" below)
+  ["wide-side-hide", 1920, COLUMN, live, p => p.click("#sidehide"), "closing"],
+  ["wide-side-show", 1920, COLUMN, async p => { await live(p); await p.click("#sidehide"); await wait(1200); }, p => p.click("#sideshow")],
+  ["wide-open", 1920, COLUMN, live, p => p.click(`.md-open[data-uid="${uid}"]`)],
+  ["wide-close", 1920, COLUMN, async p => { await live(p); await p.click(`.md-open[data-uid="${uid}"]`); await wait(900); }, p => p.keyboard.press("Escape"), "closing"],
 ];
 const problems = [];
 const ONLY = process.argv.slice(2);   // optional: names of the cases to run, e.g. theme goal
-// Opens the page ready for one case: light theme, nothing starred, animations on or off
-async function open(browser, width, motion) {
+// Opens the page ready for one case: light theme, nothing starred, animations on or off; at: a time for the page's
+// clock (Date only: animations keep to performance.now), such as during the sample match, so Live now shows it
+async function open(browser, width, motion, at) {
   const page = await browser.newPage();
   await page.setViewport({ width, height: 900 });
+  if (at) await page.evaluateOnNewDocument(at => { const D = Date, off = at - D.now();
+    window.Date = class extends D { constructor(...a) { super(...(a.length ? a : [D.now() + off])); } static now() { return D.now() + off; } }; }, at);
   await page.evaluateOnNewDocument(m => { try { localStorage.setItem("mp.theme", '"light"'); localStorage.setItem("mp.favs", "[]");
     localStorage.setItem("mp.side", '"open"'); localStorage.setItem("mp.contrast", '"normal"'); localStorage.setItem("mp.range", '"all"');
     localStorage.setItem("mp.motion", JSON.stringify(m)); localStorage.removeItem("mp.follow"); } catch {} }, motion);
@@ -124,7 +150,7 @@ async function run(label, launch) {
     throw e;
   }
   try {
-    for (const [name, width, act] of cases.filter(c => !ONLY.length || ONLY.includes(c[0]))) {
+    for (const [name, width, act, expect] of cases.filter(c => !ONLY.length || ONLY.includes(c[0]))) {
       if (process.env.TIMINGS !== "0") {
         const on = await slowest(browser, label, width, act, "on"), off = await slowest(browser, label, width, act, "off");
         console.log(`${label.padEnd(8)} ${name.padEnd(12)} slowest frame: ${on} ms with animations, ${off} ms without`);
@@ -171,6 +197,7 @@ async function run(label, launch) {
           list: [...window.__seen.values()] }; });
       await page.close();
       if (!anims.list.length) problems.push(`${label} ${name}: no animation ran`);
+      else if (expect && !anims.list.some(a => a.what === expect)) problems.push(`${label} ${name}: ${expect} did not run`);
       const seen = new Set();
       for (const a of anims.list) {
         const inner = /^-ua-|^-moz-|view-transition/.test(a.what);   // the browser's own steps inside a View Transition
@@ -213,14 +240,16 @@ async function run(label, launch) {
     if (stillFading || !dark) problems.push(`${label}: unticking Animations during the theme cross-fade left ${stillFading} running (dark theme kept: ${dark})`);
     // smooth: each frame, where the things that move are and how visible they are
     for (const [name, width, sels, prep, act, closing] of smooth.filter(c => !ONLY.length || ONLY.includes(c[0]) || ONLY.includes("smooth"))) {
-      const page = await open(browser, width, "on");
+      const page = await open(browser, width, "on", sels.includes("#livebox") && DURING);
       await prep(page);
       await page.evaluate(sels => {
         window.__tr = [];
         const t0 = performance.now(), pin = [...document.querySelectorAll("#list .match")].find(m => m.getBoundingClientRect().bottom > 0);
         const tick = now => {   // now: the frame's own time, the clock the animations move by
           window.__tr.push({ t: now, y: scrollY, at: sels.map(s => { const e = document.querySelector(s), r = (s === "#list" ? pin : e).getBoundingClientRect();
-            return [r.left, r.top, e.checkVisibility() ? +getComputedStyle(e).opacity : 0]; }) });
+            let o = e.checkVisibility() ? 1 : 0;   // how visible it is: its own opacity times every parent's, as a visitor sees it
+            for (let x = e; o && x !== document.documentElement; x = x.parentElement) o *= +getComputedStyle(x).opacity;
+            return [r.left, r.top, o]; }) });
           if (now - t0 < 900) requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
@@ -248,6 +277,21 @@ async function run(label, launch) {
         return `${s} biggest step ${big.toFixed(0)}px` + (first ? `, first ${first[0].toFixed(0)}px / opacity ${first[1].toFixed(2)}` : "");
       });
       if (jumped) problems.push(`${label} smooth ${name}: the page jumped while closing`);
+      // together: Live now and the key sit in one column, so every frame they have moved as far as each other and are
+      // as visible as each other (one moved or faded twice, by its own animation and its column's, lags or jumps)
+      const lb = sels.indexOf("#livebox"), lg = sels.indexOf("#legend");
+      if (lb >= 0 && lg >= 0) {
+        let apart = 0, faded = 0;
+        for (const f of tr) {
+          const a = f.at[lb], b = f.at[lg], a0 = tr[0].at[lb], b0 = tr[0].at[lg];
+          if (f.y !== tr[0].y || !a[2] || !b[2]) continue;   // scrolled, or gone (a hidden box has no place)
+          apart = Math.max(apart, Math.hypot(a[0] - a0[0] - (b[0] - b0[0]), a[1] - a0[1] - (b[1] - b0[1])));
+          faded = Math.max(faded, Math.abs(a[2] - b[2]));
+        }
+        if (apart > 2 || faded > 0.05)
+          problems.push(`${label} smooth ${name}: Live now and the key come apart (${apart.toFixed(0)}px, opacity ${faded.toFixed(2)})`);
+        lines.push(`apart ${apart.toFixed(0)}px / opacity ${faded.toFixed(2)}`);
+      }
       console.log(`${label.padEnd(8)} smooth ${name.padEnd(13)} ${lines.join("; ")}${jumped ? "; the page jumped" : ""}`);
     }
   } finally {

@@ -434,9 +434,12 @@ const riseDays = days =>
 // above the window change height and the browser scrolls to keep what is read in place, so the list's top edge can
 // move thousands of pixels while what is on screen barely moves.
 // pin: the match to follow, when one matters (the one whose details open or close beside the list)
+// Something inside another of els (Live now in the right-hand column, on monitors) moves with it and is left alone:
+// moved by its own animation too, it would go twice as far, jumping ahead and gliding back, or fade twice.
 const onScreen = el =>
   (el === listEl && [...el.querySelectorAll(".match")].find(m => m.getBoundingClientRect().bottom > 0)) || el;
 function glide(els, change, pin) {
+  els = els.filter(el => !els.some(o => o !== el && o.contains(el)));
   const z = parseFloat(getComputedStyle(document.documentElement).zoom) || 1,
     pins = els.map(el => (el === listEl && pin && pin.isConnected ? pin : onScreen(el))),
     was = els.map((el, i) => [el.getBoundingClientRect(), pins[i].getBoundingClientRect()]);
