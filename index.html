@@ -7,7 +7,7 @@
      service must be added here: fetch() addresses to connect-src, pictures to img-src. When the site is published,
      publish_site.py replaces script-src with a fingerprint (hash) of each script in the page, so visitors' browsers run
      those scripts and nothing else; 'unsafe-inline' only remains in this copy, for previewing the files as they are. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://a.espncdn.com; connect-src 'self' https://site.api.espn.com https://api.openligadb.de https://www.wikidata.org https://api.jolpi.ca; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://a.espncdn.com https://gnc.goatcounter.com/count; connect-src 'self' https://site.api.espn.com https://api.openligadb.de https://www.wikidata.org https://api.jolpi.ca; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <script>
 /* start downloading the fixtures straight away, while the rest of the page is still being read */
 window.FX = fetch("fixtures.json", { cache: "no-store" }).then(r => {

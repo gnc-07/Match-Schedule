@@ -8,7 +8,7 @@
 // STATS is the GoatCounter address, such as "https://name.goatcounter.com", with no "/" at the end; while it is empty,
 // nothing is counted and "How it works" does not mention counting. The same address followed by /count must be in
 // img-src (tests/test_scripts.py checks the two agree).
-const STATS = "";
+const STATS = "https://gnc.goatcounter.com";
 
 // Counted only on the real site (the address in the hreflang links of <head>), so a local preview, the tests or a
 // copy of the site published elsewhere add nothing; and never for a browser that asks sites not to track it
