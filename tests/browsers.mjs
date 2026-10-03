@@ -394,7 +394,8 @@ const until = async (page, step, fn) => {
     const state = await page.evaluate(() => {
       const r = document.documentElement, d = document.getElementById("mddlg");
       return `wide=${r.dataset.wide || ""} pane=${r.hasAttribute("data-pane")} pane-out=${r.hasAttribute("data-pane-out")} ` +
-        `dialog open=${d.open} address=${location.search || "(none)"} scrollY=${Math.round(scrollY)} focus=${document.activeElement?.id || document.activeElement?.className || ""}`;
+        `dialog open=${d.open} address=${location.search || "(none)"} scrollY=${Math.round(scrollY)} focus=${document.activeElement?.id || document.activeElement?.className || ""}` +
+        (window.__trace ? ` events=${window.__trace.join(",") || "none"}` : "");
     }).catch(() => "page state unreadable");
     throw new Error(`${step}: ${e.message.split("\n")[0]} (${state})`);
   }
@@ -409,6 +410,27 @@ const besideChecks = [
       return a.dataset.uid;
     });
     const card = `#list .match:has(.md-open[data-uid="${pick}"])`;
+    // the days near the window are laid out only once they are near it (content-visibility in styles.css), so the
+    // matches above can change height just after the scroll: wait until the card stays put for a few frames, or the
+    // press and release of the click can land on different places and no click happens (see showMatch())
+    await page.locator(card).evaluate(c => new Promise(done => {
+      let last = null, same = 0, frames = 0;
+      const look = () => {
+        const top = Math.round(c.getBoundingClientRect().top);
+        same = top === last ? same + 1 : 0;
+        last = top;
+        if (same >= 5 || ++frames > 120) done();
+        else requestAnimationFrame(look);
+      };
+      requestAnimationFrame(look);
+    }));
+    // what happened, for the message if a wait below runs out: a click reaching the page, the panel closing
+    await page.evaluate(() => {
+      window.__trace = [];
+      document.addEventListener("click", e => window.__trace.push("click:" + (e.target.closest?.(".md-open") ? "md-open" : e.target.tagName)), true);
+      document.getElementById("mddlg").addEventListener("close", () => window.__trace.push("dialog-closed"));
+      addEventListener("popstate", () => window.__trace.push("popstate"));
+    });
     const top = () => page.locator(card).evaluate(c => Math.round(c.getBoundingClientRect().top));
     await page.click(`#list .match .md-open[data-uid="${pick}"]`);
     await until(page, "waiting for Match details to open beside the list", () => document.documentElement.hasAttribute("data-pane"));
