@@ -150,6 +150,9 @@ const calmenu = document.getElementById("calmenu"),
   MENUS = [setmenu, calmenu];
 // on phones the menus open as a sheet over a dimmed page: focus moves into the sheet and Tab stays inside it
 const SHEET = matchMedia("(max-width:640px)");
+// Closed, a <details> leaves what it hides unstyled (Chromium), so the browser would never see its opening animation
+// end, and the next opening would not play it: asking for the hidden part's style once it is closed resets it
+const rearm = el => getComputedStyle(el).animationName;
 // a menu closing folds back up into its button (on phones the sheet slides down and the dimmed page fades)
 function foldMenu(m) {
   const p = m.querySelector(".calpanel");
@@ -169,6 +172,7 @@ function foldMenu(m) {
     () => {
       undim(m); // first: once closed, the dimmed layer and its animation are gone from the menu
       m.open = false;
+      rearm(p);
     },
     sheet ? "m" : "s",
   );
@@ -203,6 +207,7 @@ MENUS.forEach(m => {
         stay(o.querySelector(".calpanel")); // the other menu is replaced at once, not folded
         undim(o);
         o.open = false;
+        rearm(o.querySelector(".calpanel"));
       }
     });
     if (SHEET.matches) m.querySelector(".calpanel").focus();
@@ -896,6 +901,7 @@ document.addEventListener("click", e => {
   leave(body, LIFT, () => {
     d.open = false;
     d.removeAttribute("data-folding");
+    rearm(body);
   });
 });
 // the invitation's buttons: Find my team opens the filters where needed and goes to the team search; Not now folds the

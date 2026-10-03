@@ -434,12 +434,16 @@ const riseDays = days =>
 // above the window change height and the browser scrolls to keep what is read in place, so the list's top edge can
 // move thousands of pixels while what is on screen barely moves.
 // pin: the match to follow, when one matters (the one whose details open or close beside the list)
+// Something inside another of els (Live now in the right-hand column, on monitors) moves with it and is left alone:
+// moved by its own animation too, it would go twice as far, jumping ahead and gliding back, or fade twice.
 const onScreen = el =>
   (el === listEl && [...el.querySelectorAll(".match")].find(m => m.getBoundingClientRect().bottom > 0)) || el;
 function glide(els, change, pin) {
+  els = els.filter(el => !els.some(o => o !== el && o.contains(el)));
   const z = parseFloat(getComputedStyle(document.documentElement).zoom) || 1,
     pins = els.map(el => (el === listEl && pin && pin.isConnected ? pin : onScreen(el))),
     was = els.map((el, i) => [el.getBoundingClientRect(), pins[i].getBoundingClientRect()]);
+  els.forEach(el => el.getAnimations().forEach(a => a.cancel())); // still gliding: it turns back from where it is now
   change();
   els.forEach((el, i) => {
     const [a, pa] = was[i],
@@ -452,6 +456,32 @@ function glide(els, change, pin) {
     else if (a.width && b.width && (Math.abs(dx) > 1 || Math.abs(dy) > 1))
       move(el, [{ transform: "translate(" + dx + "px," + dy + "px)" }, { transform: "none" }], SOFT()); // a long way: gently
   });
+}
+// Text that gets wider or narrower with the layout (the "Updated" line under the header) wraps anew, which no transform
+// can smooth: a copy of it as it was fades out where it was, while it fades in where it is now (glide moves it there).
+// Called before the layout changes; what it returns is called once it has changed.
+function crossFade(el) {
+  const r = el.getBoundingClientRect();
+  if (!r.width || !motionOn()) return () => {};
+  const z = parseFloat(getComputedStyle(document.documentElement).zoom) || 1,
+    g = el.cloneNode(true);
+  [g, ...g.querySelectorAll("[id]")].forEach(x => x.removeAttribute("id"));
+  g.removeAttribute("aria-live");
+  g.setAttribute("aria-hidden", "true");
+  g.inert = true;
+  Object.assign(g.style, {
+    position: "fixed",
+    left: r.left / z + "px",
+    top: r.top / z + "px",
+    width: r.width / z + "px",
+    margin: "0",
+  });
+  return () => {
+    if (Math.abs(el.getBoundingClientRect().width - r.width) < 1) return; // the same width: it only glides
+    document.body.append(g);
+    leave(g, [{ opacity: 1 }, { opacity: 0 }], () => g.remove(), "m");
+    move(el, [{ opacity: 0 }, { opacity: 1 }], SOFT());
+  };
 }
 // the page cross-fades to a new look (theme, contrast, text size, language, time zone). The buttons' own colour
 // changes are paused meanwhile (data-theming): the cross-fade already covers them, and hundreds at once only cost time.
