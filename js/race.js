@@ -265,7 +265,8 @@ function paintWkTop() {
     ICON.share +
     "<span>" +
     esc(T.share) +
-    '</span></button></div><p class="toast" id="md-toast" role="status"></p>';
+    '</span></button></div><p class="toast" id="md-toast" role="status"></p>' +
+    tvHTML("F1");
 }
 function paintWkSched() {
   const w = WK,
@@ -632,6 +633,17 @@ function paintActions() {
   m.root.querySelector("#md-act").innerHTML = mdActions(m.r);
   m.root.querySelector("#md-ics").onclick = () => downloadICS(m.r);
   m.root.querySelector("#md-share").onclick = () => shareMatch(m.r);
+  // News unfolds the links to each club's ESPN page under the buttons, and folds them away again
+  const nb = m.root.querySelector("#md-newsbtn"),
+    box = m.root.querySelector("#md-newsbox");
+  if (nb && box) {
+    nb.onclick = () => {
+      const open = nb.getAttribute("aria-expanded") !== "true";
+      nb.setAttribute("aria-expanded", open);
+      reveal(box, open);
+    };
+    box.querySelectorAll("a").forEach(a => (a.onclick = () => countVisit("news-click", true))); // which kind, never which club
+  }
   const tb = m.root.querySelector("#md-table");
   // a group match brings its group into view: "Group A1, Matchday 3" (Nations League), "Group C" (Libertadores)
   if (tb) tb.onclick = () => openTables(m.r.code, (/^Group (A[1-4]|[A-H])(?:,|$)/.exec(m.r.round || "") || [])[1]);

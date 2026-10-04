@@ -211,7 +211,8 @@ function mdHead(m) {
   );
 }
 function mdActions(r) {
-  const L = liveOf(r);
+  const L = liveOf(r),
+    news = newsHTML(r);
   return (
     '<div class="md-actions"><button type="button" class="btn" id="md-ics">' +
     ICON.calAdd +
@@ -230,12 +231,70 @@ function mdActions(r) {
         esc(T.mdTable(compName(LEAGUES.find(l => l.code === r.code).name))) +
         "</span></button>"
       : "") +
+    (news
+      ? '<button type="button" class="btn" id="md-newsbtn" aria-expanded="false" aria-controls="md-newsbox">' +
+        ICON.news +
+        "<span>" +
+        esc(T.newsBtn) +
+        "</span>" +
+        ICON.chev +
+        "</button>"
+      : "") +
     "</div>" +
     watchHTML(r, L) +
     '<p class="toast" id="md-toast" role="status"></p><p class="hint">' +
     esc(T.addCalNote) +
-    "</p>"
+    "</p>" +
+    (news ? '<div class="md-newsbox" id="md-newsbox" hidden>' + news + "</div>" : "") +
+    tvHTML(r.code)
   );
+}
+// News: each club's page on ESPN (ESPN Brasil in Portuguese), from the ESPN team number its crest already uses, checked
+// again so fixtures.json cannot point the link elsewhere. National teams have no ESPN number, so no link.
+const NEWS_URL = { en: "https://www.espn.com/soccer/club/_/id/", pt: "https://www.espn.com.br/futebol/time/_/id/" };
+function newsHTML(r) {
+  const links = [r.home, r.away]
+    .map(n => [n, BADGES.get(n)])
+    .filter(([, b]) => b && typeof b === "object" && typeof b.crest === "string" && CREST_RE.test(b.crest))
+    .map(([n, b]) => {
+      const href = safeUrl(NEWS_URL[LANG === "pt" ? "pt" : "en"] + b.crest);
+      return href
+        ? '<a class="btn" href="' +
+            esc(href) +
+            '" target="_blank" rel="noopener">' +
+            badgeHTML(n) +
+            "<b>" +
+            esc(teamName(n)) +
+            '</b><span class="sr">' +
+            esc(T.newsHint) +
+            '</span><small aria-hidden="true">' +
+            esc(T.newsSrc) +
+            ICON.ext +
+            "</small></a>"
+        : "";
+    })
+    .join("");
+  return links ? '<div class="md-newslinks">' + links + "</div>" : "";
+}
+// Where to watch: the official broadcasters in Canada and Brazil for this competition, as build_schedule.py kept them
+// from broadcasters.json (an official report, or two sources agreeing). The page's language decides which country
+// comes first. Country names come from the browser (Intl.DisplayNames), broadcaster names from fixtures.json.
+function tvHTML(code) {
+  const all = META && META.broadcasters,
+    by = all && typeof all === "object" && !Array.isArray(all) ? all[code] : null;
+  if (!by || typeof by !== "object" || Array.isArray(by)) return "";
+  const order = LANG === "pt" ? ["BR", "CA"] : ["CA", "BR"];
+  let region = c => c;
+  try {
+    const names = new Intl.DisplayNames([T.locale || LANG], { type: "region" });
+    region = c => names.of(c) || c;
+  } catch {}
+  const list = new Intl.ListFormat(T.locale || LANG, { type: "conjunction" });
+  const rows = order
+    .map(c => [c, by[c]])
+    .filter(([, n]) => Array.isArray(n) && n.length && n.every(x => typeof x === "string" && x.length <= 40))
+    .map(([c, n]) => "<span>" + esc(region(c)) + ": " + esc(list.format(n)) + "</span>");
+  return rows.length ? '<p class="md-tv"><b>' + esc(T.tvTitle) + "</b> " + rows.join(" · ") + "</p>" : "";
 }
 function mdEvents(m) {
   const S = m.S;
