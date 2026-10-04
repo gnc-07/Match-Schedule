@@ -527,7 +527,6 @@ dialog.sheet::backdrop{background:var(--backdrop)}
 #md-newsbtn[aria-expanded="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 #md-newsbtn[aria-expanded="true"] .chev{transform:rotate(180deg)}
 .md-newsbox{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
-.md-newsbox>p{margin:0 0 8px;color:var(--muted);font-size:13.5px;text-align:center}
 .md-newslinks{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))}
 .md-newslinks .btn{justify-content:flex-start;min-height:52px;padding:0 14px;font-size:15px;gap:10px}
 .md-newslinks .btn b{font-weight:600}

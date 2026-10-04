@@ -245,7 +245,7 @@ function mdActions(r) {
     '<p class="toast" id="md-toast" role="status"></p><p class="hint">' +
     esc(T.addCalNote) +
     "</p>" +
-    (news ? '<div class="md-newsbox" id="md-newsbox" hidden><p>' + esc(T.newsHint) + "</p>" + news + "</div>" : "") +
+    (news ? '<div class="md-newsbox" id="md-newsbox" hidden>' + news + "</div>" : "") +
     tvHTML(r.code)
   );
 }
@@ -264,8 +264,10 @@ function newsHTML(r) {
             '" target="_blank" rel="noopener">' +
             badgeHTML(n) +
             "<b>" +
-            esc(T.newsTeam(teamName(n))) +
-            "</b><small>" +
+            esc(teamName(n)) +
+            '</b><span class="sr">' +
+            esc(T.newsHint) +
+            '</span><small aria-hidden="true">' +
             esc(T.newsSrc) +
             ICON.ext +
             "</small></a>"
