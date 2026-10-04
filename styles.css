@@ -521,6 +521,18 @@ dialog.sheet::backdrop{background:var(--backdrop)}
 .md-kick small{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.06em}
 .md-when{margin:12px 0 0;color:var(--muted);font-size:14px}
 .md-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;justify-content:center}
+#md-newsbtn .chev{width:14px;height:14px;transition:transform var(--dur-s) var(--ease)}
+#md-newsbtn[aria-expanded="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+#md-newsbtn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.md-newsbox{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+.md-newslinks{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))}
+.md-newslinks .btn{justify-content:flex-start;min-height:52px;padding:0 14px;font-size:15px;gap:10px}
+.md-newslinks .btn b{font-weight:600}
+.md-newslinks .btn small{margin-left:auto;display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;font-weight:500;white-space:nowrap}
+.md-newslinks .ext{width:15px;height:15px;flex:none}
+.md-tv{margin:12px 0 0;text-align:center;font-size:14px;color:var(--muted)}
+.md-tv b{color:var(--ink);font-weight:600;margin-right:4px}
+.md-tv span{white-space:nowrap}
 .md-top .watch-row{justify-content:center;margin-top:12px}
 .md-top .toast{margin:12px 0 0}
 .md .hint,.md-note{margin:12px 0 0;color:var(--muted);font-size:14px}

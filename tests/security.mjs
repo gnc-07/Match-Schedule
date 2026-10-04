@@ -48,7 +48,10 @@ const badges = { [bad.home]: { crest: EVIL }, Chelsea: { crest: "359&img=https:/
   // a crest's measured box (crest_box()) with markup, and one reaching outside the picture: the crest is drawn unsized
   "Mapland FC test-map-none": { crest: "133", box: ['1" onerror="alert(1)', 0, 500, 500, 400] },
   "Liverpool FC": { crest: "364", box: [900, 0, 500, 500, 400] } };
-const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, tables, badges,
+// where to watch with markup for names and wrong shapes: names stay text, the wrong shapes are skipped
+const SHORT_EVIL = '<img src=x onerror="window.__xss=9">';   // under 40 characters, so the page does show it
+const broadcasters = { EPL: { CA: [SHORT_EVIL], BR: "ESPN", US: [7] }, F1: [EVIL], LIGA: null, BUN: { CA: ["x".repeat(41)] } };
+const fixtures = { ...data, generated: EVIL, sources: { EPL: EVIL }, tables, badges, broadcasters,
   matches: [bad, badWidth, badLat, bunLive, ...malformed, mapMatch("test-map", "Mapland Arena, Testville"),
     mapMatch("test-map-none", "Nowhere Ground, Testville"), ...data.matches] };
 // OpenLigaDB's answers: the match on now (a scorer with markup) and malformed entries that must be skipped quietly
@@ -118,6 +121,10 @@ try {
     for (const f of found) { console.log("      " + f); problems.push(f); }
   };
 
+  const shows = (what, ok) => {
+    console.log(`${ok ? "PASS" : "FAIL"}  ${what}`);
+    if (!ok) problems.push(what);
+  };
   await page.goto(`${BASE}?lang=en`, { waitUntil: "networkidle0" });
   await page.waitForSelector("details.srcs");
   await page.evaluate(() => document.querySelectorAll("details.srcs").forEach(d => { d.open = true; }));
@@ -135,6 +142,12 @@ try {
       && text("#md-venue").includes("Stadium");
   });
   await page.waitForFunction(() => !document.querySelector("#md-map") || !/Finding|Procurando/.test(document.querySelector("#md-map").textContent));
+  // news links: the hostile match's home club has markup for a crest number, so it gets no link; any link there is goes to
+  // an ESPN team page with a plain number. Where to watch shows the markup as text.
+  shows("match details: news links only to an ESPN team page with a plain number", await page.evaluate(() =>
+    [...document.querySelectorAll("#md-newsbox a")].every(a => /^https:\/\/www\.espn\.com(\.br)?\/(soccer\/club|futebol\/time)\/_\/id\/\d{1,7}$/.test(a.href))));
+  shows("match details: a broadcaster name with markup is shown as text", await page.evaluate(() =>
+    (document.querySelector("#md-act .md-tv")?.textContent || "").includes("<img")));
   await check("match details");
   for (const wk of ["98", "99"]) {
     await page.goto(`${BASE}?lang=en&match=${encodeURIComponent("f1|2026|" + wk)}`, { waitUntil: "networkidle0" });
@@ -157,10 +170,6 @@ try {
     if (!ok) problems.push(`league tables: the ${cell} cell does not show the hostile value as text`);
   }
 
-  const shows = (what, ok) => {
-    console.log(`${ok ? "PASS" : "FAIL"}  ${what}`);
-    if (!ok) problems.push(what);
-  };
   // team badges: only a flag in flags/ or a crest from ESPN's crest folder, built from a plain team number
   await page.goto(`${BASE}?lang=en`, { waitUntil: "networkidle0" });
   const imgs = await page.evaluate(() => [...document.querySelectorAll("#list .badge img")].map(i =>
