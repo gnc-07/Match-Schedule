@@ -116,10 +116,9 @@ const I18N = {
     how3: "Live scores, line-ups, match events and league tables come from ESPN. If ESPN is not answering, Bundesliga scores, goals and table come from OpenLigaDB, and the other tables are worked out from the league results. Stadium maps come from OpenStreetMap and Wikidata. Live scores appear on this site only, not in the calendar.",
     how5: "CazéTV buttons lead to its free YouTube streams, found through its channel and the fan-made agendacazetv.com. Most only play in Brazil.",
     watch: "Watch on CazéTV",
-    watchNote: "Free on YouTube. Usually only plays in Brazil.",
+    watchShort: "CazéTV",
     watchAria: (h, a) => "Watch on CazéTV: " + h + " v " + a + ", on YouTube",
     watchPlanned: "CazéTV on YouTube",
-    watchPlannedNote: "Stream link coming soon. Usually only plays in Brazil.",
     watchPlannedAria: (h, a) => h + " v " + a + " is on CazéTV's schedule. Open CazéTV's YouTube channel",
     howCounthtml:
       'This site counts visits with <a href="https://www.goatcounter.com/" rel="noopener">GoatCounter</a>, without cookies: only how many people open the page, match details, race weekends and news links, and in which language. Nothing about your teams, stars or settings is sent. To count a person once rather than at every reload, GoatCounter uses your internet address and browser details for up to 8 hours, in memory only, and never saves them. If your browser asks sites not to track you, nothing is counted.',
@@ -431,10 +430,9 @@ const I18N = {
     how3: "Placares ao vivo, escalações, lances e classificações vêm da ESPN. Se a ESPN não responder, os placares, gols e a classificação da Bundesliga vêm do OpenLigaDB, e as outras classificações são calculadas a partir dos resultados das ligas. Os mapas dos estádios vêm do OpenStreetMap e do Wikidata. Os placares ao vivo aparecem só neste site, não na agenda.",
     how5: "Os botões da CazéTV levam às transmissões grátis no YouTube, encontradas pelo canal dela e pelo site de fã agendacazetv.com. A maioria só funciona no Brasil.",
     watch: "Assistir na CazéTV",
-    watchNote: "Grátis no YouTube. Em geral só funciona no Brasil.",
+    watchShort: "CazéTV",
     watchAria: (h, a) => "Assistir na CazéTV: " + h + " x " + a + ", no YouTube",
     watchPlanned: "CazéTV no YouTube",
-    watchPlannedNote: "Link da transmissão em breve. Em geral só funciona no Brasil.",
     watchPlannedAria: (h, a) => h + " x " + a + " está na programação da CazéTV. Abrir o canal da CazéTV no YouTube",
     howCounthtml:
       'Este site conta as visitas com o <a href="https://www.goatcounter.com/" rel="noopener">GoatCounter</a>, sem cookies: só quantas pessoas abrem a página, os detalhes dos jogos, os fins de semana de corrida e os links de notícias, e em qual idioma. Nada sobre seus times, favoritos ou preferências é enviado. Para contar cada pessoa uma vez, e não a cada recarga, o GoatCounter usa o seu endereço de internet e os dados do navegador por até 8 horas, só na memória, e nunca os guarda. Se o seu navegador pede aos sites que não rastreiem você, nada é contado.',
