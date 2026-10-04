@@ -301,7 +301,11 @@ const actChecks = [
     must(meta.includes(pt ? "Semifinal, jogo de ida" : "Semi-finals, 1st leg"), `a Libertadores card reads "${meta.trim()}"`);
   }],
   ["sources unfold", async page => {
+    // an earlier check may have scrolled far down the list; this one is at its top, so bring it into view and let the
+    // days around it be laid out first (see stayPut())
     const d = page.locator("#list .srcs").first();
+    await d.evaluate(e => e.scrollIntoView({ block: "center" }));
+    must(await stayPut(d), "waiting for the sources to stay put after the scroll: they were still moving after 120 frames");
     await d.locator("summary").click();
     must(await d.evaluate(e => e.open), "the sources did not open");
   }],
@@ -437,6 +441,21 @@ const until = async (page, step, fn) => {
     throw new Error(`${step}: ${e.message.split("\n")[0]} (${state})`);
   }
 };
+// the days near the window are laid out only once they are near it (content-visibility in styles.css), so the matches
+// above an element just scrolled to can change height a moment later: true once it has stayed put for five frames
+// (false after 120), so that the press and release of a click land on the same place
+const stayPut = locator => locator.evaluate(c => new Promise(done => {
+  let last = null, same = 0, frames = 0;
+  const look = () => {
+    const top = Math.round(c.getBoundingClientRect().top);
+    same = top === last ? same + 1 : 0;
+    last = top;
+    if (same >= 5) done(true);
+    else if (++frames > 120) done(false);
+    else requestAnimationFrame(look);
+  };
+  requestAnimationFrame(look);
+}));
 const besideChecks = [
   ["match details beside the list close in place", async page => {
     await page.setViewportSize({ width: 1650, height: 1000 });
@@ -447,22 +466,8 @@ const besideChecks = [
       return a.dataset.uid;
     });
     const card = `#list .match:has(.md-open[data-uid="${pick}"])`;
-    // the days near the window are laid out only once they are near it (content-visibility in styles.css), so the
-    // matches above can change height just after the scroll: wait until the card stays put for a few frames, or the
-    // press and release of the click can land on different places and no click happens (see showMatch())
-    const settled = await page.locator(card).evaluate(c => new Promise(done => {
-      let last = null, same = 0, frames = 0;
-      const look = () => {
-        const top = Math.round(c.getBoundingClientRect().top);
-        same = top === last ? same + 1 : 0;
-        last = top;
-        if (same >= 5) done(true);
-        else if (++frames > 120) done(false);
-        else requestAnimationFrame(look);
-      };
-      requestAnimationFrame(look);
-    }));
-    must(settled, "waiting for the match card to stay put after the scroll: it was still moving after 120 frames");
+    // the matches above can change height just after the scroll (see stayPut() and showMatch())
+    must(await stayPut(page.locator(card)), "waiting for the match card to stay put after the scroll: it was still moving after 120 frames");
     // what happened, for the message if a wait below runs out: a click reaching the page, the panel closing
     await page.evaluate(() => {
       window.__trace = [];
