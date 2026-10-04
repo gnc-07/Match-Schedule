@@ -116,6 +116,28 @@ Two limits come from the address, not the page. A `robots.txt` file only works a
 
 To see a link preview, paste the site's address into a chat with yourself (WhatsApp, Signal, Messages). Apps remember a preview for a while, so a changed picture can take days to show there.
 
+## Visit counts
+
+`js/count.js` counts three things through [GoatCounter](https://www.goatcounter.com/) (open source, no cookies): a visit to the page, named `/en` or `/pt` after the language it opened in; `match-details`, when a match's details are opened; and `race-weekend`, when an F1 race weekend is opened. With GoatCounter's Sessions setting on (below), each is counted once per session: the same internet address with the same browser, for 8 hours. So the numbers are sessions, close to but not exactly people: one person on a phone and a laptop counts twice, and two people sharing a computer and connection count once. Nothing else is sent: no team, match, star, setting or search. Each count is a request for a tiny picture from GoatCounter, so none of GoatCounter's own scripts runs on the page. Nothing is counted on a local preview, in the tests or in a copy of the site published elsewhere (only at the address in the `hreflang` links of `index.html`), nor for a browser that asks sites not to track it (Global Privacy Control or Do Not Track). "How it works" tells visitors this, in both languages, and appears only while counting is switched on.
+
+### How it is set up
+
+Counting is on, sending to the GoatCounter site `https://gnc.goatcounter.com`. The address is written in two places, which must agree: `STATS` in `js/count.js`, and `https://gnc.goatcounter.com/count` in `img-src` in the `Content-Security-Policy` line at the top of `index.html`. `tests/test_scripts.py` (`VisitCounts`) fails if they do not, and browsers would then silently block every count.
+
+GoatCounter's settings (Settings, then **Data collection**): only **Sessions** is ticked, so a person reloading the page counts once, and everything else is unticked (Individual pageviews, Referrer, User-Agent, Size, Country, Region, Language). Sessions works from the internet address and the browser's details (its User-Agent), held in GoatCounter's memory for up to 8 hours and never written to its database or disk; it uses them even though the separate **User-Agent** option, which would report browser names on the dashboard, is unticked. The sentence in "How it works" and the README's Privacy section describe exactly this; if you tick more there later, change that sentence (`howCounthtml` in `js/i18n.js`, both languages) and the README to say so. Under **Ignore IPs**, your home connection is listed, so your own visits from home are not counted (your phone on mobile data still counts).
+
+To move to another GoatCounter account, replace `gnc.goatcounter.com` with the new account's address in both places (on GitHub: open each file, click the pencil icon, edit, **Commit changes**).
+
+To check it works: after the site is republished (Actions tab, about two minutes), open the site on your phone on mobile data, open a match's details, and check the dashboard at https://gnc.goatcounter.com: `/en` and `match-details` appear within a minute or two. (If nothing appears, your browser may be asking sites not to track it, which some browsers do by default; try another browser.)
+
+### Reading the numbers
+
+GoatCounter's dashboard lists `/en` and `/pt` as pages (visits in each language) and `match-details` and `race-weekend` as events, each counted once per 8-hour session, not once per person. The numbers are a lower bound: ad blockers often block GoatCounter, and browsers that ask not to be tracked are not counted.
+
+### Switching it off
+
+Set `STATS` back to `""` in `js/count.js` and remove the GoatCounter address from `img-src` in `index.html`. Nothing is sent from then on, and "How it works" stops mentioning counting. Your account and its numbers stay at GoatCounter until you delete them there (Settings, Delete account).
+
 ## Optional: working from the terminal instead
 
 If you would rather edit on your own computer, these commands do the same as the web steps. Each part is explained.

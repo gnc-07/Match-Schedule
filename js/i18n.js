@@ -121,6 +121,8 @@ const I18N = {
     watchPlanned: "CazéTV on YouTube",
     watchPlannedNote: "Stream link coming soon. Usually only plays in Brazil.",
     watchPlannedAria: (h, a) => h + " v " + a + " is on CazéTV's schedule. Open CazéTV's YouTube channel",
+    howCounthtml:
+      'This site counts visits with <a href="https://www.goatcounter.com/" rel="noopener">GoatCounter</a>, without cookies: only how many people open the page, match details and race weekends, and in which language. Nothing about your teams, stars or settings is sent. To count a person once rather than at every reload, GoatCounter uses your internet address and browser details for up to 8 hours, in memory only, and never saves them. If your browser asks sites not to track you, nothing is counted.',
     how4: "Stars and settings are saved in your browser only. Finished matches stay on the list, with the final score, for a day after kick-off.",
     repo: "Source code and data:",
     teams: {},
@@ -428,6 +430,8 @@ const I18N = {
     watchPlanned: "CazéTV no YouTube",
     watchPlannedNote: "Link da transmissão em breve. Em geral só funciona no Brasil.",
     watchPlannedAria: (h, a) => h + " x " + a + " está na programação da CazéTV. Abrir o canal da CazéTV no YouTube",
+    howCounthtml:
+      'Este site conta as visitas com o <a href="https://www.goatcounter.com/" rel="noopener">GoatCounter</a>, sem cookies: só quantas pessoas abrem a página, os detalhes dos jogos e os fins de semana de corrida, e em qual idioma. Nada sobre seus times, favoritos ou preferências é enviado. Para contar cada pessoa uma vez, e não a cada recarga, o GoatCounter usa o seu endereço de internet e os dados do navegador por até 8 horas, só na memória, e nunca os guarda. Se o seu navegador pede aos sites que não rastreiem você, nada é contado.',
     how4: "Favoritos e preferências ficam salvos só no seu navegador. Jogos encerrados continuam na lista, com o placar final, por um dia após o início.",
     repo: "Código-fonte e dados:",
     teams: {

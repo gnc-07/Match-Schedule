@@ -806,6 +806,7 @@ let pushed = false,
   trigger = null, // the match whose button opened the panel, for focus to return to it
   triggerSel = ".match .md-open";
 function showPanel(uid) {
+  countVisit(uid.startsWith("f1|") ? "race-weekend" : "match-details", true); // which kind of panel, never which match
   openMatch(uid, document.getElementById("mdbody"));
   // the match shown is brought to the middle of the window (beside the list, it glides there)
   openDialog(() => {

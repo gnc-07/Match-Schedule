@@ -61,6 +61,7 @@ const oldbBoard = [oldbMatch, { matchID: EVIL, team1: {}, team2: {} }, null, { m
 const oldbTable = [{ teamName: "Borussia Dortmund" + EVIL, matches: 4, won: 4, draw: 0, lost: 0, goalDiff: EVIL, points: EVIL }, { teamName: 3 }];
 let espnDown = false;
 let wikidata = "hostile";   // how Wikidata answers: "hostile" (markup for coordinates), "http-error", "api-error", "incomplete", "ok", "none"
+const counted = [];         // requests to GoatCounter (js/count.js): a test must never make one
 
 const server = await startServer();
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true,
@@ -95,6 +96,7 @@ try {
       descriptions: { en: { value: "football stadium" } }, claims: { P625: [{ mainsnak: { datavalue: { value: { latitude: 51.555, longitude: -0.108 } } } }] } } } });
     if (u.includes("wikidata.org")) return json(u.includes("wbsearchentities") ? { search: [{ id: "Q1" }] } : { entities: { Q1: {
       claims: { P625: [{ mainsnak: { datavalue: { value: { latitude: EVIL, longitude: 1 } } } }] } } } });
+    if (u.includes("goatcounter.com")) counted.push(u);
     if (u.startsWith(BASE)) return req.continue();
     return req.abort();                     // nothing else leaves the machine
   });
@@ -287,6 +289,31 @@ try {
   shows("Wikidata knows no such place: that is remembered", (await saved("nowhere ground")) === "{}");
   wikidata = "hostile";
   await check("stadium map while Wikidata fails and recovers");
+
+  // Visit counts (js/count.js): a count names only what was opened (p), whether it is an event (e) and a random value
+  // (rnd), never a team, match or setting; opening a match's details or a race weekend asks for exactly one count; and
+  // the tests themselves are never counted (not the real site's address, and a browser driven by a program)
+  await page.goto(`${BASE}?lang=en`, { waitUntil: "networkidle0" });
+  const visits = await page.evaluate(async () => {
+    const asked = [];
+    countVisit = (...a) => asked.push(a); // listen in on the calls, without sending anything
+    const url = new URL(countURL("match-details", true), location.href);
+    const match = DATA.find(r => r.kind !== "f1" && r.uid),
+      race = DATA.find(r => r.kind === "f1" && r.wk);
+    for (const uid of [match.uid, race.wk]) {
+      showPanel(uid);
+      await new Promise(r => setTimeout(r, 300));
+      shut(mddlg);
+      await new Promise(r => setTimeout(r, 600));
+    }
+    return { keys: [...url.searchParams.keys()].join(","), p: url.searchParams.get("p"), asked: JSON.stringify(asked),
+      on: countable() };
+  });
+  shows("visit counts: a count sends only the event name, the event flag and a random value",
+    visits.keys === "p,e,rnd" && visits.p === "match-details");
+  shows(`visit counts: one count per panel opened, naming only its kind (${visits.asked})`,
+    visits.asked === JSON.stringify([["match-details", true], ["race-weekend", true]]));
+  shows("visit counts: the test page is not counted", !visits.on && !counted.length);
 } finally {
   await browser.close();
   server.kill();

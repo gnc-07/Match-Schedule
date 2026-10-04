@@ -7,7 +7,7 @@
      service must be added here: fetch() addresses to connect-src, pictures to img-src. When the site is published,
      publish_site.py replaces script-src with a fingerprint (hash) of each script in the page, so visitors' browsers run
      those scripts and nothing else; 'unsafe-inline' only remains in this copy, for previewing the files as they are. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://a.espncdn.com; connect-src 'self' https://site.api.espn.com https://api.openligadb.de https://www.wikidata.org https://api.jolpi.ca; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://a.espncdn.com https://gnc.goatcounter.com/count; connect-src 'self' https://site.api.espn.com https://api.openligadb.de https://www.wikidata.org https://api.jolpi.ca; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <script>
 /* start downloading the fixtures straight away, while the rest of the page is still being read */
 window.FX = fetch("fixtures.json", { cache: "no-store" }).then(r => {
@@ -210,6 +210,7 @@ try {
         <li data-t="how3">Live scores, line-ups, match events and league tables come from ESPN. If ESPN is not answering, Bundesliga scores, goals and table come from OpenLigaDB, and the other tables are worked out from the league results. Stadium maps come from OpenStreetMap and Wikidata. Live scores appear on this site only, not in the calendar.</li>
         <li data-t="how5">CazéTV buttons lead to its free YouTube streams, found through its channel and the fan-made agendacazetv.com. Most only play in Brazil.</li>
         <li data-t="howF1html">Formula 1 session times come from <a href="https://github.com/jolpica/jolpica-f1" rel="noopener">Jolpica-F1</a> and are marked verified when <a href="https://openf1.org/" rel="noopener">OpenF1</a> gives the same time. F1 is not in the calendar.</li>
+        <li data-t="howCounthtml" id="countnote" hidden>This site counts visits with <a href="https://www.goatcounter.com/" rel="noopener">GoatCounter</a>, without cookies: only how many people open the page, match details and race weekends, and in which language. Nothing about your teams, stars or settings is sent. To count a person once rather than at every reload, GoatCounter uses your internet address and browser details for up to 8 hours, in memory only, and never saves them. If your browser asks sites not to track you, nothing is counted.</li>
         <li data-t="how4">Stars and settings are saved in your browser only. Finished matches stay on the list, with the final score, for a day after kick-off.</li>
       </ul>
       <p id="repo" hidden></p>
@@ -235,6 +236,7 @@ try {
      download a single file, as before the split. -->
 <script src="js/i18n.js"></script>
 <script src="js/settings.js"></script>
+<script src="js/count.js"></script>
 <script src="js/list.js"></script>
 <script src="js/live.js"></script>
 <script src="js/match.js"></script>
