@@ -265,7 +265,7 @@ def broadcasters(today, path="broadcasters.json"):
                        and isinstance(r.get("url"), str) and r["url"].startswith("https://")]
         except (KeyError, TypeError, ValueError, AttributeError):
             continue
-        if code not in BROADCAST_CODES or not re.fullmatch(r"[A-Z]{2}", str(country)) or not 0 < len(name) <= 40 or ends < today:
+        if not isinstance(code, str) or code not in BROADCAST_CODES or not re.fullmatch(r"[A-Z]{2}", str(country)) or not 0 < len(name) <= 40 or ends < today:
             continue
         official = any(r.get("official") is True for r in reports)
         if not official and len({r["source"].strip().lower() for r in reports}) < 2:

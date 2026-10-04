@@ -124,7 +124,7 @@ const I18N = {
     howCounthtml:
       'This site counts visits with <a href="https://www.goatcounter.com/" rel="noopener">GoatCounter</a>, without cookies: only how many people open the page, match details, race weekends and news links, and in which language. Nothing about your teams, stars or settings is sent. To count a person once rather than at every reload, GoatCounter uses your internet address and browser details for up to 8 hours, in memory only, and never saves them. If your browser asks sites not to track you, nothing is counted.',
     howTv:
-      "Where to watch names the official broadcasters in Canada and Brazil, from the leagues' own lists checked against a second source, and only where two sources agree or an official one gives it.",
+      "Where to watch names the official broadcasters in Canada and Brazil, only when an official source names them or two sources agree.",
     how4: "Stars and settings are saved in your browser only. Finished matches stay on the list, with the final score, for a day after kick-off.",
     repo: "Source code and data:",
     teams: {},
@@ -439,7 +439,7 @@ const I18N = {
     howCounthtml:
       'Este site conta as visitas com o <a href="https://www.goatcounter.com/" rel="noopener">GoatCounter</a>, sem cookies: só quantas pessoas abrem a página, os detalhes dos jogos, os fins de semana de corrida e os links de notícias, e em qual idioma. Nada sobre seus times, favoritos ou preferências é enviado. Para contar cada pessoa uma vez, e não a cada recarga, o GoatCounter usa o seu endereço de internet e os dados do navegador por até 8 horas, só na memória, e nunca os guarda. Se o seu navegador pede aos sites que não rastreiem você, nada é contado.',
     howTv:
-      "Onde assistir mostra as emissoras oficiais no Canadá e no Brasil, das listas das próprias ligas conferidas com uma segunda fonte, e só quando duas fontes concordam ou uma oficial confirma.",
+      "Onde assistir mostra as emissoras oficiais no Canadá e no Brasil, só quando uma fonte oficial as confirma ou duas fontes concordam.",
     how4: "Favoritos e preferências ficam salvos só no seu navegador. Jogos encerrados continuam na lista, com o placar final, por um dia após o início.",
     repo: "Código-fonte e dados:",
     teams: {

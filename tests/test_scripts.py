@@ -1414,7 +1414,7 @@ class Broadcasters(unittest.TestCase):
         bad = [self.entry(self.OFFICIAL, comp="XYZ"), self.entry(self.OFFICIAL, country="Canada"),
                self.entry(self.OFFICIAL, broadcaster=""), self.entry(self.OFFICIAL, broadcaster="x" * 41),
                self.entry(self.OFFICIAL, until="soon"), self.entry(dict(self.OFFICIAL, url="javascript:alert(1)")),
-               {"comp": "EPL"}, "text", None]
+               self.entry(self.OFFICIAL, comp=[]), self.entry(self.OFFICIAL, comp={}), {"comp": "EPL"}, "text", None]
         self.assertEqual(self.run_on(bad + [self.entry(self.OFFICIAL, broadcaster="DAZN")]), {"EPL": {"CA": ["DAZN"]}})
 
     def test_the_real_file(self):

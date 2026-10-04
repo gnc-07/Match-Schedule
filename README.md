@@ -17,7 +17,7 @@ Matchday Planner is a free website that lists upcoming matches from the **Premie
 - **Check the league tables** with the **Tables** button: all four leagues, the Libertadores and Nations League (League A) groups, plus the F1 drivers' and teams' championships.
 - **Keep it on your home screen.** On an Android phone, open the site in Chrome, tap the menu (three dots) and choose **Add to Home screen** (or **Install app**). On an iPhone, open it in Safari, tap **Share** and choose **Add to Home Screen**. The site then opens from its own icon, like an app.
 - **Put the fixtures in your calendar.** The **Calendar** button gives you a feed you can subscribe to in Google Calendar, Apple Calendar, Outlook, Proton Calendar and most other apps. Subscribed calendars update by themselves when a time changes. (The feed covers football only.)
-- **See where to watch.** Match details and Race weekend name the official broadcasters in Canada and Brazil, where they are known: the leagues' own lists, checked against a second source.
+- **See where to watch.** Match details and Race weekend name the official broadcasters in Canada and Brazil, only when an official source names them or two sources agree.
 - **Watch on CazéTV.** When the Brazilian YouTube channel CazéTV is streaming a match, the card shows a link to the stream. These streams are usually only available in Brazil.
 
 ## How kick-off times are checked
