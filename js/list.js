@@ -728,15 +728,8 @@ function render() {
         c = r.check,
         L = liveOf(r);
       const started = L && L.state !== "pre"; // once a match is on, its score replaces the time labels
-      if (L && L.state === "in")
-        tags.push(
-          '<span class="pill live"><span class="dot-live" aria-hidden="true"></span>' +
-            esc(T.pLive) +
-            " " +
-            esc(L.clock) +
-            "</span>",
-        );
-      else if (L && L.state === "post")
+      // a live match has no pill: its score, marked "live", and the Live now box say so
+      if (L && L.state === "post")
         tags.push('<span class="pill ft">' + esc(L.detail === "FT" || !L.detail ? T.ft : L.detail) + "</span>");
       if (!started) {
         if (!r.utc) {
@@ -795,13 +788,11 @@ function render() {
         '<div class="m-meta">' +
         meta.join("") +
         "</div>" +
-        watchHTML(r, L) +
-        detailsBtn(r) +
+        cardActions(r, L) +
         srcHTML(r) +
         "</div>" +
-        '<div class="m-tags">' +
-        tags.join("") +
-        "</div></li>";
+        (tags.length ? '<div class="m-tags">' + tags.join("") + "</div>" : "") +
+        "</li>";
     }
     parts.push(html + "</ul></section>");
   }
@@ -938,14 +929,14 @@ listEl.addEventListener("click", e => {
 });
 // CazéTV YouTube stream (or, kind "planned", a match on CazéTV's schedule whose stream
 // does not exist yet: links to the channel), when build_schedule.py found one; hidden once the match has finished
-function watchHTML(r, L) {
+function watchLink(r, L) {
   const url = r.watch && safeUrl(r.watch.url);
   if (!url || (L && L.state === "post")) return "";
   const h = teamName(r.home),
     a = teamName(r.away),
     p = r.watch.kind === "planned";
   return (
-    '<p class="watch"><a class="btn" href="' +
+    '<a class="btn watch" href="' +
     esc(url) +
     '" rel="noopener" aria-label="' +
     esc(p ? T.watchPlannedAria(h, a) : T.watchAria(h, a)) +
@@ -953,15 +944,18 @@ function watchHTML(r, L) {
     ICON.play +
     "<span>" +
     esc(p ? T.watchPlanned : T.watch) +
-    "</span></a><small>" +
-    esc(p ? T.watchPlannedNote : T.watchNote) +
-    "</small></p>"
+    "</span></a>"
   );
 }
-function detailsBtn(r) {
+// the match details panel shows the CazéTV button on its own line
+function watchHTML(r, L) {
+  const w = watchLink(r, L);
+  return w && '<p class="m-act watch-row">' + w + "</p>";
+}
+function detailsLink(r) {
   if (!r.uid) return "";
   return (
-    '<p class="m-act"><a class="btn md-open" href="' +
+    '<a class="btn md-open" href="' +
     esc(matchHref(r)) +
     '" data-uid="' +
     esc(r.uid) +
@@ -971,8 +965,13 @@ function detailsBtn(r) {
     ICON.info +
     "<span>" +
     esc(T.mdOpen) +
-    "</span></a></p>"
+    "</span></a>"
   );
+}
+// a match card's buttons, side by side: Match details first, so it sits in the same place on every card
+function cardActions(r, L) {
+  const b = detailsLink(r) + watchLink(r, L);
+  return b && '<p class="m-act">' + b + "</p>";
 }
 /* ---------- Formula 1 sessions: a compact row each, and a full card for the race ---------- */
 const F1_MIN = { FP1: 60, FP2: 60, FP3: 60, SQ: 45, S: 60, Q: 60, R: 120 }; // rough length, for "on now"

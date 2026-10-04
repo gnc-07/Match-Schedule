@@ -272,10 +272,7 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
 .m-meta{display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;color:var(--muted);font-size:13.5px}
 .m-meta .comp{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2);font-weight:600}
 .m-meta .comp i{width:9px;height:9px;border-radius:2px;background:var(--c);display:inline-block}
-.watch{margin:2px 0 0;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px}
-.watch .btn{min-height:44px;font-size:14.5px}
-.watch .btn svg{width:18px;height:18px;color:var(--live-ink)}
-.watch small{font-size:13px;color:var(--muted)}
+.btn.watch svg{width:18px;height:18px;color:var(--live-ink)}
 .m-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;padding-top:2px}
 .pill{font-size:12.5px;font-weight:600;line-height:1;border-radius:999px;padding:6px 10px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
 .pill svg{width:13px;height:13px}
@@ -523,7 +520,7 @@ dialog.sheet::backdrop{background:var(--backdrop)}
 .md-kick small{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.06em}
 .md-when{margin:12px 0 0;color:var(--muted);font-size:14px}
 .md-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;justify-content:center}
-.md-top .watch{justify-content:center;margin-top:12px}
+.md-top .watch-row{justify-content:center;margin-top:12px}
 .md-top .toast{margin:12px 0 0}
 .md .hint,.md-note{margin:12px 0 0;color:var(--muted);font-size:14px}
 .md-card>.md-note:first-child,.map>.md-note{margin:0}

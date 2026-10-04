@@ -284,6 +284,23 @@ const actChecks = [
     must(await differ.locator(".m-time time").count() === 1, "a league match whose sources disagree lost its time");
     must((await differ.locator(".pill.warn").textContent()).trim().length > 0, "a league match whose sources disagree has no warning");
   }],
+  ["match card buttons", async page => {
+    await showMatch(page, LEAGUE_OK);
+    const card = page.locator(`.match:has(.md-open[data-uid="${LEAGUE_OK}"])`);
+    // Match details and Watch on CazéTV share one row, with no note beside them
+    must(await card.locator(".m-act").count() === 1, "the CazéTV button is not in the same row as Match details");
+    must(await card.locator(".m-act > .md-open + .watch").count() === 1, "the card does not show Match details, then Watch on CazéTV");
+    must(await card.locator(".m-act small").count() === 0, "the CazéTV button still has a note beside it");
+    if (page.viewportSize().width >= 1280) {
+      const [d, w] = await card.locator(".m-act > a").evaluateAll(a => a.map(e => e.getBoundingClientRect().top));
+      must(Math.abs(d - w) < 1, "Watch on CazéTV is not beside Match details on a wide screen");
+    }
+    // a live match shows its score marked live, with no LIVE pill (the Live now box shows the clock)
+    await page.evaluate(u => { LIVE.set(keyOf(DATA.find(x => x.uid === u)), { id: "900001", state: "in", clock: "67'", detail: "", hs: "1", as: "0" }); render(); }, LEAGUE_OK);
+    must(await card.evaluate(e => e.classList.contains("is-live")), "the sample match did not turn live");
+    must(await card.locator(".pill.live").count() === 0, "a live match card still has a LIVE pill");
+    await page.evaluate(u => { LIVE.delete(keyOf(DATA.find(x => x.uid === u))); render(); }, LEAGUE_OK);
+  }],
   ["Nations League button and cards", async page => {
     const pt = await page.evaluate(() => LANG === "pt");
     const chip = await page.locator("#chip-UNL").textContent();
