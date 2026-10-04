@@ -245,6 +245,36 @@ def from_hand_kept(start, code, path=None):
         out.append(r)
     return out
 
+# ---------- where to watch (hand-maintained, cross-checked) ----------
+# broadcasters.json lists reports of who shows a competition in a country, as kick-off times are reported in the
+# hand-kept files: a broadcaster is published only when an official source gives it (the league's own list, the
+# rights holder's announcement) or two different sources agree, and only until its rights end ("until"). Rights are
+# sold per competition, per country, for several seasons, so one entry covers every match; a competition shared
+# between broadcasters match by match (the Libertadores and the Brasileirão in Brazil) has no entry yet.
+BROADCAST_CODES = {"EPL", "LIGA", "BUN", "BRA", "LIB", "INTL", "UNL", "F1"}
+
+def broadcasters(today, path="broadcasters.json"):
+    """{code: {country: [broadcaster, ...]}} of the entries an official report gives or two sources agree on, whose
+    rights have not ended by `today`. A malformed entry is skipped."""
+    out = {}
+    for b in load_json(path, []):
+        try:
+            code, country, name = b["comp"], b["country"], b["broadcaster"].strip()
+            ends = date.fromisoformat(b["until"])
+            reports = [r for r in b["reports"] if isinstance(r, dict) and isinstance(r.get("source"), str)
+                       and isinstance(r.get("url"), str) and r["url"].startswith("https://")]
+        except (KeyError, TypeError, ValueError, AttributeError):
+            continue
+        if code not in BROADCAST_CODES or not re.fullmatch(r"[A-Z]{2}", str(country)) or not 0 < len(name) <= 40 or ends < today:
+            continue
+        official = any(r.get("official") is True for r in reports)
+        if not official and len({r["source"].strip().lower() for r in reports}) < 2:
+            continue                         # one source alone is not enough, as for kick-off times
+        names = out.setdefault(code, {}).setdefault(country, [])
+        if name not in names:
+            names.append(name)
+    return out
+
 # ---------- league corrections: fills times the main feed has not caught up with ----------
 def apply_overrides(recs, path="overrides.json"):
     for o in load_json(path, []):
@@ -1459,7 +1489,8 @@ def main():
     # tell the site itself was updated and reload
     meta = {"generated": datetime.now(timezone.utc).isoformat(timespec="minutes"), "site": publish_site.fingerprint(),
             "sources": sources, "tables": {c: t for c, t in tables.items() if t},
-            "badges": team_badges(recs, previous_badges()), "matches": recs}
+            "badges": team_badges(recs, previous_badges()),
+            "broadcasters": broadcasters(datetime.now(HOME_TZ).date()), "matches": recs}
     if f1_stale:
         meta["f1stale"] = True
     write_fixtures(meta)

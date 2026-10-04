@@ -97,6 +97,15 @@ Add an object to the match's `reports` list:
 
 A time is shown as **verified** only when an official source gives it or at least two independent sources agree. Otherwise the match stays "time TBC" and the reported times are listed.
 
+### Where to watch (`broadcasters.json`)
+
+"Where to watch" in Match details and Race weekend comes from `broadcasters.json`: one entry per competition, country (`CA`, `BR`) and broadcaster, with the date its rights end (`until`) and the reports that name it. `build_schedule.py` (`broadcasters()`) publishes a broadcaster only when a report marked `"official": true` gives it (the league's own broadcaster list, or the rights holder's or the league's announcement) or two reports from different sources agree, and stops on its own once `until` has passed. To add one, add an entry like this (only add entries and reports; never delete or rewrite existing ones):
+
+    {"comp": "LIGA", "country": "BR", "broadcaster": "ESPN", "until": "2029-06-30", "reports": [
+      {"source": "LaLiga", "official": true, "url": "https://www.laliga.com/...", "checked": "2026-10-04", "quote": "the exact words on the page"}]}
+
+`comp` is the site's code (`EPL`, `LIGA`, `BUN`, `BRA`, `LIB`, `INTL`, `UNL`, `F1`). Review the file before each season: rights are sold for a few seasons at a time. Not covered yet: competitions shared between broadcasters match by match in Brazil (the Libertadores and the Brasileirão), F1 in Canada (the official extension found ran to 2024), La Liga in Brazil (sources disagree), the Bundesliga and the Nations League.
+
 ## Being found in search engines
 
 The page already tells search engines what they need: a title and description in each language, the English and Portuguese addresses (`hreflang` links in `index.html`, and `sitemap.xml`), and a picture and summary for link previews (the `og:` tags). Search engines still have to be told the site exists. This part only you can do, because it needs your Google account. Do it once:
@@ -118,7 +127,7 @@ To see a link preview, paste the site's address into a chat with yourself (Whats
 
 ## Visit counts
 
-`js/count.js` counts three things through [GoatCounter](https://www.goatcounter.com/) (open source, no cookies): a visit to the page, named `/en` or `/pt` after the language it opened in; `match-details`, when a match's details are opened; and `race-weekend`, when an F1 race weekend is opened. With GoatCounter's Sessions setting on (below), each is counted once per session: the same internet address with the same browser, for 8 hours. So the numbers are sessions, close to but not exactly people: one person on a phone and a laptop counts twice, and two people sharing a computer and connection count once. Nothing else is sent: no team, match, star, setting or search. Each count is a request for a tiny picture from GoatCounter, so none of GoatCounter's own scripts runs on the page. Nothing is counted on a local preview, in the tests or in a copy of the site published elsewhere (only at the address in the `hreflang` links of `index.html`), nor for a browser that asks sites not to track it (Global Privacy Control or Do Not Track). "How it works" tells visitors this, in both languages, and appears only while counting is switched on.
+`js/count.js` counts four things through [GoatCounter](https://www.goatcounter.com/) (open source, no cookies): a visit to the page, named `/en` or `/pt` after the language it opened in; `match-details`, when a match's details are opened; `race-weekend`, when an F1 race weekend is opened; and `news-click`, when a News link in Match details is followed. With GoatCounter's Sessions setting on (below), each is counted once per session: the same internet address with the same browser, for 8 hours. So the numbers are sessions, close to but not exactly people: one person on a phone and a laptop counts twice, and two people sharing a computer and connection count once. Nothing else is sent: no team, match, star, setting or search. Each count is a request for a tiny picture from GoatCounter, so none of GoatCounter's own scripts runs on the page. Nothing is counted on a local preview, in the tests or in a copy of the site published elsewhere (only at the address in the `hreflang` links of `index.html`), nor for a browser that asks sites not to track it (Global Privacy Control or Do Not Track). "How it works" tells visitors this, in both languages, and appears only while counting is switched on.
 
 ### How it is set up
 

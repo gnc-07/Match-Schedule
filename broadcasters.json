@@ -1,0 +1,19 @@
+[
+  {"comp": "EPL", "country": "CA", "broadcaster": "Fubo", "until": "2028-06-30", "reports": [
+    {"source": "Premier League", "official": true, "url": "https://www.premierleague.com/en/media/broadcasters", "checked": "2026-10-04", "quote": "Canada - Fubo"},
+    {"source": "Wikipedia", "url": "https://en.wikipedia.org/wiki/List_of_Premier_League_overseas_broadcasters", "checked": "2026-10-04", "quote": "Canada | fuboTV (Fubo press release: multi-year agreement beginning with 2025/2026 season)"}]},
+  {"comp": "EPL", "country": "BR", "broadcaster": "ESPN", "until": "2028-06-30", "reports": [
+    {"source": "Premier League", "official": true, "url": "https://www.premierleague.com/en/media/broadcasters", "checked": "2026-10-04", "quote": "Brazil - ESPN"},
+    {"source": "Wikipedia", "url": "https://en.wikipedia.org/wiki/List_of_Premier_League_overseas_broadcasters", "checked": "2026-10-04", "quote": "Brazil | ESPN (ESPN renews Premier League rights through 2028)"}]},
+  {"comp": "EPL", "country": "BR", "broadcaster": "CazéTV", "until": "2028-06-30", "reports": [
+    {"source": "Wikipedia", "url": "https://en.wikipedia.org/wiki/List_of_Premier_League_overseas_broadcasters", "checked": "2026-10-04", "quote": "Brazil | ESPN, CazéTV (not on the Premier League's own list; needs a second report)"}]},
+  {"comp": "LIGA", "country": "CA", "broadcaster": "TSN", "until": "2029-06-30", "reports": [
+    {"source": "LaLiga", "official": true, "url": "https://www.laliga.com/en-GB/news/espn-and-laliga-reach-historic-rights-agreement-bringing-top-rated-soccer-league-to-millions-more-fans-across-the-us", "checked": "2026-10-04", "quote": "through 2028-29 ... The deal also includes rights for Canada. TSN and RDS, Canada's leading sports networks, will deliver comprehensive coverage of LaLiga matches"},
+    {"source": "Wikipedia", "url": "https://en.wikipedia.org/wiki/List_of_La_Liga_broadcasters", "checked": "2026-10-04", "quote": "Canada | TSN/RDS"}]},
+  {"comp": "LIGA", "country": "CA", "broadcaster": "RDS", "until": "2029-06-30", "reports": [
+    {"source": "LaLiga", "official": true, "url": "https://www.laliga.com/en-GB/news/espn-and-laliga-reach-historic-rights-agreement-bringing-top-rated-soccer-league-to-millions-more-fans-across-the-us", "checked": "2026-10-04", "quote": "TSN and RDS, Canada's leading sports networks, will deliver comprehensive coverage of LaLiga matches"},
+    {"source": "Wikipedia", "url": "https://en.wikipedia.org/wiki/List_of_La_Liga_broadcasters", "checked": "2026-10-04", "quote": "Canada | TSN/RDS"}]},
+  {"comp": "F1", "country": "BR", "broadcaster": "Globo", "until": "2028-12-31", "reports": [
+    {"source": "Formula 1", "official": true, "url": "https://corp.formula1.com/formula-1-returns-to-globo-in-multi-year-broadcast-deal-from-2026/", "checked": "2026-10-04", "quote": "Globo will return as the exclusive broadcaster in Brazil from 2026 ... until 2028 inclusive (read through search excerpts)"},
+    {"source": "Wikipedia", "url": "https://en.wikipedia.org/wiki/List_of_Formula_One_broadcasters", "checked": "2026-10-04", "quote": "Brazil | TV Globo ... all sessions live on SporTV ... Rights until 2028"}]}
+]

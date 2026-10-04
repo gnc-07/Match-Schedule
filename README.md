@@ -12,11 +12,12 @@ Matchday Planner is a free website that lists upcoming matches from the **Premie
 - **See what is on, and when.** Matches are grouped by day. Filter by league, by date (today, this weekend, the next seven days or your own range) or by team name.
 - **Follow your teams.** Tap the star next to a team. Its next matches then appear under **Your teams** at the top of the list, and "Starred teams only" shows just its matches. In Formula 1, a star next to a driver highlights that driver in results and standings. Stars are remembered on your device.
 - **Follow live scores.** While a match is on, its score updates every 30 seconds without reloading the page.
-- **Open the match details.** Each match has a **Match details** button with the score, goals, cards and substitutions, the line-ups, the league table and a map of the stadium. You can share a link to one match or add it to your calendar.
+- **Open the match details.** Each match has a **Match details** button with the score, goals, cards and substitutions, the line-ups, the league table and a map of the stadium. You can share a link to one match or add it to your calendar. For clubs, **News** opens each club's page on ESPN (ESPN Brasil in Portuguese) in a new tab.
 - **Follow a Formula 1 weekend.** Every practice, qualifying, sprint and race session is listed. The **Race weekend** button shows the schedule, results, the championship standings and a drawing of the track.
 - **Check the league tables** with the **Tables** button: all four leagues, the Libertadores and Nations League (League A) groups, plus the F1 drivers' and teams' championships.
 - **Keep it on your home screen.** On an Android phone, open the site in Chrome, tap the menu (three dots) and choose **Add to Home screen** (or **Install app**). On an iPhone, open it in Safari, tap **Share** and choose **Add to Home Screen**. The site then opens from its own icon, like an app.
 - **Put the fixtures in your calendar.** The **Calendar** button gives you a feed you can subscribe to in Google Calendar, Apple Calendar, Outlook, Proton Calendar and most other apps. Subscribed calendars update by themselves when a time changes. (The feed covers football only.)
+- **See where to watch.** Match details and Race weekend name the official broadcasters in Canada and Brazil, where they are known: the leagues' own lists, checked against a second source.
 - **Watch on CazéTV.** When the Brazilian YouTube channel CazéTV is streaming a match, the card shows a link to the stream. These streams are usually only available in Brazil.
 
 ## How kick-off times are checked
@@ -34,7 +35,7 @@ The fixture list is refreshed automatically at least four times a day.
 
 ## Privacy
 
-The site has no accounts, no advertising and no cookies. Your preferences (stars, language, theme, filters) are stored only in your own browser. Visits are counted with [GoatCounter](https://www.goatcounter.com/), as totals only: how many people open the page, match details and race weekends, and in which language. Nothing about your teams, stars or settings is sent. To count a person once rather than at every reload, GoatCounter uses your internet address and browser details for up to 8 hours, in memory only, and never saves them. If your browser asks sites not to track you (Global Privacy Control or Do Not Track), nothing is counted. To show live scores, match details, tables, club crests and maps, your browser contacts the services listed below directly.
+The site has no accounts, no advertising and no cookies. Your preferences (stars, language, theme, filters) are stored only in your own browser. Visits are counted with [GoatCounter](https://www.goatcounter.com/), as totals only: how many people open the page, match details, race weekends and news links, and in which language. Nothing about your teams, stars or settings is sent. To count a person once rather than at every reload, GoatCounter uses your internet address and browser details for up to 8 hours, in memory only, and never saves them. If your browser asks sites not to track you (Global Privacy Control or Do Not Track), nothing is counted. To show live scores, match details, tables, club crests and maps, your browser contacts the services listed below directly.
 
 ## Where the data comes from
 

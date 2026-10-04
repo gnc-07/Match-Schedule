@@ -322,12 +322,49 @@ const actChecks = [
     await page.goBack();
     await page.waitForFunction(() => !document.getElementById("mddlg").open);
   }],
+  ["news links and where to watch", async page => {
+    await showMatch(page, uid);
+    await page.click(`.md-open[data-uid="${uid}"]`);
+    await page.waitForSelector("#md-newsbtn");
+    const state = () => page.evaluate(() => ({ expanded: document.getElementById("md-newsbtn").getAttribute("aria-expanded"),
+      hidden: document.getElementById("md-newsbox").hidden }));
+    let s = await state();
+    must(s.expanded === "false" && s.hidden, "the news links are shown before News is pressed");
+    await page.click("#md-newsbtn");
+    await wait(300);
+    s = await state();
+    must(s.expanded === "true" && !s.hidden, "pressing News did not unfold the links");
+    // one link per club, to its ESPN page (ESPN Brasil in Portuguese), built from the crest's team number, in a new tab
+    const links = await page.evaluate(() => [...document.querySelectorAll("#md-newsbox a")].map(a => ({ href: a.href, target: a.target, rel: a.rel })));
+    const base = (await page.evaluate(() => LANG)) === "pt" ? "https://www.espn.com.br/futebol/time/_/id/" : "https://www.espn.com/soccer/club/_/id/";
+    must(JSON.stringify(links.map(l => l.href)) === JSON.stringify([base + "359", base + "360"]), `news links ${JSON.stringify(links.map(l => l.href))}`);
+    must(links.every(l => l.target === "_blank" && l.rel.includes("noopener")), "a news link does not open safely in a new tab");
+    // following one counts "news-click" and nothing else (the count itself is never sent from a test)
+    const counted = await page.evaluate(() => { const a = []; countVisit = (...x) => a.push(x);
+      const l = document.querySelector("#md-newsbox a");
+      l.addEventListener("click", e => e.preventDefault()); // stay on the page: the link itself is left as it is
+      l.click(); return JSON.stringify(a); });
+    must(counted === JSON.stringify([["news-click", true]]), `following a news link counted ${counted}`);
+    await page.click("#md-newsbtn");
+    await wait(400);
+    s = await state();
+    must(s.expanded === "false" && s.hidden, "pressing News again did not fold the links away");
+    // where to watch: the sample's Premier League broadcasters, the page's own country first
+    const tv = await page.textContent("#md-act .md-tv");
+    must(/Fubo/.test(tv) && /ESPN/.test(tv), `where to watch reads "${tv}"`);
+    // a national team has no ESPN number, so a match between two of them has no news links
+    must(await page.evaluate(() => { const r = DATA.find(x => ["UNL", "INTL"].includes(x.code)); return !r || newsHTML(r) === ""; }),
+      "a national-team match got news links");
+    await page.click("#mddlg [data-close]");
+    await page.waitForFunction(() => !document.getElementById("mddlg").open);
+  }],
   ["F1 race weekend", async page => {
     await showMatch(page, F1_WEEKEND);   // in view first: days far from the window are not laid out until they come near
     await page.click(`.md-open[data-uid="${F1_WEEKEND}"]`);
     await page.waitForSelector("#wk-champ table");
     await page.waitForSelector("#wk-res .pod li.p1");
     must(await count(page, "#wk-venue svg") > 0, "the track diagram was not drawn");
+    must(/Globo/.test((await page.textContent("#wk-top .md-tv")) || ""), "the race weekend does not say where to watch");
     // a starred driver's rows are highlighted (class "mine", as in the league tables), and nothing else gets that class
     const drv = await page.getAttribute("#wk-res .star[data-drv]", "data-drv");
     await page.click(`#wk-res .star[data-drv="${drv}"]`);

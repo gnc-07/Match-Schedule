@@ -1377,6 +1377,56 @@ class SearchAndSharing(unittest.TestCase):
             self.assertNotIn("\u2014", text)                                          # no em dashes (project rule 7)
 
 
+class Broadcasters(unittest.TestCase):
+    """broadcasters.json: a broadcaster is published only when an official report gives it or two different sources
+    agree, and only until its rights end, as kick-off times need an official source or two agreeing ones."""
+    TODAY = date(2026, 10, 4)
+
+    def run_on(self, entries):
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "b.json")
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(entries, f)
+            return bs.broadcasters(self.TODAY, path)
+
+    def entry(self, *reports, **kw):
+        return {"comp": "EPL", "country": "CA", "broadcaster": "Fubo", "until": "2028-06-30", "reports": list(reports), **kw}
+
+    OFFICIAL = {"source": "Premier League", "official": True, "url": "https://www.premierleague.com/x"}
+    WIKI = {"source": "Wikipedia", "url": "https://en.wikipedia.org/x"}
+    PRESS = {"source": "Fubo", "url": "https://ir.fubo.tv/x"}
+
+    def test_official_alone_is_enough(self):
+        self.assertEqual(self.run_on([self.entry(self.OFFICIAL)]), {"EPL": {"CA": ["Fubo"]}})
+
+    def test_two_sources_agreeing_are_enough(self):
+        self.assertEqual(self.run_on([self.entry(self.WIKI, self.PRESS)]), {"EPL": {"CA": ["Fubo"]}})
+
+    def test_one_unofficial_source_is_not(self):
+        self.assertEqual(self.run_on([self.entry(self.WIKI)]), {})
+        # the same source twice is still one source
+        self.assertEqual(self.run_on([self.entry(self.WIKI, dict(self.WIKI, url="https://en.wikipedia.org/y"))]), {})
+
+    def test_rights_that_have_ended_are_left_out(self):
+        self.assertEqual(self.run_on([self.entry(self.OFFICIAL, until="2026-10-03")]), {})
+
+    def test_malformed_entries_are_skipped(self):
+        bad = [self.entry(self.OFFICIAL, comp="XYZ"), self.entry(self.OFFICIAL, country="Canada"),
+               self.entry(self.OFFICIAL, broadcaster=""), self.entry(self.OFFICIAL, broadcaster="x" * 41),
+               self.entry(self.OFFICIAL, until="soon"), self.entry(dict(self.OFFICIAL, url="javascript:alert(1)")),
+               {"comp": "EPL"}, "text", None]
+        self.assertEqual(self.run_on(bad + [self.entry(self.OFFICIAL, broadcaster="DAZN")]), {"EPL": {"CA": ["DAZN"]}})
+
+    def test_the_real_file(self):
+        # every entry has its reports; what is published follows the rule (CazéTV has one report, so it is not shown)
+        got = bs.broadcasters(self.TODAY, os.path.join(PublishSite.ROOT, "broadcasters.json"))
+        self.assertEqual(got["EPL"], {"CA": ["Fubo"], "BR": ["ESPN"]})
+        self.assertEqual(got["LIGA"], {"CA": ["TSN", "RDS"]})
+        self.assertEqual(got["F1"], {"BR": ["Globo"]})
+        for b in bs.load_json(os.path.join(PublishSite.ROOT, "broadcasters.json")):
+            self.assertTrue(b["reports"] and all(r["url"].startswith("https://") and r.get("checked") for r in b["reports"]))
+
+
 class VisitCounts(unittest.TestCase):
     """js/count.js sends visit counts to the GoatCounter address in STATS. That address must be a GoatCounter site and
     be allowed in the security policy (img-src, address/count), or browsers block every count without a word; with no
