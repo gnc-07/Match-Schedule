@@ -942,8 +942,10 @@ function watchLink(r, L) {
     esc(p ? T.watchPlannedAria(h, a) : T.watchAria(h, a)) +
     '">' +
     ICON.play +
-    "<span>" +
+    '<span class="w-long">' +
     esc(p ? T.watchPlanned : T.watch) +
+    '</span><span class="w-short">' +
+    esc(T.watchShort) + // on a phone's match card, so it fits beside Match details
     "</span></a>"
   );
 }

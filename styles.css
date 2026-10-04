@@ -273,6 +273,7 @@ input[type=date]{min-height:44px;background:var(--panel);border:1px solid var(--
 .m-meta .comp{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2);font-weight:600}
 .m-meta .comp i{width:9px;height:9px;border-radius:2px;background:var(--c);display:inline-block}
 .btn.watch svg{width:18px;height:18px;color:var(--live-ink)}
+.btn.watch .w-short{display:none}
 .m-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;padding-top:2px}
 .pill{font-size:12.5px;font-weight:600;line-height:1;border-radius:999px;padding:6px 10px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
 .pill svg{width:13px;height:13px}
@@ -628,6 +629,9 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
   .cal-block .wd{order:3;padding:0;font-size:13px}
   .cal-block .rel{order:4;width:auto;border-radius:999px;padding:5px 9px}
   .match{grid-template-columns:82px minmax(0,1fr);padding:13px 12px 13px 16px;gap:6px 12px}
+  .match .m-act{margin-left:-94px}   /* the buttons start under the time (82px column + 12px gap), so two fit side by side */
+  .match .btn.watch .w-long{display:none}   /* "CazéTV" alone, so it fits beside Match details */
+  .match .btn.watch .w-short{display:inline}
   .m-time{font-size:15px}
   .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}
   .tools{grid-column:1/-1}
