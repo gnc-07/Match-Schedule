@@ -641,8 +641,8 @@ table.lt{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numer
   .cal-block .wd{order:3;padding:0;font-size:13px}
   .cal-block .rel{order:4;width:auto;border-radius:999px;padding:5px 9px}
   .match{grid-template-columns:82px minmax(0,1fr);padding:13px 12px 13px 16px;gap:6px 12px}
-  .match .m-act{margin-left:-94px}   /* the buttons start under the time (82px column + 12px gap), so two fit side by side */
-  .match .btn.watch .w-long{display:none}   /* "CazéTV" alone, so it fits beside Match details */
+  .match .m-act{flex-direction:column;align-items:flex-start}   /* CazéTV under Match details, in line with the team names */
+  .match .btn.watch .w-long{display:none}   /* "CazéTV" alone: the column is narrow */
   .match .btn.watch .w-short{display:inline}
   .m-time{font-size:15px}
   .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}

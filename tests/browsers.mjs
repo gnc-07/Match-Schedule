@@ -291,11 +291,16 @@ const actChecks = [
     must(await card.locator(".m-act").count() === 1, "the CazéTV button is not in the same row as Match details");
     must(await card.locator(".m-act > .md-open + .watch").count() === 1, "the card does not show Match details, then Watch on CazéTV");
     must(await card.locator(".m-act small").count() === 0, "the CazéTV button still has a note beside it");
-    // side by side, on phones too: there the button reads "CazéTV" and the row starts under the time
-    const [d, w] = await card.locator(".m-act > a").evaluateAll(a => a.map(e => e.getBoundingClientRect().top));
-    must(Math.abs(d - w) < 1, "Watch on CazéTV is not beside Match details");
+    // side by side on wider screens; on phones CazéTV (reading "CazéTV") sits under Match details, both in line with the team names
+    const phone = page.viewportSize().width <= 640;
+    const [d, w] = await card.locator(".m-act > a").evaluateAll(a => a.map(e => e.getBoundingClientRect()));
+    if (phone) {
+      const names = await card.locator(".m-teams").evaluate(e => e.getBoundingClientRect().left);
+      must(w.top >= d.bottom, "on a phone, Watch on CazéTV is not under Match details");
+      must(Math.abs(d.left - names) < 1 && Math.abs(w.left - names) < 1, "on a phone, the buttons are not in line with the team names");
+    } else must(Math.abs(d.top - w.top) < 1, "Watch on CazéTV is not beside Match details");
     const label = (await card.locator(".btn.watch").innerText()).trim();
-    must(page.viewportSize().width <= 640 ? label === "CazéTV" : label.length > "CazéTV".length, `the CazéTV button reads "${label}"`);
+    must(phone ? label === "CazéTV" : label.length > "CazéTV".length, `the CazéTV button reads "${label}"`);
     // a live match shows its score marked live, with no LIVE pill (the Live now box shows the clock)
     await page.evaluate(u => { LIVE.set(keyOf(DATA.find(x => x.uid === u)), { id: "900001", state: "in", clock: "67'", detail: "", hs: "1", as: "0" }); render(); }, LEAGUE_OK);
     must(await card.evaluate(e => e.classList.contains("is-live")), "the sample match did not turn live");
