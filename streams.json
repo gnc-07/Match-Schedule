@@ -196,18 +196,18 @@
   "start": "2026-10-11T13:00:00+00:00"
  },
  {
-  "id": "agenda:rennes-x-auxerre:2026-10-11",
-  "source": "agenda",
-  "home": "RENNES",
-  "away": "AUXERRE",
-  "start": "2026-10-11T15:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=8Fqqs66c6ao"
- },
- {
   "id": "8Fqqs66c6ao",
   "title": "AO VIVO: RENNES X AUXERRE | LIGUE 1 26/27 | 6ª RODADA",
   "published": "2026-10-01T12:00:17+00:00",
   "start": "2026-10-11T15:00:00+00:00"
+ },
+ {
+  "id": "agenda:rennes-x-auxerre:2026-10-11",
+  "source": "agenda",
+  "home": "RENNES",
+  "away": "AUXERRE",
+  "start": "2026-10-11T15:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=8Fqqs66c6ao"
  },
  {
   "id": "agenda:real-betis-x-osasuna:2026-10-11",
@@ -260,6 +260,14 @@
   "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg"
  },
  {
+  "id": "agenda:levante-x-sevilla:2026-10-12",
+  "source": "agenda",
+  "home": "LEVANTE",
+  "away": "SEVILLA",
+  "start": "2026-10-12T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=exOtkjMOi3k"
+ },
+ {
   "id": "agenda:botafogo-x-chapecoense:2026-10-17",
   "source": "agenda",
   "home": "BOTAFOGO",
@@ -274,6 +282,20 @@
   "away": "CORINTHIANS",
   "start": "2026-10-24T21:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=FDo01YVDsNE"
+ },
+ {
+  "id": "agenda:barcelona-x-real-madrid:2026-10-25",
+  "source": "agenda",
+  "home": "BARCELONA",
+  "away": "REAL MADRID",
+  "start": "2026-10-25T20:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=UEV1NElLuMA"
+ },
+ {
+  "id": "UEV1NElLuMA",
+  "title": "AO VIVO: BARCELONA X REAL MADRID | LALIGA 26/27 | 10ª RODADA",
+  "published": "2026-10-05T17:59:42+00:00",
+  "start": "2026-10-25T20:00:00+00:00"
  },
  {
   "id": "agenda:fluminense-x-internacional:2026-10-28",
