@@ -1,33 +1,5 @@
 [
  {
-  "id": "agenda:cazetv-x-btb-sports:2026-10-03",
-  "source": "agenda",
-  "home": "CAZÉTV",
-  "away": "BTB SPORTS",
-  "start": "2026-10-03T00:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=K6oCrMQCXJU"
- },
- {
-  "id": "K6oCrMQCXJU",
-  "title": "AO VIVO: CAZÉTV X BTB SPORTS | COPA ACERJ 2026 | QUARTAS DE FINAL",
-  "published": "2026-09-28T21:00:03+00:00",
-  "start": "2026-10-03T00:30:00+00:00"
- },
- {
-  "id": "agenda:david-jorda-x-inaki-montes:2026-10-03",
-  "source": "agenda",
-  "home": "DAVID JORDA",
-  "away": "INAKI MONTES",
-  "start": "2026-10-03T09:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=3kZOkqq0Id8"
- },
- {
-  "id": "3kZOkqq0Id8",
-  "title": "AO VIVO (SOM AMBIENTE): TÊNIS | DAVID JORDA X INAKI MONTES | ATP CHALLENGER DE PORTO | SEMIFINAL",
-  "published": "2026-09-23T12:00:03+00:00",
-  "start": "2026-10-03T09:46:04+00:00"
- },
- {
   "id": "agenda:henrique-rocha-x-inaki-montes:2026-10-04",
   "source": "agenda",
   "home": "HENRIQUE ROCHA",
@@ -44,11 +16,25 @@
   "url": "https://www.youtube.com/watch?v=7uq9nMdsVFU"
  },
  {
+  "id": "agenda:logo-apos-o-jogo-entre-internacional-x-corinthians:2026-10-08",
+  "source": "agenda",
+  "home": "LOGO APÓS O JOGO ENTRE INTERNACIONAL",
+  "away": "CORINTHIANS",
+  "start": "2026-10-08T00:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=NDTT1r3md9g"
+ },
+ {
+  "id": "NDTT1r3md9g",
+  "title": "AO VIVO: LOGO APÓS O JOGO ENTRE INTERNACIONAL X CORINTHIANS | RODA DE BOBO",
+  "published": "2026-10-06T15:23:43+00:00",
+  "start": "2026-10-08T00:30:00+00:00"
+ },
+ {
   "id": "agenda:borussia-dortmund-x-werder-bremen:2026-10-09",
   "source": "agenda",
   "home": "BORUSSIA DORTMUND",
   "away": "WERDER BREMEN",
-  "start": "2026-10-09T18:00:00+00:00",
+  "start": "2026-10-09T17:45:00+00:00",
   "url": "https://www.youtube.com/watch?v=Gyu9uUzh6BE"
  },
  {
@@ -72,6 +58,20 @@
   "away": "ESPANYOL",
   "start": "2026-10-09T18:45:00+00:00",
   "url": "https://www.youtube.com/watch?v=sT_wb63eDVo"
+ },
+ {
+  "id": "agenda:cazetv-x-futebol-globo-cbn:2026-10-10",
+  "source": "agenda",
+  "home": "CAZÉTV",
+  "away": "FUTEBOL GLOBO CBN",
+  "start": "2026-10-10T00:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=38asoGWyiQ0"
+ },
+ {
+  "id": "38asoGWyiQ0",
+  "title": "AO VIVO: CAZÉTV X FUTEBOL GLOBO CBN | COPA ACERJ 2026 | SEMIFINAL",
+  "published": "2026-10-05T21:00:33+00:00",
+  "start": "2026-10-10T00:30:00+00:00"
  },
  {
   "id": "agenda:rayo-vallecano-x-athletic-bilbao:2026-10-10",
@@ -138,6 +138,14 @@
   "start": "2026-10-10T18:00:00+00:00"
  },
  {
+  "id": "agenda:real-madrid-x-villarreal:2026-10-10",
+  "source": "agenda",
+  "home": "REAL MADRID",
+  "away": "VILLARREAL",
+  "start": "2026-10-10T18:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=XSYhg8U0WEM"
+ },
+ {
   "id": "agenda:monaco-x-toulouse:2026-10-10",
   "source": "agenda",
   "home": "MÔNACO",
@@ -152,19 +160,39 @@
   "start": "2026-10-10T18:15:00+00:00"
  },
  {
-  "id": "agenda:real-madrid-x-villarreal:2026-10-10",
+  "id": "agenda:lorient-x-paris-fc:2026-10-10",
   "source": "agenda",
-  "home": "REAL MADRID",
-  "away": "VILLARREAL",
-  "start": "2026-10-10T18:20:00+00:00",
-  "url": "https://www.youtube.com/watch?v=XSYhg8U0WEM"
+  "home": "LORIENT",
+  "away": "PARIS FC",
+  "start": "2026-10-10T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=FUn9SSdz3zY"
+ },
+ {
+  "id": "agenda:stade-brestois-x-angers:2026-10-10",
+  "source": "agenda",
+  "home": "STADE BRESTOIS",
+  "away": "ANGERS",
+  "start": "2026-10-10T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=0dq7QcW2Fy8"
+ },
+ {
+  "id": "FUn9SSdz3zY",
+  "title": "AO VIVO (SOM AMBIENTE): LORIENT X PARIS FC | LIGUE 1 26/27 | 6ª RODADA",
+  "published": "2026-10-06T14:34:38+00:00",
+  "start": "2026-10-10T18:30:00+00:00"
+ },
+ {
+  "id": "0dq7QcW2Fy8",
+  "title": "AO VIVO (SOM AMBIENTE): STADE BRESTOIS X ANGERS | LIGUE 1 26/27 | 6ª RODADA",
+  "published": "2026-10-05T21:00:02+00:00",
+  "start": "2026-10-10T18:30:00+00:00"
  },
  {
   "id": "agenda:vasco-x-remo:2026-10-10",
   "source": "agenda",
   "home": "VASCO",
   "away": "REMO",
-  "start": "2026-10-10T18:30:00+00:00",
+  "start": "2026-10-10T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg"
  },
  {
@@ -180,6 +208,20 @@
   "title": "AO VIVO: ELCHE X CELTA DE VIGO | LALIGA 26/27 | 8ª RODADA",
   "published": "2026-10-01T12:00:04+00:00",
   "start": "2026-10-11T11:45:00+00:00"
+ },
+ {
+  "id": "agenda:nice-x-strasbourg:2026-10-11",
+  "source": "agenda",
+  "home": "NICE",
+  "away": "STRASBOURG",
+  "start": "2026-10-11T12:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=b0qyeJrQWpQ"
+ },
+ {
+  "id": "b0qyeJrQWpQ",
+  "title": "AO VIVO (SOM AMBIENTE): NICE X STRASBOURG | LIGUE 1 26/27 | 6ª RODADA",
+  "published": "2026-10-06T15:32:14+00:00",
+  "start": "2026-10-11T12:45:00+00:00"
  },
  {
   "id": "agenda:fc-koln-x-borussia-monchengladbach:2026-10-11",
@@ -228,7 +270,7 @@
   "source": "agenda",
   "home": "CAGLIARI",
   "away": "JUVENTUS",
-  "start": "2026-10-11T18:20:00+00:00",
+  "start": "2026-10-11T18:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=B6pdLNMOiLg"
  },
  {
@@ -250,6 +292,20 @@
   "title": "AO VIVO: RACING CLUB X VALENCIA | LaLiga 26/27 | 8ª RODADA",
   "published": "2026-10-01T12:01:16+00:00",
   "start": "2026-10-11T18:30:00+00:00"
+ },
+ {
+  "id": "agenda:troyes-x-marseille:2026-10-11",
+  "source": "agenda",
+  "home": "TROYES",
+  "away": "MARSEILLE",
+  "start": "2026-10-11T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=zkpl3oJPLJQ"
+ },
+ {
+  "id": "zkpl3oJPLJQ",
+  "title": "AO VIVO (SOM AMBIENTE): TROYES X MARSEILLE | LIGUE 1 26/27 | 6ª RODADA",
+  "published": "2026-10-06T15:36:41+00:00",
+  "start": "2026-10-11T18:45:00+00:00"
  },
  {
   "id": "agenda:vasco-x-remo:2026-10-11",
