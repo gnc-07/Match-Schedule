@@ -8,6 +8,12 @@
   "url": "https://www.youtube.com/watch?v=7uq9nMdsVFU"
  },
  {
+  "id": "7uq9nMdsVFU",
+  "title": "AO VIVO: INTERNACIONAL X CORINTHIANS | BRASILEIRÃO 2026 | 29ª RODADA",
+  "published": "2026-08-30T14:59:10+00:00",
+  "start": "2026-10-07T21:00:07+00:00"
+ },
+ {
   "id": "agenda:logo-apos-o-jogo-entre-internacional-x-corinthians:2026-10-08",
   "source": "agenda",
   "home": "LOGO APÓS O JOGO ENTRE INTERNACIONAL",
@@ -20,6 +26,20 @@
   "title": "AO VIVO: RODA DE BOBO | PÓS-JOGO INTERNACIONAL X CORINTHIANS",
   "published": "2026-10-06T15:23:43+00:00",
   "start": "2026-10-08T00:30:00+00:00"
+ },
+ {
+  "id": "agenda:preparacao-para-brasil-x-argentina-em-porto-alegre:2026-10-08",
+  "source": "agenda",
+  "home": "PREPARAÇÃO PARA BRASIL",
+  "away": "ARGENTINA EM PORTO ALEGRE",
+  "start": "2026-10-08T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=uLtnG8H3zzE"
+ },
+ {
+  "id": "uLtnG8H3zzE",
+  "title": "AO VIVO: TREINO DA SELEÇÃO BRASILEIRA FEMININA | PREPARAÇÃO PARA BRASIL X ARGENTINA EM PORTO ALEGRE",
+  "published": "2026-10-07T18:59:05+00:00",
+  "start": "2026-10-08T18:30:00+00:00"
  },
  {
   "id": "agenda:borussia-dortmund-x-werder-bremen:2026-10-09",
