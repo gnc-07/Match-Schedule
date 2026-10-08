@@ -86,6 +86,12 @@
   "start": "2026-10-10T00:30:00+00:00"
  },
  {
+  "id": "ykl-XVRHMag",
+  "title": "AO VIVO: TÊNIS DE MESA | HUGO CALDERANO X FELIX LEBRUM NO CHINA SMASH 2026 | QUARTAS DE FINAL",
+  "published": "2026-10-08T15:29:41+00:00",
+  "start": "2026-10-10T03:30:00+00:00"
+ },
+ {
   "id": "agenda:rayo-vallecano-x-athletic-bilbao:2026-10-10",
   "source": "agenda",
   "home": "RAYO VALLECANO",
@@ -334,6 +340,46 @@
   "away": "SEVILLA",
   "start": "2026-10-12T18:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=exOtkjMOi3k"
+ },
+ {
+  "id": "agenda:fc-salzburg-x-milan:2026-10-15",
+  "source": "agenda",
+  "home": "FC SALZBURG",
+  "away": "MILAN",
+  "start": "2026-10-15T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=Kba6oh68ziE"
+ },
+ {
+  "id": "agenda:cska-sofia-x-monaco:2026-10-15",
+  "source": "agenda",
+  "home": "CSKA SOFIA",
+  "away": "MÔNACO",
+  "start": "2026-10-15T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=6Y4PPuXFEaw"
+ },
+ {
+  "id": "agenda:benfica-x-celtic:2026-10-15",
+  "source": "agenda",
+  "home": "BENFICA",
+  "away": "CELTIC",
+  "start": "2026-10-15T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=RSWk2fkIZas"
+ },
+ {
+  "id": "agenda:celta-x-juventus:2026-10-15",
+  "source": "agenda",
+  "home": "CELTA",
+  "away": "JUVENTUS",
+  "start": "2026-10-15T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=CcP_GHaXnqc"
+ },
+ {
+  "id": "agenda:bournemouth-x-sturm-graz:2026-10-15",
+  "source": "agenda",
+  "home": "BOURNEMOUTH",
+  "away": "STURM GRAZ",
+  "start": "2026-10-15T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=V-AqPCzJBZM"
  },
  {
   "id": "agenda:botafogo-x-chapecoense:2026-10-17",
