@@ -170,6 +170,14 @@
   "url": "https://www.youtube.com/watch?v=XSYhg8U0WEM"
  },
  {
+  "id": "agenda:psg-x-le-mans:2026-10-10",
+  "source": "agenda",
+  "home": "PSG",
+  "away": "LE MANS",
+  "start": "2026-10-10T18:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=lUH5DF_2974"
+ },
+ {
   "id": "agenda:monaco-x-toulouse:2026-10-10",
   "source": "agenda",
   "home": "MÔNACO",
@@ -218,6 +226,20 @@
   "away": "REMO",
   "start": "2026-10-10T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg"
+ },
+ {
+  "id": "agenda:logo-apos-vasco-x-remo-no-brasileirao:2026-10-10",
+  "source": "agenda",
+  "home": "LOGO APÓS VASCO",
+  "away": "REMO NO BRASILEIRÃO",
+  "start": "2026-10-10T23:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=ahc29ktiDU0"
+ },
+ {
+  "id": "ahc29ktiDU0",
+  "title": "AO VIVO: LOGO APÓS VASCO X REMO NO BRASILEIRÃO | RODA DE BOBO",
+  "published": "2026-10-09T19:20:20+00:00",
+  "start": "2026-10-10T23:00:00+00:00"
  },
  {
   "id": "agenda:elche-x-celta-de-vigo:2026-10-11",
@@ -348,6 +370,48 @@
   "url": "https://www.youtube.com/watch?v=exOtkjMOi3k"
  },
  {
+  "id": "agenda:vasco-x-boca-juniors:2026-10-13",
+  "source": "agenda",
+  "home": "VASCO",
+  "away": "BOCA JUNIORS",
+  "start": "2026-10-13T23:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=gQ_hIEjOcKs"
+ },
+ {
+  "id": "gQ_hIEjOcKs",
+  "title": "AO VIVO: VASCO X BOCA JUNIORS | SUL-AMERICANA | NARRAÇÃO | NOCHE DE COPA",
+  "published": "2026-10-09T18:30:04+00:00",
+  "start": "2026-10-13T23:30:00+00:00"
+ },
+ {
+  "id": "agenda:atletico-mg-x-torque:2026-10-14",
+  "source": "agenda",
+  "home": "ATLÉTICO-MG",
+  "away": "TORQUE",
+  "start": "2026-10-14T21:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=rOYyBWep6Hg"
+ },
+ {
+  "id": "rOYyBWep6Hg",
+  "title": "AO VIVO: ATLÉTICO-MG X TORQUE | SUL-AMERICANA | NARRAÇÃO | NOCHE DE COPA",
+  "published": "2026-10-09T18:35:20+00:00",
+  "start": "2026-10-14T21:20:00+00:00"
+ },
+ {
+  "id": "agenda:fluminense-x-palmeiras:2026-10-14",
+  "source": "agenda",
+  "home": "FLUMINENSE",
+  "away": "PALMEIRAS",
+  "start": "2026-10-14T23:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=hrAlXOXySic"
+ },
+ {
+  "id": "hrAlXOXySic",
+  "title": "AO VIVO: FLUMINENSE X PALMEIRAS | LIBERTADORES | NARRAÇÃO | NOCHE DE COPA",
+  "published": "2026-10-09T18:38:22+00:00",
+  "start": "2026-10-14T23:50:00+00:00"
+ },
+ {
   "id": "agenda:fc-salzburg-x-milan:2026-10-15",
   "source": "agenda",
   "home": "FC SALZBURG",
@@ -386,6 +450,20 @@
   "away": "STURM GRAZ",
   "start": "2026-10-15T18:45:00+00:00",
   "url": "https://www.youtube.com/watch?v=V-AqPCzJBZM"
+ },
+ {
+  "id": "agenda:flamengo-x-estudiantes-de-la-plata:2026-10-15",
+  "source": "agenda",
+  "home": "FLAMENGO",
+  "away": "ESTUDIANTES DE LA PLATA",
+  "start": "2026-10-15T23:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=EaVa5uzH1Ko"
+ },
+ {
+  "id": "EaVa5uzH1Ko",
+  "title": "AO VIVO: FLAMENGO X ESTUDIANTES DE LA PLATA | LIBERTADORES | NARRAÇÃO | NOCHE DE COPA",
+  "published": "2026-10-09T18:49:23+00:00",
+  "start": "2026-10-15T23:15:00+00:00"
  },
  {
   "id": "agenda:botafogo-x-chapecoense:2026-10-17",
