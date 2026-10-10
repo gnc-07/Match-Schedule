@@ -452,6 +452,14 @@
   "url": "https://www.youtube.com/watch?v=V-AqPCzJBZM"
  },
  {
+  "id": "agenda:corinthians-x-colo-colo:2026-10-15",
+  "source": "agenda",
+  "home": "CORINTHIANS",
+  "away": "COLO-COLO",
+  "start": "2026-10-15T19:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=HPs_ahJ6ns4"
+ },
+ {
   "id": "agenda:flamengo-x-estudiantes-de-la-plata:2026-10-15",
   "source": "agenda",
   "home": "FLAMENGO",
@@ -464,6 +472,22 @@
   "title": "AO VIVO: FLAMENGO X ESTUDIANTES DE LA PLATA | LIBERTADORES | NARRAÇÃO | NOCHE DE COPA",
   "published": "2026-10-09T18:49:23+00:00",
   "start": "2026-10-15T23:15:00+00:00"
+ },
+ {
+  "id": "agenda:universitario-x-palmeiras:2026-10-15",
+  "source": "agenda",
+  "home": "UNIVERSITÁRIO",
+  "away": "PALMEIRAS",
+  "start": "2026-10-15T23:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=e21oU_yA7Vg"
+ },
+ {
+  "id": "agenda:cruzeiro-x-ldu:2026-10-16",
+  "source": "agenda",
+  "home": "CRUZEIRO",
+  "away": "LDU",
+  "start": "2026-10-16T23:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=p19LrCSs7hk"
  },
  {
   "id": "agenda:botafogo-x-chapecoense:2026-10-17",
