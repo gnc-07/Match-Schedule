@@ -1,19 +1,5 @@
 [
  {
-  "id": "agenda:internacional-x-corinthians:2026-10-07",
-  "source": "agenda",
-  "home": "INTERNACIONAL",
-  "away": "CORINTHIANS",
-  "start": "2026-10-07T21:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=7uq9nMdsVFU"
- },
- {
-  "id": "7uq9nMdsVFU",
-  "title": "AO VIVO: INTERNACIONAL X CORINTHIANS | BRASILEIRÃO 2026 | 29ª RODADA",
-  "published": "2026-08-30T14:59:10+00:00",
-  "start": "2026-10-07T21:00:07+00:00"
- },
- {
   "id": "agenda:logo-apos-o-jogo-entre-internacional-x-corinthians:2026-10-08",
   "source": "agenda",
   "home": "LOGO APÓS O JOGO ENTRE INTERNACIONAL",
@@ -232,6 +218,12 @@
   "away": "REMO",
   "start": "2026-10-10T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg"
+ },
+ {
+  "id": "90fW7TbZ9sg",
+  "title": "AO VIVO: VASCO X REMO | BRASILEIRÃO 2026 | 30ª RODADA",
+  "published": "2026-08-30T15:03:08+00:00",
+  "start": "2026-10-10T19:30:26+00:00"
  },
  {
   "id": "agenda:logo-apos-vasco-x-remo-no-brasileirao:2026-10-10",
