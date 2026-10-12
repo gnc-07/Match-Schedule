@@ -1,41 +1,5 @@
 [
  {
-  "id": "agenda:borussia-dortmund-x-werder-bremen:2026-10-09",
-  "source": "agenda",
-  "home": "BORUSSIA DORTMUND",
-  "away": "WERDER BREMEN",
-  "start": "2026-10-09T17:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=Gyu9uUzh6BE"
- },
- {
-  "id": "Gyu9uUzh6BE",
-  "title": "AO VIVO: BORUSSIA DORTMUND X WERDER BREMEN | BUNDESLIGA 26/27 | 5ª RODADA",
-  "published": "2026-09-29T21:00:07+00:00",
-  "start": "2026-10-09T18:00:00+00:00"
- },
- {
-  "id": "agenda:lens-x-lyon:2026-10-09",
-  "source": "agenda",
-  "home": "LENS",
-  "away": "LYON",
-  "start": "2026-10-09T18:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=WUgavf6ZEhA"
- },
- {
-  "id": "WUgavf6ZEhA",
-  "title": "AO VIVO: LENS X LYON | LIGUE 1 26/27 | 6ª RODADA",
-  "published": "2026-09-29T12:00:10+00:00",
-  "start": "2026-10-09T18:15:05+00:00"
- },
- {
-  "id": "agenda:malaga-x-espanyol:2026-10-09",
-  "source": "agenda",
-  "home": "MÁLAGA",
-  "away": "ESPANYOL",
-  "start": "2026-10-09T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=sT_wb63eDVo"
- },
- {
   "id": "agenda:cazetv-x-futebol-globo-cbn:2026-10-10",
   "source": "agenda",
   "home": "CAZÉTV",
@@ -332,6 +296,12 @@
   "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg"
  },
  {
+  "id": "exOtkjMOi3k",
+  "title": "AO VIVO: LEVANTE X SEVILLA | LALIGA 26/27 | 8ª RODADA",
+  "published": "2026-10-02T12:00:07+00:00",
+  "start": "2026-10-12T18:29:10+00:00"
+ },
+ {
   "id": "agenda:levante-x-sevilla:2026-10-12",
   "source": "agenda",
   "home": "LEVANTE",
@@ -396,6 +366,14 @@
   "away": "MÔNACO",
   "start": "2026-10-15T16:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=6Y4PPuXFEaw"
+ },
+ {
+  "id": "agenda:lech-poznan-x-bayer-leverkusen:2026-10-15",
+  "source": "agenda",
+  "home": "LECH POZNAŃ",
+  "away": "BAYER LEVERKUSEN",
+  "start": "2026-10-15T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=1_E7ie4K8kY"
  },
  {
   "id": "agenda:benfica-x-celtic:2026-10-15",
