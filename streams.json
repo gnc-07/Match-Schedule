@@ -1,53 +1,5 @@
 [
  {
-  "id": "agenda:cazetv-x-futebol-globo-cbn:2026-10-10",
-  "source": "agenda",
-  "home": "CAZÉTV",
-  "away": "FUTEBOL GLOBO CBN",
-  "start": "2026-10-10T00:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=38asoGWyiQ0"
- },
- {
-  "id": "38asoGWyiQ0",
-  "title": "AO VIVO: CAZÉTV X FUTEBOL GLOBO CBN | COPA ACERJ 2026 | SEMIFINAL",
-  "published": "2026-10-05T21:00:33+00:00",
-  "start": "2026-10-10T00:30:00+00:00"
- },
- {
-  "id": "ykl-XVRHMag",
-  "title": "AO VIVO: TÊNIS DE MESA | HUGO CALDERANO X FELIX LEBRUM NO CHINA SMASH 2026 | QUARTAS DE FINAL",
-  "published": "2026-10-08T15:29:41+00:00",
-  "start": "2026-10-10T03:30:00+00:00"
- },
- {
-  "id": "agenda:rayo-vallecano-x-athletic-bilbao:2026-10-10",
-  "source": "agenda",
-  "home": "RAYO VALLECANO",
-  "away": "ATHLETIC BILBAO",
-  "start": "2026-10-10T11:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=tHSIAa4kbcc"
- },
- {
-  "id": "tHSIAa4kbcc",
-  "title": "AO VIVO: RAYO VALLECANO X ATHLETIC BILBAO | LALIGA 26/27 | 8ª RODADA",
-  "published": "2026-09-30T12:00:04+00:00",
-  "start": "2026-10-10T11:30:00+00:00"
- },
- {
-  "id": "agenda:chelsea-x-bornemouth:2026-10-10",
-  "source": "agenda",
-  "home": "CHELSEA",
-  "away": "BORNEMOUTH",
-  "start": "2026-10-10T12:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=RY7dS1pDUGs"
- },
- {
-  "id": "RY7dS1pDUGs",
-  "title": "AO VIVO: CHELSEA X BORNEMOUTH | PREMIER LEAGUE 26/27 | 6ª RODADA",
-  "published": "2026-09-30T15:26:42+00:00",
-  "start": "2026-10-10T12:45:00+00:00"
- },
- {
   "id": "agenda:lille-x-le-havre:2026-10-10",
   "source": "agenda",
   "home": "LILLE",
