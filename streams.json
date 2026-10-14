@@ -1,55 +1,5 @@
 [
  {
-  "id": "agenda:cagliari-x-juventus:2026-10-11",
-  "source": "agenda",
-  "home": "CAGLIARI",
-  "away": "JUVENTUS",
-  "start": "2026-10-11T18:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=B6pdLNMOiLg"
- },
- {
-  "id": "B6pdLNMOiLg",
-  "title": "AO VIVO: CAGLIARI X JUVENTUS | SÉRIE A ITALIANA 26/27 | 6ª RODADA",
-  "published": "2026-10-01T12:00:38+00:00",
-  "start": "2026-10-11T18:20:00+00:00"
- },
- {
-  "id": "agenda:racing-club-x-valencia:2026-10-11",
-  "source": "agenda",
-  "home": "RACING CLUB",
-  "away": "VALENCIA",
-  "start": "2026-10-11T18:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=JULAbK5otvA"
- },
- {
-  "id": "JULAbK5otvA",
-  "title": "AO VIVO: RACING CLUB X VALENCIA | LaLiga 26/27 | 8ª RODADA",
-  "published": "2026-10-01T12:01:16+00:00",
-  "start": "2026-10-11T18:30:00+00:00"
- },
- {
-  "id": "agenda:troyes-x-marseille:2026-10-11",
-  "source": "agenda",
-  "home": "TROYES",
-  "away": "MARSEILLE",
-  "start": "2026-10-11T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=zkpl3oJPLJQ"
- },
- {
-  "id": "zkpl3oJPLJQ",
-  "title": "AO VIVO (SOM AMBIENTE): TROYES X MARSEILLE | LIGUE 1 26/27 | 6ª RODADA",
-  "published": "2026-10-06T15:36:41+00:00",
-  "start": "2026-10-11T18:45:00+00:00"
- },
- {
-  "id": "agenda:vasco-x-remo:2026-10-11",
-  "source": "agenda",
-  "home": "VASCO",
-  "away": "REMO",
-  "start": "2026-10-11T19:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg"
- },
- {
   "id": "exOtkjMOi3k",
   "title": "AO VIVO: LEVANTE X SEVILLA | LALIGA 26/27 | 8ª RODADA",
   "published": "2026-10-02T12:00:07+00:00",
@@ -76,6 +26,14 @@
   "title": "AO VIVO: VASCO X BOCA JUNIORS | SUL-AMERICANA | NARRAÇÃO | NOCHE DE COPA",
   "published": "2026-10-09T18:30:04+00:00",
   "start": "2026-10-13T23:30:00+00:00"
+ },
+ {
+  "id": "agenda:guto-miguel-x-maximo-zeitune:2026-10-14",
+  "source": "agenda",
+  "home": "GUTO MIGUEL",
+  "away": "MAXIMO ZEITUNE",
+  "start": "2026-10-14T18:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=7bNKHtwpU_0"
  },
  {
   "id": "agenda:atletico-mg-x-torque:2026-10-14",
@@ -168,6 +126,20 @@
   "away": "GETAFE",
   "start": "2026-10-15T16:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=Lk01Bmzxkco"
+ },
+ {
+  "id": "agenda:hajduk-split-x-ajax:2026-10-15",
+  "source": "agenda",
+  "home": "HAJDUK SPLIT",
+  "away": "AJAX",
+  "start": "2026-10-15T16:31:00+00:00",
+  "url": "https://www.youtube.com/watch?v=QfeYvXH1-R4"
+ },
+ {
+  "id": "QfeYvXH1-R4",
+  "title": "AO VIVO (SOM AMBIENTE): HAJDUK SPLIT X AJAX | CONFERENCE LEAGUE 26/27 | 1ª RODADA",
+  "published": "2026-10-13T21:00:03+00:00",
+  "start": "2026-10-15T16:31:00+00:00"
  },
  {
   "id": "agenda:benfica-x-celtic:2026-10-15",
@@ -286,6 +258,12 @@
   "start": "2026-10-15T18:45:00+00:00"
  },
  {
+  "id": "5-QZFGdkVMQ",
+  "title": "AO VIVO (SOM AMBIENTE): HEARTS X NORDSJAELLAND | CONFERENCE LEAGUE 26/27 | 1ª RODADA",
+  "published": "2026-10-14T20:53:53+00:00",
+  "start": "2026-10-15T18:45:00+00:00"
+ },
+ {
   "id": "agenda:corinthians-x-colo-colo:2026-10-15",
   "source": "agenda",
   "home": "CORINTHIANS",
@@ -332,6 +310,14 @@
   "url": "https://www.youtube.com/watch?v=p19LrCSs7hk"
  },
  {
+  "id": "agenda:espanyol-x-atletico-de-madrid:2026-10-17",
+  "source": "agenda",
+  "home": "ESPANYOL",
+  "away": "ATLÉTICO DE MADRID",
+  "start": "2026-10-17T11:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=44Bv4IslXuo"
+ },
+ {
   "id": "agenda:union-berlin-x-borussia-dortmund:2026-10-17",
   "source": "agenda",
   "home": "UNION BERLIN",
@@ -340,12 +326,28 @@
   "url": "https://www.youtube.com/watch?v=_ddp4OY6shU"
  },
  {
+  "id": "agenda:villarreal-x-elche:2026-10-17",
+  "source": "agenda",
+  "home": "VILLARREAL",
+  "away": "ELCHE",
+  "start": "2026-10-17T13:35:00+00:00",
+  "url": "https://www.youtube.com/watch?v=NWULtKFTBwY"
+ },
+ {
   "id": "agenda:strasbourg-x-psg:2026-10-17",
   "source": "agenda",
   "home": "STRASBOURG",
   "away": "PSG",
   "start": "2026-10-17T14:35:00+00:00",
   "url": "https://www.youtube.com/watch?v=ZumFR_-q3lA"
+ },
+ {
+  "id": "agenda:real-betis-x-barcelona:2026-10-17",
+  "source": "agenda",
+  "home": "REAL BETIS",
+  "away": "BARCELONA",
+  "start": "2026-10-17T15:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=kbMRsKPlg7A"
  },
  {
   "id": "agenda:bayern-de-munique-x-rb-leipzig:2026-10-17",
