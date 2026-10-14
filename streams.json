@@ -1,47 +1,5 @@
 [
  {
-  "id": "agenda:vasco-x-remo:2026-10-10",
-  "source": "agenda",
-  "home": "VASCO",
-  "away": "REMO",
-  "start": "2026-10-10T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg"
- },
- {
-  "id": "90fW7TbZ9sg",
-  "title": "AO VIVO: VASCO X REMO | BRASILEIRÃO 2026 | 30ª RODADA",
-  "published": "2026-08-30T15:03:08+00:00",
-  "start": "2026-10-10T19:30:26+00:00"
- },
- {
-  "id": "agenda:logo-apos-vasco-x-remo-no-brasileirao:2026-10-10",
-  "source": "agenda",
-  "home": "LOGO APÓS VASCO",
-  "away": "REMO NO BRASILEIRÃO",
-  "start": "2026-10-10T23:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=ahc29ktiDU0"
- },
- {
-  "id": "ahc29ktiDU0",
-  "title": "AO VIVO: LOGO APÓS VASCO X REMO NO BRASILEIRÃO | RODA DE BOBO",
-  "published": "2026-10-09T19:20:20+00:00",
-  "start": "2026-10-10T23:00:00+00:00"
- },
- {
-  "id": "agenda:elche-x-celta-de-vigo:2026-10-11",
-  "source": "agenda",
-  "home": "ELCHE",
-  "away": "CELTA DE VIGO",
-  "start": "2026-10-11T11:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=cu707Ey2nss"
- },
- {
-  "id": "cu707Ey2nss",
-  "title": "AO VIVO: ELCHE X CELTA DE VIGO | LALIGA 26/27 | 8ª RODADA",
-  "published": "2026-10-01T12:00:04+00:00",
-  "start": "2026-10-11T11:45:00+00:00"
- },
- {
   "id": "agenda:nice-x-strasbourg:2026-10-11",
   "source": "agenda",
   "home": "NICE",
@@ -414,6 +372,14 @@
   "url": "https://www.youtube.com/watch?v=e21oU_yA7Vg"
  },
  {
+  "id": "agenda:le-mans-x-toulouse:2026-10-16",
+  "source": "agenda",
+  "home": "LE MANS",
+  "away": "TOULOUSE",
+  "start": "2026-10-16T18:05:00+00:00",
+  "url": "https://www.youtube.com/watch?v=lTh_EOLyvgQ"
+ },
+ {
   "id": "agenda:cruzeiro-x-ldu:2026-10-16",
   "source": "agenda",
   "home": "CRUZEIRO",
@@ -422,12 +388,84 @@
   "url": "https://www.youtube.com/watch?v=p19LrCSs7hk"
  },
  {
+  "id": "agenda:union-berlin-x-borussia-dortmund:2026-10-17",
+  "source": "agenda",
+  "home": "UNION BERLIN",
+  "away": "BORUSSIA DORTMUND",
+  "start": "2026-10-17T12:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=_ddp4OY6shU"
+ },
+ {
+  "id": "agenda:strasbourg-x-psg:2026-10-17",
+  "source": "agenda",
+  "home": "STRASBOURG",
+  "away": "PSG",
+  "start": "2026-10-17T14:35:00+00:00",
+  "url": "https://www.youtube.com/watch?v=ZumFR_-q3lA"
+ },
+ {
+  "id": "agenda:bayern-de-munique-x-rb-leipzig:2026-10-17",
+  "source": "agenda",
+  "home": "BAYERN DE MUNIQUE",
+  "away": "RB LEIPZIG",
+  "start": "2026-10-17T15:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=d2d8HT4eOB8"
+ },
+ {
+  "id": "agenda:estac-troyes-x-lens:2026-10-17",
+  "source": "agenda",
+  "home": "ESTAC TROYES",
+  "away": "LENS",
+  "start": "2026-10-17T18:05:00+00:00",
+  "url": "https://www.youtube.com/watch?v=V1tlOsy9J9I"
+ },
+ {
+  "id": "agenda:lille-x-stade-brestois:2026-10-17",
+  "source": "agenda",
+  "home": "LILLE",
+  "away": "STADE BRESTOIS",
+  "start": "2026-10-17T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=MpEGyne3WN8"
+ },
+ {
   "id": "agenda:botafogo-x-chapecoense:2026-10-17",
   "source": "agenda",
   "home": "BOTAFOGO",
   "away": "CHAPECOENSE",
-  "start": "2026-10-17T21:00:00+00:00",
+  "start": "2026-10-17T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=-x1MQjpr02Y"
+ },
+ {
+  "id": "agenda:leeds-x-manchester-united:2026-10-18",
+  "source": "agenda",
+  "home": "LEEDS",
+  "away": "MANCHESTER UNITED",
+  "start": "2026-10-18T11:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=dy_KAxVd80M"
+ },
+ {
+  "id": "agenda:angers-x-olympique-marseille:2026-10-18",
+  "source": "agenda",
+  "home": "ANGERS",
+  "away": "OLYMPIQUE MARSEILLE",
+  "start": "2026-10-18T12:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=OclknXFGuBc"
+ },
+ {
+  "id": "agenda:le-havre-x-auxerre:2026-10-18",
+  "source": "agenda",
+  "home": "LE HAVRE",
+  "away": "AUXERRE",
+  "start": "2026-10-18T14:35:00+00:00",
+  "url": "https://www.youtube.com/watch?v=1avDDMiUb4A"
+ },
+ {
+  "id": "agenda:milan-x-atalanta:2026-10-18",
+  "source": "agenda",
+  "home": "MILAN",
+  "away": "ATALANTA",
+  "start": "2026-10-18T15:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=pGzNeydvf-o"
  },
  {
   "id": "agenda:vasco-x-corinthians:2026-10-24",
