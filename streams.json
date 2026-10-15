@@ -1,19 +1,5 @@
 [
  {
-  "id": "exOtkjMOi3k",
-  "title": "AO VIVO: LEVANTE X SEVILLA | LALIGA 26/27 | 8ª RODADA",
-  "published": "2026-10-02T12:00:07+00:00",
-  "start": "2026-10-12T18:29:10+00:00"
- },
- {
-  "id": "agenda:levante-x-sevilla:2026-10-12",
-  "source": "agenda",
-  "home": "LEVANTE",
-  "away": "SEVILLA",
-  "start": "2026-10-12T18:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=exOtkjMOi3k"
- },
- {
   "id": "agenda:vasco-x-boca-juniors:2026-10-13",
   "source": "agenda",
   "home": "VASCO",
@@ -204,6 +190,14 @@
   "start": "2026-10-15T17:50:00+00:00"
  },
  {
+  "id": "agenda:thiago-wild-x-carlos-zarate:2026-10-15",
+  "source": "agenda",
+  "home": "THIAGO WILD",
+  "away": "CARLOS ZARATE",
+  "start": "2026-10-15T17:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=YSySXsVTMIc"
+ },
+ {
   "id": "agenda:benfica-x-celtic:2026-10-15",
   "source": "agenda",
   "home": "BENFICA",
@@ -334,12 +328,30 @@
   "url": "https://www.youtube.com/watch?v=5-QZFGdkVMQ"
  },
  {
+  "id": "V-AqPCzJBZM",
+  "title": "AO VIVO: BOURNEMOUTH X STURM GRAZ | EUROPA LEAGUE 26/27 | 2ª RODADA",
+  "published": "2026-10-15T21:01:08+00:00",
+  "start": "2026-10-15T18:45:21+00:00"
+ },
+ {
+  "id": "_Hn1KMWlEp4",
+  "title": "AO VIVO (SOM AMBIENTE): MARSEILLE X OLYMPIAKOS | EUROPA LEAGUE 26/27 | 2ª RODADA",
+  "published": "2026-10-15T21:03:52+00:00",
+  "start": "2026-10-15T18:46:46+00:00"
+ },
+ {
   "id": "agenda:corinthians-x-colo-colo:2026-10-15",
   "source": "agenda",
   "home": "CORINTHIANS",
   "away": "COLO-COLO",
   "start": "2026-10-15T19:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=HPs_ahJ6ns4"
+ },
+ {
+  "id": "HPs_ahJ6ns4",
+  "title": "AO VIVO: CORINTHIANS X COLO-COLO | LIBERTADORES FEMININA 2026 | 1ª RODADA",
+  "published": "2026-10-05T12:00:54+00:00",
+  "start": "2026-10-15T19:15:54+00:00"
  },
  {
   "id": "agenda:flamengo-x-estudiantes-de-la-plata:2026-10-15",
