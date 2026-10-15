@@ -146,7 +146,7 @@
   "source": "agenda",
   "home": "BENFICA",
   "away": "CELTIC",
-  "start": "2026-10-15T18:45:00+00:00",
+  "start": "2026-10-15T18:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=RSWk2fkIZas"
  },
  {
@@ -264,6 +264,14 @@
   "start": "2026-10-15T18:45:00+00:00"
  },
  {
+  "id": "agenda:hearts-x-nordsjaelland:2026-10-15",
+  "source": "agenda",
+  "home": "HEARTS",
+  "away": "NORDSJAELLAND",
+  "start": "2026-10-15T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=5-QZFGdkVMQ"
+ },
+ {
   "id": "agenda:corinthians-x-colo-colo:2026-10-15",
   "source": "agenda",
   "home": "CORINTHIANS",
@@ -366,6 +374,14 @@
   "url": "https://www.youtube.com/watch?v=V1tlOsy9J9I"
  },
  {
+  "id": "agenda:valencia-x-athletic-bilbao:2026-10-17",
+  "source": "agenda",
+  "home": "VALENCIA",
+  "away": "ATHLETIC BILBAO",
+  "start": "2026-10-17T18:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=FRrYT6NBqoQ"
+ },
+ {
   "id": "agenda:lille-x-stade-brestois:2026-10-17",
   "source": "agenda",
   "home": "LILLE",
@@ -398,6 +414,14 @@
   "url": "https://www.youtube.com/watch?v=OclknXFGuBc"
  },
  {
+  "id": "agenda:celta-x-alaves:2026-10-18",
+  "source": "agenda",
+  "home": "CELTA",
+  "away": "ALAVÉS",
+  "start": "2026-10-18T13:25:00+00:00",
+  "url": "https://www.youtube.com/watch?v=qP3KpVm10To"
+ },
+ {
   "id": "agenda:le-havre-x-auxerre:2026-10-18",
   "source": "agenda",
   "home": "LE HAVRE",
@@ -412,6 +436,30 @@
   "away": "ATALANTA",
   "start": "2026-10-18T15:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=pGzNeydvf-o"
+ },
+ {
+  "id": "agenda:malaga-x-real-sociedad:2026-10-18",
+  "source": "agenda",
+  "home": "MÁLAGA",
+  "away": "REAL SOCIEDAD",
+  "start": "2026-10-18T15:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=PiDTTDirgmw"
+ },
+ {
+  "id": "agenda:real-madrid-x-sevilla:2026-10-18",
+  "source": "agenda",
+  "home": "REAL MADRID",
+  "away": "SEVILLA",
+  "start": "2026-10-18T18:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=YR4ofvJ9NqU"
+ },
+ {
+  "id": "agenda:getafe-x-rayo-vallecano:2026-10-19",
+  "source": "agenda",
+  "home": "GETAFE",
+  "away": "RAYO VALLECANO",
+  "start": "2026-10-19T18:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=rQnCIMhHpNc"
  },
  {
   "id": "agenda:vasco-x-corinthians:2026-10-24",
