@@ -384,6 +384,14 @@
   "url": "https://www.youtube.com/watch?v=lTh_EOLyvgQ"
  },
  {
+  "id": "agenda:guto-miguel-x-hugo-dellien:2026-10-16",
+  "source": "agenda",
+  "home": "GUTO MIGUEL",
+  "away": "HUGO DELLIEN",
+  "start": "2026-10-16T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=oQMTpEPpa3s"
+ },
+ {
   "id": "agenda:cruzeiro-x-ldu:2026-10-16",
   "source": "agenda",
   "home": "CRUZEIRO",
@@ -510,6 +518,14 @@
   "away": "AUXERRE",
   "start": "2026-10-18T14:35:00+00:00",
   "url": "https://www.youtube.com/watch?v=1avDDMiUb4A"
+ },
+ {
+  "id": "agenda:fc-lorient-x-monaco:2026-10-18",
+  "source": "agenda",
+  "home": "FC LORIENT",
+  "away": "MÔNACO",
+  "start": "2026-10-18T14:35:00+00:00",
+  "url": "https://www.youtube.com/watch?v=cuL1AU5Oajw"
  },
  {
   "id": "agenda:milan-x-atalanta:2026-10-18",
