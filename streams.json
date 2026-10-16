@@ -380,7 +380,7 @@
   "source": "agenda",
   "home": "LE MANS",
   "away": "TOULOUSE",
-  "start": "2026-10-16T18:05:00+00:00",
+  "start": "2026-10-16T18:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=lTh_EOLyvgQ"
  },
  {
@@ -388,8 +388,14 @@
   "source": "agenda",
   "home": "GUTO MIGUEL",
   "away": "HUGO DELLIEN",
-  "start": "2026-10-16T19:45:00+00:00",
+  "start": "2026-10-16T20:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=oQMTpEPpa3s"
+ },
+ {
+  "id": "oQMTpEPpa3s",
+  "title": "AO VIVO: TÊNIS | GUTO MIGUEL X HUGO DELLIEN | ATP CHALLENGER SANTA CRUZ 2 | QUARTAS DE FINAL",
+  "published": "2026-10-14T21:00:07+00:00",
+  "start": "2026-10-16T20:36:07+00:00"
  },
  {
   "id": "agenda:cruzeiro-x-ldu:2026-10-16",
