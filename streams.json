@@ -1,13 +1,5 @@
 [
  {
-  "id": "agenda:guto-miguel-x-maximo-zeitune:2026-10-14",
-  "source": "agenda",
-  "home": "GUTO MIGUEL",
-  "away": "MAXIMO ZEITUNE",
-  "start": "2026-10-14T18:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=7bNKHtwpU_0"
- },
- {
   "id": "agenda:atletico-mg-x-torque:2026-10-14",
   "source": "agenda",
   "home": "ATLÉTICO-MG",
@@ -480,6 +472,18 @@
   "url": "https://www.youtube.com/watch?v=V1tlOsy9J9I"
  },
  {
+  "id": "V1tlOsy9J9I",
+  "title": "AO VIVO (SOM AMBIENTE): ESTAC TROYES X LENS | LIGUE 1 26/27 | 7ª RODADA",
+  "published": "2026-10-09T12:00:17+00:00",
+  "start": "2026-10-17T18:14:34+00:00"
+ },
+ {
+  "id": "MpEGyne3WN8",
+  "title": "AO VIVO (SOM AMBIENTE): LILLE X STADE BRESTOIS | LIGUE 1 26/27 | 7ª RODADA",
+  "published": "2026-10-09T12:00:03+00:00",
+  "start": "2026-10-17T18:15:09+00:00"
+ },
+ {
   "id": "agenda:valencia-x-athletic-bilbao:2026-10-17",
   "source": "agenda",
   "home": "VALENCIA",
@@ -502,6 +506,20 @@
   "away": "CHAPECOENSE",
   "start": "2026-10-17T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=-x1MQjpr02Y"
+ },
+ {
+  "id": "-x1MQjpr02Y",
+  "title": "AO VIVO: BOTAFOGO X CHAPECOENSE | BRASILEIRÃO 2026 | 31ª RODADA",
+  "published": "2026-09-24T20:29:12+00:00",
+  "start": "2026-10-17T19:33:18+00:00"
+ },
+ {
+  "id": "agenda:thiago-wild-x-francisco-comesana:2026-10-17",
+  "source": "agenda",
+  "home": "THIAGO WILD",
+  "away": "FRANCISCO COMESANA",
+  "start": "2026-10-17T20:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=sqVKVSbJs5w"
  },
  {
   "id": "agenda:resenha-pos-jogo-entre-botafogo-x-chapecoense:2026-10-17",
