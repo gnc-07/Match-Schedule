@@ -1,33 +1,5 @@
 [
  {
-  "id": "agenda:atletico-mg-x-torque:2026-10-14",
-  "source": "agenda",
-  "home": "ATLÉTICO-MG",
-  "away": "TORQUE",
-  "start": "2026-10-14T21:20:00+00:00",
-  "url": "https://www.youtube.com/watch?v=rOYyBWep6Hg"
- },
- {
-  "id": "rOYyBWep6Hg",
-  "title": "AO VIVO: ATLÉTICO-MG X TORQUE | SUL-AMERICANA | NARRAÇÃO | NOCHE DE COPA",
-  "published": "2026-10-09T18:35:20+00:00",
-  "start": "2026-10-14T21:20:00+00:00"
- },
- {
-  "id": "agenda:fluminense-x-palmeiras:2026-10-14",
-  "source": "agenda",
-  "home": "FLUMINENSE",
-  "away": "PALMEIRAS",
-  "start": "2026-10-14T23:50:00+00:00",
-  "url": "https://www.youtube.com/watch?v=hrAlXOXySic"
- },
- {
-  "id": "hrAlXOXySic",
-  "title": "AO VIVO: FLUMINENSE X PALMEIRAS | LIBERTADORES | NARRAÇÃO | NOCHE DE COPA",
-  "published": "2026-10-09T18:38:22+00:00",
-  "start": "2026-10-14T23:50:00+00:00"
- },
- {
   "id": "6Y4PPuXFEaw",
   "title": "AO VIVO: CSKA SOFIA X MÔNACO | CONFERENCE LEAGUE 26/27 | 1ª RODADA",
   "published": "2026-10-05T12:00:19+00:00",
@@ -560,6 +532,14 @@
   "url": "https://www.youtube.com/watch?v=qP3KpVm10To"
  },
  {
+  "id": "agenda:canada-x-brasil:2026-10-18",
+  "source": "agenda",
+  "home": "CANADÁ",
+  "away": "BRASIL",
+  "start": "2026-10-18T14:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=IXyPT6B-mtA"
+ },
+ {
   "id": "agenda:le-havre-x-auxerre:2026-10-18",
   "source": "agenda",
   "home": "LE HAVRE",
@@ -598,6 +578,54 @@
   "away": "SEVILLA",
   "start": "2026-10-18T18:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=YR4ofvJ9NqU"
+ },
+ {
+  "id": "agenda:lyon-x-nice:2026-10-18",
+  "source": "agenda",
+  "home": "LYON",
+  "away": "NICE",
+  "start": "2026-10-18T18:05:00+00:00",
+  "url": "https://www.youtube.com/watch?v=vQv42_Wn0mo"
+ },
+ {
+  "id": "agenda:belgrano-x-palmeiras:2026-10-18",
+  "source": "agenda",
+  "home": "BELGRANO",
+  "away": "PALMEIRAS",
+  "start": "2026-10-18T19:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=BveoHSOqs1c"
+ },
+ {
+  "id": "agenda:thiago-wild-x-hugo-dellien:2026-10-18",
+  "source": "agenda",
+  "home": "THIAGO WILD",
+  "away": "HUGO DELLIEN",
+  "start": "2026-10-18T20:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=NCdzvEj70MU"
+ },
+ {
+  "id": "agenda:corinthians-x-caracas:2026-10-18",
+  "source": "agenda",
+  "home": "CORINTHIANS",
+  "away": "CARACAS",
+  "start": "2026-10-18T23:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=tBJXJdKZxO4"
+ },
+ {
+  "id": "agenda:espanha-x-mexico:2026-10-19",
+  "source": "agenda",
+  "home": "ESPANHA",
+  "away": "MÉXICO",
+  "start": "2026-10-19T14:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=D31WyslnOrw"
+ },
+ {
+  "id": "agenda:estados-unidos-x-samoa:2026-10-19",
+  "source": "agenda",
+  "home": "ESTADOS UNIDOS",
+  "away": "SAMOA",
+  "start": "2026-10-19T17:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=1yhe9MxZy8Q"
  },
  {
   "id": "agenda:getafe-x-rayo-vallecano:2026-10-19",
