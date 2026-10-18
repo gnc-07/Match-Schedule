@@ -1,17 +1,5 @@
 [
  {
-  "id": "6Y4PPuXFEaw",
-  "title": "AO VIVO: CSKA SOFIA X MÔNACO | CONFERENCE LEAGUE 26/27 | 1ª RODADA",
-  "published": "2026-10-05T12:00:19+00:00",
-  "start": "2026-10-15T14:12:03+00:00"
- },
- {
-  "id": "Kba6oh68ziE",
-  "title": "AO VIVO: FC SALZBURG X MILAN | EUROPA LEAGUE 26/27 | 2ª RODADA",
-  "published": "2026-10-05T12:00:13+00:00",
-  "start": "2026-10-15T14:12:14+00:00"
- },
- {
   "id": "U_TdMEk4Kb8",
   "title": "AO VIVO (SOM AMBIENTE): KUPS X TRABZONSPOR | CONFERENCE LEAGUE 26/27 | 2ª RODADA",
   "published": "2026-10-12T21:00:05+00:00",
@@ -516,6 +504,12 @@
   "url": "https://www.youtube.com/watch?v=dy_KAxVd80M"
  },
  {
+  "id": "dy_KAxVd80M",
+  "title": "AO VIVO: CANADÁ X BRASIL | COPA DO MUNDO FEMININA SUB-17 FIFA 2026 | 1ª RODADA",
+  "published": "2026-10-08T12:00:24+00:00",
+  "start": "2026-10-18T11:45:06+00:00"
+ },
+ {
   "id": "agenda:angers-x-olympique-marseille:2026-10-18",
   "source": "agenda",
   "home": "ANGERS",
@@ -528,8 +522,14 @@
   "source": "agenda",
   "home": "CELTA",
   "away": "ALAVÉS",
-  "start": "2026-10-18T13:25:00+00:00",
+  "start": "2026-10-18T14:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=qP3KpVm10To"
+ },
+ {
+  "id": "qP3KpVm10To",
+  "title": "AO VIVO: CELTA X ALAVÉS | LALIGA 26/27 | 9ª RODADA",
+  "published": "2026-10-08T12:00:30+00:00",
+  "start": "2026-10-18T14:00:29+00:00"
  },
  {
   "id": "agenda:canada-x-brasil:2026-10-18",
@@ -538,6 +538,12 @@
   "away": "BRASIL",
   "start": "2026-10-18T14:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=IXyPT6B-mtA"
+ },
+ {
+  "id": "cuL1AU5Oajw",
+  "title": "AO VIVO: FC LORIENT X MÔNACO | LIGUE 1 26/27 | 7ª RODADA",
+  "published": "2026-10-08T12:00:45+00:00",
+  "start": "2026-10-18T14:34:59+00:00"
  },
  {
   "id": "agenda:le-havre-x-auxerre:2026-10-18",
@@ -554,6 +560,18 @@
   "away": "MÔNACO",
   "start": "2026-10-18T14:35:00+00:00",
   "url": "https://www.youtube.com/watch?v=cuL1AU5Oajw"
+ },
+ {
+  "id": "1avDDMiUb4A",
+  "title": "AO VIVO (SOM AMBIENTE): LE HAVRE X AUXERRE | LIGUE 1 26/27 | 7ª RODADA",
+  "published": "2026-10-10T12:00:02+00:00",
+  "start": "2026-10-18T14:35:06+00:00"
+ },
+ {
+  "id": "pGzNeydvf-o",
+  "title": "AO VIVO: MILAN X ATALANTA | SÉRIE A ITALIANA 26/27 | 7ª RODADA",
+  "published": "2026-10-08T12:00:52+00:00",
+  "start": "2026-10-18T15:14:58+00:00"
  },
  {
   "id": "agenda:milan-x-atalanta:2026-10-18",
@@ -634,6 +652,14 @@
   "away": "RAYO VALLECANO",
   "start": "2026-10-19T18:20:00+00:00",
   "url": "https://www.youtube.com/watch?v=rQnCIMhHpNc"
+ },
+ {
+  "id": "agenda:cruzeiro-x-bolivar:2026-10-19",
+  "source": "agenda",
+  "home": "CRUZEIRO",
+  "away": "BOLIVAR",
+  "start": "2026-10-19T20:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=99yQKJNSfKE"
  },
  {
   "id": "agenda:vasco-x-corinthians:2026-10-24",
