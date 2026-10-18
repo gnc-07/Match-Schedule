@@ -1,297 +1,5 @@
 [
  {
-  "id": "U_TdMEk4Kb8",
-  "title": "AO VIVO (SOM AMBIENTE): KUPS X TRABZONSPOR | CONFERENCE LEAGUE 26/27 | 2ª RODADA",
-  "published": "2026-10-12T21:00:05+00:00",
-  "start": "2026-10-15T16:25:23+00:00"
- },
- {
-  "id": "Lk01Bmzxkco",
-  "title": "AO VIVO (SOM AMBIENTE): CSU CRAIOVA X GETAFE | CONFERENCE LEAGUE 26/27 | 1ª RODADA",
-  "published": "2026-10-12T21:00:30+00:00",
-  "start": "2026-10-15T16:25:45+00:00"
- },
- {
-  "id": "nYLV7YZh2ik",
-  "title": "AO VIVO (SOM AMBIENTE): PANATHINAIKOS X BORAC | CONFERENCE LEAGUE 26/27 | 1ª RODADA",
-  "published": "2026-10-12T21:00:50+00:00",
-  "start": "2026-10-15T16:26:20+00:00"
- },
- {
-  "id": "agenda:fc-salzburg-x-milan:2026-10-15",
-  "source": "agenda",
-  "home": "FC SALZBURG",
-  "away": "MILAN",
-  "start": "2026-10-15T16:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=Kba6oh68ziE"
- },
- {
-  "id": "agenda:cska-sofia-x-monaco:2026-10-15",
-  "source": "agenda",
-  "home": "CSKA SOFIA",
-  "away": "MÔNACO",
-  "start": "2026-10-15T16:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=6Y4PPuXFEaw"
- },
- {
-  "id": "agenda:lech-poznan-x-bayer-leverkusen:2026-10-15",
-  "source": "agenda",
-  "home": "LECH POZNAŃ",
-  "away": "BAYER LEVERKUSEN",
-  "start": "2026-10-15T16:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=1_E7ie4K8kY"
- },
- {
-  "id": "agenda:panathinaikos-x-borac:2026-10-15",
-  "source": "agenda",
-  "home": "PANATHINAIKOS",
-  "away": "BORAC",
-  "start": "2026-10-15T16:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=nYLV7YZh2ik"
- },
- {
-  "id": "agenda:torreense-x-sunderland:2026-10-15",
-  "source": "agenda",
-  "home": "TORREENSE",
-  "away": "SUNDERLAND",
-  "start": "2026-10-15T16:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=HWKeUNy0JQo"
- },
- {
-  "id": "agenda:union-saint-gilloise-x-real-sociedad:2026-10-15",
-  "source": "agenda",
-  "home": "UNION SAINT-GILLOISE",
-  "away": "REAL SOCIEDAD",
-  "start": "2026-10-15T16:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=aayPyVOSJI4"
- },
- {
-  "id": "agenda:kups-x-trabzonspor:2026-10-15",
-  "source": "agenda",
-  "home": "KUPS",
-  "away": "TRABZONSPOR",
-  "start": "2026-10-15T16:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=U_TdMEk4Kb8"
- },
- {
-  "id": "agenda:csu-craiova-x-getafe:2026-10-15",
-  "source": "agenda",
-  "home": "CSU CRAIOVA",
-  "away": "GETAFE",
-  "start": "2026-10-15T16:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=Lk01Bmzxkco"
- },
- {
-  "id": "agenda:hajduk-split-x-ajax:2026-10-15",
-  "source": "agenda",
-  "home": "HAJDUK SPLIT",
-  "away": "AJAX",
-  "start": "2026-10-15T16:31:00+00:00",
-  "url": "https://www.youtube.com/watch?v=QfeYvXH1-R4"
- },
- {
-  "id": "QfeYvXH1-R4",
-  "title": "AO VIVO (SOM AMBIENTE): HAJDUK SPLIT X AJAX | CONFERENCE LEAGUE 26/27 | 1ª RODADA",
-  "published": "2026-10-13T21:00:03+00:00",
-  "start": "2026-10-15T16:31:00+00:00"
- },
- {
-  "id": "1_E7ie4K8kY",
-  "title": "AO VIVO (SOM AMBIENTE): LECH POZNAŃ X BAYER LEVERKUSEN | EUROPA LEAGUE 26/27 | 2ª RODADA",
-  "published": "2026-10-07T12:00:03+00:00",
-  "start": "2026-10-15T16:31:49+00:00"
- },
- {
-  "id": "HWKeUNy0JQo",
-  "title": "AO VIVO (SOM AMBIENTE): TORREENSE X SUNDERLAND | EUROPA LEAGUE 26/27 | 2ª RODADA",
-  "published": "2026-10-12T21:00:15+00:00",
-  "start": "2026-10-15T16:32:52+00:00"
- },
- {
-  "id": "aayPyVOSJI4",
-  "title": "AO VIVO (SOM AMBIENTE): UNION SAINT-GILLOISE X REAL SOCIEDAD | EUROPA LEAGUE 26/27 | 2ª RODADA",
-  "published": "2026-10-07T12:00:12+00:00",
-  "start": "2026-10-15T16:34:01+00:00"
- },
- {
-  "id": "agenda:mateus-alves-e-marcelo-zormann-x-estevez-e-ratti:2026-10-15",
-  "source": "agenda",
-  "home": "MATEUS ALVES E MARCELO ZORMANN",
-  "away": "ESTEVEZ E RATTI",
-  "start": "2026-10-15T17:50:00+00:00",
-  "url": "https://www.youtube.com/watch?v=YSySXsVTMIc"
- },
- {
-  "id": "YSySXsVTMIc",
-  "title": "AO VIVO: TÊNIS | MATEUS ALVES E MARCELO ZORMANN X ESTEVEZ E RATTI | ATP CHALLENGER | OITAVAS",
-  "published": "2026-10-15T14:32:27+00:00",
-  "start": "2026-10-15T17:50:00+00:00"
- },
- {
-  "id": "agenda:thiago-wild-x-carlos-zarate:2026-10-15",
-  "source": "agenda",
-  "home": "THIAGO WILD",
-  "away": "CARLOS ZARATE",
-  "start": "2026-10-15T17:50:00+00:00",
-  "url": "https://www.youtube.com/watch?v=YSySXsVTMIc"
- },
- {
-  "id": "agenda:benfica-x-celtic:2026-10-15",
-  "source": "agenda",
-  "home": "BENFICA",
-  "away": "CELTIC",
-  "start": "2026-10-15T18:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=RSWk2fkIZas"
- },
- {
-  "id": "agenda:celta-x-juventus:2026-10-15",
-  "source": "agenda",
-  "home": "CELTA",
-  "away": "JUVENTUS",
-  "start": "2026-10-15T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=CcP_GHaXnqc"
- },
- {
-  "id": "agenda:bournemouth-x-sturm-graz:2026-10-15",
-  "source": "agenda",
-  "home": "BOURNEMOUTH",
-  "away": "STURM GRAZ",
-  "start": "2026-10-15T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=V-AqPCzJBZM"
- },
- {
-  "id": "agenda:hoffenheim-x-besiktas:2026-10-15",
-  "source": "agenda",
-  "home": "HOFFENHEIM",
-  "away": "BEŞIKTAŞ",
-  "start": "2026-10-15T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=d6y7f2DnAu8"
- },
- {
-  "id": "agenda:dinamo-zagreb-x-anderlecht:2026-10-15",
-  "source": "agenda",
-  "home": "DINAMO ZAGREB",
-  "away": "ANDERLECHT",
-  "start": "2026-10-15T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=nuTwS_HIN-w"
- },
- {
-  "id": "agenda:copenhagen-x-braga:2026-10-15",
-  "source": "agenda",
-  "home": "COPENHAGEN",
-  "away": "BRAGA",
-  "start": "2026-10-15T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=PAW_4udodmI"
- },
- {
-  "id": "agenda:atalanta-x-pafos:2026-10-15",
-  "source": "agenda",
-  "home": "ATALANTA",
-  "away": "PAFOS",
-  "start": "2026-10-15T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=g8wC2qTaUbs"
- },
- {
-  "id": "agenda:brighton-x-kauno-zalgiris:2026-10-15",
-  "source": "agenda",
-  "home": "BRIGHTON",
-  "away": "KAUNO ŽALGIRIS",
-  "start": "2026-10-15T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=Kfig0CDoFjk"
- },
- {
-  "id": "agenda:rennes-x-ofi:2026-10-15",
-  "source": "agenda",
-  "home": "RENNES",
-  "away": "OFI",
-  "start": "2026-10-15T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=08Fv-bE7RVg"
- },
- {
-  "id": "agenda:marseille-x-olympiakos:2026-10-15",
-  "source": "agenda",
-  "home": "MARSEILLE",
-  "away": "OLYMPIAKOS",
-  "start": "2026-10-15T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=_Hn1KMWlEp4"
- },
- {
-  "id": "Kfig0CDoFjk",
-  "title": "AO VIVO (SOM AMBIENTE): BRIGHTON X KAUNO ŽALGIRIS | CONFERENCE LEAGUE 26/27 | 1ª RODADA",
-  "published": "2026-10-12T21:03:45+00:00",
-  "start": "2026-10-15T18:45:00+00:00"
- },
- {
-  "id": "g8wC2qTaUbs",
-  "title": "AO VIVO (SOM AMBIENTE): ATALANTA X PAFOS | CONFERENCE LEAGUE 26/27 | 1ª RODADA",
-  "published": "2026-10-12T21:02:19+00:00",
-  "start": "2026-10-15T18:45:00+00:00"
- },
- {
-  "id": "08Fv-bE7RVg",
-  "title": "AO VIVO (SOM AMBIENTE): RENNES X OFI | EUROPA LEAGUE 26/27 | 2ª RODADA",
-  "published": "2026-10-12T21:02:04+00:00",
-  "start": "2026-10-15T18:45:00+00:00"
- },
- {
-  "id": "nuTwS_HIN-w",
-  "title": "AO VIVO (SOM AMBIENTE): DINAMO ZAGREB X ANDERLECHT | EUROPA LEAGUE 26/27 | 2ª RODADA",
-  "published": "2026-10-12T21:01:44+00:00",
-  "start": "2026-10-15T18:45:00+00:00"
- },
- {
-  "id": "d6y7f2DnAu8",
-  "title": "AO VIVO (SOM AMBIENTE): HOFFENHEIM X BEŞIKTAŞ | EUROPA LEAGUE 26/27 | 2ª RODADA",
-  "published": "2026-10-12T21:01:26+00:00",
-  "start": "2026-10-15T18:45:00+00:00"
- },
- {
-  "id": "PAW_4udodmI",
-  "title": "AO VIVO (SOM AMBIENTE): COPENHAGEN X BRAGA | CONFERENCE LEAGUE 26/27 | 1ª RODADA",
-  "published": "2026-10-12T21:01:11+00:00",
-  "start": "2026-10-15T18:45:00+00:00"
- },
- {
-  "id": "5-QZFGdkVMQ",
-  "title": "AO VIVO (SOM AMBIENTE): HEARTS X NORDSJAELLAND | CONFERENCE LEAGUE 26/27 | 1ª RODADA",
-  "published": "2026-10-14T20:53:53+00:00",
-  "start": "2026-10-15T18:45:00+00:00"
- },
- {
-  "id": "agenda:hearts-x-nordsjaelland:2026-10-15",
-  "source": "agenda",
-  "home": "HEARTS",
-  "away": "NORDSJAELLAND",
-  "start": "2026-10-15T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=5-QZFGdkVMQ"
- },
- {
-  "id": "V-AqPCzJBZM",
-  "title": "AO VIVO: BOURNEMOUTH X STURM GRAZ | EUROPA LEAGUE 26/27 | 2ª RODADA",
-  "published": "2026-10-15T21:01:08+00:00",
-  "start": "2026-10-15T18:45:21+00:00"
- },
- {
-  "id": "_Hn1KMWlEp4",
-  "title": "AO VIVO (SOM AMBIENTE): MARSEILLE X OLYMPIAKOS | EUROPA LEAGUE 26/27 | 2ª RODADA",
-  "published": "2026-10-15T21:03:52+00:00",
-  "start": "2026-10-15T18:46:46+00:00"
- },
- {
-  "id": "agenda:corinthians-x-colo-colo:2026-10-15",
-  "source": "agenda",
-  "home": "CORINTHIANS",
-  "away": "COLO-COLO",
-  "start": "2026-10-15T19:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=HPs_ahJ6ns4"
- },
- {
-  "id": "HPs_ahJ6ns4",
-  "title": "AO VIVO: CORINTHIANS X COLO-COLO | LIBERTADORES FEMININA 2026 | 1ª RODADA",
-  "published": "2026-10-05T12:00:54+00:00",
-  "start": "2026-10-15T19:15:54+00:00"
- },
- {
   "id": "agenda:flamengo-x-estudiantes-de-la-plata:2026-10-15",
   "source": "agenda",
   "home": "FLAMENGO",
@@ -590,6 +298,12 @@
   "url": "https://www.youtube.com/watch?v=PiDTTDirgmw"
  },
  {
+  "id": "YR4ofvJ9NqU",
+  "title": "AO VIVO: REAL MADRID X SEVILLA | LALIGA 26/27 | 9ª RODADA",
+  "published": "2026-10-08T12:01:10+00:00",
+  "start": "2026-10-18T17:57:26+00:00"
+ },
+ {
   "id": "agenda:real-madrid-x-sevilla:2026-10-18",
   "source": "agenda",
   "home": "REAL MADRID",
@@ -606,6 +320,12 @@
   "url": "https://www.youtube.com/watch?v=vQv42_Wn0mo"
  },
  {
+  "id": "vQv42_Wn0mo",
+  "title": "AO VIVO (SOM AMBIENTE): LYON X NICE | LIGUE 1 26/27 | 7ª RODADA",
+  "published": "2026-10-10T12:00:14+00:00",
+  "start": "2026-10-18T18:05:10+00:00"
+ },
+ {
   "id": "agenda:belgrano-x-palmeiras:2026-10-18",
   "source": "agenda",
   "home": "BELGRANO",
@@ -614,12 +334,24 @@
   "url": "https://www.youtube.com/watch?v=BveoHSOqs1c"
  },
  {
+  "id": "BveoHSOqs1c",
+  "title": "AO VIVO: BELGRANO X PALMEIRAS | LIBERTADORES FEMININA 2026 | 2ª RODADA",
+  "published": "2026-10-08T12:01:15+00:00",
+  "start": "2026-10-18T19:15:34+00:00"
+ },
+ {
   "id": "agenda:thiago-wild-x-hugo-dellien:2026-10-18",
   "source": "agenda",
   "home": "THIAGO WILD",
   "away": "HUGO DELLIEN",
   "start": "2026-10-18T20:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=NCdzvEj70MU"
+ },
+ {
+  "id": "NCdzvEj70MU",
+  "title": "AO VIVO: TÊNIS | THIAGO WILD X HUGO DELLIEN | ATP CHALLENGER SANTA CRUZ 2 | FINAL",
+  "published": "2026-10-13T21:00:17+00:00",
+  "start": "2026-10-18T20:15:34+00:00"
  },
  {
   "id": "agenda:corinthians-x-caracas:2026-10-18",
