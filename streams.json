@@ -1,19 +1,5 @@
 [
  {
-  "id": "agenda:guto-miguel-x-hugo-dellien:2026-10-16",
-  "source": "agenda",
-  "home": "GUTO MIGUEL",
-  "away": "HUGO DELLIEN",
-  "start": "2026-10-16T20:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=oQMTpEPpa3s"
- },
- {
-  "id": "oQMTpEPpa3s",
-  "title": "AO VIVO: TÊNIS | GUTO MIGUEL X HUGO DELLIEN | ATP CHALLENGER SANTA CRUZ 2 | QUARTAS DE FINAL",
-  "published": "2026-10-14T21:00:07+00:00",
-  "start": "2026-10-16T20:36:07+00:00"
- },
- {
   "id": "agenda:cruzeiro-x-ldu:2026-10-16",
   "source": "agenda",
   "home": "CRUZEIRO",
@@ -368,6 +354,20 @@
   "start": "2026-10-19T18:20:12+00:00"
  },
  {
+  "id": "agenda:desimpain-x-capim:2026-10-19",
+  "source": "agenda",
+  "home": "DESIMPAIN",
+  "away": "CAPIM",
+  "start": "2026-10-19T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=ILTpQkq4-X0"
+ },
+ {
+  "id": "ILTpQkq4-X0",
+  "title": "AO VIVO: FLUXO X FURIA | KINGS CUP BRASIL 2026 | 1ª RODADA",
+  "published": "2026-10-13T21:00:23+00:00",
+  "start": "2026-10-19T18:45:03+00:00"
+ },
+ {
   "id": "agenda:cruzeiro-x-bolivar:2026-10-19",
   "source": "agenda",
   "home": "CRUZEIRO",
@@ -390,12 +390,100 @@
   "start": "2026-10-21T17:30:00+00:00"
  },
  {
+  "id": "agenda:kairat-x-panathinaikos:2026-10-22",
+  "source": "agenda",
+  "home": "KAIRAT",
+  "away": "PANATHINAIKOS",
+  "start": "2026-10-22T14:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=qQdyppM71sM"
+ },
+ {
+  "id": "agenda:juventus-x-rennes:2026-10-22",
+  "source": "agenda",
+  "home": "JUVENTUS",
+  "away": "RENNES",
+  "start": "2026-10-22T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=o1znblligNU"
+ },
+ {
+  "id": "agenda:bournemouth-x-milan:2026-10-22",
+  "source": "agenda",
+  "home": "BOURNEMOUTH",
+  "away": "MILAN",
+  "start": "2026-10-22T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=rdYxtFx_Tlw"
+ },
+ {
+  "id": "agenda:monaco-x-freiburg:2026-10-22",
+  "source": "agenda",
+  "home": "MÔNACO",
+  "away": "FREIBURG",
+  "start": "2026-10-22T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=odOtCnI2wVA"
+ },
+ {
+  "id": "agenda:vfb-stuttgart-x-borussia-monchengladbach:2026-10-23",
+  "source": "agenda",
+  "home": "VFB STUTTGART",
+  "away": "BORUSSIA MÖNCHENGLADBACH",
+  "start": "2026-10-23T18:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=rnlPbOMWkQQ"
+ },
+ {
+  "id": "agenda:rb-leipzig-x-elversberg:2026-10-24",
+  "source": "agenda",
+  "home": "RB LEIPZIG",
+  "away": "ELVERSBERG",
+  "start": "2026-10-24T13:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=0Mgj3C7PHO8"
+ },
+ {
+  "id": "agenda:napoli-x-roma:2026-10-24",
+  "source": "agenda",
+  "home": "NAPOLI",
+  "away": "ROMA",
+  "start": "2026-10-24T15:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=N1Wc-FufSBM"
+ },
+ {
+  "id": "agenda:lens-x-paris-fc:2026-10-24",
+  "source": "agenda",
+  "home": "LENS",
+  "away": "PARIS FC",
+  "start": "2026-10-24T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=RKCJAcj2xOU"
+ },
+ {
   "id": "agenda:vasco-x-corinthians:2026-10-24",
   "source": "agenda",
   "home": "VASCO",
   "away": "CORINTHIANS",
   "start": "2026-10-24T21:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=FDo01YVDsNE"
+ },
+ {
+  "id": "agenda:manchester-united-x-bournemouth:2026-10-25",
+  "source": "agenda",
+  "home": "MANCHESTER UNITED",
+  "away": "BOURNEMOUTH",
+  "start": "2026-10-25T13:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=jZXkDVmpoU0"
+ },
+ {
+  "id": "agenda:monaco-x-lille:2026-10-25",
+  "source": "agenda",
+  "home": "MÔNACO",
+  "away": "LILLE",
+  "start": "2026-10-25T13:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=qtUD9j9Mfd8"
+ },
+ {
+  "id": "agenda:paris-saint-germain-x-lyon:2026-10-25",
+  "source": "agenda",
+  "home": "PARIS SAINT-GERMAIN",
+  "away": "LYON",
+  "start": "2026-10-25T19:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=WHYTOnqWFgE"
  },
  {
   "id": "agenda:barcelona-x-real-madrid:2026-10-25",
