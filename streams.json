@@ -1,27 +1,5 @@
 [
  {
-  "id": "agenda:flamengo-x-estudiantes-de-la-plata:2026-10-15",
-  "source": "agenda",
-  "home": "FLAMENGO",
-  "away": "ESTUDIANTES DE LA PLATA",
-  "start": "2026-10-15T23:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=EaVa5uzH1Ko"
- },
- {
-  "id": "EaVa5uzH1Ko",
-  "title": "AO VIVO: FLAMENGO X ESTUDIANTES DE LA PLATA | LIBERTADORES | NARRAÇÃO | NOCHE DE COPA",
-  "published": "2026-10-09T18:49:23+00:00",
-  "start": "2026-10-15T23:15:00+00:00"
- },
- {
-  "id": "agenda:universitario-x-palmeiras:2026-10-15",
-  "source": "agenda",
-  "home": "UNIVERSITÁRIO",
-  "away": "PALMEIRAS",
-  "start": "2026-10-15T23:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=e21oU_yA7Vg"
- },
- {
   "id": "agenda:le-mans-x-toulouse:2026-10-16",
   "source": "agenda",
   "home": "LE MANS",
