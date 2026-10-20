@@ -1,63 +1,5 @@
 [
  {
-  "id": "agenda:estac-troyes-x-lens:2026-10-17",
-  "source": "agenda",
-  "home": "ESTAC TROYES",
-  "away": "LENS",
-  "start": "2026-10-17T18:05:00+00:00",
-  "url": "https://www.youtube.com/watch?v=V1tlOsy9J9I"
- },
- {
-  "id": "V1tlOsy9J9I",
-  "title": "AO VIVO (SOM AMBIENTE): ESTAC TROYES X LENS | LIGUE 1 26/27 | 7ª RODADA",
-  "published": "2026-10-09T12:00:17+00:00",
-  "start": "2026-10-17T18:14:34+00:00"
- },
- {
-  "id": "MpEGyne3WN8",
-  "title": "AO VIVO (SOM AMBIENTE): LILLE X STADE BRESTOIS | LIGUE 1 26/27 | 7ª RODADA",
-  "published": "2026-10-09T12:00:03+00:00",
-  "start": "2026-10-17T18:15:09+00:00"
- },
- {
-  "id": "agenda:valencia-x-athletic-bilbao:2026-10-17",
-  "source": "agenda",
-  "home": "VALENCIA",
-  "away": "ATHLETIC BILBAO",
-  "start": "2026-10-17T18:20:00+00:00",
-  "url": "https://www.youtube.com/watch?v=FRrYT6NBqoQ"
- },
- {
-  "id": "agenda:lille-x-stade-brestois:2026-10-17",
-  "source": "agenda",
-  "home": "LILLE",
-  "away": "STADE BRESTOIS",
-  "start": "2026-10-17T18:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=MpEGyne3WN8"
- },
- {
-  "id": "agenda:botafogo-x-chapecoense:2026-10-17",
-  "source": "agenda",
-  "home": "BOTAFOGO",
-  "away": "CHAPECOENSE",
-  "start": "2026-10-17T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=-x1MQjpr02Y"
- },
- {
-  "id": "-x1MQjpr02Y",
-  "title": "AO VIVO: BOTAFOGO X CHAPECOENSE | BRASILEIRÃO 2026 | 31ª RODADA",
-  "published": "2026-09-24T20:29:12+00:00",
-  "start": "2026-10-17T19:33:18+00:00"
- },
- {
-  "id": "agenda:thiago-wild-x-francisco-comesana:2026-10-17",
-  "source": "agenda",
-  "home": "THIAGO WILD",
-  "away": "FRANCISCO COMESANA",
-  "start": "2026-10-17T20:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=sqVKVSbJs5w"
- },
- {
   "id": "agenda:resenha-pos-jogo-entre-botafogo-x-chapecoense:2026-10-17",
   "source": "agenda",
   "home": "RESENHA PÓS-JOGO ENTRE BOTAFOGO",
@@ -296,6 +238,22 @@
   "url": "https://www.youtube.com/watch?v=A7RSPs9pVJ4"
  },
  {
+  "id": "agenda:japao-x-franca:2026-10-21",
+  "source": "agenda",
+  "home": "JAPÃO",
+  "away": "FRANÇA",
+  "start": "2026-10-21T14:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=qBUYYgaZr-Q"
+ },
+ {
+  "id": "agenda:gana-x-brasil:2026-10-21",
+  "source": "agenda",
+  "home": "GANA",
+  "away": "BRASIL",
+  "start": "2026-10-21T17:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=bn7FhRGqo1g"
+ },
+ {
   "id": "agenda:levante-x-athletic-bilbao:2026-10-21",
   "source": "agenda",
   "home": "LEVANTE",
@@ -310,12 +268,28 @@
   "start": "2026-10-21T17:30:00+00:00"
  },
  {
+  "id": "agenda:santa-fe-x-corinthians:2026-10-21",
+  "source": "agenda",
+  "home": "SANTA FÉ",
+  "away": "CORINTHIANS",
+  "start": "2026-10-21T19:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=umBdOZtE5KQ"
+ },
+ {
   "id": "agenda:atletico-mg-x-torque:2026-10-21",
   "source": "agenda",
   "home": "ATLÉTICO-MG",
   "away": "TORQUE",
   "start": "2026-10-21T21:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=JXSIpy6CoZI"
+ },
+ {
+  "id": "agenda:palmeiras-x-ind-del-valle:2026-10-21",
+  "source": "agenda",
+  "home": "PALMEIRAS",
+  "away": "IND. DEL VALLE",
+  "start": "2026-10-21T23:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=bI0ZIVSWcas"
  },
  {
   "id": "agenda:palmeiras-x-fluminense:2026-10-21",
@@ -334,12 +308,60 @@
   "url": "https://www.youtube.com/watch?v=qQdyppM71sM"
  },
  {
+  "id": "agenda:espanha-x-australia:2026-10-22",
+  "source": "agenda",
+  "home": "ESPANHA",
+  "away": "AUSTRÁLIA",
+  "start": "2026-10-22T14:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=-YJrkJd6ge8"
+ },
+ {
   "id": "agenda:juventus-x-rennes:2026-10-22",
   "source": "agenda",
   "home": "JUVENTUS",
   "away": "RENNES",
   "start": "2026-10-22T16:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=o1znblligNU"
+ },
+ {
+  "id": "agenda:getafe-x-lugano:2026-10-22",
+  "source": "agenda",
+  "home": "GETAFE",
+  "away": "LUGANO",
+  "start": "2026-10-22T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=QyF4AYBmTpY"
+ },
+ {
+  "id": "agenda:sturm-graz-x-marseille:2026-10-22",
+  "source": "agenda",
+  "home": "STURM GRAZ",
+  "away": "MARSEILLE",
+  "start": "2026-10-22T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=ELGYrAtopvg"
+ },
+ {
+  "id": "agenda:ofi-x-bayer-leverkusen:2026-10-22",
+  "source": "agenda",
+  "home": "OFI",
+  "away": "BAYER LEVERKUSEN",
+  "start": "2026-10-22T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=FWAt3m5v21o"
+ },
+ {
+  "id": "agenda:lech-poznan-x-sunderland:2026-10-22",
+  "source": "agenda",
+  "home": "LECH POZNAŃ",
+  "away": "SUNDERLAND",
+  "start": "2026-10-22T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=6e96qbhlK2Q"
+ },
+ {
+  "id": "agenda:jablonec-x-brighton:2026-10-22",
+  "source": "agenda",
+  "home": "JABLONEC",
+  "away": "BRIGHTON",
+  "start": "2026-10-22T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=r3uUOPsA0Xo"
  },
  {
   "id": "agenda:bournemouth-x-milan:2026-10-22",
@@ -358,6 +380,22 @@
   "url": "https://www.youtube.com/watch?v=odOtCnI2wVA"
  },
  {
+  "id": "agenda:besiktas-x-crystal-palace:2026-10-22",
+  "source": "agenda",
+  "home": "BEŞIKTAŞ",
+  "away": "CRYSTAL PALACE",
+  "start": "2026-10-22T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=DoAJnbFVywE"
+ },
+ {
+  "id": "agenda:ajax-x-atalanta:2026-10-22",
+  "source": "agenda",
+  "home": "AJAX",
+  "away": "ATALANTA",
+  "start": "2026-10-22T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=ywCKTa9irBw"
+ },
+ {
   "id": "agenda:flamengo-x-estudiantes-de-la-plata:2026-10-22",
   "source": "agenda",
   "home": "FLAMENGO",
@@ -370,6 +408,14 @@
   "title": "AO VIVO: FLAMENGO X ESTUDIANTES DE LA PLATA | LIBERTADORES | NARRAÇÃO | NOCHE DE COPA",
   "published": "2026-10-20T03:12:14+00:00",
   "start": "2026-10-22T23:15:00+00:00"
+ },
+ {
+  "id": "agenda:olimpia-x-cruzeiro:2026-10-22",
+  "source": "agenda",
+  "home": "OLIMPIA",
+  "away": "CRUZEIRO",
+  "start": "2026-10-22T23:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=zGP4fejjkMY"
  },
  {
   "id": "agenda:vfb-stuttgart-x-borussia-monchengladbach:2026-10-23",
