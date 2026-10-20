@@ -1,29 +1,5 @@
 [
  {
-  "id": "agenda:cruzeiro-x-ldu:2026-10-16",
-  "source": "agenda",
-  "home": "CRUZEIRO",
-  "away": "LDU",
-  "start": "2026-10-16T23:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=p19LrCSs7hk"
- },
- {
-  "id": "agenda:cazetv-x-sintonia-esportiva:2026-10-17",
-  "source": "agenda",
-  "home": "CAZÉTV",
-  "away": "SINTONIA ESPORTIVA",
-  "start": "2026-10-17T00:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=fzm-CawcBQc"
- },
- {
-  "id": "agenda:espanyol-x-atletico-de-madrid:2026-10-17",
-  "source": "agenda",
-  "home": "ESPANYOL",
-  "away": "ATLÉTICO DE MADRID",
-  "start": "2026-10-17T11:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=44Bv4IslXuo"
- },
- {
   "id": "agenda:union-berlin-x-borussia-dortmund:2026-10-17",
   "source": "agenda",
   "home": "UNION BERLIN",
@@ -376,6 +352,14 @@
   "url": "https://www.youtube.com/watch?v=99yQKJNSfKE"
  },
  {
+  "id": "agenda:vasco-x-boca-juniors:2026-10-20",
+  "source": "agenda",
+  "home": "VASCO",
+  "away": "BOCA JUNIORS",
+  "start": "2026-10-20T23:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=A7RSPs9pVJ4"
+ },
+ {
   "id": "agenda:levante-x-athletic-bilbao:2026-10-21",
   "source": "agenda",
   "home": "LEVANTE",
@@ -388,6 +372,22 @@
   "title": "AO VIVO: LEVANTE X ATHLETIC BILBAO | LALIGA 26/27 | 6ª RODADA",
   "published": "2026-10-19T16:13:04+00:00",
   "start": "2026-10-21T17:30:00+00:00"
+ },
+ {
+  "id": "agenda:atletico-mg-x-torque:2026-10-21",
+  "source": "agenda",
+  "home": "ATLÉTICO-MG",
+  "away": "TORQUE",
+  "start": "2026-10-21T21:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=JXSIpy6CoZI"
+ },
+ {
+  "id": "agenda:palmeiras-x-fluminense:2026-10-21",
+  "source": "agenda",
+  "home": "PALMEIRAS",
+  "away": "FLUMINENSE",
+  "start": "2026-10-21T23:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=RwWR9yDG81I"
  },
  {
   "id": "agenda:kairat-x-panathinaikos:2026-10-22",
@@ -420,6 +420,20 @@
   "away": "FREIBURG",
   "start": "2026-10-22T18:45:00+00:00",
   "url": "https://www.youtube.com/watch?v=odOtCnI2wVA"
+ },
+ {
+  "id": "agenda:flamengo-x-estudiantes-de-la-plata:2026-10-22",
+  "source": "agenda",
+  "home": "FLAMENGO",
+  "away": "ESTUDIANTES DE LA PLATA",
+  "start": "2026-10-22T23:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=PSZsVLpNbvg"
+ },
+ {
+  "id": "PSZsVLpNbvg",
+  "title": "AO VIVO: FLAMENGO X ESTUDIANTES DE LA PLATA | LIBERTADORES | NARRAÇÃO | NOCHE DE COPA",
+  "published": "2026-10-20T03:12:14+00:00",
+  "start": "2026-10-22T23:15:00+00:00"
  },
  {
   "id": "agenda:vfb-stuttgart-x-borussia-monchengladbach:2026-10-23",
