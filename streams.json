@@ -1,85 +1,5 @@
 [
  {
-  "id": "agenda:angers-x-olympique-marseille:2026-10-18",
-  "source": "agenda",
-  "home": "ANGERS",
-  "away": "OLYMPIQUE MARSEILLE",
-  "start": "2026-10-18T12:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=OclknXFGuBc"
- },
- {
-  "id": "agenda:celta-x-alaves:2026-10-18",
-  "source": "agenda",
-  "home": "CELTA",
-  "away": "ALAVÉS",
-  "start": "2026-10-18T14:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=qP3KpVm10To"
- },
- {
-  "id": "qP3KpVm10To",
-  "title": "AO VIVO: CELTA X ALAVÉS | LALIGA 26/27 | 9ª RODADA",
-  "published": "2026-10-08T12:00:30+00:00",
-  "start": "2026-10-18T14:00:29+00:00"
- },
- {
-  "id": "agenda:canada-x-brasil:2026-10-18",
-  "source": "agenda",
-  "home": "CANADÁ",
-  "away": "BRASIL",
-  "start": "2026-10-18T14:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=IXyPT6B-mtA"
- },
- {
-  "id": "cuL1AU5Oajw",
-  "title": "AO VIVO: FC LORIENT X MÔNACO | LIGUE 1 26/27 | 7ª RODADA",
-  "published": "2026-10-08T12:00:45+00:00",
-  "start": "2026-10-18T14:34:59+00:00"
- },
- {
-  "id": "agenda:le-havre-x-auxerre:2026-10-18",
-  "source": "agenda",
-  "home": "LE HAVRE",
-  "away": "AUXERRE",
-  "start": "2026-10-18T14:35:00+00:00",
-  "url": "https://www.youtube.com/watch?v=1avDDMiUb4A"
- },
- {
-  "id": "agenda:fc-lorient-x-monaco:2026-10-18",
-  "source": "agenda",
-  "home": "FC LORIENT",
-  "away": "MÔNACO",
-  "start": "2026-10-18T14:35:00+00:00",
-  "url": "https://www.youtube.com/watch?v=cuL1AU5Oajw"
- },
- {
-  "id": "1avDDMiUb4A",
-  "title": "AO VIVO (SOM AMBIENTE): LE HAVRE X AUXERRE | LIGUE 1 26/27 | 7ª RODADA",
-  "published": "2026-10-10T12:00:02+00:00",
-  "start": "2026-10-18T14:35:06+00:00"
- },
- {
-  "id": "pGzNeydvf-o",
-  "title": "AO VIVO: MILAN X ATALANTA | SÉRIE A ITALIANA 26/27 | 7ª RODADA",
-  "published": "2026-10-08T12:00:52+00:00",
-  "start": "2026-10-18T15:14:58+00:00"
- },
- {
-  "id": "agenda:milan-x-atalanta:2026-10-18",
-  "source": "agenda",
-  "home": "MILAN",
-  "away": "ATALANTA",
-  "start": "2026-10-18T15:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=pGzNeydvf-o"
- },
- {
-  "id": "agenda:malaga-x-real-sociedad:2026-10-18",
-  "source": "agenda",
-  "home": "MÁLAGA",
-  "away": "REAL SOCIEDAD",
-  "start": "2026-10-18T15:50:00+00:00",
-  "url": "https://www.youtube.com/watch?v=PiDTTDirgmw"
- },
- {
   "id": "YR4ofvJ9NqU",
   "title": "AO VIVO: REAL MADRID X SEVILLA | LALIGA 26/27 | 9ª RODADA",
   "published": "2026-10-08T12:01:10+00:00",
@@ -216,6 +136,12 @@
   "away": "FRANÇA",
   "start": "2026-10-21T14:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=qBUYYgaZr-Q"
+ },
+ {
+  "id": "qBUYYgaZr-Q",
+  "title": "AO VIVO: GANA X BRASIL | COPA DO MUNDO FEMININA SUB-17 FIFA 2026 | 2ª RODADA",
+  "published": "2026-10-11T12:00:05+00:00",
+  "start": "2026-10-21T14:30:30+00:00"
  },
  {
   "id": "agenda:gana-x-brasil:2026-10-21",
