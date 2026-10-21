@@ -1,33 +1,5 @@
 [
  {
-  "id": "agenda:resenha-pos-jogo-entre-botafogo-x-chapecoense:2026-10-17",
-  "source": "agenda",
-  "home": "RESENHA PÓS-JOGO ENTRE BOTAFOGO",
-  "away": "CHAPECOENSE",
-  "start": "2026-10-17T23:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=Zw6PS9iDgBk"
- },
- {
-  "id": "Zw6PS9iDgBk",
-  "title": "AO VIVO: RESENHA PÓS-JOGO ENTRE BOTAFOGO X CHAPECOENSE | RODA DE BOBO",
-  "published": "2026-10-16T14:01:30+00:00",
-  "start": "2026-10-17T23:00:00+00:00"
- },
- {
-  "id": "agenda:leeds-x-manchester-united:2026-10-18",
-  "source": "agenda",
-  "home": "LEEDS",
-  "away": "MANCHESTER UNITED",
-  "start": "2026-10-18T11:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=dy_KAxVd80M"
- },
- {
-  "id": "dy_KAxVd80M",
-  "title": "AO VIVO: CANADÁ X BRASIL | COPA DO MUNDO FEMININA SUB-17 FIFA 2026 | 1ª RODADA",
-  "published": "2026-10-08T12:00:24+00:00",
-  "start": "2026-10-18T11:45:06+00:00"
- },
- {
   "id": "agenda:angers-x-olympique-marseille:2026-10-18",
   "source": "agenda",
   "home": "ANGERS",
@@ -364,6 +336,30 @@
   "url": "https://www.youtube.com/watch?v=r3uUOPsA0Xo"
  },
  {
+  "id": "agenda:dinamo-zagreb-x-nec-nijmegen:2026-10-22",
+  "source": "agenda",
+  "home": "DINAMO ZAGREB",
+  "away": "NEC NIJMEGEN",
+  "start": "2026-10-22T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=PqAXwziJmwE"
+ },
+ {
+  "id": "agenda:estrela-vermelha-x-copenhagen:2026-10-22",
+  "source": "agenda",
+  "home": "ESTRELA VERMELHA",
+  "away": "COPENHAGEN",
+  "start": "2026-10-22T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=PDpXG7AxKGQ"
+ },
+ {
+  "id": "agenda:trabzonspor-x-hearts:2026-10-22",
+  "source": "agenda",
+  "home": "TRABZONSPOR",
+  "away": "HEARTS",
+  "start": "2026-10-22T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=LSrQf59R3jA"
+ },
+ {
   "id": "agenda:bournemouth-x-milan:2026-10-22",
   "source": "agenda",
   "home": "BOURNEMOUTH",
@@ -396,6 +392,54 @@
   "url": "https://www.youtube.com/watch?v=ywCKTa9irBw"
  },
  {
+  "id": "agenda:hoffenheim-x-lyon:2026-10-22",
+  "source": "agenda",
+  "home": "HOFFENHEIM",
+  "away": "LYON",
+  "start": "2026-10-22T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=8QbeFPkWXLw"
+ },
+ {
+  "id": "agenda:jagiellonia-x-anderlecht:2026-10-22",
+  "source": "agenda",
+  "home": "JAGIELLONIA",
+  "away": "ANDERLECHT",
+  "start": "2026-10-22T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=bR2UZz9H8Mw"
+ },
+ {
+  "id": "agenda:lillestrm-x-real-sociedad:2026-10-22",
+  "source": "agenda",
+  "home": "LILLESTRØM",
+  "away": "REAL SOCIEDAD",
+  "start": "2026-10-22T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=mUex_fT-Z2s"
+ },
+ {
+  "id": "agenda:braga-x-gent:2026-10-22",
+  "source": "agenda",
+  "home": "BRAGA",
+  "away": "GENT",
+  "start": "2026-10-22T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=FJ-DlEe6Qa4"
+ },
+ {
+  "id": "agenda:celtic-x-celta:2026-10-22",
+  "source": "agenda",
+  "home": "CELTIC",
+  "away": "CELTA",
+  "start": "2026-10-22T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=iQ5OVW8WhYI"
+ },
+ {
+  "id": "agenda:olympiakos-x-sparta-praha:2026-10-22",
+  "source": "agenda",
+  "home": "OLYMPIAKOS",
+  "away": "SPARTA PRAHA",
+  "start": "2026-10-22T18:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=0XfFY0uDEPc"
+ },
+ {
   "id": "agenda:flamengo-x-estudiantes-de-la-plata:2026-10-22",
   "source": "agenda",
   "home": "FLAMENGO",
@@ -426,6 +470,14 @@
   "url": "https://www.youtube.com/watch?v=rnlPbOMWkQQ"
  },
  {
+  "id": "agenda:alaves-x-malaga:2026-10-23",
+  "source": "agenda",
+  "home": "ALAVÉS",
+  "away": "MÁLAGA",
+  "start": "2026-10-23T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=dkP4lirMo5c"
+ },
+ {
   "id": "agenda:rb-leipzig-x-elversberg:2026-10-24",
   "source": "agenda",
   "home": "RB LEIPZIG",
@@ -434,12 +486,36 @@
   "url": "https://www.youtube.com/watch?v=0Mgj3C7PHO8"
  },
  {
+  "id": "agenda:racing-club-x-espanyol:2026-10-24",
+  "source": "agenda",
+  "home": "RACING CLUB",
+  "away": "ESPANYOL",
+  "start": "2026-10-24T14:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=NLz0Y6qTIxk"
+ },
+ {
   "id": "agenda:napoli-x-roma:2026-10-24",
   "source": "agenda",
   "home": "NAPOLI",
   "away": "ROMA",
   "start": "2026-10-24T15:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=N1Wc-FufSBM"
+ },
+ {
+  "id": "agenda:valencia-x-villarreal:2026-10-24",
+  "source": "agenda",
+  "home": "VALENCIA",
+  "away": "VILLARREAL",
+  "start": "2026-10-24T16:05:00+00:00",
+  "url": "https://www.youtube.com/watch?v=iwiaWUguZg8"
+ },
+ {
+  "id": "agenda:atletico-de-madrid-x-a-coruna:2026-10-24",
+  "source": "agenda",
+  "home": "ATLÉTICO DE MADRID",
+  "away": "A CORUÑA",
+  "start": "2026-10-24T18:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=JKlJyU1v7MU"
  },
  {
   "id": "agenda:lens-x-paris-fc:2026-10-24",
@@ -474,6 +550,22 @@
   "url": "https://www.youtube.com/watch?v=qtUD9j9Mfd8"
  },
  {
+  "id": "agenda:marseille-x-le-havre:2026-10-25",
+  "source": "agenda",
+  "home": "MARSEILLE",
+  "away": "LE HAVRE",
+  "start": "2026-10-25T15:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=rNSYg1fa6og"
+ },
+ {
+  "id": "agenda:real-sociedad-x-levante:2026-10-25",
+  "source": "agenda",
+  "home": "REAL SOCIEDAD",
+  "away": "LEVANTE",
+  "start": "2026-10-25T17:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=rEyhHNVuOHw"
+ },
+ {
   "id": "agenda:paris-saint-germain-x-lyon:2026-10-25",
   "source": "agenda",
   "home": "PARIS SAINT-GERMAIN",
@@ -494,6 +586,14 @@
   "title": "AO VIVO: BARCELONA X REAL MADRID | LALIGA 26/27 | 10ª RODADA",
   "published": "2026-10-05T17:59:42+00:00",
   "start": "2026-10-25T20:00:00+00:00"
+ },
+ {
+  "id": "agenda:sevilla-x-osasuna:2026-10-26",
+  "source": "agenda",
+  "home": "SEVILLA",
+  "away": "OSASUNA",
+  "start": "2026-10-26T19:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=Q1ccB92YYFA"
  },
  {
   "id": "agenda:fluminense-x-internacional:2026-10-28",
