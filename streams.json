@@ -1,55 +1,5 @@
 [
  {
-  "id": "agenda:estados-unidos-x-samoa:2026-10-19",
-  "source": "agenda",
-  "home": "ESTADOS UNIDOS",
-  "away": "SAMOA",
-  "start": "2026-10-19T17:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=1yhe9MxZy8Q"
- },
- {
-  "id": "1yhe9MxZy8Q",
-  "title": "AO VIVO: ESTADOS UNIDOS X SAMOA | COPA DO MUNDO FEMININA SUB-17 FIFA 2026 | 1ª RODADA",
-  "published": "2026-10-09T12:00:09+00:00",
-  "start": "2026-10-19T17:15:31+00:00"
- },
- {
-  "id": "agenda:getafe-x-rayo-vallecano:2026-10-19",
-  "source": "agenda",
-  "home": "GETAFE",
-  "away": "RAYO VALLECANO",
-  "start": "2026-10-19T18:20:00+00:00",
-  "url": "https://www.youtube.com/watch?v=rQnCIMhHpNc"
- },
- {
-  "id": "rQnCIMhHpNc",
-  "title": "AO VIVO: GETAFE X RAYO VALLECANO | LALIGA 26/27 | 9ª RODADA",
-  "published": "2026-10-09T12:00:15+00:00",
-  "start": "2026-10-19T18:20:12+00:00"
- },
- {
-  "id": "agenda:desimpain-x-capim:2026-10-19",
-  "source": "agenda",
-  "home": "DESIMPAIN",
-  "away": "CAPIM",
-  "start": "2026-10-19T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=ILTpQkq4-X0"
- },
- {
-  "id": "ILTpQkq4-X0",
-  "title": "AO VIVO: FLUXO X FURIA | KINGS CUP BRASIL 2026 | 1ª RODADA",
-  "published": "2026-10-13T21:00:23+00:00",
-  "start": "2026-10-19T18:45:03+00:00"
- },
- {
-  "id": "agenda:cruzeiro-x-bolivar:2026-10-19",
-  "source": "agenda",
-  "home": "CRUZEIRO",
-  "away": "BOLIVAR",
-  "start": "2026-10-19T20:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=99yQKJNSfKE"
- },
- {
   "id": "agenda:vasco-x-boca-juniors:2026-10-20",
   "source": "agenda",
   "home": "VASCO",
@@ -286,6 +236,12 @@
   "start": "2026-10-22T16:33:00+00:00"
  },
  {
+  "id": "0XfFY0uDEPc",
+  "title": "AO VIVO (SOM AMBIENTE): OLYMPIAKOS X SPARTA PRAHA | EUROPA LEAGUE 26/27 | 3ª RODADA",
+  "published": "2026-10-22T20:56:56+00:00",
+  "start": "2026-10-22T18:41:44+00:00"
+ },
+ {
   "id": "agenda:bournemouth-x-milan:2026-10-22",
   "source": "agenda",
   "home": "BOURNEMOUTH",
@@ -404,6 +360,14 @@
   "url": "https://www.youtube.com/watch?v=dkP4lirMo5c"
  },
  {
+  "id": "agenda:rayo-vallecano-x-elche:2026-10-24",
+  "source": "agenda",
+  "home": "RAYO VALLECANO",
+  "away": "ELCHE",
+  "start": "2026-10-24T11:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=rGl17MRxQh4"
+ },
+ {
   "id": "agenda:rb-leipzig-x-elversberg:2026-10-24",
   "source": "agenda",
   "home": "RB LEIPZIG",
@@ -418,6 +382,14 @@
   "away": "ESPANYOL",
   "start": "2026-10-24T14:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=NLz0Y6qTIxk"
+ },
+ {
+  "id": "agenda:brasil-x-noruega:2026-10-24",
+  "source": "agenda",
+  "home": "BRASIL",
+  "away": "NORUEGA",
+  "start": "2026-10-24T14:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=Px-yCHRK6Hc"
  },
  {
   "id": "agenda:napoli-x-roma:2026-10-24",
@@ -458,6 +430,20 @@
   "away": "CORINTHIANS",
   "start": "2026-10-24T21:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=FDo01YVDsNE"
+ },
+ {
+  "id": "5AY5yxrY6lY",
+  "title": "AO VIVO: RESENHA APÓS VASCO X CORINTHIANS PELO BRASILEIRÃO | RODA DE BOBO",
+  "published": "2026-10-22T20:37:08+00:00",
+  "start": "2026-10-24T23:20:00+00:00"
+ },
+ {
+  "id": "agenda:athletic-bilbao-x-getafe:2026-10-25",
+  "source": "agenda",
+  "home": "ATHLETIC BILBAO",
+  "away": "GETAFE",
+  "start": "2026-10-25T12:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=pvGkECYJNWQ"
  },
  {
   "id": "agenda:manchester-united-x-bournemouth:2026-10-25",
