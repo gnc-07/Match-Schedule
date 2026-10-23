@@ -392,6 +392,14 @@
   "url": "https://www.youtube.com/watch?v=Px-yCHRK6Hc"
  },
  {
+  "id": "agenda:toulouse-x-estac-troyes:2026-10-24",
+  "source": "agenda",
+  "home": "TOULOUSE",
+  "away": "ESTAC TROYES",
+  "start": "2026-10-24T15:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=OGQDwvFeUgc"
+ },
+ {
   "id": "agenda:napoli-x-roma:2026-10-24",
   "source": "agenda",
   "home": "NAPOLI",
@@ -468,6 +476,30 @@
   "away": "LE HAVRE",
   "start": "2026-10-25T15:50:00+00:00",
   "url": "https://www.youtube.com/watch?v=rNSYg1fa6og"
+ },
+ {
+  "id": "agenda:rennes-x-strasbourg:2026-10-25",
+  "source": "agenda",
+  "home": "RENNES",
+  "away": "STRASBOURG",
+  "start": "2026-10-25T15:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=esjFxYnf7Ew"
+ },
+ {
+  "id": "agenda:angers-x-fc-lorient:2026-10-25",
+  "source": "agenda",
+  "home": "ANGERS",
+  "away": "FC LORIENT",
+  "start": "2026-10-25T16:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=ahhWGDzrmko"
+ },
+ {
+  "id": "agenda:auxerre-x-le-mans:2026-10-25",
+  "source": "agenda",
+  "home": "AUXERRE",
+  "away": "LE MANS",
+  "start": "2026-10-25T16:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=8MKR0qBP6lQ"
  },
  {
   "id": "agenda:real-sociedad-x-levante:2026-10-25",
