@@ -432,12 +432,40 @@
   "url": "https://www.youtube.com/watch?v=RKCJAcj2xOU"
  },
  {
+  "id": "agenda:palmeiras-x-santa-fe:2026-10-24",
+  "source": "agenda",
+  "home": "PALMEIRAS",
+  "away": "SANTA FE",
+  "start": "2026-10-24T19:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=qWfdUKagXQE"
+ },
+ {
+  "id": "qWfdUKagXQE",
+  "title": "AO VIVO: PALMEIRAS X SANTA FE | LIBERTADORES FEMININA 2026 | QUARTAS DE FINAL",
+  "published": "2026-10-23T19:54:16+00:00",
+  "start": "2026-10-24T19:15:00+00:00"
+ },
+ {
   "id": "agenda:vasco-x-corinthians:2026-10-24",
   "source": "agenda",
   "home": "VASCO",
   "away": "CORINTHIANS",
   "start": "2026-10-24T21:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=FDo01YVDsNE"
+ },
+ {
+  "id": "agenda:corinthians-x-independiente-dragonas:2026-10-24",
+  "source": "agenda",
+  "home": "CORINTHIANS",
+  "away": "INDEPENDIENTE DRAGONAS",
+  "start": "2026-10-24T23:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=z7xACiLpDqg"
+ },
+ {
+  "id": "z7xACiLpDqg",
+  "title": "AO VIVO: CORINTHIANS X INDEPENDIENTE DRAGONAS | LIBERTADORES FEMININA 2026 | QUARTAS DE FINAL",
+  "published": "2026-10-23T19:51:26+00:00",
+  "start": "2026-10-24T23:15:00+00:00"
  },
  {
   "id": "5AY5yxrY6lY",
@@ -510,6 +538,14 @@
   "url": "https://www.youtube.com/watch?v=rEyhHNVuOHw"
  },
  {
+  "id": "agenda:barcelona-x-real-madrid:2026-10-25",
+  "source": "agenda",
+  "home": "BARCELONA",
+  "away": "REAL MADRID",
+  "start": "2026-10-25T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=UEV1NElLuMA"
+ },
+ {
   "id": "agenda:paris-saint-germain-x-lyon:2026-10-25",
   "source": "agenda",
   "home": "PARIS SAINT-GERMAIN",
@@ -518,18 +554,24 @@
   "url": "https://www.youtube.com/watch?v=WHYTOnqWFgE"
  },
  {
-  "id": "agenda:barcelona-x-real-madrid:2026-10-25",
-  "source": "agenda",
-  "home": "BARCELONA",
-  "away": "REAL MADRID",
-  "start": "2026-10-25T20:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=UEV1NElLuMA"
- },
- {
   "id": "UEV1NElLuMA",
   "title": "AO VIVO: BARCELONA X REAL MADRID | LALIGA 26/27 | 10ª RODADA",
   "published": "2026-10-05T17:59:42+00:00",
   "start": "2026-10-25T20:00:00+00:00"
+ },
+ {
+  "id": "agenda:cruzeiro-x-libertad:2026-10-25",
+  "source": "agenda",
+  "home": "CRUZEIRO",
+  "away": "LIBERTAD",
+  "start": "2026-10-25T23:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=DsuvaGXHpsA"
+ },
+ {
+  "id": "DsuvaGXHpsA",
+  "title": "AO VIVO: CRUZEIRO X LIBERTAD | LIBERTADORES FEMININA 2026 | QUARTAS DE FINAL",
+  "published": "2026-10-23T20:00:48+00:00",
+  "start": "2026-10-25T23:20:00+00:00"
  },
  {
   "id": "agenda:sevilla-x-osasuna:2026-10-26",
@@ -538,6 +580,14 @@
   "away": "OSASUNA",
   "start": "2026-10-26T19:20:00+00:00",
   "url": "https://www.youtube.com/watch?v=Q1ccB92YYFA"
+ },
+ {
+  "id": "agenda:paris-saint-germain-x-lyon:2026-10-26",
+  "source": "agenda",
+  "home": "PARIS SAINT-GERMAIN",
+  "away": "LYON",
+  "start": "2026-10-26T19:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=WHYTOnqWFgE"
  },
  {
   "id": "agenda:fluminense-x-internacional:2026-10-28",
