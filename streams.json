@@ -1,41 +1,5 @@
 [
  {
-  "id": "agenda:gana-x-brasil:2026-10-21",
-  "source": "agenda",
-  "home": "GANA",
-  "away": "BRASIL",
-  "start": "2026-10-21T17:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=bn7FhRGqo1g"
- },
- {
-  "id": "agenda:levante-x-athletic-bilbao:2026-10-21",
-  "source": "agenda",
-  "home": "LEVANTE",
-  "away": "ATHLETIC BILBAO",
-  "start": "2026-10-21T17:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=wpPkYrdWtU4"
- },
- {
-  "id": "wpPkYrdWtU4",
-  "title": "AO VIVO: LEVANTE X ATHLETIC BILBAO | LALIGA 26/27 | 6ª RODADA",
-  "published": "2026-10-19T16:13:04+00:00",
-  "start": "2026-10-21T17:30:00+00:00"
- },
- {
-  "id": "agenda:santa-fe-x-corinthians:2026-10-21",
-  "source": "agenda",
-  "home": "SANTA FÉ",
-  "away": "CORINTHIANS",
-  "start": "2026-10-21T19:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=umBdOZtE5KQ"
- },
- {
-  "id": "umBdOZtE5KQ",
-  "title": "AO VIVO: SANTA FÉ X CORINTHIANS | LIBERTADORES FEMININA 2026 | 3ª RODADA",
-  "published": "2026-10-11T12:00:19+00:00",
-  "start": "2026-10-21T19:15:37+00:00"
- },
- {
   "id": "agenda:atletico-mg-x-torque:2026-10-21",
   "source": "agenda",
   "home": "ATLÉTICO-MG",
@@ -404,6 +368,12 @@
   "url": "https://www.youtube.com/watch?v=N1Wc-FufSBM"
  },
  {
+  "id": "iwiaWUguZg8",
+  "title": "AO VIVO: ATLÉTICO DE MADRID X A CORUÑA | LALIGA 26/27 | 10ª RODADA",
+  "published": "2026-10-14T12:01:12+00:00",
+  "start": "2026-10-24T16:14:50+00:00"
+ },
+ {
   "id": "agenda:valencia-x-villarreal:2026-10-24",
   "source": "agenda",
   "home": "VALENCIA",
@@ -418,6 +388,12 @@
   "away": "A CORUÑA",
   "start": "2026-10-24T18:20:00+00:00",
   "url": "https://www.youtube.com/watch?v=JKlJyU1v7MU"
+ },
+ {
+  "id": "RKCJAcj2xOU",
+  "title": "AO VIVO: LENS X PARIS FC | LIGUE 1 26/27 | 8ª RODADA",
+  "published": "2026-10-14T12:01:18+00:00",
+  "start": "2026-10-24T18:29:52+00:00"
  },
  {
   "id": "agenda:lens-x-paris-fc:2026-10-24",
@@ -446,8 +422,14 @@
   "source": "agenda",
   "home": "VASCO",
   "away": "CORINTHIANS",
-  "start": "2026-10-24T21:30:00+00:00",
+  "start": "2026-10-24T20:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=FDo01YVDsNE"
+ },
+ {
+  "id": "FDo01YVDsNE",
+  "title": "AO VIVO: VASCO X CORINTHIANS | BRASILEIRÃO 2026 | 32ª RODADA",
+  "published": "2026-09-24T20:32:18+00:00",
+  "start": "2026-10-24T20:01:48+00:00"
  },
  {
   "id": "agenda:corinthians-x-independiente-dragonas:2026-10-24",
