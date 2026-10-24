@@ -1,19 +1,5 @@
 [
  {
-  "id": "agenda:japao-x-franca:2026-10-21",
-  "source": "agenda",
-  "home": "JAPÃO",
-  "away": "FRANÇA",
-  "start": "2026-10-21T14:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=qBUYYgaZr-Q"
- },
- {
-  "id": "qBUYYgaZr-Q",
-  "title": "AO VIVO: GANA X BRASIL | COPA DO MUNDO FEMININA SUB-17 FIFA 2026 | 2ª RODADA",
-  "published": "2026-10-11T12:00:05+00:00",
-  "start": "2026-10-21T14:30:30+00:00"
- },
- {
   "id": "agenda:gana-x-brasil:2026-10-21",
   "source": "agenda",
   "home": "GANA",
@@ -360,6 +346,12 @@
   "url": "https://www.youtube.com/watch?v=rGl17MRxQh4"
  },
  {
+  "id": "rGl17MRxQh4",
+  "title": "AO VIVO: RACING CLUB X ESPANYOL | LALIGA 26/27 | 10ª RODADA",
+  "published": "2026-10-14T12:00:03+00:00",
+  "start": "2026-10-24T11:45:01+00:00"
+ },
+ {
   "id": "agenda:rb-leipzig-x-elversberg:2026-10-24",
   "source": "agenda",
   "home": "RB LEIPZIG",
@@ -384,12 +376,24 @@
   "url": "https://www.youtube.com/watch?v=Px-yCHRK6Hc"
  },
  {
+  "id": "Px-yCHRK6Hc",
+  "title": "AO VIVO: BRASIL X NORUEGA | COPA DO MUNDO FEMININA SUB-17 2026 | 3ª RODADA",
+  "published": "2026-10-14T12:00:22+00:00",
+  "start": "2026-10-24T14:15:01+00:00"
+ },
+ {
   "id": "agenda:toulouse-x-estac-troyes:2026-10-24",
   "source": "agenda",
   "home": "TOULOUSE",
   "away": "ESTAC TROYES",
   "start": "2026-10-24T15:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=OGQDwvFeUgc"
+ },
+ {
+  "id": "N1Wc-FufSBM",
+  "title": "AO VIVO: NAPOLI X ROMA | SÉRIE A ITALIANA 26/27 | 8ª RODADA",
+  "published": "2026-10-14T12:00:28+00:00",
+  "start": "2026-10-24T15:14:39+00:00"
  },
  {
   "id": "agenda:napoli-x-roma:2026-10-24",
@@ -404,7 +408,7 @@
   "source": "agenda",
   "home": "VALENCIA",
   "away": "VILLARREAL",
-  "start": "2026-10-24T16:05:00+00:00",
+  "start": "2026-10-24T16:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=iwiaWUguZg8"
  },
  {
