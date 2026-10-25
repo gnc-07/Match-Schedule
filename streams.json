@@ -1,35 +1,5 @@
 [
  {
-  "id": "agenda:atletico-mg-x-torque:2026-10-21",
-  "source": "agenda",
-  "home": "ATLÉTICO-MG",
-  "away": "TORQUE",
-  "start": "2026-10-21T21:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=JXSIpy6CoZI"
- },
- {
-  "id": "JXSIpy6CoZI",
-  "title": "AO VIVO: ATLÉTICO-MG X TORQUE | SUL-AMERICANA | NARRAÇÃO | NOCHE DE COPA",
-  "published": "2026-10-19T15:59:48+00:00",
-  "start": "2026-10-21T21:00:29+00:00"
- },
- {
-  "id": "agenda:palmeiras-x-ind-del-valle:2026-10-21",
-  "source": "agenda",
-  "home": "PALMEIRAS",
-  "away": "IND. DEL VALLE",
-  "start": "2026-10-21T23:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=bI0ZIVSWcas"
- },
- {
-  "id": "agenda:palmeiras-x-fluminense:2026-10-21",
-  "source": "agenda",
-  "home": "PALMEIRAS",
-  "away": "FLUMINENSE",
-  "start": "2026-10-21T23:50:00+00:00",
-  "url": "https://www.youtube.com/watch?v=RwWR9yDG81I"
- },
- {
   "id": "agenda:kairat-x-panathinaikos:2026-10-22",
   "source": "agenda",
   "home": "KAIRAT",
