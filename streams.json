@@ -6,24 +6,6 @@
   "start": null
  },
  {
-  "id": "rNSYg1fa6og",
-  "title": "AO VIVO (SOM AMBIENTE): MARSEILLE X LE HAVRE | LIGUE 1 26/27 | 8ª RODADA",
-  "published": "2026-10-15T12:02:02+00:00",
-  "start": null
- },
- {
-  "id": "esjFxYnf7Ew",
-  "title": "AO VIVO (SOM AMBIENTE): RENNES X STRASBOURG | LIGUE 1 26/27 | 8ª RODADA",
-  "published": "2026-10-17T12:00:02+00:00",
-  "start": null
- },
- {
-  "id": "ahhWGDzrmko",
-  "title": "AO VIVO (SOM AMBIENTE): ANGERS X FC LORIENT | LIGUE 1 26/27 | 8ª RODADA",
-  "published": "2026-10-17T12:00:13+00:00",
-  "start": null
- },
- {
   "id": "PDpXG7AxKGQ",
   "title": "AO VIVO (SOM AMBIENTE): ESTRELA VERMELHA X COPENHAGEN | CONFERENCE LEAGUE 26/27 | 2ª RODADA",
   "published": "2026-10-14T12:00:13+00:00",
@@ -436,6 +418,12 @@
   "url": "https://www.youtube.com/watch?v=qtUD9j9Mfd8"
  },
  {
+  "id": "ahhWGDzrmko",
+  "title": "AO VIVO (SOM AMBIENTE): ANGERS X FC LORIENT | LIGUE 1 26/27 | 8ª RODADA",
+  "published": "2026-10-17T12:00:13+00:00",
+  "start": "2026-10-25T15:49:43+00:00"
+ },
+ {
   "id": "agenda:marseille-x-le-havre:2026-10-25",
   "source": "agenda",
   "home": "MARSEILLE",
@@ -456,6 +444,18 @@
   "title": "AO VIVO (SOM AMBIENTE): AUXERRE X LE MANS | LIGUE 1 26/27 | 8ª RODADA",
   "published": "2026-10-22T20:27:13+00:00",
   "start": "2026-10-25T15:50:09+00:00"
+ },
+ {
+  "id": "rNSYg1fa6og",
+  "title": "AO VIVO (SOM AMBIENTE): MARSEILLE X LE HAVRE | LIGUE 1 26/27 | 8ª RODADA",
+  "published": "2026-10-15T12:02:02+00:00",
+  "start": "2026-10-25T15:50:30+00:00"
+ },
+ {
+  "id": "esjFxYnf7Ew",
+  "title": "AO VIVO (SOM AMBIENTE): RENNES X STRASBOURG | LIGUE 1 26/27 | 8ª RODADA",
+  "published": "2026-10-17T12:00:02+00:00",
+  "start": "2026-10-25T15:50:39+00:00"
  },
  {
   "id": "OGQDwvFeUgc",
