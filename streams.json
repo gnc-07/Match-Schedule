@@ -6,6 +6,12 @@
   "start": null
  },
  {
+  "id": "dpkwMjudZME",
+  "title": "AO VIVO: DIBRADOS FC X PODPAH FUNKBOL CLUBE | KINGS LEAGUE BRAZIL | 2ª RODADA",
+  "published": "2026-10-16T12:00:09+00:00",
+  "start": null
+ },
+ {
   "id": "agenda:rayo-vallecano-x-elche:2026-10-24",
   "source": "agenda",
   "home": "RAYO VALLECANO",
@@ -302,6 +308,14 @@
   "url": "https://www.youtube.com/watch?v=dpkwMjudZME"
  },
  {
+  "id": "agenda:dibrados-fc-x-podpah-funkbol-clube:2026-10-26",
+  "source": "agenda",
+  "home": "DIBRADOS FC",
+  "away": "PODPAH FUNKBOL CLUBE",
+  "start": "2026-10-26T18:38:00+00:00",
+  "url": "https://www.youtube.com/watch?v=dpkwMjudZME"
+ },
+ {
   "id": "agenda:sevilla-x-osasuna:2026-10-26",
   "source": "agenda",
   "home": "SEVILLA",
@@ -398,12 +412,52 @@
   "url": "https://www.youtube.com/watch?v=D0Hlk9PWweg"
  },
  {
+  "id": "agenda:getafe-x-sevilla:2026-11-01",
+  "source": "agenda",
+  "home": "GETAFE",
+  "away": "SEVILLA",
+  "start": "2026-11-01T12:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=hSwG8U4eZcY"
+ },
+ {
   "id": "agenda:racing-club-x-real-madrid:2026-11-01",
   "source": "agenda",
   "home": "RACING CLUB",
   "away": "REAL MADRID",
   "start": "2026-11-01T14:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=je2yc78QepQ"
+ },
+ {
+  "id": "agenda:paris-fc-x-monaco:2026-11-01",
+  "source": "agenda",
+  "home": "PARIS FC",
+  "away": "MÔNACO",
+  "start": "2026-11-01T15:35:00+00:00",
+  "url": "https://www.youtube.com/watch?v=9ldtfxoJt0g"
+ },
+ {
+  "id": "agenda:elche-x-valencia:2026-11-01",
+  "source": "agenda",
+  "home": "ELCHE",
+  "away": "VALENCIA",
+  "start": "2026-11-01T16:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=VuohoSdhF1E"
+ },
+ {
+  "id": "agenda:juventus-x-napoli:2026-11-01",
+  "source": "agenda",
+  "home": "JUVENTUS",
+  "away": "NAPOLI",
+  "start": "2026-11-01T19:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=2B1y2LfMTPE"
+ },
+ {
+  "id": "agenda:athletic-bilbao-x-real-sociedad:2026-11-01",
+  "source": "agenda",
+  "home": "ATHLETIC BILBAO",
+  "away": "REAL SOCIEDAD",
+  "start": "2026-11-01T19:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=3lZSp9WbrXY"
  },
  {
   "id": "agenda:athletico-x-vasco:2026-11-04",
