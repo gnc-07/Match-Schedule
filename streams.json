@@ -6,28 +6,6 @@
   "start": null
  },
  {
-  "id": "agenda:flamengo-x-estudiantes-de-la-plata:2026-10-22",
-  "source": "agenda",
-  "home": "FLAMENGO",
-  "away": "ESTUDIANTES DE LA PLATA",
-  "start": "2026-10-22T23:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=PSZsVLpNbvg"
- },
- {
-  "id": "PSZsVLpNbvg",
-  "title": "AO VIVO: FLAMENGO X ESTUDIANTES DE LA PLATA | LIBERTADORES | NARRAÇÃO | NOCHE DE COPA",
-  "published": "2026-10-20T03:12:14+00:00",
-  "start": "2026-10-22T23:15:00+00:00"
- },
- {
-  "id": "agenda:olimpia-x-cruzeiro:2026-10-22",
-  "source": "agenda",
-  "home": "OLIMPIA",
-  "away": "CRUZEIRO",
-  "start": "2026-10-22T23:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=zGP4fejjkMY"
- },
- {
   "id": "agenda:vfb-stuttgart-x-borussia-monchengladbach:2026-10-23",
   "source": "agenda",
   "home": "VFB STUTTGART",
