@@ -6,22 +6,6 @@
   "start": null
  },
  {
-  "id": "agenda:vfb-stuttgart-x-borussia-monchengladbach:2026-10-23",
-  "source": "agenda",
-  "home": "VFB STUTTGART",
-  "away": "BORUSSIA MÖNCHENGLADBACH",
-  "start": "2026-10-23T18:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=rnlPbOMWkQQ"
- },
- {
-  "id": "agenda:alaves-x-malaga:2026-10-23",
-  "source": "agenda",
-  "home": "ALAVÉS",
-  "away": "MÁLAGA",
-  "start": "2026-10-23T18:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=dkP4lirMo5c"
- },
- {
   "id": "agenda:rayo-vallecano-x-elche:2026-10-24",
   "source": "agenda",
   "home": "RAYO VALLECANO",
@@ -302,6 +286,14 @@
   "start": "2026-10-25T23:20:00+00:00"
  },
  {
+  "id": "agenda:psg-x-lyon:2026-10-26",
+  "source": "agenda",
+  "home": "PSG",
+  "away": "LYON",
+  "start": "2026-10-26T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=WHYTOnqWFgE"
+ },
+ {
   "id": "agenda:dendele-x-capim:2026-10-26",
   "source": "agenda",
   "home": "DENDELE",
@@ -374,12 +366,28 @@
   "url": "https://www.youtube.com/watch?v=9WXEgHHixrg"
  },
  {
+  "id": "agenda:rayo-vallecano-x-celta:2026-10-31",
+  "source": "agenda",
+  "home": "RAYO VALLECANO",
+  "away": "CELTA",
+  "start": "2026-10-31T14:35:00+00:00",
+  "url": "https://www.youtube.com/watch?v=DhJ6tF1a8nw"
+ },
+ {
   "id": "agenda:bayern-de-munique-x-borussia-dortmund:2026-10-31",
   "source": "agenda",
   "home": "BAYERN DE MUNIQUE",
   "away": "BORUSSIA DORTMUND",
   "start": "2026-10-31T16:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=iKkpMQK5Lcw"
+ },
+ {
+  "id": "agenda:real-betis-x-malaga:2026-10-31",
+  "source": "agenda",
+  "home": "REAL BETIS",
+  "away": "MÁLAGA",
+  "start": "2026-10-31T16:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=bzbkqAf_Awo"
  },
  {
   "id": "agenda:barcelona-x-alaves:2026-10-31",
