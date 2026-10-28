@@ -12,100 +12,6 @@
   "start": null
  },
  {
-  "id": "agenda:manchester-united-x-bournemouth:2026-10-25",
-  "source": "agenda",
-  "home": "MANCHESTER UNITED",
-  "away": "BOURNEMOUTH",
-  "start": "2026-10-25T13:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=jZXkDVmpoU0"
- },
- {
-  "id": "agenda:monaco-x-lille:2026-10-25",
-  "source": "agenda",
-  "home": "MÔNACO",
-  "away": "LILLE",
-  "start": "2026-10-25T13:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=qtUD9j9Mfd8"
- },
- {
-  "id": "ahhWGDzrmko",
-  "title": "AO VIVO (SOM AMBIENTE): ANGERS X FC LORIENT | LIGUE 1 26/27 | 8ª RODADA",
-  "published": "2026-10-17T12:00:13+00:00",
-  "start": "2026-10-25T15:49:43+00:00"
- },
- {
-  "id": "agenda:marseille-x-le-havre:2026-10-25",
-  "source": "agenda",
-  "home": "MARSEILLE",
-  "away": "LE HAVRE",
-  "start": "2026-10-25T15:50:00+00:00",
-  "url": "https://www.youtube.com/watch?v=rNSYg1fa6og"
- },
- {
-  "id": "agenda:rennes-x-strasbourg:2026-10-25",
-  "source": "agenda",
-  "home": "RENNES",
-  "away": "STRASBOURG",
-  "start": "2026-10-25T15:50:00+00:00",
-  "url": "https://www.youtube.com/watch?v=esjFxYnf7Ew"
- },
- {
-  "id": "8MKR0qBP6lQ",
-  "title": "AO VIVO (SOM AMBIENTE): AUXERRE X LE MANS | LIGUE 1 26/27 | 8ª RODADA",
-  "published": "2026-10-22T20:27:13+00:00",
-  "start": "2026-10-25T15:50:09+00:00"
- },
- {
-  "id": "rNSYg1fa6og",
-  "title": "AO VIVO (SOM AMBIENTE): MARSEILLE X LE HAVRE | LIGUE 1 26/27 | 8ª RODADA",
-  "published": "2026-10-15T12:02:02+00:00",
-  "start": "2026-10-25T15:50:30+00:00"
- },
- {
-  "id": "esjFxYnf7Ew",
-  "title": "AO VIVO (SOM AMBIENTE): RENNES X STRASBOURG | LIGUE 1 26/27 | 8ª RODADA",
-  "published": "2026-10-17T12:00:02+00:00",
-  "start": "2026-10-25T15:50:39+00:00"
- },
- {
-  "id": "OGQDwvFeUgc",
-  "title": "AO VIVO (SOM AMBIENTE): TOULOUSE X ESTAC TROYES | LIGUE 1 26/27 | 8ª RODADA",
-  "published": "2026-10-16T12:00:02+00:00",
-  "start": "2026-10-25T15:52:05+00:00"
- },
- {
-  "id": "agenda:angers-x-fc-lorient:2026-10-25",
-  "source": "agenda",
-  "home": "ANGERS",
-  "away": "FC LORIENT",
-  "start": "2026-10-25T16:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=ahhWGDzrmko"
- },
- {
-  "id": "agenda:auxerre-x-le-mans:2026-10-25",
-  "source": "agenda",
-  "home": "AUXERRE",
-  "away": "LE MANS",
-  "start": "2026-10-25T16:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=8MKR0qBP6lQ"
- },
- {
-  "id": "agenda:real-sociedad-x-levante:2026-10-25",
-  "source": "agenda",
-  "home": "REAL SOCIEDAD",
-  "away": "LEVANTE",
-  "start": "2026-10-25T17:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=rEyhHNVuOHw"
- },
- {
-  "id": "agenda:barcelona-x-real-madrid:2026-10-25",
-  "source": "agenda",
-  "home": "BARCELONA",
-  "away": "REAL MADRID",
-  "start": "2026-10-25T17:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=UEV1NElLuMA"
- },
- {
   "id": "agenda:paris-saint-germain-x-lyon:2026-10-25",
   "source": "agenda",
   "home": "PARIS SAINT-GERMAIN",
@@ -186,6 +92,12 @@
   "away": "CAGLIARI",
   "start": "2026-10-27T18:45:00+00:00",
   "url": "https://www.youtube.com/watch?v=mraN4lL8IVw"
+ },
+ {
+  "id": "WW90jZ1Lea0",
+  "title": "AO VIVO: BRASIL X POLÔNIA | COPA DO MUNDO FEMININA SUB-17 2026 | OITAVAS DE FINAL",
+  "published": "2026-10-26T21:00:12+00:00",
+  "start": "2026-10-28T16:14:10+00:00"
  },
  {
   "id": "agenda:brasil-x-polonia:2026-10-28",
