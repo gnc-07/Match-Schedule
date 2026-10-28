@@ -12,34 +12,6 @@
   "start": null
  },
  {
-  "id": "agenda:corinthians-x-independiente-dragonas:2026-10-24",
-  "source": "agenda",
-  "home": "CORINTHIANS",
-  "away": "INDEPENDIENTE DRAGONAS",
-  "start": "2026-10-24T23:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=z7xACiLpDqg"
- },
- {
-  "id": "z7xACiLpDqg",
-  "title": "AO VIVO: CORINTHIANS X INDEPENDIENTE DRAGONAS | LIBERTADORES FEMININA 2026 | QUARTAS DE FINAL",
-  "published": "2026-10-23T19:51:26+00:00",
-  "start": "2026-10-24T23:15:00+00:00"
- },
- {
-  "id": "5AY5yxrY6lY",
-  "title": "AO VIVO: RESENHA APÓS VASCO X CORINTHIANS PELO BRASILEIRÃO | RODA DE BOBO",
-  "published": "2026-10-22T20:37:08+00:00",
-  "start": "2026-10-24T23:20:00+00:00"
- },
- {
-  "id": "agenda:athletic-bilbao-x-getafe:2026-10-25",
-  "source": "agenda",
-  "home": "ATHLETIC BILBAO",
-  "away": "GETAFE",
-  "start": "2026-10-25T12:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=pvGkECYJNWQ"
- },
- {
   "id": "agenda:manchester-united-x-bournemouth:2026-10-25",
   "source": "agenda",
   "home": "MANCHESTER UNITED",
@@ -224,12 +196,28 @@
   "url": "https://www.youtube.com/watch?v=WW90jZ1Lea0"
  },
  {
+  "id": "agenda:corinthians-x-independiente-santa-fe:2026-10-28",
+  "source": "agenda",
+  "home": "CORINTHIANS",
+  "away": "INDEPENDIENTE SANTA FE",
+  "start": "2026-10-28T19:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=XK3UOBxPzqE"
+ },
+ {
   "id": "agenda:fluminense-x-internacional:2026-10-28",
   "source": "agenda",
   "home": "FLUMINENSE",
   "away": "INTERNACIONAL",
-  "start": "2026-10-28T22:30:00+00:00",
+  "start": "2026-10-28T21:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=t4pf4qZ0c14"
+ },
+ {
+  "id": "agenda:cruzeiro-x-olimpia:2026-10-28",
+  "source": "agenda",
+  "home": "CRUZEIRO",
+  "away": "OLIMPIA",
+  "start": "2026-10-28T23:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=mMA7t4TyKU8"
  },
  {
   "id": "agenda:china-x-franca:2026-10-29",
