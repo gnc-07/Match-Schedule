@@ -12,34 +12,6 @@
   "start": null
  },
  {
-  "id": "agenda:paris-saint-germain-x-lyon:2026-10-25",
-  "source": "agenda",
-  "home": "PARIS SAINT-GERMAIN",
-  "away": "LYON",
-  "start": "2026-10-25T19:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=WHYTOnqWFgE"
- },
- {
-  "id": "UEV1NElLuMA",
-  "title": "AO VIVO: BARCELONA X REAL MADRID | LALIGA 26/27 | 10ª RODADA",
-  "published": "2026-10-05T17:59:42+00:00",
-  "start": "2026-10-25T20:00:00+00:00"
- },
- {
-  "id": "agenda:cruzeiro-x-libertad:2026-10-25",
-  "source": "agenda",
-  "home": "CRUZEIRO",
-  "away": "LIBERTAD",
-  "start": "2026-10-25T23:20:00+00:00",
-  "url": "https://www.youtube.com/watch?v=DsuvaGXHpsA"
- },
- {
-  "id": "DsuvaGXHpsA",
-  "title": "AO VIVO: CRUZEIRO X LIBERTAD | LIBERTADORES FEMININA 2026 | QUARTAS DE FINAL",
-  "published": "2026-10-23T20:00:48+00:00",
-  "start": "2026-10-25T23:20:00+00:00"
- },
- {
   "id": "agenda:psg-x-lyon:2026-10-26",
   "source": "agenda",
   "home": "PSG",
