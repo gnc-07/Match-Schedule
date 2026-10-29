@@ -116,8 +116,14 @@
   "source": "agenda",
   "home": "ESPANHA",
   "away": "EUA",
-  "start": "2026-10-29T17:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=Sgm_6pjnOdc"
+  "start": "2026-10-29T14:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=GYxIbplDOBY"
+ },
+ {
+  "id": "GYxIbplDOBY",
+  "title": "AO VIVO: ESPANHA X EUA | COPA DO MUNDO FEMININA SUB-17 2026 | OITAVAS DE FINAL",
+  "published": "2026-10-26T21:01:49+00:00",
+  "start": "2026-10-29T14:30:04+00:00"
  },
  {
   "id": "agenda:le-havre-x-paris-saint-germain:2026-10-30",
