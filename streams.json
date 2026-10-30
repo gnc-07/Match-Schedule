@@ -12,12 +12,6 @@
   "start": null
  },
  {
-  "id": "mraN4lL8IVw",
-  "title": "AO VIVO: TUDO SOBRE VASCO X FLAMENGO E A BRIGA CONTRA O REBAIXAMENTO | GERAL CAZÉTV",
-  "published": "2026-10-17T12:00:02+00:00",
-  "start": "2026-10-27T17:05:06+00:00"
- },
- {
   "id": "agenda:roma-x-cagliari:2026-10-27",
   "source": "agenda",
   "home": "ROMA",
@@ -86,12 +80,30 @@
   "start": "2026-10-29T14:30:04+00:00"
  },
  {
+  "id": "JTf3frtecG8",
+  "title": "AO VIVO: TÊNIS | JÁ JÁ TEM NANÁ SILVA X FRANCESCA JONES | QUARTAS DE FINAL DO WTA DE CURITIBA",
+  "published": "2026-10-27T21:00:03+00:00",
+  "start": "2026-10-30T15:46:32+00:00"
+ },
+ {
+  "id": "EOdp6r7RNbo",
+  "title": "AO VIVO: LE HAVRE X PARIS SAINT-GERMAIN | LIGUE 1 26/27 | 9ª RODADA",
+  "published": "2026-10-20T12:00:03+00:00",
+  "start": "2026-10-30T16:00:00+00:00"
+ },
+ {
   "id": "agenda:le-havre-x-paris-saint-germain:2026-10-30",
   "source": "agenda",
   "home": "LE HAVRE",
   "away": "PARIS SAINT-GERMAIN",
   "start": "2026-10-30T17:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=EOdp6r7RNbo"
+ },
+ {
+  "id": "NLMUqrUSR1s",
+  "title": "AO VIVO (SOM AMBIENTE): NICE X RENNES | LIGUE 1 26/27 | 9ª RODADA",
+  "published": "2026-10-23T12:00:03+00:00",
+  "start": "2026-10-30T17:46:19+00:00"
  },
  {
   "id": "agenda:nice-x-rennes:2026-10-30",
@@ -186,6 +198,14 @@
   "away": "SEVILLA",
   "start": "2026-11-01T12:20:00+00:00",
   "url": "https://www.youtube.com/watch?v=hSwG8U4eZcY"
+ },
+ {
+  "id": "agenda:strasbourg-x-auxerre:2026-11-01",
+  "source": "agenda",
+  "home": "STRASBOURG",
+  "away": "AUXERRE",
+  "start": "2026-11-01T13:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=UnAB6DFV63I"
  },
  {
   "id": "agenda:racing-club-x-real-madrid:2026-11-01",
