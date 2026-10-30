@@ -12,14 +12,6 @@
   "start": null
  },
  {
-  "id": "agenda:roma-x-cagliari:2026-10-27",
-  "source": "agenda",
-  "home": "ROMA",
-  "away": "CAGLIARI",
-  "start": "2026-10-27T18:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=mraN4lL8IVw"
- },
- {
   "id": "WW90jZ1Lea0",
   "title": "AO VIVO: BRASIL X POLÔNIA | COPA DO MUNDO FEMININA SUB-17 2026 | OITAVAS DE FINAL",
   "published": "2026-10-26T21:00:12+00:00",
@@ -100,6 +92,14 @@
   "url": "https://www.youtube.com/watch?v=EOdp6r7RNbo"
  },
  {
+  "id": "agenda:kane-estreia-como-bola-de-ouro-e-tem-chelsea-x-manchester-united:2026-10-30",
+  "source": "agenda",
+  "home": "KANE ESTREIA COMO BOLA DE OURO E TEM CHELSEA",
+  "away": "MANCHESTER UNITED",
+  "start": "2026-10-30T17:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=EOdp6r7RNbo"
+ },
+ {
   "id": "NLMUqrUSR1s",
   "title": "AO VIVO (SOM AMBIENTE): NICE X RENNES | LIGUE 1 26/27 | 9ª RODADA",
   "published": "2026-10-23T12:00:03+00:00",
@@ -122,14 +122,6 @@
   "url": "https://www.youtube.com/watch?v=7ZmD6rGAia0"
  },
  {
-  "id": "agenda:kane-estreia-como-bola-de-ouro-e-tem-chelsea-x-manchester-united:2026-10-30",
-  "source": "agenda",
-  "home": "KANE ESTREIA COMO BOLA DE OURO E TEM CHELSEA",
-  "away": "MANCHESTER UNITED",
-  "start": "2026-10-30T22:05:00+00:00",
-  "url": "https://www.youtube.com/watch?v=acoE8Y9dYGw"
- },
- {
   "id": "acoE8Y9dYGw",
   "title": "AO VIVO: KANE ESTREIA COMO BOLA DE OURO E TEM CHELSEA X MANCHESTER UNITED | QUEM FEZ, FEZ",
   "published": "2026-10-29T20:50:39+00:00",
@@ -140,7 +132,7 @@
   "source": "agenda",
   "home": "CHELSEA",
   "away": "MANCHESTER UNITED",
-  "start": "2026-10-31T11:30:00+00:00",
+  "start": "2026-10-31T11:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=1PCeS5cJCgI"
  },
  {
@@ -156,7 +148,7 @@
   "source": "agenda",
   "home": "RAYO VALLECANO",
   "away": "CELTA",
-  "start": "2026-10-31T14:35:00+00:00",
+  "start": "2026-10-31T15:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=DhJ6tF1a8nw"
  },
  {
@@ -172,7 +164,7 @@
   "source": "agenda",
   "home": "REAL BETIS",
   "away": "MÁLAGA",
-  "start": "2026-10-31T16:50:00+00:00",
+  "start": "2026-10-31T17:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=bzbkqAf_Awo"
  },
  {
@@ -190,6 +182,28 @@
   "away": "LE MANS",
   "start": "2026-10-31T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=s9unUJUeNig"
+ },
+ {
+  "id": "agenda:santa-fe-x-olimpia:2026-10-31",
+  "source": "agenda",
+  "home": "SANTA FÉ",
+  "away": "OLIMPIA",
+  "start": "2026-10-31T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=hS0Im9cHhJA"
+ },
+ {
+  "id": "hS0Im9cHhJA",
+  "title": "AO VIVO (SOM AMBIENTE): SANTA FÉ X OLIMPIA | LIBERTADORES FEMININA 2026 | DISPUTA DE 3º LUGAR",
+  "published": "2026-10-30T18:15:26+00:00",
+  "start": "2026-10-31T19:45:00+00:00"
+ },
+ {
+  "id": "agenda:corinthians-x-cruzeiro:2026-10-31",
+  "source": "agenda",
+  "home": "CORINTHIANS",
+  "away": "CRUZEIRO",
+  "start": "2026-10-31T23:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=05X5KpN45Q4"
  },
  {
   "id": "agenda:getafe-x-sevilla:2026-11-01",
