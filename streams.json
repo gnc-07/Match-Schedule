@@ -12,46 +12,6 @@
   "start": null
  },
  {
-  "id": "agenda:psg-x-lyon:2026-10-26",
-  "source": "agenda",
-  "home": "PSG",
-  "away": "LYON",
-  "start": "2026-10-26T18:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=WHYTOnqWFgE"
- },
- {
-  "id": "agenda:dendele-x-capim:2026-10-26",
-  "source": "agenda",
-  "home": "DENDELE",
-  "away": "CAPIM",
-  "start": "2026-10-26T18:38:00+00:00",
-  "url": "https://www.youtube.com/watch?v=dpkwMjudZME"
- },
- {
-  "id": "agenda:dibrados-fc-x-podpah-funkbol-clube:2026-10-26",
-  "source": "agenda",
-  "home": "DIBRADOS FC",
-  "away": "PODPAH FUNKBOL CLUBE",
-  "start": "2026-10-26T18:38:00+00:00",
-  "url": "https://www.youtube.com/watch?v=dpkwMjudZME"
- },
- {
-  "id": "agenda:sevilla-x-osasuna:2026-10-26",
-  "source": "agenda",
-  "home": "SEVILLA",
-  "away": "OSASUNA",
-  "start": "2026-10-26T19:20:00+00:00",
-  "url": "https://www.youtube.com/watch?v=Q1ccB92YYFA"
- },
- {
-  "id": "agenda:paris-saint-germain-x-lyon:2026-10-26",
-  "source": "agenda",
-  "home": "PARIS SAINT-GERMAIN",
-  "away": "LYON",
-  "start": "2026-10-26T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=WHYTOnqWFgE"
- },
- {
   "id": "mraN4lL8IVw",
   "title": "AO VIVO: TUDO SOBRE VASCO X FLAMENGO E A BRIGA CONTRA O REBAIXAMENTO | GERAL CAZÉTV",
   "published": "2026-10-17T12:00:02+00:00",
@@ -134,12 +94,34 @@
   "url": "https://www.youtube.com/watch?v=EOdp6r7RNbo"
  },
  {
+  "id": "agenda:nice-x-rennes:2026-10-30",
+  "source": "agenda",
+  "home": "NICE",
+  "away": "RENNES",
+  "start": "2026-10-30T18:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=NLMUqrUSR1s"
+ },
+ {
   "id": "agenda:lille-x-lens:2026-10-30",
   "source": "agenda",
   "home": "LILLE",
   "away": "LENS",
-  "start": "2026-10-30T20:00:00+00:00",
+  "start": "2026-10-30T19:35:00+00:00",
   "url": "https://www.youtube.com/watch?v=7ZmD6rGAia0"
+ },
+ {
+  "id": "agenda:kane-estreia-como-bola-de-ouro-e-tem-chelsea-x-manchester-united:2026-10-30",
+  "source": "agenda",
+  "home": "KANE ESTREIA COMO BOLA DE OURO E TEM CHELSEA",
+  "away": "MANCHESTER UNITED",
+  "start": "2026-10-30T22:05:00+00:00",
+  "url": "https://www.youtube.com/watch?v=acoE8Y9dYGw"
+ },
+ {
+  "id": "acoE8Y9dYGw",
+  "title": "AO VIVO: KANE ESTREIA COMO BOLA DE OURO E TEM CHELSEA X MANCHESTER UNITED | QUEM FEZ, FEZ",
+  "published": "2026-10-29T20:50:39+00:00",
+  "start": "2026-10-30T22:05:00+00:00"
  },
  {
   "id": "agenda:chelsea-x-manchester-united:2026-10-31",
@@ -186,8 +168,16 @@
   "source": "agenda",
   "home": "BARCELONA",
   "away": "ALAVÉS",
-  "start": "2026-10-31T19:20:00+00:00",
+  "start": "2026-10-31T19:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=D0Hlk9PWweg"
+ },
+ {
+  "id": "agenda:estac-troyes-x-le-mans:2026-10-31",
+  "source": "agenda",
+  "home": "ESTAC TROYES",
+  "away": "LE MANS",
+  "start": "2026-10-31T19:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=s9unUJUeNig"
  },
  {
   "id": "agenda:getafe-x-sevilla:2026-11-01",
@@ -236,6 +226,14 @@
   "away": "REAL SOCIEDAD",
   "start": "2026-11-01T19:20:00+00:00",
   "url": "https://www.youtube.com/watch?v=3lZSp9WbrXY"
+ },
+ {
+  "id": "agenda:fc-lorient-x-stade-brestois:2026-11-02",
+  "source": "agenda",
+  "home": "FC LORIENT",
+  "away": "STADE BRESTOIS",
+  "start": "2026-11-02T19:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=mXOil98FdlU"
  },
  {
   "id": "agenda:athletico-x-vasco:2026-11-04",
