@@ -12,20 +12,6 @@
   "start": null
  },
  {
-  "id": "WW90jZ1Lea0",
-  "title": "AO VIVO: BRASIL X POLÔNIA | COPA DO MUNDO FEMININA SUB-17 2026 | OITAVAS DE FINAL",
-  "published": "2026-10-26T21:00:12+00:00",
-  "start": "2026-10-28T16:14:10+00:00"
- },
- {
-  "id": "agenda:brasil-x-polonia:2026-10-28",
-  "source": "agenda",
-  "home": "BRASIL",
-  "away": "POLÔNIA",
-  "start": "2026-10-28T17:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=WW90jZ1Lea0"
- },
- {
   "id": "agenda:corinthians-x-independiente-santa-fe:2026-10-28",
   "source": "agenda",
   "home": "CORINTHIANS",
@@ -156,6 +142,18 @@
   "away": "CELTA",
   "start": "2026-10-31T15:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=DhJ6tF1a8nw"
+ },
+ {
+  "id": "DhJ6tF1a8nw",
+  "title": "AO VIVO: RAYO VALLECANO X CELTA | LALIGA 26/27 | 11ª RODADA",
+  "published": "2026-10-21T12:02:27+00:00",
+  "start": "2026-10-31T15:00:17+00:00"
+ },
+ {
+  "id": "4uGkDdDQdKQ",
+  "title": "AO VIVO: A NOVA JOIA DO TÊNIS! NANÁ SILVA X ALICE TUBELLO | SEMIFINAL DO WTA DE CURITIBA",
+  "published": "2026-10-27T21:00:10+00:00",
+  "start": "2026-10-31T15:45:09+00:00"
  },
  {
   "id": "agenda:bayern-de-munique-x-borussia-dortmund:2026-10-31",
