@@ -12,22 +12,6 @@
   "start": null
  },
  {
-  "id": "agenda:corinthians-x-independiente-santa-fe:2026-10-28",
-  "source": "agenda",
-  "home": "CORINTHIANS",
-  "away": "INDEPENDIENTE SANTA FE",
-  "start": "2026-10-28T19:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=XK3UOBxPzqE"
- },
- {
-  "id": "agenda:fluminense-x-internacional:2026-10-28",
-  "source": "agenda",
-  "home": "FLUMINENSE",
-  "away": "INTERNACIONAL",
-  "start": "2026-10-28T21:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=t4pf4qZ0c14"
- },
- {
   "id": "agenda:cruzeiro-x-olimpia:2026-10-28",
   "source": "agenda",
   "home": "CRUZEIRO",
@@ -176,8 +160,14 @@
   "source": "agenda",
   "home": "BARCELONA",
   "away": "ALAVÉS",
-  "start": "2026-10-31T19:00:00+00:00",
+  "start": "2026-10-31T19:03:00+00:00",
   "url": "https://www.youtube.com/watch?v=D0Hlk9PWweg"
+ },
+ {
+  "id": "D0Hlk9PWweg",
+  "title": "AO VIVO: BARCELONA X ALAVÉS | LALIGA 26/27 | 11ª RODADA",
+  "published": "2026-10-21T12:03:11+00:00",
+  "start": "2026-10-31T19:03:17+00:00"
  },
  {
   "id": "agenda:estac-troyes-x-le-mans:2026-10-31",
@@ -186,6 +176,12 @@
   "away": "LE MANS",
   "start": "2026-10-31T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=s9unUJUeNig"
+ },
+ {
+  "id": "s9unUJUeNig",
+  "title": "AO VIVO (SOM AMBIENTE): ESTAC TROYES X LE MANS | LIGUE 1 26/27 | 9ª RODADA",
+  "published": "2026-10-23T12:00:35+00:00",
+  "start": "2026-10-31T19:33:20+00:00"
  },
  {
   "id": "agenda:santa-fe-x-olimpia:2026-10-31",
