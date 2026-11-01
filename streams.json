@@ -12,28 +12,6 @@
   "start": null
  },
  {
-  "id": "agenda:china-x-franca:2026-10-29",
-  "source": "agenda",
-  "home": "CHINA",
-  "away": "FRANÇA",
-  "start": "2026-10-29T14:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=GYxIbplDOBY"
- },
- {
-  "id": "agenda:espanha-x-eua:2026-10-29",
-  "source": "agenda",
-  "home": "ESPANHA",
-  "away": "EUA",
-  "start": "2026-10-29T14:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=GYxIbplDOBY"
- },
- {
-  "id": "GYxIbplDOBY",
-  "title": "AO VIVO: ESPANHA X EUA | COPA DO MUNDO FEMININA SUB-17 2026 | OITAVAS DE FINAL",
-  "published": "2026-10-26T21:01:49+00:00",
-  "start": "2026-10-29T14:30:04+00:00"
- },
- {
   "id": "JTf3frtecG8",
   "title": "AO VIVO: TÊNIS | JÁ JÁ TEM NANÁ SILVA X FRANCESCA JONES | QUARTAS DE FINAL DO WTA DE CURITIBA",
   "published": "2026-10-27T21:00:03+00:00",
@@ -198,6 +176,12 @@
   "url": "https://www.youtube.com/watch?v=05X5KpN45Q4"
  },
  {
+  "id": "lNaGUJ6WMSE",
+  "title": "AO VIVO: TÊNIS DE MESA | TRULS MOREGÅRD X PATRICK FRANZISKA | SEMIFINAL DO WTT CHAMPIONS MONTPELLIER",
+  "published": "2026-11-01T15:21:37+00:00",
+  "start": "2026-11-01T09:29:57+00:00"
+ },
+ {
   "id": "agenda:getafe-x-sevilla:2026-11-01",
   "source": "agenda",
   "home": "GETAFE",
@@ -228,6 +212,18 @@
   "url": "https://www.youtube.com/watch?v=je2yc78QepQ"
  },
  {
+  "id": "je2yc78QepQ",
+  "title": "AO VIVO: ELCHE X VALENCIA | LALIGA 26/27 | 11ª RODADA",
+  "published": "2026-10-22T12:00:13+00:00",
+  "start": "2026-11-01T14:15:07+00:00"
+ },
+ {
+  "id": "1yANhOos7HI",
+  "title": "AO VIVO: BRASIL X CHINA | COPA DO MUNDO FEMININA SUB-17 2026 | QUARTAS DE FINAL",
+  "published": "2026-10-29T21:00:11+00:00",
+  "start": "2026-11-01T14:29:46+00:00"
+ },
+ {
   "id": "agenda:coreia-do-norte-x-estados-unidos:2026-11-01",
   "source": "agenda",
   "home": "COREIA DO NORTE",
@@ -236,12 +232,26 @@
   "url": "https://www.youtube.com/watch?v=1yANhOos7HI"
  },
  {
+  "id": "agenda:brasil-x-china:2026-11-01",
+  "source": "agenda",
+  "home": "BRASIL",
+  "away": "CHINA",
+  "start": "2026-11-01T14:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=1yANhOos7HI"
+ },
+ {
   "id": "agenda:paris-fc-x-monaco:2026-11-01",
   "source": "agenda",
   "home": "PARIS FC",
   "away": "MÔNACO",
-  "start": "2026-11-01T15:35:00+00:00",
+  "start": "2026-11-01T15:45:00+00:00",
   "url": "https://www.youtube.com/watch?v=9ldtfxoJt0g"
+ },
+ {
+  "id": "9ldtfxoJt0g",
+  "title": "AO VIVO: PARIS FC X MÔNACO | LIGUE 1 26/27 | 9ª RODADA",
+  "published": "2026-10-22T12:00:20+00:00",
+  "start": "2026-11-01T15:45:01+00:00"
  },
  {
   "id": "agenda:elche-x-valencia:2026-11-01",
@@ -250,14 +260,6 @@
   "away": "VALENCIA",
   "start": "2026-11-01T16:50:00+00:00",
   "url": "https://www.youtube.com/watch?v=VuohoSdhF1E"
- },
- {
-  "id": "agenda:brasil-x-china:2026-11-01",
-  "source": "agenda",
-  "home": "BRASIL",
-  "away": "CHINA",
-  "start": "2026-11-01T17:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=7f1Z_vPtnic"
  },
  {
   "id": "agenda:juventus-x-napoli:2026-11-01",
