@@ -12,14 +12,6 @@
   "start": null
  },
  {
-  "id": "agenda:cruzeiro-x-olimpia:2026-10-28",
-  "source": "agenda",
-  "home": "CRUZEIRO",
-  "away": "OLIMPIA",
-  "start": "2026-10-28T23:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=mMA7t4TyKU8"
- },
- {
   "id": "agenda:china-x-franca:2026-10-29",
   "source": "agenda",
   "home": "CHINA",
@@ -214,6 +206,12 @@
   "url": "https://www.youtube.com/watch?v=hSwG8U4eZcY"
  },
  {
+  "id": "hSwG8U4eZcY",
+  "title": "AO VIVO: GETAFE X SEVILLA | LALIGA 26/27 | 11ª RODADA",
+  "published": "2026-10-22T12:00:02+00:00",
+  "start": "2026-11-01T12:30:15+00:00"
+ },
+ {
   "id": "agenda:strasbourg-x-auxerre:2026-11-01",
   "source": "agenda",
   "home": "STRASBOURG",
@@ -230,6 +228,14 @@
   "url": "https://www.youtube.com/watch?v=je2yc78QepQ"
  },
  {
+  "id": "agenda:coreia-do-norte-x-estados-unidos:2026-11-01",
+  "source": "agenda",
+  "home": "COREIA DO NORTE",
+  "away": "ESTADOS UNIDOS",
+  "start": "2026-11-01T14:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=1yANhOos7HI"
+ },
+ {
   "id": "agenda:paris-fc-x-monaco:2026-11-01",
   "source": "agenda",
   "home": "PARIS FC",
@@ -244,6 +250,14 @@
   "away": "VALENCIA",
   "start": "2026-11-01T16:50:00+00:00",
   "url": "https://www.youtube.com/watch?v=VuohoSdhF1E"
+ },
+ {
+  "id": "agenda:brasil-x-china:2026-11-01",
+  "source": "agenda",
+  "home": "BRASIL",
+  "away": "CHINA",
+  "start": "2026-11-01T17:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=7f1Z_vPtnic"
  },
  {
   "id": "agenda:juventus-x-napoli:2026-11-01",
