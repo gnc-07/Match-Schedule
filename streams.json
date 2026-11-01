@@ -213,7 +213,7 @@
  },
  {
   "id": "je2yc78QepQ",
-  "title": "AO VIVO: ELCHE X VALENCIA | LALIGA 26/27 | 11ª RODADA",
+  "title": "AO VIVO: RACING CLUB X REAL MADRID | LALIGA 26/27 | 11ª RODADA",
   "published": "2026-10-22T12:00:13+00:00",
   "start": "2026-11-01T14:15:07+00:00"
  },
@@ -274,8 +274,14 @@
   "source": "agenda",
   "home": "ATHLETIC BILBAO",
   "away": "REAL SOCIEDAD",
-  "start": "2026-11-01T19:20:00+00:00",
+  "start": "2026-11-01T19:45:00+00:00",
   "url": "https://www.youtube.com/watch?v=3lZSp9WbrXY"
+ },
+ {
+  "id": "3lZSp9WbrXY",
+  "title": "AO VIVO: ATHLETIC BILBAO X REAL SOCIEDAD | LALIGA 26/27 | 11ª RODADA",
+  "published": "2026-10-22T12:00:55+00:00",
+  "start": "2026-11-01T19:45:03+00:00"
  },
  {
   "id": "agenda:fc-lorient-x-stade-brestois:2026-11-02",
