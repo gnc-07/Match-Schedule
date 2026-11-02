@@ -12,12 +12,6 @@
   "start": null
  },
  {
-  "id": "JTf3frtecG8",
-  "title": "AO VIVO: TÊNIS | JÁ JÁ TEM NANÁ SILVA X FRANCESCA JONES | QUARTAS DE FINAL DO WTA DE CURITIBA",
-  "published": "2026-10-27T21:00:03+00:00",
-  "start": "2026-10-30T15:46:32+00:00"
- },
- {
   "id": "EOdp6r7RNbo",
   "title": "AO VIVO: LE HAVRE X PARIS SAINT-GERMAIN | LIGUE 1 26/27 | 9ª RODADA",
   "published": "2026-10-20T12:00:03+00:00",
@@ -290,6 +284,14 @@
   "away": "STADE BRESTOIS",
   "start": "2026-11-02T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=mXOil98FdlU"
+ },
+ {
+  "id": "agenda:fluxo-x-podpah:2026-11-02",
+  "source": "agenda",
+  "home": "FLUXO",
+  "away": "PODPAH",
+  "start": "2026-11-02T19:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=0EqZef2S9ws"
  },
  {
   "id": "agenda:athletico-x-vasco:2026-11-04",
