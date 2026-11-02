@@ -12,50 +12,6 @@
   "start": null
  },
  {
-  "id": "EOdp6r7RNbo",
-  "title": "AO VIVO: LE HAVRE X PARIS SAINT-GERMAIN | LIGUE 1 26/27 | 9ª RODADA",
-  "published": "2026-10-20T12:00:03+00:00",
-  "start": "2026-10-30T16:00:00+00:00"
- },
- {
-  "id": "agenda:le-havre-x-paris-saint-germain:2026-10-30",
-  "source": "agenda",
-  "home": "LE HAVRE",
-  "away": "PARIS SAINT-GERMAIN",
-  "start": "2026-10-30T17:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=EOdp6r7RNbo"
- },
- {
-  "id": "agenda:kane-estreia-como-bola-de-ouro-e-tem-chelsea-x-manchester-united:2026-10-30",
-  "source": "agenda",
-  "home": "KANE ESTREIA COMO BOLA DE OURO E TEM CHELSEA",
-  "away": "MANCHESTER UNITED",
-  "start": "2026-10-30T17:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=EOdp6r7RNbo"
- },
- {
-  "id": "NLMUqrUSR1s",
-  "title": "AO VIVO (SOM AMBIENTE): NICE X RENNES | LIGUE 1 26/27 | 9ª RODADA",
-  "published": "2026-10-23T12:00:03+00:00",
-  "start": "2026-10-30T17:46:19+00:00"
- },
- {
-  "id": "agenda:nice-x-rennes:2026-10-30",
-  "source": "agenda",
-  "home": "NICE",
-  "away": "RENNES",
-  "start": "2026-10-30T18:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=NLMUqrUSR1s"
- },
- {
-  "id": "agenda:lille-x-lens:2026-10-30",
-  "source": "agenda",
-  "home": "LILLE",
-  "away": "LENS",
-  "start": "2026-10-30T19:35:00+00:00",
-  "url": "https://www.youtube.com/watch?v=7ZmD6rGAia0"
- },
- {
   "id": "acoE8Y9dYGw",
   "title": "AO VIVO: KANE ESTREIA COMO BOLA DE OURO E TEM CHELSEA X MANCHESTER UNITED | QUEM FEZ, FEZ",
   "published": "2026-10-29T20:50:39+00:00",
@@ -278,6 +234,12 @@
   "start": "2026-11-01T19:45:03+00:00"
  },
  {
+  "id": "0EqZef2S9ws",
+  "title": "AO VIVO: LOUD SC X FURIA FC | KINGS LEAGUE BRAZIL | 3ª RODADA",
+  "published": "2026-10-23T12:00:03+00:00",
+  "start": "2026-11-02T18:39:44+00:00"
+ },
+ {
   "id": "agenda:fc-lorient-x-stade-brestois:2026-11-02",
   "source": "agenda",
   "home": "FC LORIENT",
@@ -292,6 +254,28 @@
   "away": "PODPAH",
   "start": "2026-11-02T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=0EqZef2S9ws"
+ },
+ {
+  "id": "agenda:loud-sc-x-furia-fc:2026-11-02",
+  "source": "agenda",
+  "home": "LOUD SC",
+  "away": "FURIA FC",
+  "start": "2026-11-02T19:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=0EqZef2S9ws"
+ },
+ {
+  "id": "u3vq7cKfPRo",
+  "title": "AO VIVO: A CORUÑA X OSASUNA | LALIGA 26/27 | 11ª RODADA",
+  "published": "2026-10-23T12:00:09+00:00",
+  "start": "2026-11-02T19:44:58+00:00"
+ },
+ {
+  "id": "agenda:a-coruna-x-osasuna:2026-11-02",
+  "source": "agenda",
+  "home": "A CORUÑA",
+  "away": "OSASUNA",
+  "start": "2026-11-02T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=u3vq7cKfPRo"
  },
  {
   "id": "agenda:athletico-x-vasco:2026-11-04",
