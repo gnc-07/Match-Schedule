@@ -12,136 +12,6 @@
   "start": null
  },
  {
-  "id": "agenda:estac-troyes-x-le-mans:2026-10-31",
-  "source": "agenda",
-  "home": "ESTAC TROYES",
-  "away": "LE MANS",
-  "start": "2026-10-31T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=s9unUJUeNig"
- },
- {
-  "id": "s9unUJUeNig",
-  "title": "AO VIVO (SOM AMBIENTE): ESTAC TROYES X LE MANS | LIGUE 1 26/27 | 9ª RODADA",
-  "published": "2026-10-23T12:00:35+00:00",
-  "start": "2026-10-31T19:33:20+00:00"
- },
- {
-  "id": "agenda:santa-fe-x-olimpia:2026-10-31",
-  "source": "agenda",
-  "home": "SANTA FÉ",
-  "away": "OLIMPIA",
-  "start": "2026-10-31T19:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=hS0Im9cHhJA"
- },
- {
-  "id": "hS0Im9cHhJA",
-  "title": "AO VIVO (SOM AMBIENTE): SANTA FÉ X OLIMPIA | LIBERTADORES FEMININA 2026 | DISPUTA DE 3º LUGAR",
-  "published": "2026-10-30T18:15:26+00:00",
-  "start": "2026-10-31T19:45:00+00:00"
- },
- {
-  "id": "agenda:corinthians-x-cruzeiro:2026-10-31",
-  "source": "agenda",
-  "home": "CORINTHIANS",
-  "away": "CRUZEIRO",
-  "start": "2026-10-31T23:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=05X5KpN45Q4"
- },
- {
-  "id": "lNaGUJ6WMSE",
-  "title": "AO VIVO: TÊNIS DE MESA | TRULS MOREGÅRD X PATRICK FRANZISKA | SEMIFINAL DO WTT CHAMPIONS MONTPELLIER",
-  "published": "2026-11-01T15:21:37+00:00",
-  "start": "2026-11-01T09:29:57+00:00"
- },
- {
-  "id": "agenda:getafe-x-sevilla:2026-11-01",
-  "source": "agenda",
-  "home": "GETAFE",
-  "away": "SEVILLA",
-  "start": "2026-11-01T12:20:00+00:00",
-  "url": "https://www.youtube.com/watch?v=hSwG8U4eZcY"
- },
- {
-  "id": "hSwG8U4eZcY",
-  "title": "AO VIVO: GETAFE X SEVILLA | LALIGA 26/27 | 11ª RODADA",
-  "published": "2026-10-22T12:00:02+00:00",
-  "start": "2026-11-01T12:30:15+00:00"
- },
- {
-  "id": "agenda:strasbourg-x-auxerre:2026-11-01",
-  "source": "agenda",
-  "home": "STRASBOURG",
-  "away": "AUXERRE",
-  "start": "2026-11-01T13:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=UnAB6DFV63I"
- },
- {
-  "id": "agenda:racing-club-x-real-madrid:2026-11-01",
-  "source": "agenda",
-  "home": "RACING CLUB",
-  "away": "REAL MADRID",
-  "start": "2026-11-01T14:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=je2yc78QepQ"
- },
- {
-  "id": "je2yc78QepQ",
-  "title": "AO VIVO: RACING CLUB X REAL MADRID | LALIGA 26/27 | 11ª RODADA",
-  "published": "2026-10-22T12:00:13+00:00",
-  "start": "2026-11-01T14:15:07+00:00"
- },
- {
-  "id": "1yANhOos7HI",
-  "title": "AO VIVO: BRASIL X CHINA | COPA DO MUNDO FEMININA SUB-17 2026 | QUARTAS DE FINAL",
-  "published": "2026-10-29T21:00:11+00:00",
-  "start": "2026-11-01T14:29:46+00:00"
- },
- {
-  "id": "agenda:coreia-do-norte-x-estados-unidos:2026-11-01",
-  "source": "agenda",
-  "home": "COREIA DO NORTE",
-  "away": "ESTADOS UNIDOS",
-  "start": "2026-11-01T14:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=1yANhOos7HI"
- },
- {
-  "id": "agenda:brasil-x-china:2026-11-01",
-  "source": "agenda",
-  "home": "BRASIL",
-  "away": "CHINA",
-  "start": "2026-11-01T14:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=1yANhOos7HI"
- },
- {
-  "id": "agenda:paris-fc-x-monaco:2026-11-01",
-  "source": "agenda",
-  "home": "PARIS FC",
-  "away": "MÔNACO",
-  "start": "2026-11-01T15:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=9ldtfxoJt0g"
- },
- {
-  "id": "9ldtfxoJt0g",
-  "title": "AO VIVO: PARIS FC X MÔNACO | LIGUE 1 26/27 | 9ª RODADA",
-  "published": "2026-10-22T12:00:20+00:00",
-  "start": "2026-11-01T15:45:01+00:00"
- },
- {
-  "id": "agenda:elche-x-valencia:2026-11-01",
-  "source": "agenda",
-  "home": "ELCHE",
-  "away": "VALENCIA",
-  "start": "2026-11-01T16:50:00+00:00",
-  "url": "https://www.youtube.com/watch?v=VuohoSdhF1E"
- },
- {
-  "id": "agenda:juventus-x-napoli:2026-11-01",
-  "source": "agenda",
-  "home": "JUVENTUS",
-  "away": "NAPOLI",
-  "start": "2026-11-01T19:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=2B1y2LfMTPE"
- },
- {
   "id": "agenda:athletic-bilbao-x-real-sociedad:2026-11-01",
   "source": "agenda",
   "home": "ATHLETIC BILBAO",
@@ -198,6 +68,20 @@
   "away": "OSASUNA",
   "start": "2026-11-02T19:45:00+00:00",
   "url": "https://www.youtube.com/watch?v=u3vq7cKfPRo"
+ },
+ {
+  "id": "agenda:brasil-x-nigeria:2026-11-04",
+  "source": "agenda",
+  "home": "BRASIL",
+  "away": "NIGÉRIA",
+  "start": "2026-11-04T14:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=fWLkEXEq4rA"
+ },
+ {
+  "id": "fWLkEXEq4rA",
+  "title": "AO VIVO: BRASIL X NIGÉRIA | COPA DO MUNDO FEMININA SUB-17 2026 | SEMIFINAL",
+  "published": "2026-11-03T12:00:03+00:00",
+  "start": "2026-11-04T14:30:12+00:00"
  },
  {
   "id": "agenda:rennes-x-olympiakos:2026-11-04",
@@ -262,6 +146,38 @@
   "url": "https://www.youtube.com/watch?v=U5xo3pSswp4"
  },
  {
+  "id": "agenda:milan-x-ferencvarosi:2026-11-05",
+  "source": "agenda",
+  "home": "MILAN",
+  "away": "FERENCVÁROSI",
+  "start": "2026-11-05T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=g4kwhQFCqrg"
+ },
+ {
+  "id": "agenda:real-sociedad-x-lyon:2026-11-05",
+  "source": "agenda",
+  "home": "REAL SOCIEDAD",
+  "away": "LYON",
+  "start": "2026-11-05T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=W6qm_V5YlDM"
+ },
+ {
+  "id": "agenda:crystal-palace-x-hoffenheim:2026-11-05",
+  "source": "agenda",
+  "home": "CRYSTAL PALACE",
+  "away": "HOFFENHEIM",
+  "start": "2026-11-05T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=1FtOfto6N3Y"
+ },
+ {
+  "id": "agenda:sparta-praha-x-bournemouth:2026-11-05",
+  "source": "agenda",
+  "home": "SPARTA PRAHA",
+  "away": "BOURNEMOUTH",
+  "start": "2026-11-05T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=H3xdEZCWG68"
+ },
+ {
   "id": "agenda:copenhagen-x-iberia:2026-11-05",
   "source": "agenda",
   "home": "COPENHAGEN",
@@ -300,5 +216,69 @@
   "away": "BEŞIKTAŞ",
   "start": "2026-11-05T19:45:00+00:00",
   "url": "https://www.youtube.com/watch?v=BvzKAxrzksU"
+ },
+ {
+  "id": "agenda:monaco-x-nordsjaelland:2026-11-05",
+  "source": "agenda",
+  "home": "MÔNACO",
+  "away": "NORDSJAELLAND",
+  "start": "2026-11-05T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=M4yvLMNE5L4"
+ },
+ {
+  "id": "agenda:az-alkmaar-zaanstreek-x-juventus:2026-11-05",
+  "source": "agenda",
+  "home": "AZ - ALKMAAR ZAANSTREEK",
+  "away": "JUVENTUS",
+  "start": "2026-11-05T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=1HjIq25MBqg"
+ },
+ {
+  "id": "agenda:benfica-x-lech-poznan:2026-11-05",
+  "source": "agenda",
+  "home": "BENFICA",
+  "away": "LECH POZNAŃ",
+  "start": "2026-11-05T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=RJN-QfmiKnc"
+ },
+ {
+  "id": "agenda:toulouse-x-strasbourg:2026-11-06",
+  "source": "agenda",
+  "home": "TOULOUSE",
+  "away": "STRASBOURG",
+  "start": "2026-11-06T19:05:00+00:00",
+  "url": "https://www.youtube.com/watch?v=zXANPBOgg6E"
+ },
+ {
+  "id": "agenda:auxerre-x-paris-fc:2026-11-07",
+  "source": "agenda",
+  "home": "AUXERRE",
+  "away": "PARIS FC",
+  "start": "2026-11-07T15:35:00+00:00",
+  "url": "https://www.youtube.com/watch?v=Yqe-YA61QrA"
+ },
+ {
+  "id": "agenda:le-mans-x-monaco:2026-11-08",
+  "source": "agenda",
+  "home": "LE MANS",
+  "away": "MÔNACO",
+  "start": "2026-11-08T15:35:00+00:00",
+  "url": "https://www.youtube.com/watch?v=2WEUufnlntw"
+ },
+ {
+  "id": "agenda:lens-x-olympique-marseille:2026-11-08",
+  "source": "agenda",
+  "home": "LENS",
+  "away": "OLYMPIQUE MARSEILLE",
+  "start": "2026-11-08T19:05:00+00:00",
+  "url": "https://www.youtube.com/watch?v=M6zzug9n3B0"
+ },
+ {
+  "id": "agenda:atletico-de-madrid-x-barcelona:2026-11-08",
+  "source": "agenda",
+  "home": "ATLÉTICO DE MADRID",
+  "away": "BARCELONA",
+  "start": "2026-11-08T19:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=3_bkj6_3Jvc"
  }
 ]
