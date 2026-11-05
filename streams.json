@@ -1,59 +1,9 @@
 [
  {
-  "id": "qtUD9j9Mfd8",
-  "title": "AO VIVO: MÔNACO X LILLE | LIGUE 1 26/27 | 8ª RODADA",
-  "published": "2026-10-15T12:01:57+00:00",
-  "start": null
- },
- {
   "id": "dpkwMjudZME",
   "title": "AO VIVO: DIBRADOS FC X PODPAH FUNKBOL CLUBE | KINGS LEAGUE BRAZIL | 2ª RODADA",
   "published": "2026-10-16T12:00:09+00:00",
   "start": null
- },
- {
-  "id": "0EqZef2S9ws",
-  "title": "AO VIVO: LOUD SC X FURIA FC | KINGS LEAGUE BRAZIL | 3ª RODADA",
-  "published": "2026-10-23T12:00:03+00:00",
-  "start": "2026-11-02T18:39:44+00:00"
- },
- {
-  "id": "agenda:fc-lorient-x-stade-brestois:2026-11-02",
-  "source": "agenda",
-  "home": "FC LORIENT",
-  "away": "STADE BRESTOIS",
-  "start": "2026-11-02T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=mXOil98FdlU"
- },
- {
-  "id": "agenda:fluxo-x-podpah:2026-11-02",
-  "source": "agenda",
-  "home": "FLUXO",
-  "away": "PODPAH",
-  "start": "2026-11-02T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=0EqZef2S9ws"
- },
- {
-  "id": "agenda:loud-sc-x-furia-fc:2026-11-02",
-  "source": "agenda",
-  "home": "LOUD SC",
-  "away": "FURIA FC",
-  "start": "2026-11-02T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=0EqZef2S9ws"
- },
- {
-  "id": "u3vq7cKfPRo",
-  "title": "AO VIVO: A CORUÑA X OSASUNA | LALIGA 26/27 | 11ª RODADA",
-  "published": "2026-10-23T12:00:09+00:00",
-  "start": "2026-11-02T19:44:58+00:00"
- },
- {
-  "id": "agenda:a-coruna-x-osasuna:2026-11-02",
-  "source": "agenda",
-  "home": "A CORUÑA",
-  "away": "OSASUNA",
-  "start": "2026-11-02T19:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=u3vq7cKfPRo"
  },
  {
   "id": "agenda:brasil-x-nigeria:2026-11-04",
@@ -90,6 +40,24 @@
   "away": "VASCO",
   "start": "2026-11-04T21:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=cOjixSohLkY"
+ },
+ {
+  "id": "U5xo3pSswp4",
+  "title": "AO VIVO (SOM AMBIENTE): AGF FODBOLD X BRAGA | CONFERENCE LEAGUE 26/27 | RODADA",
+  "published": "2026-11-05T19:47:31+00:00",
+  "start": "2026-11-05T17:28:42+00:00"
+ },
+ {
+  "id": "GqdycOiqL7U",
+  "title": "AO VIVO (SOM AMBIENTE): ATALANTA X KAIRAT | CONFERENCE LEAGUE 26/27 | 3ª RODADA",
+  "published": "2026-11-05T19:48:36+00:00",
+  "start": "2026-11-05T17:28:52+00:00"
+ },
+ {
+  "id": "W6qm_V5YlDM",
+  "title": "AO VIVO (SOM AMBIENTE): REAL SOCIEDAD X LYON | EUROPA LEAGUE 26/27 | 4ª RODADA",
+  "published": "2026-11-05T19:47:30+00:00",
+  "start": "2026-11-05T17:29:48+00:00"
  },
  {
   "id": "agenda:midtjylland-x-ajax:2026-11-05",
@@ -164,6 +132,24 @@
   "url": "https://www.youtube.com/watch?v=H3xdEZCWG68"
  },
  {
+  "id": "uV1_2DTfePw",
+  "title": "AO VIVO (SOM AMBIENTE): TRABZONSPOR X FREIBURG | CONFERENCE LEAGUE 26/27 | RODADA",
+  "published": "2026-11-05T19:43:21+00:00",
+  "start": "2026-11-05T17:30:10+00:00"
+ },
+ {
+  "id": "xg_ji_foRDU",
+  "title": "AO VIVO (SOM AMBIENTE): MIDTJYLLAND X AJAX | CONFERENCE LEAGUE 26/27 | RODADA",
+  "published": "2026-10-28T12:00:25+00:00",
+  "start": "2026-11-05T17:30:12+00:00"
+ },
+ {
+  "id": "qtYa-Zr8ncI",
+  "title": "AO VIVO (SOM AMBIENTE): PANATHINAIKOS X CSKA SOFIA | CONFERENCE LEAGUE 26/27 | RODADA",
+  "published": "2026-10-28T12:03:35+00:00",
+  "start": "2026-11-05T19:44:45+00:00"
+ },
+ {
   "id": "agenda:copenhagen-x-iberia:2026-11-05",
   "source": "agenda",
   "home": "COPENHAGEN",
@@ -228,12 +214,112 @@
   "url": "https://www.youtube.com/watch?v=RJN-QfmiKnc"
  },
  {
+  "id": "agenda:celta-x-union-saint-gilloise:2026-11-05",
+  "source": "agenda",
+  "home": "CELTA",
+  "away": "UNION SAINT-GILLOISE",
+  "start": "2026-11-05T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=N5pm4-yv6pA"
+ },
+ {
+  "id": "2AWoK6lGZsc",
+  "title": "AO VIVO (SOM AMBIENTE): GETAFE X BRIGHTON | CONFERENCE LEAGUE 26/27 | RODADA",
+  "published": "2026-10-28T12:02:33+00:00",
+  "start": "2026-11-05T19:45:07+00:00"
+ },
+ {
+  "id": "jDtB-bds6Oo",
+  "title": "AO VIVO (SOM AMBIENTE): COPENHAGEN X IBERIA | CONFERENCE LEAGUE 26/27 | RODADA",
+  "published": "2026-10-28T12:03:53+00:00",
+  "start": "2026-11-05T19:45:19+00:00"
+ },
+ {
+  "id": "RJN-QfmiKnc",
+  "title": "AO VIVO: BENFICA X LECH POZNAŃ | EUROPA LEAGUE 26/27 | 4ª RODADA",
+  "published": "2026-10-26T12:01:30+00:00",
+  "start": "2026-11-05T19:45:30+00:00"
+ },
+ {
+  "id": "BvzKAxrzksU",
+  "title": "AO VIVO (SOM AMBIENTE): CELTIC X BEŞIKTAŞ | EUROPA LEAGUE 26/27 | RODADA",
+  "published": "2026-10-27T12:00:16+00:00",
+  "start": "2026-11-05T19:45:46+00:00"
+ },
+ {
+  "id": "Um6L1X6_6-4",
+  "title": "AO VIVO (SOM AMBIENTE): SUNDERLAND X DINAMO ZAGREB | EUROPA LEAGUE 26/27 | RODADA",
+  "published": "2026-10-28T12:03:16+00:00",
+  "start": "2026-11-05T19:47:04+00:00"
+ },
+ {
+  "id": "N5pm4-yv6pA",
+  "title": "AO VIVO (SOM AMBIENTE): CELTA X UNION SAINT-GILLOISE | EUROPA LEAGUE 26/27 | RODADA",
+  "published": "2026-10-28T12:02:49+00:00",
+  "start": "2026-11-05T19:47:30+00:00"
+ },
+ {
+  "id": "agenda:hamburgo-x-borussia-monchengladbach:2026-11-06",
+  "source": "agenda",
+  "home": "HAMBURGO",
+  "away": "BORUSSIA MÖNCHENGLADBACH",
+  "start": "2026-11-06T19:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=BjjULPnw0bE"
+ },
+ {
   "id": "agenda:toulouse-x-strasbourg:2026-11-06",
   "source": "agenda",
   "home": "TOULOUSE",
   "away": "STRASBOURG",
   "start": "2026-11-06T19:05:00+00:00",
   "url": "https://www.youtube.com/watch?v=zXANPBOgg6E"
+ },
+ {
+  "id": "agenda:sevilla-x-deportivo-alaves:2026-11-06",
+  "source": "agenda",
+  "home": "SEVILLA",
+  "away": "DEPORTIVO ALAVÉS",
+  "start": "2026-11-06T19:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=vYBNP0t23_Y"
+ },
+ {
+  "id": "agenda:espanha-x-portugal:2026-11-06",
+  "source": "agenda",
+  "home": "ESPANHA",
+  "away": "PORTUGAL",
+  "start": "2026-11-06T21:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=v55Vhlq4h0g"
+ },
+ {
+  "id": "agenda:brasil-x-argentina:2026-11-06",
+  "source": "agenda",
+  "home": "BRASIL",
+  "away": "ARGENTINA",
+  "start": "2026-11-06T23:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=YzAxT5BxZlk"
+ },
+ {
+  "id": "agenda:malaga-x-racing-club:2026-11-07",
+  "source": "agenda",
+  "home": "MÁLAGA",
+  "away": "RACING CLUB",
+  "start": "2026-11-07T12:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=mW8ByBGepuQ"
+ },
+ {
+  "id": "agenda:borussia-dortmund-x-elversberg:2026-11-07",
+  "source": "agenda",
+  "home": "BORUSSIA DORTMUND",
+  "away": "ELVERSBERG",
+  "start": "2026-11-07T14:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=hSapSeuNkwo"
+ },
+ {
+  "id": "agenda:espanyol-x-a-coruna:2026-11-07",
+  "source": "agenda",
+  "home": "ESPANYOL",
+  "away": "A CORUÑA",
+  "start": "2026-11-07T14:35:00+00:00",
+  "url": "https://www.youtube.com/watch?v=Tzthj2C5crc"
  },
  {
   "id": "agenda:auxerre-x-paris-fc:2026-11-07",
@@ -244,12 +330,68 @@
   "url": "https://www.youtube.com/watch?v=Yqe-YA61QrA"
  },
  {
+  "id": "agenda:osasuna-x-athletic-club-bilbao:2026-11-07",
+  "source": "agenda",
+  "home": "OSASUNA",
+  "away": "ATHLETIC CLUB BILBAO",
+  "start": "2026-11-07T16:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=NFA_3Pn_U6U"
+ },
+ {
+  "id": "agenda:paris-saint-germain-x-troyes:2026-11-07",
+  "source": "agenda",
+  "home": "PARIS SAINT-GERMAIN",
+  "away": "TROYES",
+  "start": "2026-11-07T19:05:00+00:00",
+  "url": "https://www.youtube.com/watch?v=JbadYNseXFM"
+ },
+ {
+  "id": "agenda:valencia-x-real-madrid:2026-11-07",
+  "source": "agenda",
+  "home": "VALENCIA",
+  "away": "REAL MADRID",
+  "start": "2026-11-07T19:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=RGy_kZnNCWs"
+ },
+ {
+  "id": "agenda:crystal-palace-x-liverpool:2026-11-08",
+  "source": "agenda",
+  "home": "CRYSTAL PALACE",
+  "away": "LIVERPOOL",
+  "start": "2026-11-08T13:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=NeLF6KywUxo"
+ },
+ {
+  "id": "agenda:real-sociedad-x-rayo-vallecano:2026-11-08",
+  "source": "agenda",
+  "home": "REAL SOCIEDAD",
+  "away": "RAYO VALLECANO",
+  "start": "2026-11-08T14:35:00+00:00",
+  "url": "https://www.youtube.com/watch?v=d2mZDPi18N4"
+ },
+ {
   "id": "agenda:le-mans-x-monaco:2026-11-08",
   "source": "agenda",
   "home": "LE MANS",
   "away": "MÔNACO",
   "start": "2026-11-08T15:35:00+00:00",
   "url": "https://www.youtube.com/watch?v=2WEUufnlntw"
+ },
+ {
+  "id": "agenda:internazionale-x-como:2026-11-08",
+  "source": "agenda",
+  "home": "INTERNAZIONALE",
+  "away": "COMO",
+  "start": "2026-11-08T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=Y2Qu7-tee0A"
+ },
+ {
+  "id": "agenda:celta-x-levante:2026-11-08",
+  "source": "agenda",
+  "home": "CELTA",
+  "away": "LEVANTE",
+  "start": "2026-11-08T16:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=HHvQ1ygYR6U"
  },
  {
   "id": "agenda:lens-x-olympique-marseille:2026-11-08",
@@ -266,5 +408,21 @@
   "away": "BARCELONA",
   "start": "2026-11-08T19:20:00+00:00",
   "url": "https://www.youtube.com/watch?v=3_bkj6_3Jvc"
+ },
+ {
+  "id": "agenda:coritiba-x-santos:2026-11-18",
+  "source": "agenda",
+  "home": "CORITIBA",
+  "away": "SANTOS",
+  "start": "2026-11-18T22:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=9B48Zrg5s18"
+ },
+ {
+  "id": "agenda:fluminense-x-mirassol:2026-11-22",
+  "source": "agenda",
+  "home": "FLUMINENSE",
+  "away": "MIRASSOL",
+  "start": "2026-11-22T21:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=n2KWc_xbPAA"
  }
 ]
