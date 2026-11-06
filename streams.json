@@ -266,11 +266,17 @@
   "url": "https://www.youtube.com/watch?v=BjjULPnw0bE"
  },
  {
+  "id": "zXANPBOgg6E",
+  "title": "AO VIVO: TOULOUSE X STRASBOURG | LIGUE 1 26/27 | 10ª RODADA",
+  "published": "2026-10-27T12:00:27+00:00",
+  "start": "2026-11-06T19:14:58+00:00"
+ },
+ {
   "id": "agenda:toulouse-x-strasbourg:2026-11-06",
   "source": "agenda",
   "home": "TOULOUSE",
   "away": "STRASBOURG",
-  "start": "2026-11-06T19:05:00+00:00",
+  "start": "2026-11-06T19:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=zXANPBOgg6E"
  },
  {
@@ -278,7 +284,7 @@
   "source": "agenda",
   "home": "SEVILLA",
   "away": "DEPORTIVO ALAVÉS",
-  "start": "2026-11-06T19:20:00+00:00",
+  "start": "2026-11-06T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=vYBNP0t23_Y"
  },
  {
@@ -302,6 +308,14 @@
   "title": "AO VIVO: SEMIFINAIS DA COPA DO BRASIL E O CLÁSSICO ATLÉTICO DE MADRID X BARCELONA | QUEM FEZ, FEZ",
   "published": "2026-11-06T18:21:25+00:00",
   "start": "2026-11-07T02:30:00+00:00"
+ },
+ {
+  "id": "agenda:semifinais-da-copa-do-brasil-e-o-classico-atletico-de-madrid-x-barcelona:2026-11-07",
+  "source": "agenda",
+  "home": "SEMIFINAIS DA COPA DO BRASIL E O CLÁSSICO ATLÉTICO DE MADRID",
+  "away": "BARCELONA",
+  "start": "2026-11-07T02:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=wJNMAXRIhVk"
  },
  {
   "id": "agenda:malaga-x-racing-club:2026-11-07",
@@ -390,6 +404,14 @@
   "start": "2026-11-07T19:45:00+00:00"
  },
  {
+  "id": "agenda:rennes-x-lille:2026-11-07",
+  "source": "agenda",
+  "home": "RENNES",
+  "away": "LILLE",
+  "start": "2026-11-07T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=Bsj5UH45_AM"
+ },
+ {
   "id": "agenda:crystal-palace-x-liverpool:2026-11-08",
   "source": "agenda",
   "home": "CRYSTAL PALACE",
@@ -402,7 +424,7 @@
   "source": "agenda",
   "home": "REAL SOCIEDAD",
   "away": "RAYO VALLECANO",
-  "start": "2026-11-08T14:35:00+00:00",
+  "start": "2026-11-08T15:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=d2mZDPi18N4"
  },
  {
@@ -410,7 +432,7 @@
   "source": "agenda",
   "home": "LE MANS",
   "away": "MÔNACO",
-  "start": "2026-11-08T15:35:00+00:00",
+  "start": "2026-11-08T15:50:00+00:00",
   "url": "https://www.youtube.com/watch?v=2WEUufnlntw"
  },
  {
@@ -422,11 +444,27 @@
   "url": "https://www.youtube.com/watch?v=8KPCjExYQNo"
  },
  {
+  "id": "agenda:stade-brestois-x-lyon:2026-11-08",
+  "source": "agenda",
+  "home": "STADE BRESTOIS",
+  "away": "LYON",
+  "start": "2026-11-08T16:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=flEMUJ0H72k"
+ },
+ {
+  "id": "agenda:le-havre-x-fc-lorient:2026-11-08",
+  "source": "agenda",
+  "home": "LE HAVRE",
+  "away": "FC LORIENT",
+  "start": "2026-11-08T16:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=LXFiXmEdR64"
+ },
+ {
   "id": "agenda:internazionale-x-como:2026-11-08",
   "source": "agenda",
   "home": "INTERNAZIONALE",
   "away": "COMO",
-  "start": "2026-11-08T16:30:00+00:00",
+  "start": "2026-11-08T16:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=Y2Qu7-tee0A"
  },
  {
@@ -434,24 +472,24 @@
   "source": "agenda",
   "home": "CELTA",
   "away": "LEVANTE",
-  "start": "2026-11-08T16:50:00+00:00",
+  "start": "2026-11-08T17:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=HHvQ1ygYR6U"
- },
- {
-  "id": "agenda:lens-x-olympique-marseille:2026-11-08",
-  "source": "agenda",
-  "home": "LENS",
-  "away": "OLYMPIQUE MARSEILLE",
-  "start": "2026-11-08T19:05:00+00:00",
-  "url": "https://www.youtube.com/watch?v=M6zzug9n3B0"
  },
  {
   "id": "agenda:atletico-de-madrid-x-barcelona:2026-11-08",
   "source": "agenda",
   "home": "ATLÉTICO DE MADRID",
   "away": "BARCELONA",
-  "start": "2026-11-08T19:20:00+00:00",
+  "start": "2026-11-08T18:45:00+00:00",
   "url": "https://www.youtube.com/watch?v=3_bkj6_3Jvc"
+ },
+ {
+  "id": "agenda:lens-x-olympique-marseille:2026-11-08",
+  "source": "agenda",
+  "home": "LENS",
+  "away": "OLYMPIQUE MARSEILLE",
+  "start": "2026-11-08T19:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=M6zzug9n3B0"
  },
  {
   "id": "agenda:coritiba-x-santos:2026-11-18",
