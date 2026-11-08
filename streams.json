@@ -408,6 +408,12 @@
   "url": "https://www.youtube.com/watch?v=NeLF6KywUxo"
  },
  {
+  "id": "NeLF6KywUxo",
+  "title": "AO VIVO: CRYSTAL PALACE X LIVERPOOL | PREMIER LEAGUE 26/27 | 10ª RODADA",
+  "published": "2026-11-04T21:00:04+00:00",
+  "start": "2026-11-08T13:00:08+00:00"
+ },
+ {
   "id": "agenda:real-sociedad-x-rayo-vallecano:2026-11-08",
   "source": "agenda",
   "home": "REAL SOCIEDAD",
@@ -464,6 +470,14 @@
   "url": "https://www.youtube.com/watch?v=HHvQ1ygYR6U"
  },
  {
+  "id": "agenda:argentina-x-portugal:2026-11-08",
+  "source": "agenda",
+  "home": "ARGENTINA",
+  "away": "PORTUGAL",
+  "start": "2026-11-08T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=__m2KQAtId0"
+ },
+ {
   "id": "agenda:atletico-de-madrid-x-barcelona:2026-11-08",
   "source": "agenda",
   "home": "ATLÉTICO DE MADRID",
@@ -478,6 +492,28 @@
   "away": "OLYMPIQUE MARSEILLE",
   "start": "2026-11-08T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=M6zzug9n3B0"
+ },
+ {
+  "id": "agenda:brasil-x-espanha:2026-11-08",
+  "source": "agenda",
+  "home": "BRASIL",
+  "away": "ESPANHA",
+  "start": "2026-11-08T19:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=UaiedxBKwqA"
+ },
+ {
+  "id": "agenda:copa-do-brasil-define-o-2o-finalista-e-tem-atletico-de-madrid-x-barca:2026-11-08",
+  "source": "agenda",
+  "home": "COPA DO BRASIL DEFINE O 2º FINALISTA E TEM ATLÉTICO DE MADRID",
+  "away": "BARÇA",
+  "start": "2026-11-08T21:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=1oZymalSAno"
+ },
+ {
+  "id": "1oZymalSAno",
+  "title": "AO VIVO: COPA DO BRASIL DEFINE O 2º FINALISTA E TEM ATLÉTICO DE MADRID X BARÇA | SEIS EM UM",
+  "published": "2026-11-08T12:26:27+00:00",
+  "start": "2026-11-08T21:50:00+00:00"
  },
  {
   "id": "agenda:coritiba-x-santos:2026-11-18",
