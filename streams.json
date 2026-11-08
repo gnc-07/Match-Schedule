@@ -1,119 +1,5 @@
 [
  {
-  "id": "qtYa-Zr8ncI",
-  "title": "AO VIVO (SOM AMBIENTE): PANATHINAIKOS X CSKA SOFIA | CONFERENCE LEAGUE 26/27 | RODADA",
-  "published": "2026-10-28T12:03:35+00:00",
-  "start": "2026-11-05T19:44:45+00:00"
- },
- {
-  "id": "agenda:copenhagen-x-iberia:2026-11-05",
-  "source": "agenda",
-  "home": "COPENHAGEN",
-  "away": "IBERIA",
-  "start": "2026-11-05T19:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=jDtB-bds6Oo"
- },
- {
-  "id": "agenda:panathinaikos-x-cska-sofia:2026-11-05",
-  "source": "agenda",
-  "home": "PANATHINAIKOS",
-  "away": "CSKA SOFIA",
-  "start": "2026-11-05T19:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=qtYa-Zr8ncI"
- },
- {
-  "id": "agenda:getafe-x-brighton:2026-11-05",
-  "source": "agenda",
-  "home": "GETAFE",
-  "away": "BRIGHTON",
-  "start": "2026-11-05T19:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=2AWoK6lGZsc"
- },
- {
-  "id": "agenda:sunderland-x-dinamo-zagreb:2026-11-05",
-  "source": "agenda",
-  "home": "SUNDERLAND",
-  "away": "DINAMO ZAGREB",
-  "start": "2026-11-05T19:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=Um6L1X6_6-4"
- },
- {
-  "id": "agenda:celtic-x-besiktas:2026-11-05",
-  "source": "agenda",
-  "home": "CELTIC",
-  "away": "BEŞIKTAŞ",
-  "start": "2026-11-05T19:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=BvzKAxrzksU"
- },
- {
-  "id": "agenda:monaco-x-nordsjaelland:2026-11-05",
-  "source": "agenda",
-  "home": "MÔNACO",
-  "away": "NORDSJAELLAND",
-  "start": "2026-11-05T19:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=M4yvLMNE5L4"
- },
- {
-  "id": "agenda:az-alkmaar-zaanstreek-x-juventus:2026-11-05",
-  "source": "agenda",
-  "home": "AZ - ALKMAAR ZAANSTREEK",
-  "away": "JUVENTUS",
-  "start": "2026-11-05T19:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=1HjIq25MBqg"
- },
- {
-  "id": "agenda:benfica-x-lech-poznan:2026-11-05",
-  "source": "agenda",
-  "home": "BENFICA",
-  "away": "LECH POZNAŃ",
-  "start": "2026-11-05T19:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=RJN-QfmiKnc"
- },
- {
-  "id": "agenda:celta-x-union-saint-gilloise:2026-11-05",
-  "source": "agenda",
-  "home": "CELTA",
-  "away": "UNION SAINT-GILLOISE",
-  "start": "2026-11-05T19:45:00+00:00",
-  "url": "https://www.youtube.com/watch?v=N5pm4-yv6pA"
- },
- {
-  "id": "2AWoK6lGZsc",
-  "title": "AO VIVO (SOM AMBIENTE): GETAFE X BRIGHTON | CONFERENCE LEAGUE 26/27 | RODADA",
-  "published": "2026-10-28T12:02:33+00:00",
-  "start": "2026-11-05T19:45:07+00:00"
- },
- {
-  "id": "jDtB-bds6Oo",
-  "title": "AO VIVO (SOM AMBIENTE): COPENHAGEN X IBERIA | CONFERENCE LEAGUE 26/27 | RODADA",
-  "published": "2026-10-28T12:03:53+00:00",
-  "start": "2026-11-05T19:45:19+00:00"
- },
- {
-  "id": "RJN-QfmiKnc",
-  "title": "AO VIVO: BENFICA X LECH POZNAŃ | EUROPA LEAGUE 26/27 | 4ª RODADA",
-  "published": "2026-10-26T12:01:30+00:00",
-  "start": "2026-11-05T19:45:30+00:00"
- },
- {
-  "id": "BvzKAxrzksU",
-  "title": "AO VIVO (SOM AMBIENTE): CELTIC X BEŞIKTAŞ | EUROPA LEAGUE 26/27 | RODADA",
-  "published": "2026-10-27T12:00:16+00:00",
-  "start": "2026-11-05T19:45:46+00:00"
- },
- {
-  "id": "Um6L1X6_6-4",
-  "title": "AO VIVO (SOM AMBIENTE): SUNDERLAND X DINAMO ZAGREB | EUROPA LEAGUE 26/27 | RODADA",
-  "published": "2026-10-28T12:03:16+00:00",
-  "start": "2026-11-05T19:47:04+00:00"
- },
- {
-  "id": "N5pm4-yv6pA",
-  "title": "AO VIVO (SOM AMBIENTE): CELTA X UNION SAINT-GILLOISE | EUROPA LEAGUE 26/27 | RODADA",
-  "published": "2026-10-28T12:02:49+00:00",
-  "start": "2026-11-05T19:47:30+00:00"
- },
- {
   "id": "BjjULPnw0bE",
   "title": "AO VIVO: HAMBURGO X BORUSSIA MÖNCHENGLADBACH | BUNDESLIGA 26/27 | 9ª RODADA",
   "published": "2026-11-03T21:01:38+00:00",
@@ -412,6 +298,14 @@
   "url": "https://www.youtube.com/watch?v=__m2KQAtId0"
  },
  {
+  "id": "agenda:brasil-x-espanha:2026-11-08",
+  "source": "agenda",
+  "home": "BRASIL",
+  "away": "ESPANHA",
+  "start": "2026-11-08T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=__m2KQAtId0"
+ },
+ {
   "id": "agenda:atletico-de-madrid-x-barcelona:2026-11-08",
   "source": "agenda",
   "home": "ATLÉTICO DE MADRID",
@@ -420,20 +314,18 @@
   "url": "https://www.youtube.com/watch?v=3_bkj6_3Jvc"
  },
  {
+  "id": "3_bkj6_3Jvc",
+  "title": "AO VIVO: BRASIL X ESPANHA | FINALÍSSIMA DE FUTSAL 2026 | FINAL",
+  "published": "2026-10-29T12:01:49+00:00",
+  "start": "2026-11-08T18:45:05+00:00"
+ },
+ {
   "id": "agenda:lens-x-olympique-marseille:2026-11-08",
   "source": "agenda",
   "home": "LENS",
   "away": "OLYMPIQUE MARSEILLE",
   "start": "2026-11-08T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=M6zzug9n3B0"
- },
- {
-  "id": "agenda:brasil-x-espanha:2026-11-08",
-  "source": "agenda",
-  "home": "BRASIL",
-  "away": "ESPANHA",
-  "start": "2026-11-08T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=UaiedxBKwqA"
  },
  {
   "id": "agenda:copa-do-brasil-define-o-2o-finalista-e-tem-atletico-de-madrid-x-barca:2026-11-08",
