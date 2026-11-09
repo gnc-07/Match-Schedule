@@ -1,47 +1,9 @@
 [
  {
-  "id": "BjjULPnw0bE",
-  "title": "AO VIVO: HAMBURGO X BORUSSIA MÖNCHENGLADBACH | BUNDESLIGA 26/27 | 9ª RODADA",
-  "published": "2026-11-03T21:01:38+00:00",
-  "start": "2026-11-06T18:59:52+00:00"
- },
- {
-  "id": "agenda:hamburgo-x-borussia-monchengladbach:2026-11-06",
-  "source": "agenda",
-  "home": "HAMBURGO",
-  "away": "BORUSSIA MÖNCHENGLADBACH",
-  "start": "2026-11-06T19:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=BjjULPnw0bE"
- },
- {
-  "id": "zXANPBOgg6E",
-  "title": "AO VIVO: TOULOUSE X STRASBOURG | LIGUE 1 26/27 | 10ª RODADA",
-  "published": "2026-10-27T12:00:27+00:00",
-  "start": "2026-11-06T19:14:58+00:00"
- },
- {
-  "id": "agenda:toulouse-x-strasbourg:2026-11-06",
-  "source": "agenda",
-  "home": "TOULOUSE",
-  "away": "STRASBOURG",
-  "start": "2026-11-06T19:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=zXANPBOgg6E"
- },
- {
-  "id": "agenda:sevilla-x-deportivo-alaves:2026-11-06",
-  "source": "agenda",
-  "home": "SEVILLA",
-  "away": "DEPORTIVO ALAVÉS",
-  "start": "2026-11-06T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=vYBNP0t23_Y"
- },
- {
-  "id": "agenda:espanha-x-portugal:2026-11-06",
-  "source": "agenda",
-  "home": "ESPANHA",
-  "away": "PORTUGAL",
-  "start": "2026-11-06T21:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=v55Vhlq4h0g"
+  "id": "dpSHMYCdtcg",
+  "title": "AO VIVO: G3X X DESIMPAIN | KINGS CUP BRAZIL | 4ª RODADA",
+  "published": "2026-10-30T12:00:06+00:00",
+  "start": null
  },
  {
   "id": "agenda:brasil-x-argentina:2026-11-06",
@@ -346,8 +308,14 @@
   "source": "agenda",
   "home": "NYVELADOS FC",
   "away": "DENDELE FC",
-  "start": "2026-11-09T19:30:00+00:00",
+  "start": "2026-11-09T18:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=dpSHMYCdtcg"
+ },
+ {
+  "id": "QvGq9QQi4Rg",
+  "title": "AO VIVO: BRASIL X HUNGRIA NO HANDEBOL DE PRAIA | JOGOS OLÍMPICOS DA JUVENTUDE DAKAR 2026",
+  "published": "2026-11-09T20:56:32+00:00",
+  "start": "2026-11-10T11:25:00+00:00"
  },
  {
   "id": "agenda:coritiba-x-santos:2026-11-18",
