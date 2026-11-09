@@ -342,6 +342,14 @@
   "start": "2026-11-08T21:50:00+00:00"
  },
  {
+  "id": "agenda:nyvelados-fc-x-dendele-fc:2026-11-09",
+  "source": "agenda",
+  "home": "NYVELADOS FC",
+  "away": "DENDELE FC",
+  "start": "2026-11-09T19:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=dpSHMYCdtcg"
+ },
+ {
   "id": "agenda:coritiba-x-santos:2026-11-18",
   "source": "agenda",
   "home": "CORITIBA",
