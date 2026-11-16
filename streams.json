@@ -6,6 +6,12 @@
   "start": null
  },
  {
+  "id": "H1hgiNtjoZI",
+  "title": "KINGS LEAGUE BRASIL AO VIVO: DIBRADOS X FLUXO | KINGS CUP BRAZIL | 5ª RODADA",
+  "published": "2026-11-06T12:00:03+00:00",
+  "start": null
+ },
+ {
   "id": "agenda:e-final-cazetv-fc-x-globo:2026-11-13",
   "source": "agenda",
   "home": "É FINAL! CAZÉTV FC",
@@ -18,6 +24,28 @@
   "title": "AO VIVO: REACT DA FINAL DO WTA FINALS 2026 | ANDREEVA X SVITOLINA",
   "published": "2026-11-15T13:30:51+00:00",
   "start": "2026-11-15T19:55:00+00:00"
+ },
+ {
+  "id": "agenda:dibrados-x-fluxo:2026-11-16",
+  "source": "agenda",
+  "home": "DIBRADOS",
+  "away": "FLUXO",
+  "start": "2026-11-16T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=H1hgiNtjoZI"
+ },
+ {
+  "id": "agenda:santos-x-sao-paulo:2026-11-17",
+  "source": "agenda",
+  "home": "SANTOS",
+  "away": "SÃO PAULO",
+  "start": "2026-11-17T21:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=m9GZ-bkD5aI"
+ },
+ {
+  "id": "m9GZ-bkD5aI",
+  "title": "AO VIVO: SANTOS X SÃO PAULO | PAULISTÃO F 2026 | SEMIFINAL",
+  "published": "2026-11-16T16:30:01+00:00",
+  "start": "2026-11-17T21:15:00+00:00"
  },
  {
   "id": "agenda:coritiba-x-santos:2026-11-18",
@@ -34,5 +62,13 @@
   "away": "MIRASSOL",
   "start": "2026-11-22T21:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=n2KWc_xbPAA"
+ },
+ {
+  "id": "agenda:chapecoense-x-palmeiras:2026-11-24",
+  "source": "agenda",
+  "home": "CHAPECOENSE",
+  "away": "PALMEIRAS",
+  "start": "2026-11-24T19:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=jUd5TAB29NQ"
  }
 ]
