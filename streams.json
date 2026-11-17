@@ -48,6 +48,14 @@
   "url": "https://www.youtube.com/watch?v=9B48Zrg5s18"
  },
  {
+  "id": "agenda:brasil-x-irlanda:2026-11-21",
+  "source": "agenda",
+  "home": "BRASIL",
+  "away": "IRLANDA",
+  "start": "2026-11-21T14:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=uj3ua2ddfsc"
+ },
+ {
   "id": "agenda:fluminense-x-mirassol:2026-11-22",
   "source": "agenda",
   "home": "FLUMINENSE",
@@ -62,5 +70,35 @@
   "away": "PALMEIRAS",
   "start": "2026-11-24T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=jUd5TAB29NQ"
+ },
+ {
+  "id": "agenda:uruguai-x-franca:2026-11-25",
+  "source": "agenda",
+  "home": "URUGUAI",
+  "away": "FRANÇA",
+  "start": "2026-11-25T13:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=heqBu_0wYmM"
+ },
+ {
+  "id": "agenda:dinamarca-x-argentina:2026-11-25",
+  "source": "agenda",
+  "home": "DINAMARCA",
+  "away": "ARGENTINA",
+  "start": "2026-11-25T15:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=RwLcizFKewo"
+ },
+ {
+  "id": "agenda:marrocos-x-espanha:2026-11-26",
+  "source": "agenda",
+  "home": "MARROCOS",
+  "away": "ESPANHA",
+  "start": "2026-11-26T14:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=YlVTi866wY4"
+ },
+ {
+  "id": "YlVTi866wY4",
+  "title": "AO VIVO: MARROCOS X ESPANHA | COPA DO MUNDO SUB-17 2026 | FASE DE GRUPOS",
+  "published": "2026-11-16T12:00:16+00:00",
+  "start": "2026-11-26T14:30:00+00:00"
  }
 ]
