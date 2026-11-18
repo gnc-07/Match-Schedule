@@ -12,12 +12,6 @@
   "start": null
  },
  {
-  "id": "3HHJntRzj2M",
-  "title": "AO VIVO: REACT DA FINAL DO WTA FINALS 2026 | ANDREEVA X SVITOLINA",
-  "published": "2026-11-15T13:30:51+00:00",
-  "start": "2026-11-15T19:55:00+00:00"
- },
- {
   "id": "agenda:dibrados-x-fluxo:2026-11-16",
   "source": "agenda",
   "home": "DIBRADOS",
@@ -48,12 +42,92 @@
   "url": "https://www.youtube.com/watch?v=9B48Zrg5s18"
  },
  {
+  "id": "agenda:bayern-de-munique-x-fc-koln:2026-11-20",
+  "source": "agenda",
+  "home": "BAYERN DE MUNIQUE",
+  "away": "FC KÖLN",
+  "start": "2026-11-20T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=r6Hc7PpnPlU"
+ },
+ {
+  "id": "agenda:estac-troyes-x-le-havre:2026-11-20",
+  "source": "agenda",
+  "home": "ESTAC TROYES",
+  "away": "LE HAVRE",
+  "start": "2026-11-20T19:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=SpFEIHHF520"
+ },
+ {
+  "id": "agenda:deportivo-alaves-x-a-coruna:2026-11-21",
+  "source": "agenda",
+  "home": "DEPORTIVO ALAVÉS",
+  "away": "A CORUÑA",
+  "start": "2026-11-21T12:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=HPbN1F2QB2c"
+ },
+ {
   "id": "agenda:brasil-x-irlanda:2026-11-21",
   "source": "agenda",
   "home": "BRASIL",
   "away": "IRLANDA",
   "start": "2026-11-21T14:15:00+00:00",
   "url": "https://www.youtube.com/watch?v=uj3ua2ddfsc"
+ },
+ {
+  "id": "agenda:rayo-vallecano-x-valencia:2026-11-21",
+  "source": "agenda",
+  "home": "RAYO VALLECANO",
+  "away": "VALENCIA",
+  "start": "2026-11-21T14:35:00+00:00",
+  "url": "https://www.youtube.com/watch?v=kvCWpIAf5bk"
+ },
+ {
+  "id": "agenda:nice-x-paris-saint-germain:2026-11-21",
+  "source": "agenda",
+  "home": "NICE",
+  "away": "PARIS SAINT-GERMAIN",
+  "start": "2026-11-21T15:35:00+00:00",
+  "url": "https://www.youtube.com/watch?v=OMN2eqS5y5c"
+ },
+ {
+  "id": "agenda:monaco-x-auxerre:2026-11-21",
+  "source": "agenda",
+  "home": "MÔNACO",
+  "away": "AUXERRE",
+  "start": "2026-11-21T19:05:00+00:00",
+  "url": "https://www.youtube.com/watch?v=T1efkRIfyJM"
+ },
+ {
+  "id": "agenda:strasbourg-x-stade-brestois:2026-11-21",
+  "source": "agenda",
+  "home": "STRASBOURG",
+  "away": "STADE BRESTOIS",
+  "start": "2026-11-21T19:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=RjzEIqqYrc4"
+ },
+ {
+  "id": "agenda:lille-x-lyon:2026-11-21",
+  "source": "agenda",
+  "home": "LILLE",
+  "away": "LYON",
+  "start": "2026-11-21T19:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=Lw7vRSSNgHg"
+ },
+ {
+  "id": "agenda:lens-x-toulouse:2026-11-21",
+  "source": "agenda",
+  "home": "LENS",
+  "away": "TOULOUSE",
+  "start": "2026-11-21T19:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=uyLHr3WgWzo"
+ },
+ {
+  "id": "agenda:fc-lorient-x-rennes:2026-11-22",
+  "source": "agenda",
+  "home": "FC LORIENT",
+  "away": "RENNES",
+  "start": "2026-11-22T15:35:00+00:00",
+  "url": "https://www.youtube.com/watch?v=LKwpO-D0opc"
  },
  {
   "id": "agenda:fluminense-x-mirassol:2026-11-22",
