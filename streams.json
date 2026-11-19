@@ -12,14 +12,6 @@
   "start": null
  },
  {
-  "id": "agenda:dibrados-x-fluxo:2026-11-16",
-  "source": "agenda",
-  "home": "DIBRADOS",
-  "away": "FLUXO",
-  "start": "2026-11-16T18:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=H1hgiNtjoZI"
- },
- {
   "id": "agenda:santos-x-sao-paulo:2026-11-17",
   "source": "agenda",
   "home": "SANTOS",
@@ -64,6 +56,20 @@
   "away": "A CORUÑA",
   "start": "2026-11-21T12:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=HPbN1F2QB2c"
+ },
+ {
+  "id": "agenda:sao-paulo-x-santos:2026-11-21",
+  "source": "agenda",
+  "home": "SÃO PAULO",
+  "away": "SANTOS",
+  "start": "2026-11-21T13:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=fqjgF95lZlk"
+ },
+ {
+  "id": "fqjgF95lZlk",
+  "title": "AO VIVO: SÃO PAULO X SANTOS | PAULISTÃO F 2026 | PLAY-IN",
+  "published": "2026-11-19T13:41:41+00:00",
+  "start": "2026-11-21T13:15:00+00:00"
  },
  {
   "id": "agenda:brasil-x-irlanda:2026-11-21",
@@ -160,6 +166,20 @@
   "away": "MIRASSOL",
   "start": "2026-11-22T21:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=n2KWc_xbPAA"
+ },
+ {
+  "id": "agenda:resenha-pos-jogo-fluminense-x-mirassol:2026-11-22",
+  "source": "agenda",
+  "home": "RESENHA PÓS-JOGO FLUMINENSE",
+  "away": "MIRASSOL",
+  "start": "2026-11-22T23:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=ctkkRR8xVoA"
+ },
+ {
+  "id": "ctkkRR8xVoA",
+  "title": "AO VIVO: RESENHA PÓS-JOGO FLUMINENSE X MIRASSOL | RODA DE BOBO",
+  "published": "2026-11-19T14:39:04+00:00",
+  "start": "2026-11-22T23:30:00+00:00"
  },
  {
   "id": "agenda:chapecoense-x-palmeiras:2026-11-24",
