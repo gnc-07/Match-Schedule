@@ -6,18 +6,6 @@
   "start": null
  },
  {
-  "id": "r6Hc7PpnPlU",
-  "title": "AO VIVO: BAYERN DE MUNIQUE X FC KÖLN | BUNDESLIGA 26/27 | 10ª RODADA",
-  "published": "2026-11-10T12:00:24+00:00",
-  "start": null
- },
- {
-  "id": "SpFEIHHF520",
-  "title": "AO VIVO (SOM AMBIENTE): ESTAC TROYES X LE HAVRE | LIGUE 1 26/27 | 11ª RODADA",
-  "published": "2026-11-12T12:00:03+00:00",
-  "start": null
- },
- {
   "id": "agenda:santos-x-sao-paulo:2026-11-17",
   "source": "agenda",
   "home": "SANTOS",
@@ -40,6 +28,12 @@
   "url": "https://www.youtube.com/watch?v=9B48Zrg5s18"
  },
  {
+  "id": "r6Hc7PpnPlU",
+  "title": "AO VIVO: BAYERN DE MUNIQUE X FC KÖLN | BUNDESLIGA 26/27 | 10ª RODADA",
+  "published": "2026-11-10T12:00:24+00:00",
+  "start": "2026-11-20T15:20:04+00:00"
+ },
+ {
   "id": "agenda:bayern-de-munique-x-fc-koln:2026-11-20",
   "source": "agenda",
   "home": "BAYERN DE MUNIQUE",
@@ -54,6 +48,12 @@
   "away": "LE HAVRE",
   "start": "2026-11-20T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=SpFEIHHF520"
+ },
+ {
+  "id": "SpFEIHHF520",
+  "title": "AO VIVO (SOM AMBIENTE): ESTAC TROYES X LE HAVRE | LIGUE 1 26/27 | 11ª RODADA",
+  "published": "2026-11-12T12:00:03+00:00",
+  "start": "2026-11-20T19:30:49+00:00"
  },
  {
   "id": "agenda:deportivo-alaves-x-a-coruna:2026-11-21",
