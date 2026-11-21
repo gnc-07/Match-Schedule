@@ -6,20 +6,6 @@
   "start": null
  },
  {
-  "id": "agenda:santos-x-sao-paulo:2026-11-17",
-  "source": "agenda",
-  "home": "SANTOS",
-  "away": "SÃO PAULO",
-  "start": "2026-11-17T21:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=m9GZ-bkD5aI"
- },
- {
-  "id": "m9GZ-bkD5aI",
-  "title": "AO VIVO: SANTOS X SÃO PAULO | PAULISTÃO F 2026 | SEMIFINAL",
-  "published": "2026-11-16T16:30:01+00:00",
-  "start": "2026-11-17T21:15:00+00:00"
- },
- {
   "id": "agenda:coritiba-x-santos:2026-11-18",
   "source": "agenda",
   "home": "CORITIBA",
@@ -78,6 +64,14 @@
   "start": "2026-11-21T13:15:00+00:00"
  },
  {
+  "id": "agenda:union-berlin-x-rb-leipzig:2026-11-21",
+  "source": "agenda",
+  "home": "UNION BERLIN",
+  "away": "RB LEIPZIG",
+  "start": "2026-11-21T13:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=d86cfzSyLMQ"
+ },
+ {
   "id": "agenda:brasil-x-irlanda:2026-11-21",
   "source": "agenda",
   "home": "BRASIL",
@@ -100,6 +94,22 @@
   "away": "PARIS SAINT-GERMAIN",
   "start": "2026-11-21T15:35:00+00:00",
   "url": "https://www.youtube.com/watch?v=OMN2eqS5y5c"
+ },
+ {
+  "id": "agenda:newcastle-x-arsenal:2026-11-21",
+  "source": "agenda",
+  "home": "NEWCASTLE",
+  "away": "ARSENAL",
+  "start": "2026-11-21T16:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=q-abbpI42es"
+ },
+ {
+  "id": "agenda:real-madrid-x-celta:2026-11-21",
+  "source": "agenda",
+  "home": "REAL MADRID",
+  "away": "CELTA",
+  "start": "2026-11-21T19:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=T63APoIgZ5o"
  },
  {
   "id": "agenda:monaco-x-auxerre:2026-11-21",
@@ -142,6 +152,22 @@
   "url": "https://www.youtube.com/watch?v=W3Fat7nIC8Q"
  },
  {
+  "id": "agenda:juventus-x-venezia:2026-11-22",
+  "source": "agenda",
+  "home": "JUVENTUS",
+  "away": "VENEZIA",
+  "start": "2026-11-22T11:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=U783JSxqQlo"
+ },
+ {
+  "id": "agenda:barcelona-x-villarreal:2026-11-22",
+  "source": "agenda",
+  "home": "BARCELONA",
+  "away": "VILLARREAL",
+  "start": "2026-11-22T12:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=DkeKLWqMyqE"
+ },
+ {
   "id": "agenda:paris-fc-x-angers:2026-11-22",
   "source": "agenda",
   "home": "PARIS FC",
@@ -164,6 +190,22 @@
   "away": "RENNES",
   "start": "2026-11-22T15:35:00+00:00",
   "url": "https://www.youtube.com/watch?v=LKwpO-D0opc"
+ },
+ {
+  "id": "agenda:osasuna-x-malaga:2026-11-22",
+  "source": "agenda",
+  "home": "OSASUNA",
+  "away": "MÁLAGA",
+  "start": "2026-11-22T17:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=4OHKw9l6TIQ"
+ },
+ {
+  "id": "agenda:getafe-x-atletico-de-madrid:2026-11-22",
+  "source": "agenda",
+  "home": "GETAFE",
+  "away": "ATLÉTICO DE MADRID",
+  "start": "2026-11-22T19:20:00+00:00",
+  "url": "https://www.youtube.com/watch?v=MF8LYbKU0nc"
  },
  {
   "id": "agenda:fluminense-x-mirassol:2026-11-22",
