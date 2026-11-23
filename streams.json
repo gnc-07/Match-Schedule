@@ -252,6 +252,30 @@
   "start": "2026-11-22T23:30:00+00:00"
  },
  {
+  "id": "agenda:podpah-funkbol-clube-x-desimpain:2026-11-23",
+  "source": "agenda",
+  "home": "PODPAH FUNKBOL CLUBE",
+  "away": "DESIMPAIN",
+  "start": "2026-11-23T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=ePqZKF2Ui7A"
+ },
+ {
+  "id": "agenda:levante-x-elche:2026-11-23",
+  "source": "agenda",
+  "home": "LEVANTE",
+  "away": "ELCHE",
+  "start": "2026-11-23T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=GKBnXdzCNY4"
+ },
+ {
+  "id": "agenda:brasil-x-tanzania:2026-11-24",
+  "source": "agenda",
+  "home": "BRASIL",
+  "away": "TANZÂNIA",
+  "start": "2026-11-24T14:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=7CH80r5buwo"
+ },
+ {
   "id": "agenda:chapecoense-x-palmeiras:2026-11-24",
   "source": "agenda",
   "home": "CHAPECOENSE",
