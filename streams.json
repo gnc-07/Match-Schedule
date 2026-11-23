@@ -6,34 +6,6 @@
   "start": null
  },
  {
-  "id": "r6Hc7PpnPlU",
-  "title": "AO VIVO: BAYERN DE MUNIQUE X FC KÖLN | BUNDESLIGA 26/27 | 10ª RODADA",
-  "published": "2026-11-10T12:00:24+00:00",
-  "start": "2026-11-20T15:20:04+00:00"
- },
- {
-  "id": "agenda:bayern-de-munique-x-fc-koln:2026-11-20",
-  "source": "agenda",
-  "home": "BAYERN DE MUNIQUE",
-  "away": "FC KÖLN",
-  "start": "2026-11-20T18:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=r6Hc7PpnPlU"
- },
- {
-  "id": "agenda:estac-troyes-x-le-havre:2026-11-20",
-  "source": "agenda",
-  "home": "ESTAC TROYES",
-  "away": "LE HAVRE",
-  "start": "2026-11-20T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=SpFEIHHF520"
- },
- {
-  "id": "SpFEIHHF520",
-  "title": "AO VIVO (SOM AMBIENTE): ESTAC TROYES X LE HAVRE | LIGUE 1 26/27 | 11ª RODADA",
-  "published": "2026-11-12T12:00:03+00:00",
-  "start": "2026-11-20T19:30:49+00:00"
- },
- {
   "id": "agenda:deportivo-alaves-x-a-coruna:2026-11-21",
   "source": "agenda",
   "home": "DEPORTIVO ALAVÉS",
@@ -260,6 +232,20 @@
   "url": "https://www.youtube.com/watch?v=ePqZKF2Ui7A"
  },
  {
+  "id": "agenda:capim-fc-x-furia-fc:2026-11-23",
+  "source": "agenda",
+  "home": "CAPIM FC",
+  "away": "FURIA FC",
+  "start": "2026-11-23T18:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=ePqZKF2Ui7A"
+ },
+ {
+  "id": "ePqZKF2Ui7A",
+  "title": "AO VIVO:FLUXO FC X DENDELE FC | KINGS CUP BRAZIL | QUARTAS DE FINAL",
+  "published": "2026-11-13T12:00:09+00:00",
+  "start": "2026-11-23T19:40:01+00:00"
+ },
+ {
   "id": "agenda:levante-x-elche:2026-11-23",
   "source": "agenda",
   "home": "LEVANTE",
@@ -276,12 +262,34 @@
   "url": "https://www.youtube.com/watch?v=7CH80r5buwo"
  },
  {
+  "id": "agenda:tchequia-x-canada:2026-11-24",
+  "source": "agenda",
+  "home": "TCHÉQUIA",
+  "away": "CANADÁ",
+  "start": "2026-11-24T14:40:00+00:00",
+  "url": "https://www.youtube.com/watch?v=-pwgvi35YOU"
+ },
+ {
   "id": "agenda:chapecoense-x-palmeiras:2026-11-24",
   "source": "agenda",
   "home": "CHAPECOENSE",
   "away": "PALMEIRAS",
   "start": "2026-11-24T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=jUd5TAB29NQ"
+ },
+ {
+  "id": "agenda:acabou-chape-x-palmeiras-e-hora-dos-bobos-entrarem-em-campo:2026-11-24",
+  "source": "agenda",
+  "home": "ACABOU CHAPE",
+  "away": "PALMEIRAS? É HORA DOS BOBOS ENTRAREM EM CAMPO!",
+  "start": "2026-11-24T23:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=UO8w4tntQsU"
+ },
+ {
+  "id": "UO8w4tntQsU",
+  "title": "AO VIVO: ACABOU CHAPE X PALMEIRAS? É HORA DOS BOBOS ENTRAREM EM CAMPO! | RODA DE BOBO",
+  "published": "2026-11-23T20:31:20+00:00",
+  "start": "2026-11-24T23:00:00+00:00"
  },
  {
   "id": "agenda:uruguai-x-franca:2026-11-25",
@@ -292,12 +300,28 @@
   "url": "https://www.youtube.com/watch?v=heqBu_0wYmM"
  },
  {
+  "id": "agenda:italia-x-coreia-do-sul:2026-11-25",
+  "source": "agenda",
+  "home": "ITÁLIA",
+  "away": "COREIA DO SUL",
+  "start": "2026-11-25T14:40:00+00:00",
+  "url": "https://www.youtube.com/watch?v=Bia_vQfRnl4"
+ },
+ {
   "id": "agenda:dinamarca-x-argentina:2026-11-25",
   "source": "agenda",
   "home": "DINAMARCA",
   "away": "ARGENTINA",
   "start": "2026-11-25T15:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=RwLcizFKewo"
+ },
+ {
+  "id": "agenda:reino-unido-x-alemanha:2026-11-26",
+  "source": "agenda",
+  "home": "REINO UNIDO",
+  "away": "ALEMANHA",
+  "start": "2026-11-26T08:40:00+00:00",
+  "url": "https://www.youtube.com/watch?v=xnDsGyolc1Y"
  },
  {
   "id": "agenda:marrocos-x-espanha:2026-11-26",
@@ -312,6 +336,188 @@
   "title": "AO VIVO: MARROCOS X ESPANHA | COPA DO MUNDO SUB-17 2026 | FASE DE GRUPOS",
   "published": "2026-11-16T12:00:16+00:00",
   "start": "2026-11-26T14:30:00+00:00"
+ },
+ {
+  "id": "agenda:austria-x-espanha:2026-11-26",
+  "source": "agenda",
+  "home": "ÁUSTRIA",
+  "away": "ESPANHA",
+  "start": "2026-11-26T15:40:00+00:00",
+  "url": "https://www.youtube.com/watch?v=0yEpIvTk5Ts"
+ },
+ {
+  "id": "agenda:olympique-marseille-x-levski-sofia:2026-11-26",
+  "source": "agenda",
+  "home": "OLYMPIQUE MARSEILLE",
+  "away": "LEVSKI SOFIA",
+  "start": "2026-11-26T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=AJiwj8dS2MQ"
+ },
+ {
+  "id": "agenda:jablonec-x-lugano:2026-11-26",
+  "source": "agenda",
+  "home": "JABLONEC",
+  "away": "LUGANO",
+  "start": "2026-11-26T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=9t224Jl6D-8"
+ },
+ {
+  "id": "agenda:brighton-x-u-craiova:2026-11-26",
+  "source": "agenda",
+  "home": "BRIGHTON",
+  "away": "U CRAIOVA",
+  "start": "2026-11-26T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=Mr4pshLicZM"
+ },
+ {
+  "id": "agenda:besiktas-x-hapoel-beer-sheva:2026-11-26",
+  "source": "agenda",
+  "home": "BEŞIKTAŞ",
+  "away": "HAPOEL BEER SHEVA",
+  "start": "2026-11-26T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=EAyUIdK-kFQ"
+ },
+ {
+  "id": "agenda:viktoria-plzen-x-benfica:2026-11-26",
+  "source": "agenda",
+  "home": "VIKTORIA PLZEŇ",
+  "away": "BENFICA",
+  "start": "2026-11-26T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=fNHrzlxD7C8"
+ },
+ {
+  "id": "agenda:celta-x-bournemouth:2026-11-26",
+  "source": "agenda",
+  "home": "CELTA",
+  "away": "BOURNEMOUTH",
+  "start": "2026-11-26T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=rD0EwHBUc1c"
+ },
+ {
+  "id": "agenda:hearts-x-monaco:2026-11-26",
+  "source": "agenda",
+  "home": "HEARTS",
+  "away": "MÔNACO",
+  "start": "2026-11-26T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=QLMYhEXsyYY"
+ },
+ {
+  "id": "agenda:olympiakos-x-milan:2026-11-26",
+  "source": "agenda",
+  "home": "OLYMPIAKOS",
+  "away": "MILAN",
+  "start": "2026-11-26T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=lwy1aTGEzxw"
+ },
+ {
+  "id": "agenda:ajax-x-thun:2026-11-26",
+  "source": "agenda",
+  "home": "AJAX",
+  "away": "THUN",
+  "start": "2026-11-26T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=0U3jxysJVBA"
+ },
+ {
+  "id": "agenda:iberia-x-getafe:2026-11-26",
+  "source": "agenda",
+  "home": "IBERIA",
+  "away": "GETAFE",
+  "start": "2026-11-26T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=uSazQJDymco"
+ },
+ {
+  "id": "agenda:dinamo-zagreb-x-bayer-leverkusen:2026-11-26",
+  "source": "agenda",
+  "home": "DINAMO ZAGREB",
+  "away": "BAYER LEVERKUSEN",
+  "start": "2026-11-26T17:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=kPjb7nhbfeg"
+ },
+ {
+  "id": "agenda:crystal-palace-x-real-sociedad:2026-11-26",
+  "source": "agenda",
+  "home": "CRYSTAL PALACE",
+  "away": "REAL SOCIEDAD",
+  "start": "2026-11-26T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=zaT0xVett8U"
+ },
+ {
+  "id": "agenda:freiburg-x-twente:2026-11-26",
+  "source": "agenda",
+  "home": "FREIBURG",
+  "away": "TWENTE",
+  "start": "2026-11-26T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=pqGgFfGUcFU"
+ },
+ {
+  "id": "agenda:nec-nijmegen-x-rennes:2026-11-26",
+  "source": "agenda",
+  "home": "NEC NIJMEGEN",
+  "away": "RENNES",
+  "start": "2026-11-26T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=uko5Zl0zG74"
+ },
+ {
+  "id": "agenda:lyon-x-lillestrm:2026-11-26",
+  "source": "agenda",
+  "home": "LYON",
+  "away": "LILLESTRØM",
+  "start": "2026-11-26T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=QrOM2f9cwzA"
+ },
+ {
+  "id": "agenda:borac-x-atalanta:2026-11-26",
+  "source": "agenda",
+  "home": "BORAC",
+  "away": "ATALANTA",
+  "start": "2026-11-26T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=h-fp2h7UOns"
+ },
+ {
+  "id": "agenda:braga-x-kups:2026-11-26",
+  "source": "agenda",
+  "home": "BRAGA",
+  "away": "KUPS",
+  "start": "2026-11-26T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=9lcWYyhlTVQ"
+ },
+ {
+  "id": "agenda:torreense-x-celtic:2026-11-26",
+  "source": "agenda",
+  "home": "TORREENSE",
+  "away": "CELTIC",
+  "start": "2026-11-26T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=Jtqi_cW0EJM"
+ },
+ {
+  "id": "agenda:juventus-x-omonia:2026-11-26",
+  "source": "agenda",
+  "home": "JUVENTUS",
+  "away": "OMONIA",
+  "start": "2026-11-26T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=-pKjQT__ytI"
+ },
+ {
+  "id": "agenda:cska-sofia-x-trabzonspor:2026-11-26",
+  "source": "agenda",
+  "home": "CSKA SOFIA",
+  "away": "TRABZONSPOR",
+  "start": "2026-11-26T19:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=dASnIbujkBc"
+ },
+ {
+  "id": "agenda:palmeiras-x-estudiantes:2026-11-28",
+  "source": "agenda",
+  "home": "PALMEIRAS",
+  "away": "ESTUDIANTES",
+  "start": "2026-11-28T18:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=o7zWtSEbBUU"
+ },
+ {
+  "id": "o7zWtSEbBUU",
+  "title": "AO VIVO: FINAL DA LIBERTADORES 2026 | PALMEIRAS X ESTUDIANTES | NOCHE DE COPA",
+  "published": "2026-11-23T19:56:45+00:00",
+  "start": "2026-11-28T18:00:00+00:00"
  },
  {
   "id": "agenda:athletico-pr-x-sao-paulo:2026-12-02",
