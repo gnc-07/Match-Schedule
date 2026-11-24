@@ -278,6 +278,14 @@
   "url": "https://www.youtube.com/watch?v=jUd5TAB29NQ"
  },
  {
+  "id": "agenda:flamengo-x-vasco:2026-11-24",
+  "source": "agenda",
+  "home": "FLAMENGO",
+  "away": "VASCO",
+  "start": "2026-11-24T21:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=8DHzQERvbYQ"
+ },
+ {
   "id": "agenda:acabou-chape-x-palmeiras-e-hora-dos-bobos-entrarem-em-campo:2026-11-24",
   "source": "agenda",
   "home": "ACABOU CHAPE",
@@ -504,6 +512,14 @@
   "away": "TRABZONSPOR",
   "start": "2026-11-26T19:45:00+00:00",
   "url": "https://www.youtube.com/watch?v=dASnIbujkBc"
+ },
+ {
+  "id": "agenda:palmeiras-x-vasco:2026-11-27",
+  "source": "agenda",
+  "home": "PALMEIRAS",
+  "away": "VASCO",
+  "start": "2026-11-27T20:30:00+00:00",
+  "url": "https://www.youtube.com/watch?v=wxhbsN1XUFE"
  },
  {
   "id": "agenda:palmeiras-x-estudiantes:2026-11-28",
