@@ -6,134 +6,6 @@
   "start": null
  },
  {
-  "id": "agenda:deportivo-alaves-x-a-coruna:2026-11-21",
-  "source": "agenda",
-  "home": "DEPORTIVO ALAVÉS",
-  "away": "A CORUÑA",
-  "start": "2026-11-21T12:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=HPbN1F2QB2c"
- },
- {
-  "id": "agenda:sao-paulo-x-santos:2026-11-21",
-  "source": "agenda",
-  "home": "SÃO PAULO",
-  "away": "SANTOS",
-  "start": "2026-11-21T13:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=fqjgF95lZlk"
- },
- {
-  "id": "fqjgF95lZlk",
-  "title": "AO VIVO: SÃO PAULO X SANTOS | PAULISTÃO F 2026 | PLAY-IN",
-  "published": "2026-11-19T13:41:41+00:00",
-  "start": "2026-11-21T13:15:00+00:00"
- },
- {
-  "id": "agenda:union-berlin-x-rb-leipzig:2026-11-21",
-  "source": "agenda",
-  "home": "UNION BERLIN",
-  "away": "RB LEIPZIG",
-  "start": "2026-11-21T13:50:00+00:00",
-  "url": "https://www.youtube.com/watch?v=d86cfzSyLMQ"
- },
- {
-  "id": "agenda:brasil-x-irlanda:2026-11-21",
-  "source": "agenda",
-  "home": "BRASIL",
-  "away": "IRLANDA",
-  "start": "2026-11-21T14:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=uj3ua2ddfsc"
- },
- {
-  "id": "agenda:rayo-vallecano-x-valencia:2026-11-21",
-  "source": "agenda",
-  "home": "RAYO VALLECANO",
-  "away": "VALENCIA",
-  "start": "2026-11-21T14:35:00+00:00",
-  "url": "https://www.youtube.com/watch?v=kvCWpIAf5bk"
- },
- {
-  "id": "agenda:nice-x-paris-saint-germain:2026-11-21",
-  "source": "agenda",
-  "home": "NICE",
-  "away": "PARIS SAINT-GERMAIN",
-  "start": "2026-11-21T15:35:00+00:00",
-  "url": "https://www.youtube.com/watch?v=OMN2eqS5y5c"
- },
- {
-  "id": "q-abbpI42es",
-  "title": "AO VIVO: NEWCASTLE X ARSENAL | PREMIER LEAGUE 26/27 | 11ª RODADA",
-  "published": "2026-11-11T12:01:27+00:00",
-  "start": "2026-11-21T16:29:53+00:00"
- },
- {
-  "id": "agenda:newcastle-x-arsenal:2026-11-21",
-  "source": "agenda",
-  "home": "NEWCASTLE",
-  "away": "ARSENAL",
-  "start": "2026-11-21T16:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=q-abbpI42es"
- },
- {
-  "id": "agenda:real-madrid-x-celta:2026-11-21",
-  "source": "agenda",
-  "home": "REAL MADRID",
-  "away": "CELTA",
-  "start": "2026-11-21T19:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=T63APoIgZ5o"
- },
- {
-  "id": "T63APoIgZ5o",
-  "title": "AO VIVO: REAL MADRID X CELTA | LALIGA 26/27 | 13ª RODADA",
-  "published": "2026-11-11T12:01:41+00:00",
-  "start": "2026-11-21T19:00:07+00:00"
- },
- {
-  "id": "agenda:monaco-x-auxerre:2026-11-21",
-  "source": "agenda",
-  "home": "MÔNACO",
-  "away": "AUXERRE",
-  "start": "2026-11-21T19:05:00+00:00",
-  "url": "https://www.youtube.com/watch?v=T1efkRIfyJM"
- },
- {
-  "id": "T1efkRIfyJM",
-  "title": "AO VIVO: MÔNACO X AUXERRE | LIGUE 1 26/27 | 11ª RODADA",
-  "published": "2026-11-11T12:01:35+00:00",
-  "start": "2026-11-21T19:05:03+00:00"
- },
- {
-  "id": "agenda:strasbourg-x-stade-brestois:2026-11-21",
-  "source": "agenda",
-  "home": "STRASBOURG",
-  "away": "STADE BRESTOIS",
-  "start": "2026-11-21T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=RjzEIqqYrc4"
- },
- {
-  "id": "agenda:lille-x-lyon:2026-11-21",
-  "source": "agenda",
-  "home": "LILLE",
-  "away": "LYON",
-  "start": "2026-11-21T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=Lw7vRSSNgHg"
- },
- {
-  "id": "agenda:lens-x-toulouse:2026-11-21",
-  "source": "agenda",
-  "home": "LENS",
-  "away": "TOULOUSE",
-  "start": "2026-11-21T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=uyLHr3WgWzo"
- },
- {
-  "id": "agenda:atletico-mg-x-boca-juniors:2026-11-21",
-  "source": "agenda",
-  "home": "ATLÉTICO-MG",
-  "away": "BOCA JUNIORS",
-  "start": "2026-11-21T21:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=W3Fat7nIC8Q"
- },
- {
   "id": "agenda:juventus-x-venezia:2026-11-22",
   "source": "agenda",
   "home": "JUVENTUS",
@@ -278,12 +150,24 @@
   "url": "https://www.youtube.com/watch?v=jUd5TAB29NQ"
  },
  {
+  "id": "jUd5TAB29NQ",
+  "title": "AO VIVO: CHAPECOENSE X PALMEIRAS | BRASILEIRÃO 2026 | 37ª RODADA",
+  "published": "2026-11-14T12:00:21+00:00",
+  "start": "2026-11-24T19:30:22+00:00"
+ },
+ {
   "id": "agenda:flamengo-x-vasco:2026-11-24",
   "source": "agenda",
   "home": "FLAMENGO",
   "away": "VASCO",
   "start": "2026-11-24T21:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=8DHzQERvbYQ"
+ },
+ {
+  "id": "8DHzQERvbYQ",
+  "title": "AO VIVO: FLAMENGO X VASCO | COPINHA FEMININA 2026",
+  "published": "2026-11-14T12:00:27+00:00",
+  "start": "2026-11-24T21:30:10+00:00"
  },
  {
   "id": "agenda:acabou-chape-x-palmeiras-e-hora-dos-bobos-entrarem-em-campo:2026-11-24",
