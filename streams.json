@@ -6,82 +6,6 @@
   "start": null
  },
  {
-  "id": "agenda:juventus-x-venezia:2026-11-22",
-  "source": "agenda",
-  "home": "JUVENTUS",
-  "away": "VENEZIA",
-  "start": "2026-11-22T11:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=U783JSxqQlo"
- },
- {
-  "id": "agenda:barcelona-x-villarreal:2026-11-22",
-  "source": "agenda",
-  "home": "BARCELONA",
-  "away": "VILLARREAL",
-  "start": "2026-11-22T12:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=DkeKLWqMyqE"
- },
- {
-  "id": "agenda:paris-fc-x-angers:2026-11-22",
-  "source": "agenda",
-  "home": "PARIS FC",
-  "away": "ANGERS",
-  "start": "2026-11-22T13:20:00+00:00",
-  "url": "https://www.youtube.com/watch?v=tsmmAd5U064"
- },
- {
-  "id": "agenda:racing-club-x-real-sociedad:2026-11-22",
-  "source": "agenda",
-  "home": "RACING CLUB",
-  "away": "REAL SOCIEDAD",
-  "start": "2026-11-22T15:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=tIM_T-D66iI"
- },
- {
-  "id": "agenda:fc-lorient-x-rennes:2026-11-22",
-  "source": "agenda",
-  "home": "FC LORIENT",
-  "away": "RENNES",
-  "start": "2026-11-22T15:35:00+00:00",
-  "url": "https://www.youtube.com/watch?v=LKwpO-D0opc"
- },
- {
-  "id": "wRk_0qHQrl8",
-  "title": "AO VIVO: REACT DA FINAL DO ATP FINALS 2026 | ALCARAZ X ZVEREV",
-  "published": "2026-11-22T12:42:09+00:00",
-  "start": "2026-11-22T16:59:54+00:00"
- },
- {
-  "id": "4OHKw9l6TIQ",
-  "title": "AO VIVO: GETAFE X ATLÉTICO DE MADRID | LALIGA 26/27 | 13ª RODADA",
-  "published": "2026-11-12T12:01:40+00:00",
-  "start": "2026-11-22T17:05:44+00:00"
- },
- {
-  "id": "agenda:osasuna-x-malaga:2026-11-22",
-  "source": "agenda",
-  "home": "OSASUNA",
-  "away": "MÁLAGA",
-  "start": "2026-11-22T17:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=4OHKw9l6TIQ"
- },
- {
-  "id": "agenda:getafe-x-atletico-de-madrid:2026-11-22",
-  "source": "agenda",
-  "home": "GETAFE",
-  "away": "ATLÉTICO DE MADRID",
-  "start": "2026-11-22T19:20:00+00:00",
-  "url": "https://www.youtube.com/watch?v=MF8LYbKU0nc"
- },
- {
-  "id": "agenda:fluminense-x-mirassol:2026-11-22",
-  "source": "agenda",
-  "home": "FLUMINENSE",
-  "away": "MIRASSOL",
-  "start": "2026-11-22T20:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=n2KWc_xbPAA"
- },
- {
   "id": "agenda:resenha-pos-jogo-fluminense-x-mirassol:2026-11-22",
   "source": "agenda",
   "home": "RESENHA PÓS-JOGO FLUMINENSE",
@@ -198,6 +122,20 @@
   "away": "COREIA DO SUL",
   "start": "2026-11-25T14:40:00+00:00",
   "url": "https://www.youtube.com/watch?v=Bia_vQfRnl4"
+ },
+ {
+  "id": "agenda:berrettini-vavassori-x-chung-kwon:2026-11-25",
+  "source": "agenda",
+  "home": "BERRETTINI/VAVASSORI",
+  "away": "CHUNG/KWON",
+  "start": "2026-11-25T14:40:00+00:00",
+  "url": "https://www.youtube.com/watch?v=Bia_vQfRnl4"
+ },
+ {
+  "id": "Bia_vQfRnl4",
+  "title": "AO VIVO: COPA DAVIS 2026 | BERRETTINI/VAVASSORI X CHUNG/KWON | ITÁLIA X COREIA DO SUL | QUARTAS",
+  "published": "2026-11-19T21:00:28+00:00",
+  "start": "2026-11-25T14:40:04+00:00"
  },
  {
   "id": "agenda:dinamarca-x-argentina:2026-11-25",
