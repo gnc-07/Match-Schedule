@@ -362,6 +362,20 @@
   "url": "https://www.youtube.com/watch?v=5Cf-sjehPFc"
  },
  {
+  "id": "agenda:italia-x-tchequia:2026-11-27",
+  "source": "agenda",
+  "home": "ITÁLIA",
+  "away": "TCHÉQUIA",
+  "start": "2026-11-27T14:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=ro3Mu-Ki31k"
+ },
+ {
+  "id": "ro3Mu-Ki31k",
+  "title": "AO VIVO: ITÁLIA X TCHÉQUIA | SEMIFINAL DA COPA DAVIS 2026 | AO VIVO E COM IMAGENS",
+  "published": "2026-11-27T04:23:05+00:00",
+  "start": "2026-11-27T14:45:00+00:00"
+ },
+ {
   "id": "agenda:werder-bremen-x-borussia-monchengladbach:2026-11-27",
   "source": "agenda",
   "home": "WERDER BREMEN",
@@ -392,6 +406,14 @@
   "away": "VASCO",
   "start": "2026-11-27T20:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=wxhbsN1XUFE"
+ },
+ {
+  "id": "agenda:manchester-united-x-brentford:2026-11-28",
+  "source": "agenda",
+  "home": "MANCHESTER UNITED",
+  "away": "BRENTFORD",
+  "start": "2026-11-28T14:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=rMVKpNgrIbw"
  },
  {
   "id": "agenda:malaga-x-athletic-bilbao:2026-11-28",
@@ -430,6 +452,22 @@
   "title": "AO VIVO: FINAL DA LIBERTADORES 2026 | PALMEIRAS X ESTUDIANTES | NOCHE DE COPA",
   "published": "2026-11-23T19:56:45+00:00",
   "start": "2026-11-28T18:00:00+00:00"
+ },
+ {
+  "id": "agenda:real-madrid-x-deportivo-alaves:2026-11-28",
+  "source": "agenda",
+  "home": "REAL MADRID",
+  "away": "DEPORTIVO ALAVÉS",
+  "start": "2026-11-28T19:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=zqCuqfQB7vg"
+ },
+ {
+  "id": "agenda:psg-x-fc-lorient:2026-11-28",
+  "source": "agenda",
+  "home": "PSG",
+  "away": "FC LORIENT",
+  "start": "2026-11-28T19:00:00+00:00",
+  "url": "https://www.youtube.com/watch?v=JZdXogFEnQI"
  },
  {
   "id": "agenda:le-havre-x-strasbourg:2026-11-28",
@@ -472,6 +510,14 @@
   "url": "https://www.youtube.com/watch?v=vxTJ_F6zw_I"
  },
  {
+  "id": "agenda:a-coruna-x-barcelona:2026-11-29",
+  "source": "agenda",
+  "home": "A CORUÑA",
+  "away": "BARCELONA",
+  "start": "2026-11-29T14:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=pzJoYrWw1ZM"
+ },
+ {
   "id": "agenda:toulouse-x-rennes:2026-11-29",
   "source": "agenda",
   "home": "TOULOUSE",
@@ -486,6 +532,30 @@
   "away": "VILLARREAL",
   "start": "2026-11-29T17:05:00+00:00",
   "url": "https://www.youtube.com/watch?v=sWU9PF50c6w"
+ },
+ {
+  "id": "agenda:borussia-dortmund-x-bayer-leverkusen:2026-11-29",
+  "source": "agenda",
+  "home": "BORUSSIA DORTMUND",
+  "away": "BAYER LEVERKUSEN",
+  "start": "2026-11-29T17:50:00+00:00",
+  "url": "https://www.youtube.com/watch?v=sa_p_JplCXg"
+ },
+ {
+  "id": "agenda:lyon-x-monaco:2026-11-29",
+  "source": "agenda",
+  "home": "LYON",
+  "away": "MÔNACO",
+  "start": "2026-11-29T19:05:00+00:00",
+  "url": "https://www.youtube.com/watch?v=rJ6wCu6W4Vs"
+ },
+ {
+  "id": "agenda:cagliari-x-milan:2026-11-30",
+  "source": "agenda",
+  "home": "CAGLIARI",
+  "away": "MILAN",
+  "start": "2026-11-30T14:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=ihDNGGEkmJY"
  },
  {
   "id": "agenda:espanyol-x-getafe:2026-11-30",
