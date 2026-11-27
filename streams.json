@@ -1,39 +1,27 @@
 [
  {
-  "id": "H1hgiNtjoZI",
-  "title": "KINGS LEAGUE BRASIL AO VIVO: DIBRADOS X FLUXO | KINGS CUP BRAZIL | 5ª RODADA",
-  "published": "2026-11-06T12:00:03+00:00",
+  "id": "nE3wa2GZGoc",
+  "title": "AO VIVO: WERDER BREMEN X BORUSSIA MÖNCHENGLADBACH | BUNDESLIGA 26/27 | 11ª RODADA",
+  "published": "2026-11-17T12:00:11+00:00",
   "start": null
  },
  {
-  "id": "agenda:brasil-x-tanzania:2026-11-24",
-  "source": "agenda",
-  "home": "BRASIL",
-  "away": "TANZÂNIA",
-  "start": "2026-11-24T14:15:00+00:00",
-  "url": "https://www.youtube.com/watch?v=7CH80r5buwo"
+  "id": "JsFfki4iSbE",
+  "title": "AO VIVO: STADE BRESTOIS X PARIS FC | LIGUE 1 26/27 | 12ª RODADA",
+  "published": "2026-11-17T12:00:20+00:00",
+  "start": null
  },
  {
-  "id": "agenda:tchequia-x-canada:2026-11-24",
-  "source": "agenda",
-  "home": "TCHÉQUIA",
-  "away": "CANADÁ",
-  "start": "2026-11-24T14:40:00+00:00",
-  "url": "https://www.youtube.com/watch?v=-pwgvi35YOU"
+  "id": "u3RYKn-E09A",
+  "title": "AO VIVO: LEVANTE X RACING CLUB | LALIGA 26/27 | 14ª RODADA",
+  "published": "2026-11-17T12:00:42+00:00",
+  "start": null
  },
  {
-  "id": "agenda:chapecoense-x-palmeiras:2026-11-24",
-  "source": "agenda",
-  "home": "CHAPECOENSE",
-  "away": "PALMEIRAS",
-  "start": "2026-11-24T19:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=jUd5TAB29NQ"
- },
- {
-  "id": "jUd5TAB29NQ",
-  "title": "AO VIVO: CHAPECOENSE X PALMEIRAS | BRASILEIRÃO 2026 | 37ª RODADA",
-  "published": "2026-11-14T12:00:21+00:00",
-  "start": "2026-11-24T19:30:22+00:00"
+  "id": "wxhbsN1XUFE",
+  "title": "AO VIVO: PALMEIRAS X VASCO | COPINHA FEMININA 2026",
+  "published": "2026-11-17T12:00:56+00:00",
+  "start": null
  },
  {
   "id": "agenda:flamengo-x-vasco:2026-11-24",
@@ -371,9 +359,17 @@
  },
  {
   "id": "ro3Mu-Ki31k",
-  "title": "AO VIVO: ITÁLIA X TCHÉQUIA | SEMIFINAL DA COPA DAVIS 2026 | AO VIVO E COM IMAGENS",
+  "title": "AO VIVO: COPA DAVIS 2026 | COBOLLI X LEHEČKA | ITÁLIA X TCHÉQUIA | SEMIFINAL",
   "published": "2026-11-27T04:23:05+00:00",
   "start": "2026-11-27T14:45:00+00:00"
+ },
+ {
+  "id": "agenda:cobolli-x-lehecka:2026-11-27",
+  "source": "agenda",
+  "home": "COBOLLI",
+  "away": "LEHEČKA",
+  "start": "2026-11-27T14:45:00+00:00",
+  "url": "https://www.youtube.com/watch?v=ro3Mu-Ki31k"
  },
  {
   "id": "agenda:werder-bremen-x-borussia-monchengladbach:2026-11-27",
@@ -388,7 +384,7 @@
   "source": "agenda",
   "home": "STADE BRESTOIS",
   "away": "PARIS FC",
-  "start": "2026-11-27T19:15:00+00:00",
+  "start": "2026-11-27T19:20:00+00:00",
   "url": "https://www.youtube.com/watch?v=JsFfki4iSbE"
  },
  {
@@ -396,7 +392,7 @@
   "source": "agenda",
   "home": "LEVANTE",
   "away": "RACING CLUB",
-  "start": "2026-11-27T19:45:00+00:00",
+  "start": "2026-11-27T19:55:00+00:00",
   "url": "https://www.youtube.com/watch?v=u3RYKn-E09A"
  },
  {
