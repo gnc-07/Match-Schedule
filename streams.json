@@ -24,72 +24,6 @@
   "start": null
  },
  {
-  "id": "agenda:flamengo-x-vasco:2026-11-24",
-  "source": "agenda",
-  "home": "FLAMENGO",
-  "away": "VASCO",
-  "start": "2026-11-24T21:30:00+00:00",
-  "url": "https://www.youtube.com/watch?v=8DHzQERvbYQ"
- },
- {
-  "id": "8DHzQERvbYQ",
-  "title": "AO VIVO: FLAMENGO X VASCO | COPINHA FEMININA 2026",
-  "published": "2026-11-14T12:00:27+00:00",
-  "start": "2026-11-24T21:30:10+00:00"
- },
- {
-  "id": "agenda:acabou-chape-x-palmeiras-e-hora-dos-bobos-entrarem-em-campo:2026-11-24",
-  "source": "agenda",
-  "home": "ACABOU CHAPE",
-  "away": "PALMEIRAS? É HORA DOS BOBOS ENTRAREM EM CAMPO!",
-  "start": "2026-11-24T23:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=UO8w4tntQsU"
- },
- {
-  "id": "UO8w4tntQsU",
-  "title": "AO VIVO: ACABOU CHAPE X PALMEIRAS? É HORA DOS BOBOS ENTRAREM EM CAMPO! | RODA DE BOBO",
-  "published": "2026-11-23T20:31:20+00:00",
-  "start": "2026-11-24T23:00:00+00:00"
- },
- {
-  "id": "agenda:uruguai-x-franca:2026-11-25",
-  "source": "agenda",
-  "home": "URUGUAI",
-  "away": "FRANÇA",
-  "start": "2026-11-25T13:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=heqBu_0wYmM"
- },
- {
-  "id": "agenda:italia-x-coreia-do-sul:2026-11-25",
-  "source": "agenda",
-  "home": "ITÁLIA",
-  "away": "COREIA DO SUL",
-  "start": "2026-11-25T14:40:00+00:00",
-  "url": "https://www.youtube.com/watch?v=Bia_vQfRnl4"
- },
- {
-  "id": "agenda:berrettini-vavassori-x-chung-kwon:2026-11-25",
-  "source": "agenda",
-  "home": "BERRETTINI/VAVASSORI",
-  "away": "CHUNG/KWON",
-  "start": "2026-11-25T14:40:00+00:00",
-  "url": "https://www.youtube.com/watch?v=Bia_vQfRnl4"
- },
- {
-  "id": "Bia_vQfRnl4",
-  "title": "AO VIVO: COPA DAVIS 2026 | BERRETTINI/VAVASSORI X CHUNG/KWON | ITÁLIA X COREIA DO SUL | QUARTAS",
-  "published": "2026-11-19T21:00:28+00:00",
-  "start": "2026-11-25T14:40:04+00:00"
- },
- {
-  "id": "agenda:dinamarca-x-argentina:2026-11-25",
-  "source": "agenda",
-  "home": "DINAMARCA",
-  "away": "ARGENTINA",
-  "start": "2026-11-25T15:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=RwLcizFKewo"
- },
- {
   "id": "agenda:reino-unido-x-alemanha:2026-11-26",
   "source": "agenda",
   "home": "REINO UNIDO",
@@ -450,20 +384,32 @@
   "start": "2026-11-28T18:00:00+00:00"
  },
  {
-  "id": "agenda:real-madrid-x-deportivo-alaves:2026-11-28",
-  "source": "agenda",
-  "home": "REAL MADRID",
-  "away": "DEPORTIVO ALAVÉS",
-  "start": "2026-11-28T19:00:00+00:00",
-  "url": "https://www.youtube.com/watch?v=zqCuqfQB7vg"
- },
- {
   "id": "agenda:psg-x-fc-lorient:2026-11-28",
   "source": "agenda",
   "home": "PSG",
   "away": "FC LORIENT",
   "start": "2026-11-28T19:00:00+00:00",
   "url": "https://www.youtube.com/watch?v=JZdXogFEnQI"
+ },
+ {
+  "id": "JZdXogFEnQI",
+  "title": "AO VIVO: PSG X FC LORIENT | LIGUE 1 26/27 | 12ª RODADA",
+  "published": "2026-11-18T12:00:37+00:00",
+  "start": "2026-11-28T19:00:05+00:00"
+ },
+ {
+  "id": "agenda:real-madrid-x-deportivo-alaves:2026-11-28",
+  "source": "agenda",
+  "home": "REAL MADRID",
+  "away": "DEPORTIVO ALAVÉS",
+  "start": "2026-11-28T19:15:00+00:00",
+  "url": "https://www.youtube.com/watch?v=zqCuqfQB7vg"
+ },
+ {
+  "id": "zqCuqfQB7vg",
+  "title": "AO VIVO: REAL MADRID X DEPORTIVO ALAVÉS | LALIGA 26/27 | 14ª RODADA",
+  "published": "2026-11-18T12:00:52+00:00",
+  "start": "2026-11-28T19:15:27+00:00"
  },
  {
   "id": "agenda:le-havre-x-strasbourg:2026-11-28",
@@ -488,6 +434,36 @@
   "away": "TROYES",
   "start": "2026-11-28T19:30:00+00:00",
   "url": "https://www.youtube.com/watch?v=YJNxzqFaoBY"
+ },
+ {
+  "id": "3QimXz6KVYg",
+  "title": "AO VIVO (SOM AMBIENTE): LE MANS X LILLE | LIGUE 1 26/27 | 12ª RODADA",
+  "published": "2026-11-20T12:00:14+00:00",
+  "start": "2026-11-28T19:30:46+00:00"
+ },
+ {
+  "id": "YJNxzqFaoBY",
+  "title": "AO VIVO (SOM AMBIENTE): NICE X TROYES | LIGUE 1 26/27 | 12ª RODADA",
+  "published": "2026-11-20T12:00:29+00:00",
+  "start": "2026-11-28T19:30:46+00:00"
+ },
+ {
+  "id": "E_Agz71F6Go",
+  "title": "AO VIVO (SOM AMBIENTE): LE HAVRE X STRASBOURG | LIGUE 1 26/27 | 12ª RODADA",
+  "published": "2026-11-20T12:00:47+00:00",
+  "start": "2026-11-28T19:31:05+00:00"
+ },
+ {
+  "id": "u-X5pvYcSFk",
+  "title": "AO VIVO (SOM AMBIENTE): TÊNIS DE MESA | CHINA X BRASIL | COPA DO MUNDO POR EQUIPES MISTAS",
+  "published": "2026-11-28T17:51:16+00:00",
+  "start": "2026-11-29T03:00:00+00:00"
+ },
+ {
+  "id": "Se8ObUoXuGY",
+  "title": "AO VIVO: TÊNIS DE MESA | BRASIL X GRÃ-BRETANHA | COPA DO MUNDO POR EQUIPES MISTAS",
+  "published": "2026-11-28T17:55:35+00:00",
+  "start": "2026-11-29T09:00:00+00:00"
  },
  {
   "id": "agenda:valencia-x-osasuna:2026-11-29",
